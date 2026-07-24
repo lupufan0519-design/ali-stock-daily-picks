@@ -668,226 +668,10 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
   .timestamp { margin-top: 12px; padding-top: 10px; }
   .timestamp strong { font-size: 12px; }
 }
-
-/* Cinematic opening scene: market candles break through a storm front. */
-.cinema-hero {
-  --coverage-angle: 0deg;
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  width: calc(100% + 48px);
-  min-height: clamp(620px, calc(100svh - 64px), 790px);
-  margin-left: -24px;
-  color: #f7fbff;
-  background: #07182a;
-}
-.cinema-hero::before {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  background:
-    linear-gradient(90deg, rgba(3,16,30,.48) 0, rgba(3,16,30,.06) 46%, rgba(3,16,30,.08) 70%, rgba(3,16,30,.34) 100%),
-    linear-gradient(180deg, rgba(1,14,27,.08) 0, transparent 46%, rgba(1,10,20,.5) 100%);
-  pointer-events: none;
-}
-.cinema-hero::after {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 38%;
-  background: linear-gradient(180deg, transparent, rgba(2,10,20,.28));
-  pointer-events: none;
-}
-.cinema-scene {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.cinema-cloud-far { animation: cloud-drift-far 32s ease-in-out infinite alternate; transform-origin: center; }
-.cinema-cloud-near { animation: cloud-drift-near 24s ease-in-out infinite alternate; transform-origin: center; }
-.cloud-textured { filter: url(#cloudRough); }
-@keyframes cloud-drift-far { to { transform: translate3d(18px,-4px,0) scale(1.015); } }
-@keyframes cloud-drift-near { to { transform: translate3d(-22px,6px,0) scale(1.018); } }
-.cinema-trend-glow {
-  fill: none;
-  stroke: rgba(255,255,255,.32);
-  stroke-width: 2;
-  stroke-linejoin: round;
-  filter: url(#candleGlow);
-  stroke-dasharray: 2200;
-  stroke-dashoffset: 2200;
-  animation: trend-reveal 3.4s .2s cubic-bezier(.2,.75,.2,1) forwards;
-}
-@keyframes trend-reveal { to { stroke-dashoffset: 0; } }
-.cinema-candle {
-  opacity: 0;
-  transform: translateY(18px);
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: candle-arrive 440ms cubic-bezier(.2,.8,.2,1) forwards;
-  animation-delay: calc(300ms + var(--candle-index) * 55ms);
-}
-@keyframes candle-arrive { to { opacity: 1; transform: translateY(0); } }
-.cinema-candle line { stroke-width: 2.2; stroke-linecap: round; }
-.cinema-candle.up line, .cinema-candle.up rect { stroke: #ff5a5f; fill: #ff5a5f; }
-.cinema-candle.down line, .cinema-candle.down rect { stroke: #2ec4a6; fill: #2ec4a6; }
-.market-pulse { fill: #fff4d5; filter: url(#pulseGlow); }
-.cinema-inner {
-  position: relative;
-  z-index: 3;
-  width: min(1440px, 100%);
-  min-height: inherit;
-  margin: 0 auto;
-  padding: clamp(64px, 9vh, 100px) clamp(24px, 5vw, 72px);
-}
-.cinema-copy { width: min(620px, 58vw); }
-.cinema-hero .eyebrow {
-  margin-bottom: 18px;
-  color: #c8e8ff;
-  text-shadow: 0 2px 20px rgba(0,0,0,.36);
-}
-.cinema-hero h1 {
-  max-width: 640px;
-  color: #f8fbff;
-  font-family: "FZLanTingHeiS-UL-GB", "STSong", "Songti SC", "Microsoft YaHei", sans-serif;
-  font-size: clamp(58px, 6.4vw, 96px);
-  font-weight: 500;
-  line-height: .98;
-  letter-spacing: -.055em;
-  text-shadow: 0 8px 36px rgba(0,10,22,.42);
-}
-.cinema-hero .opportunity-word { color: #e8f5ff; }
-.cinema-hero .risk-word { color: #fff; }
-.cinema-hero .risk-word::after { height: 2px; bottom: -.06em; background: #ff6569; opacity: .9; }
-.cinema-kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  margin-top: 28px;
-  color: rgba(235,247,255,.78);
-  font-size: 14px;
-  letter-spacing: .08em;
-}
-.cinema-kicker::before { content: ""; width: 32px; height: 1px; background: #ff6569; }
-.cinema-live-card {
-  position: absolute;
-  top: clamp(54px, 8vh, 82px);
-  right: clamp(24px, 5vw, 72px);
-  width: min(330px, 34vw);
-  padding: 17px 18px;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 16px;
-  background: rgba(5,25,43,.42);
-  box-shadow: 0 18px 50px rgba(0,10,22,.18);
-  backdrop-filter: blur(14px);
-}
-.cinema-live-top { display: flex; align-items: center; gap: 10px; }
-.cinema-live-top strong { flex: 1; min-width: 0; font-size: 14px; }
-.cinema-coverage {
-  flex: 0 0 auto;
-  min-width: 54px;
-  padding: 3px 8px;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 999px;
-  color: #d8ecf7;
-  font: 650 11px/1.5 ui-monospace, Consolas, monospace;
-  text-align: center;
-}
-.cinema-live-card .status-dot { margin-top: 0; background: #66e1b2; box-shadow: 0 0 0 4px rgba(102,225,178,.13); }
-.cinema-live-card .status-dot.stale { background: #f2c572; box-shadow: 0 0 0 4px rgba(242,197,114,.13); }
-.cinema-live-card .status-dot.error { background: #ff8a80; box-shadow: 0 0 0 4px rgba(255,138,128,.13); }
-.cinema-live-card .status-detail { margin-top: 7px; color: rgba(220,238,248,.7); font-size: 12px; }
-.cinema-time { margin-top: 10px; color: rgba(188,216,231,.64); font-size: 11px; }
-.cinema-time strong { margin-left: 8px; color: #f2f8fb; font: 650 12px/1.4 ui-monospace, Consolas, monospace; }
-.cinema-risk-note {
-  position: absolute;
-  right: clamp(24px, 7vw, 100px);
-  bottom: clamp(58px, 8vh, 82px);
-  width: min(430px, 40vw);
-  margin: 0;
-  color: rgba(243,249,252,.92);
-  font-size: clamp(15px, 1.35vw, 19px);
-  line-height: 1.7;
-  text-align: right;
-  text-shadow: 0 3px 18px rgba(0,0,0,.8);
-}
-.cinema-risk-note strong { display: block; color: #fff; font-weight: 650; }
-.cinema-scroll {
-  position: absolute;
-  bottom: clamp(48px, 7vh, 70px);
-  left: clamp(24px, 5vw, 72px);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: rgba(223,239,248,.62);
-  font-size: 11px;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-}
-.cinema-scroll i { position: relative; width: 42px; height: 1px; overflow: hidden; background: rgba(255,255,255,.22); }
-.cinema-scroll i::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: #fff;
-  transform: translateX(-100%);
-  animation: scroll-line 1.2s .8s ease-out 1 forwards;
-}
-@keyframes scroll-line { to { transform: translateX(100%); } }
-.cinema-hero + .live-rail { margin-top: 20px; }
-@media (max-width: 900px) {
-  .cinema-copy { width: min(560px, 64vw); }
-  .cinema-live-card { top: 310px; width: min(300px, 38vw); }
-  .cinema-risk-note { width: 48vw; }
-}
-@media (max-width: 760px) {
-  .cinema-hero { min-height: 690px; }
-  .cinema-hero { width: calc(100% + 32px); margin-left: -16px; }
-  .cinema-inner { padding: 48px 20px; }
-  .cinema-copy { width: 100%; }
-  .cinema-hero h1 { width: 100%; max-width: 390px; font-size: clamp(50px, 14vw, 64px); line-height: 1.02; }
-  .cinema-kicker { margin-top: 18px; font-size: 12px; }
-  .cinema-live-card {
-    top: 265px;
-    right: 16px;
-    left: 16px;
-    width: auto;
-    padding: 14px 15px;
-    background: rgba(5,25,43,.48);
-  }
-  .cinema-risk-note {
-    right: 20px;
-    bottom: 54px;
-    width: min(310px, 84vw);
-    font-size: 14px;
-  }
-  .cinema-scroll { display: none; }
-  .cinema-scene { width: 150%; max-width: none; transform: translateX(-23%); }
-  .cloud-textured { filter: none; }
-  .cinema-hero + .live-rail { margin-top: 14px; }
-}
-@media (max-width: 430px) {
-  .cinema-hero { min-height: 660px; }
-  .cinema-hero .eyebrow { font-size: 11px; }
-  .cinema-hero h1 { font-size: clamp(46px, 13.8vw, 58px); }
-  .cinema-live-card { top: 250px; }
-  .cinema-risk-note { bottom: 42px; }
-}
 @media (prefers-reduced-motion: reduce) {
   .risk-orbit::after { animation: none; }
   html.js .reveal, html.js .reveal.is-visible { opacity: 1; transform: none; }
   .quote-updated { animation: none; }
-  .cinema-cloud-far, .cinema-cloud-near, .cinema-trend-glow,
-  .cinema-candle, .cinema-scroll i::after { animation: none; }
-  .cinema-trend-glow { stroke-dashoffset: 0; }
-  .cinema-candle { opacity: 1; transform: none; }
-  .market-pulse { display: none; }
 }
 """
 
@@ -946,7 +730,7 @@ LIVE_SCRIPT = r"""
   const quoteTime = document.querySelector("#quote-time");
   const dot = document.querySelector("#status-dot");
   const lensValue = document.querySelector("#lens-value");
-  const riskStage = document.querySelector(".risk-stage, .cinema-hero");
+  const riskStage = document.querySelector(".risk-stage");
   const ticker = document.querySelector("#ticker-track");
   const formatPct = (value) => `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
   const setTone = (element, value) => {
@@ -1155,44 +939,6 @@ def _metric(label: str, value: str) -> str:
     )
 
 
-def _hero_candles_svg() -> str:
-    closes = [
-        550, 558, 568, 577, 590, 604, 618, 634, 648, 662, 650, 636,
-        616, 588, 556, 522, 490, 456, 420, 386, 352, 318, 286, 252,
-        220, 190, 160, 132, 106, 82, 62, 46,
-    ]
-    rising = [
-        False, True, False, False, True, False, False, True,
-        False, False, True, True, True, True, False, True,
-        True, True, False, True, True, True, False, True,
-        True, True, True, False, True, True, True, True,
-    ]
-    parts = []
-    points = []
-    for index, (close_y, is_up) in enumerate(zip(closes, rising)):
-        x = 96 + index * 46
-        open_y = close_y + (18 if is_up else -14)
-        high_y = min(open_y, close_y) - (9 + index % 5)
-        low_y = max(open_y, close_y) + (10 + (index * 3) % 6)
-        y = min(open_y, close_y)
-        height = max(5, abs(open_y - close_y))
-        tone = "up" if is_up else "down"
-        parts.append(
-            f'<g class="cinema-candle {tone}" style="--candle-index:{index}">'
-            f'<line x1="{x}" y1="{high_y}" x2="{x}" y2="{low_y}"/>'
-            f'<rect x="{x - 5}" y="{y}" width="10" height="{height}" rx="1.5"/>'
-            "</g>"
-        )
-        points.append(f"{x},{close_y}")
-    return (
-        f'<polyline class="cinema-trend-glow" points="{" ".join(points)}"/>'
-        f'{"".join(parts)}'
-        '<circle class="market-pulse" r="8">'
-        '<animateMotion dur="8s" repeatCount="indefinite" '
-        f'path="M {" L ".join(points)}"/></circle>'
-    )
-
-
 def render_report(
     evaluations: Sequence,
     cfg: dict,
@@ -1285,95 +1031,25 @@ def render_report(
   </header>
 
   <main id="content">
-    <section class="cinema-hero reveal">
-      <svg class="cinema-scene" viewBox="0 0 1600 820" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <defs>
-          <linearGradient id="skyField" x1="0" y1="1" x2=".82" y2="0">
-            <stop offset="0" stop-color="#081a2c"/><stop offset=".42" stop-color="#16507b"/>
-            <stop offset=".76" stop-color="#278fc9"/><stop offset="1" stop-color="#8ed8f4"/>
-          </linearGradient>
-          <radialGradient id="skyGlow"><stop offset="0" stop-color="#fff" stop-opacity=".82"/><stop offset=".35" stop-color="#dff5ff" stop-opacity=".34"/><stop offset="1" stop-color="#b5e6ff" stop-opacity="0"/></radialGradient>
-          <linearGradient id="cloudFace" x1=".45" y1="0" x2=".5" y2="1">
-            <stop offset="0" stop-color="#f4fbff"/><stop offset=".43" stop-color="#c6d8e3"/><stop offset="1" stop-color="#62788b"/>
-          </linearGradient>
-          <linearGradient id="stormFace" x1=".5" y1="0" x2=".5" y2="1">
-            <stop offset="0" stop-color="#41586c"/><stop offset=".34" stop-color="#1d3448"/><stop offset="1" stop-color="#071523"/>
-          </linearGradient>
-          <linearGradient id="cloudEdge" x1="0" y1=".2" x2="1" y2=".8">
-            <stop offset="0" stop-color="#e9f5fa"/><stop offset=".55" stop-color="#849bac"/><stop offset="1" stop-color="#2a4155"/>
-          </linearGradient>
-          <filter id="softCloud" x="-20%" y="-30%" width="140%" height="170%">
-            <feGaussianBlur stdDeviation="4"/>
-          </filter>
-          <filter id="cloudRough" x="-15%" y="-20%" width="130%" height="145%">
-            <feTurbulence type="fractalNoise" baseFrequency=".007 .018" numOctaves="3" seed="11" result="noise"/>
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="20" xChannelSelector="R" yChannelSelector="B"/>
-            <feGaussianBlur stdDeviation=".8"/>
-          </filter>
-          <filter id="candleGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="6" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-          <filter id="pulseGlow" x="-400%" y="-400%" width="800%" height="800%">
-            <feGaussianBlur stdDeviation="10" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-          <pattern id="cityLights" width="38" height="22" patternUnits="userSpaceOnUse">
-            <circle cx="7" cy="8" r="1.2" fill="#82c8e9" opacity=".75"/><circle cx="28" cy="16" r=".8" fill="#ffd99b" opacity=".58"/>
-          </pattern>
-        </defs>
-        <rect width="1600" height="820" fill="url(#skyField)"/>
-        <ellipse cx="1250" cy="72" rx="420" ry="260" fill="url(#skyGlow)"/>
-        <g class="cinema-cloud-far">
-          <path d="M0 186C154 117 307 170 424 208c128 42 226-60 359-18 124 39 219 25 332-19 154-61 337-32 485 37v166H0Z" fill="#e5f5fc" opacity=".19" filter="url(#softCloud)"/>
-          <g class="cloud-textured" fill="#eff9fd" opacity=".72">
-            <ellipse cx="132" cy="298" rx="155" ry="74"/><ellipse cx="278" cy="276" rx="126" ry="98"/>
-            <ellipse cx="424" cy="312" rx="190" ry="78"/><ellipse cx="594" cy="277" rx="132" ry="100"/>
-            <ellipse cx="742" cy="302" rx="186" ry="83"/><ellipse cx="917" cy="274" rx="145" ry="110"/>
-            <ellipse cx="1084" cy="308" rx="204" ry="86"/><ellipse cx="1270" cy="272" rx="150" ry="106"/>
-            <ellipse cx="1454" cy="304" rx="205" ry="94"/>
-          </g>
-          <path d="M0 333c191-85 295 1 464-22 150-20 244-93 403-28 151 61 285-35 425-16 114 16 215 48 308 82v160H0Z" fill="url(#cloudFace)"/>
-          <g class="cloud-textured" fill="url(#cloudEdge)" opacity=".92">
-            <ellipse cx="68" cy="394" rx="151" ry="77"/><ellipse cx="229" cy="364" rx="128" ry="93"/>
-            <ellipse cx="388" cy="397" rx="174" ry="82"/><ellipse cx="558" cy="359" rx="144" ry="111"/>
-            <ellipse cx="744" cy="397" rx="185" ry="92"/><ellipse cx="925" cy="353" rx="150" ry="116"/>
-            <ellipse cx="1116" cy="397" rx="195" ry="91"/><ellipse cx="1302" cy="356" rx="154" ry="113"/>
-            <ellipse cx="1510" cy="394" rx="196" ry="96"/>
-          </g>
-        </g>
-        <g class="cinema-cloud-near">
-          <path d="M0 450c119-49 251-72 372-20 94 40 174 36 272-13 126-63 245 2 347 22 122 23 233-51 361-21 100 23 176 60 248 82v320H0Z" fill="url(#stormFace)"/>
-          <g class="cloud-textured" fill="#1c3347" opacity=".95">
-            <ellipse cx="87" cy="492" rx="181" ry="96"/><ellipse cx="270" cy="478" rx="147" ry="112"/>
-            <ellipse cx="447" cy="512" rx="193" ry="100"/><ellipse cx="632" cy="474" rx="156" ry="118"/>
-            <ellipse cx="830" cy="516" rx="202" ry="102"/><ellipse cx="1025" cy="474" rx="162" ry="120"/>
-            <ellipse cx="1236" cy="510" rx="209" ry="104"/><ellipse cx="1453" cy="476" rx="182" ry="118"/>
-          </g>
-          <path d="M0 560c182-38 302 48 458 16 152-30 229-75 378-33 163 45 270-22 409-22 128 1 244 54 355 83v216H0Z" fill="#06131f" opacity=".88"/>
-        </g>
-        <g opacity=".72">
-          <path d="M0 742h90v-34h46v34h58v-61h44v61h82v-27h36v27h66v-83h55v83h73v-48h43v48h90v-97h60v97h68v-40h45v40h93v-65h56v65h72v-35h42v35h76v-90h54v90h82v-53h44v53h92v78H0Z" fill="#020a12"/>
-          <rect y="650" width="1600" height="170" fill="url(#cityLights)" opacity=".5"/>
-        </g>
-        <g>{_hero_candles_svg()}</g>
-      </svg>
-      <div class="cinema-inner">
-        <div class="cinema-copy">
-          <p class="eyebrow">A-share risk & opportunity</p>
-          <h1>有人找<span class="opportunity-word">机会</span>，<br>有人专挑<span class="risk-word">风险</span></h1>
-          <p class="cinema-kicker">先过规则，再谈机会</p>
-        </div>
-        <aside class="cinema-live-card" aria-live="polite">
-          <div class="cinema-live-top">
-            <span class="status-dot" id="status-dot" aria-hidden="true"></span>
-            <strong id="market-status">收盘数据已验证</strong>
-            <span class="cinema-coverage" id="lens-value">等待行情</span>
-          </div>
-          <div class="status-detail" id="market-detail">交易日 {trade_date} · 云端行情自动刷新</div>
-          <div class="cinema-time">最新行情<strong id="quote-time">{generated}</strong></div>
-        </aside>
-        <p class="cinema-risk-note"><strong>机会可以等，风险必须先看。</strong>主选与次选只在收盘后确认，盘中变化不替你提前做决定。</p>
-        <div class="cinema-scroll" aria-hidden="true"><i></i>Scroll to signals</div>
+    <section class="hero reveal">
+      <div class="hero-copy-block">
+        <p class="eyebrow">A-share signal dashboard</p>
+        <h1>有人找<span class="opportunity-word">机会</span>，<br>有人专挑<span class="risk-word">风险</span></h1>
+        <p class="hero-copy">主选、次选严格按收盘规则更新；盘中仅刷新价格、涨跌幅与跟踪收益，不改变策略信号。</p>
       </div>
+      <aside class="risk-stage" aria-live="polite">
+        <div class="risk-orbit" aria-hidden="true">
+          <div class="risk-lens"><div><span>盘中覆盖</span><strong id="lens-value">等待行情</strong></div></div>
+        </div>
+        <div class="risk-meta">
+          <div class="status-line">
+            <span class="status-dot" id="status-dot" aria-hidden="true"></span>
+            <div><div class="status-title" id="market-status">收盘数据已验证</div>
+            <div class="status-detail" id="market-detail">交易日 {trade_date} · 云端行情自动刷新</div></div>
+          </div>
+          <div class="timestamp">最新行情时间<strong id="quote-time">{generated}</strong></div>
+        </div>
+      </aside>
     </section>
 
     <section class="live-rail reveal" aria-label="盘中行情">
