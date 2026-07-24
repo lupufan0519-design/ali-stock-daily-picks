@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import base64
 import html
 from datetime import datetime
+from pathlib import Path
 from typing import Sequence
 
 from strategy_tracker import POOL_NAME, secondary_strategy_stats, strategy_stats
+
+
+ASSET_DIR = Path(__file__).resolve().parent / "assets"
 
 
 STYLES = r"""
@@ -668,10 +673,346 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
   .timestamp { margin-top: 12px; padding-top: 10px; }
   .timestamp strong { font-size: 12px; }
 }
+
+/* Photorealistic 3D cover: image-led, with lightweight GPU motion only. */
+.cover-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  width: calc(100% + 48px);
+  min-height: clamp(620px, calc(100svh - 64px), 780px);
+  margin-left: -24px;
+  color: #f7fbff;
+  background: #061421;
+}
+.cover-stage {
+  position: absolute;
+  z-index: 0;
+  inset: -3%;
+  transform: translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0);
+  transition: transform 380ms cubic-bezier(.2,.8,.2,1);
+  pointer-events: none;
+  will-change: transform;
+}
+.cover-visual {
+  position: absolute;
+  inset: 0;
+  background-image: var(--cover-desktop);
+  background-position: center;
+  background-size: cover;
+  animation: cover-camera 18s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes cover-camera {
+  from { transform: scale(1.03) translate3d(-.35%, 0, 0); }
+  to { transform: scale(1.085) translate3d(.65%, -.7%, 0); }
+}
+.cover-hero::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(2,12,24,.68) 0, rgba(2,12,24,.34) 37%, rgba(2,12,24,.03) 67%, rgba(2,12,24,.18) 100%),
+    linear-gradient(180deg, rgba(2,10,20,.06) 0, rgba(2,10,20,.02) 50%, rgba(2,10,20,.58) 100%);
+  pointer-events: none;
+}
+.cover-glow {
+  position: absolute;
+  z-index: 1;
+  top: -18%;
+  right: -8%;
+  width: 58%;
+  height: 90%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(186,231,255,.18), transparent 62%);
+  mix-blend-mode: screen;
+  animation: cover-glow-breathe 7s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes cover-glow-breathe {
+  from { opacity: .42; transform: translate3d(0, 1.5%, 0) scale(.94); }
+  to { opacity: .9; transform: translate3d(-2%, -1%, 0) scale(1.08); }
+}
+.kline-camera {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  overflow: hidden;
+  perspective: 1000px;
+  pointer-events: none;
+}
+.kline-world {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  animation: kline-camera-climb 7s cubic-bezier(.22,.72,.2,1) infinite;
+  will-change: transform;
+}
+@keyframes kline-camera-climb {
+  0% { transform: translate3d(0, 6%, -120px) scale(.86); }
+  12% { transform: translate3d(0, 5%, -90px) scale(.89); }
+  62% { transform: translate3d(-1.5%, -1.5%, 0) scale(1.02); }
+  84% { transform: translate3d(-2.5%, -3.5%, 40px) scale(1.08); }
+  100% { transform: translate3d(-2.5%, -3.5%, 40px) scale(1.08); }
+}
+.kline-reveal {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  clip-path: inset(100% 0 0 0);
+  animation: kline-breakthrough 7s cubic-bezier(.2,.74,.18,1) infinite;
+}
+@keyframes kline-breakthrough {
+  0%, 5% { opacity: 0; clip-path: inset(100% 0 0 0); }
+  10% { opacity: 1; }
+  62% { opacity: 1; clip-path: inset(0 0 0 0); }
+  86% { opacity: 1; clip-path: inset(0 0 0 0); }
+  100% { opacity: 0; clip-path: inset(0 0 0 0); }
+}
+.cover-candle {
+  --red-front: #f22f3e;
+  --red-side: #9b101b;
+  --red-top: #ff8890;
+  --green-front: #18a978;
+  --green-side: #075c42;
+  --green-top: #6ce0b5;
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: clamp(10px, 1.05vw, 17px);
+  height: calc(var(--h) + 28px);
+  transform: translate(-50%, -50%) rotate(-3deg) translateZ(calc(var(--i) * 2px));
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 0 8px rgba(242,47,62,.34));
+}
+.cover-candle.down { filter: drop-shadow(0 0 7px rgba(24,169,120,.28)); }
+.cover-wick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--red-front);
+  transform: translateX(-50%) translateZ(-2px);
+}
+.cover-body {
+  position: absolute;
+  top: 13px;
+  right: 0;
+  left: 0;
+  height: var(--h);
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--red-side), var(--red-front) 28%, #ff5360 76%, var(--red-side));
+  box-shadow: inset 1px 0 rgba(255,255,255,.48), inset -2px 0 rgba(70,0,8,.38), 0 8px 18px rgba(242,47,62,.3);
+  transform-style: preserve-3d;
+}
+.cover-body::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  right: 3px;
+  left: 0;
+  height: 6px;
+  border-radius: 2px 2px 0 0;
+  background: var(--red-top);
+  transform: skewX(-38deg);
+  transform-origin: bottom;
+}
+.cover-body::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  right: -5px;
+  width: 6px;
+  height: calc(100% + 2px);
+  border-radius: 0 2px 2px 0;
+  background: var(--red-side);
+  transform: skewY(-28deg);
+  transform-origin: left;
+}
+.cover-candle.down .cover-wick { background: var(--green-front); }
+.cover-candle.down .cover-body {
+  background: linear-gradient(90deg, var(--green-side), var(--green-front) 28%, #38c895 76%, var(--green-side));
+  box-shadow: inset 1px 0 rgba(255,255,255,.4), inset -2px 0 rgba(0,54,37,.4), 0 8px 16px rgba(24,169,120,.25);
+}
+.cover-candle.down .cover-body::before { background: var(--green-top); }
+.cover-candle.down .cover-body::after { background: var(--green-side); }
+.cover-cloud-veil {
+  position: absolute;
+  z-index: 3;
+  top: 36%;
+  right: -8%;
+  left: 14%;
+  height: 34%;
+  background:
+    radial-gradient(ellipse at 66% 45%, rgba(239,249,255,.74), rgba(177,204,220,.36) 32%, transparent 66%),
+    radial-gradient(ellipse at 40% 60%, rgba(38,60,78,.72), transparent 68%);
+  filter: blur(13px);
+  mix-blend-mode: screen;
+  opacity: .62;
+  animation: cloud-veil-part 7s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes cloud-veil-part {
+  0%, 30% { opacity: .72; transform: translate3d(2%, 2%, 0) scale(1.04); }
+  62% { opacity: .46; transform: translate3d(-1%, -1%, 0) scale(.98); }
+  86% { opacity: .28; transform: translate3d(-2%, -2%, 0) scale(.94); }
+  100% { opacity: .72; transform: translate3d(2%, 2%, 0) scale(1.04); }
+}
+.cover-inner {
+  position: relative;
+  z-index: 4;
+  width: min(1440px, 100%);
+  min-height: inherit;
+  margin: 0 auto;
+  padding: clamp(68px, 10vh, 106px) clamp(28px, 6vw, 86px);
+}
+.cover-copy { width: min(610px, 54vw); }
+.cover-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 0 0 20px;
+  color: rgba(224,243,255,.82);
+  font-size: 12px;
+  font-weight: 680;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 16px rgba(0,0,0,.5);
+}
+.cover-eyebrow::before { content: ""; width: 34px; height: 1px; background: #ff666b; }
+.cover-hero h1 {
+  max-width: 640px;
+  color: #fff;
+  font-family: "STSong", "Songti SC", "FZLanTingHeiS-UL-GB", "Microsoft YaHei", sans-serif;
+  font-size: clamp(62px, 6.8vw, 102px);
+  font-weight: 400;
+  line-height: .98;
+  letter-spacing: -.055em;
+  text-shadow: 0 8px 38px rgba(0,5,14,.62);
+}
+.cover-hero .opportunity-word, .cover-hero .risk-word { color: inherit; }
+.cover-hero .risk-word::after { height: 2px; bottom: -.04em; background: #ff5a5f; opacity: .95; }
+.cover-subline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 28px 0 0;
+  color: rgba(235,247,253,.78);
+  font-size: 14px;
+  letter-spacing: .06em;
+}
+.cover-subline::before { content: ""; width: 28px; height: 1px; background: rgba(255,255,255,.48); }
+.cover-live {
+  position: absolute;
+  top: clamp(52px, 7vh, 76px);
+  right: clamp(28px, 5vw, 72px);
+  width: min(330px, 34vw);
+  padding: 16px 17px;
+  border: 1px solid rgba(255,255,255,.17);
+  border-radius: 16px;
+  background: rgba(4,22,38,.42);
+  box-shadow: 0 18px 52px rgba(0,8,18,.22);
+  backdrop-filter: blur(14px);
+}
+.cover-live-top { display: flex; align-items: center; gap: 10px; }
+.cover-live-top strong { flex: 1; min-width: 0; font-size: 14px; }
+.cover-count {
+  min-width: 53px;
+  padding: 3px 8px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 999px;
+  color: #e1f2fa;
+  font: 650 11px/1.5 ui-monospace, Consolas, monospace;
+  text-align: center;
+}
+.cover-live .status-dot { margin-top: 0; background: #67dfaf; box-shadow: 0 0 0 4px rgba(103,223,175,.14); }
+.cover-live .status-dot.stale { background: #f2c572; box-shadow: 0 0 0 4px rgba(242,197,114,.14); }
+.cover-live .status-dot.error { background: #ff8a80; box-shadow: 0 0 0 4px rgba(255,138,128,.14); }
+.cover-live .status-detail { margin-top: 7px; color: rgba(220,239,248,.7); font-size: 12px; }
+.cover-time { margin-top: 10px; color: rgba(189,218,232,.64); font-size: 11px; }
+.cover-time strong { margin-left: 8px; color: #f3f9fc; font: 650 12px/1.4 ui-monospace, Consolas, monospace; }
+.cover-note {
+  position: absolute;
+  right: clamp(30px, 7vw, 100px);
+  bottom: clamp(52px, 8vh, 82px);
+  width: min(460px, 42vw);
+  margin: 0;
+  color: rgba(244,250,253,.94);
+  font-size: clamp(15px, 1.35vw, 19px);
+  line-height: 1.75;
+  text-align: right;
+  text-shadow: 0 3px 18px rgba(0,0,0,.82);
+}
+.cover-note strong { display: block; color: #fff; font-size: 1.08em; }
+.cover-hero + .live-rail { margin-top: 20px; }
+@media (max-width: 900px) {
+  .cover-copy { width: 62vw; }
+  .cover-live { top: 310px; width: min(300px, 38vw); }
+  .cover-note { width: 48vw; }
+  .kline-camera { transform: translateX(8%); }
+}
+@media (max-width: 760px) {
+  .cover-hero { width: calc(100% + 32px); min-height: 680px; margin-left: -16px; }
+  .cover-stage { inset: -2%; }
+  .cover-visual {
+    background-image: var(--cover-mobile);
+    background-position: center;
+    animation-duration: 24s;
+  }
+  .cover-hero::before {
+    background:
+      linear-gradient(180deg, rgba(2,12,24,.38) 0, rgba(2,12,24,.1) 42%, rgba(2,10,20,.65) 100%),
+      linear-gradient(90deg, rgba(2,12,24,.44), rgba(2,12,24,.05) 72%);
+  }
+  .cover-inner { padding: 46px 20px; }
+  .cover-copy { position: relative; isolation: isolate; width: 100%; }
+  .cover-copy::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -22px;
+    right: 12%;
+    bottom: -18px;
+    left: -28px;
+    background: radial-gradient(ellipse at 30% 46%, rgba(3,17,30,.86), rgba(3,17,30,.5) 54%, transparent 76%);
+    filter: blur(12px);
+    pointer-events: none;
+  }
+  .cover-hero h1 { width: 100%; max-width: 390px; font-size: clamp(50px, 14vw, 64px); line-height: 1.02; }
+  .cover-subline { margin-top: 17px; font-size: 12px; }
+  .cover-live {
+    top: 265px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+    padding: 14px 15px;
+  }
+  .cover-note { right: 20px; bottom: 42px; width: min(315px, 84vw); font-size: 14px; }
+  .cover-glow { width: 90%; height: 70%; }
+  .kline-camera { transform: translateX(28%); }
+  .kline-world { animation-duration: 8s; }
+  .kline-reveal, .cover-cloud-veil { animation-duration: 8s; }
+  .cover-candle { width: clamp(9px, 2.8vw, 13px); }
+  .cover-cloud-veil { left: 0; right: -20%; filter: blur(10px); }
+  .cover-hero + .live-rail { margin-top: 14px; }
+}
+@media (max-width: 430px) {
+  .cover-hero { min-height: 660px; }
+  .cover-eyebrow { font-size: 10px; }
+  .cover-hero h1 { font-size: clamp(47px, 14vw, 58px); }
+  .cover-live { top: 250px; }
+  .cover-note { bottom: 36px; }
+}
 @media (prefers-reduced-motion: reduce) {
   .risk-orbit::after { animation: none; }
   html.js .reveal, html.js .reveal.is-visible { opacity: 1; transform: none; }
   .quote-updated { animation: none; }
+  .cover-stage { transform: none; transition: none; }
+  .cover-visual, .cover-glow, .kline-world, .kline-reveal, .cover-cloud-veil { animation: none; }
+  .kline-reveal { opacity: 1; clip-path: inset(0); }
 }
 """
 
@@ -725,12 +1066,33 @@ LIVE_SCRIPT = r"""
     reveals.forEach((item) => observer.observe(item));
   }
 
+  const coverHero = document.querySelector(".cover-hero");
+  const coverStage = document.querySelector(".cover-stage");
+  if (coverHero && coverStage && !reduceMotion && window.matchMedia("(pointer: fine)").matches) {
+    let coverFrame = 0;
+    coverHero.addEventListener("pointermove", (event) => {
+      if (coverFrame) return;
+      coverFrame = window.requestAnimationFrame(() => {
+        const rect = coverHero.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width - .5) * -12;
+        const y = ((event.clientY - rect.top) / rect.height - .5) * -8;
+        coverStage.style.setProperty("--parallax-x", `${x}px`);
+        coverStage.style.setProperty("--parallax-y", `${y}px`);
+        coverFrame = 0;
+      });
+    }, { passive: true });
+    coverHero.addEventListener("pointerleave", () => {
+      coverStage.style.setProperty("--parallax-x", "0px");
+      coverStage.style.setProperty("--parallax-y", "0px");
+    }, { passive: true });
+  }
+
   const status = document.querySelector("#market-status");
   const detail = document.querySelector("#market-detail");
   const quoteTime = document.querySelector("#quote-time");
   const dot = document.querySelector("#status-dot");
   const lensValue = document.querySelector("#lens-value");
-  const riskStage = document.querySelector(".risk-stage");
+  const riskStage = document.querySelector(".risk-stage, .cover-hero");
   const ticker = document.querySelector("#ticker-track");
   const formatPct = (value) => `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
   const setTone = (element, value) => {
@@ -817,6 +1179,27 @@ LIVE_SCRIPT = r"""
   window.setInterval(refreshLive, 60_000);
 })();
 """
+
+
+def _asset_data_uri(filename: str, mime: str = "image/webp") -> str:
+    payload = (ASSET_DIR / filename).read_bytes()
+    return f"data:{mime};base64,{base64.b64encode(payload).decode('ascii')}"
+
+
+def _cover_candles() -> str:
+    y_positions = [84, 81, 78, 74, 70, 66, 62, 58, 54, 50, 46, 42, 38, 34, 30, 27, 23, 20, 17, 14, 11, 8, 5]
+    green_indices = {2, 6, 10, 15, 19}
+    heights = [30, 44, 25, 52, 38, 48, 28, 56, 42, 50, 27, 58, 40, 55, 46, 26, 61, 45, 54, 28, 62, 49, 66]
+    candles = []
+    for index, (y, height) in enumerate(zip(y_positions, heights)):
+        x = 32 + index * 2.65
+        tone = "down" if index in green_indices else "up"
+        candles.append(
+            f'<span class="cover-candle {tone}" style="--x:{x:.2f}%;--y:{y}%;'
+            f'--h:{height}px;--i:{index}">'
+            '<i class="cover-wick"></i><b class="cover-body"></b></span>'
+        )
+    return "".join(candles)
 
 
 def _esc(value: object) -> str:
@@ -977,6 +1360,8 @@ def render_report(
     )[:30]
     trade_date = max((item.date for item in evaluations), default="无数据")
     generated = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M")
+    cover_desktop = _asset_data_uri("hero-cloud-market-v3-clean.webp")
+    cover_mobile = _asset_data_uri("hero-cloud-market-v3-clean-mobile.webp")
     main_stats = strategy_stats(strategy_state)
     secondary_stats = secondary_strategy_stats(strategy_state)
     active_rows = "".join(_position_row(item) for item in strategy_state["active"])
@@ -1031,25 +1416,30 @@ def render_report(
   </header>
 
   <main id="content">
-    <section class="hero reveal">
-      <div class="hero-copy-block">
-        <p class="eyebrow">A-share signal dashboard</p>
-        <h1>有人找<span class="opportunity-word">机会</span>，<br>有人专挑<span class="risk-word">风险</span></h1>
-        <p class="hero-copy">主选、次选严格按收盘规则更新；盘中仅刷新价格、涨跌幅与跟踪收益，不改变策略信号。</p>
+    <section class="cover-hero reveal" style="--cover-desktop:url('{cover_desktop}');--cover-mobile:url('{cover_mobile}')">
+      <div class="cover-stage" aria-hidden="true"><div class="cover-visual"></div></div>
+      <div class="cover-glow" aria-hidden="true"></div>
+      <div class="kline-camera" aria-hidden="true">
+        <div class="kline-world"><div class="kline-reveal">{_cover_candles()}</div></div>
       </div>
-      <aside class="risk-stage" aria-live="polite">
-        <div class="risk-orbit" aria-hidden="true">
-          <div class="risk-lens"><div><span>盘中覆盖</span><strong id="lens-value">等待行情</strong></div></div>
+      <div class="cover-cloud-veil" aria-hidden="true"></div>
+      <div class="cover-inner">
+        <div class="cover-copy">
+          <p class="cover-eyebrow">A-share risk & opportunity</p>
+          <h1>有人找<span class="opportunity-word">机会</span>，<br>有人专挑<span class="risk-word">风险</span></h1>
+          <p class="cover-subline">上涨为红，下跌为绿 · 先过规则，再谈机会</p>
         </div>
-        <div class="risk-meta">
-          <div class="status-line">
+        <aside class="cover-live" aria-live="polite">
+          <div class="cover-live-top">
             <span class="status-dot" id="status-dot" aria-hidden="true"></span>
-            <div><div class="status-title" id="market-status">收盘数据已验证</div>
-            <div class="status-detail" id="market-detail">交易日 {trade_date} · 云端行情自动刷新</div></div>
+            <strong id="market-status">收盘数据已验证</strong>
+            <span class="cover-count" id="lens-value">等待行情</span>
           </div>
-          <div class="timestamp">最新行情时间<strong id="quote-time">{generated}</strong></div>
-        </div>
-      </aside>
+          <div class="status-detail" id="market-detail">交易日 {trade_date} · 云端行情自动刷新</div>
+          <div class="cover-time">最新行情<strong id="quote-time">{generated}</strong></div>
+        </aside>
+        <p class="cover-note"><strong>机会可以等，风险必须先看。</strong>主选与次选只在收盘后确认，盘中变化不替你提前做决定。</p>
+      </div>
     </section>
 
     <section class="live-rail reveal" aria-label="盘中行情">
