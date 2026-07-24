@@ -688,10 +688,18 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
 .cover-stage {
   position: absolute;
   z-index: 0;
-  inset: -8%;
+  inset: -4%;
   overflow: hidden;
   background: #061421 var(--cover-desktop) center / cover no-repeat;
   pointer-events: none;
+}
+.cover-cinema {
+  position: absolute;
+  inset: 0;
+  background: var(--cover-desktop) center / cover no-repeat;
+  transform-origin: 72% 28%;
+  animation: cover-cinema-flight 4.466s cubic-bezier(.18,.66,.18,1) infinite;
+  will-change: transform;
 }
 .cover-video {
   position: absolute;
@@ -699,17 +707,22 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 65%;
-  transform: scale(1.06);
-  filter: saturate(1.08) contrast(1.04);
+  object-position: center;
   background: #061421;
 }
-.cover-video-mask {
+@keyframes cover-cinema-flight {
+  0% { transform: scale(1.02) translate3d(0, 0, 0); }
+  18% { transform: scale(1.1) translate3d(-1%, 1%, 0); }
+  46% { transform: scale(1.26) translate3d(-3%, 3.5%, 0); }
+  72% { transform: scale(1.42) translate3d(-5%, 6%, 0); }
+  92%, 100% { transform: scale(1.58) translate3d(-7%, 8%, 0); }
+}
+.cover-cinema-mask {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, #020c18 0, #020c18 14%, rgba(2,12,24,.92) 23%, rgba(2,12,24,.22) 38%, transparent 56%, rgba(2,12,24,.5) 72%, #020c18 85%, #020c18 100%),
-    linear-gradient(90deg, #020c18 0, #020c18 36%, rgba(2,12,24,.96) 44%, rgba(2,12,24,.48) 58%, rgba(2,12,24,.08) 72%);
+    linear-gradient(180deg, rgba(2,10,20,.38) 0, rgba(2,10,20,.06) 30%, transparent 62%, rgba(2,10,20,.58) 100%),
+    linear-gradient(90deg, rgba(2,12,24,.9) 0, rgba(2,12,24,.7) 30%, rgba(2,12,24,.25) 50%, rgba(2,12,24,.03) 72%);
 }
 .cover-hero::before {
   content: "";
@@ -900,7 +913,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
   text-shadow: 0 8px 38px rgba(0,5,14,.62);
 }
 .cover-hero .opportunity-word, .cover-hero .risk-word { color: inherit; }
-.cover-hero .risk-word::after { height: 2px; bottom: -.04em; background: #ff5a5f; opacity: .95; }
+.cover-hero .risk-word::after { display: none; }
 .cover-subline {
   display: flex;
   align-items: center;
@@ -961,12 +974,25 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
 }
 @media (max-width: 760px) {
   .cover-hero { width: calc(100% + 32px); min-height: 680px; margin-left: -16px; }
-  .cover-stage { inset: -6%; background-image: var(--cover-mobile); }
-  .cover-video { object-position: 58% 62%; transform: scale(1.16); }
-  .cover-video-mask {
+  .cover-stage { inset: -4%; background-image: var(--cover-mobile); }
+  .cover-cinema {
+    background-image: var(--cover-mobile);
+    transform-origin: 76% 30%;
+    animation-name: cover-cinema-flight-mobile;
+    animation-duration: 5.2s;
+  }
+  .cover-video { object-position: 66% center; }
+  @keyframes cover-cinema-flight-mobile {
+    0% { transform: scale(1.02) translate3d(0, 0, 0); }
+    20% { transform: scale(1.07) translate3d(-.5%, 1%, 0); }
+    50% { transform: scale(1.16) translate3d(-1.5%, 3%, 0); }
+    76% { transform: scale(1.27) translate3d(-3%, 5%, 0); }
+    94%, 100% { transform: scale(1.36) translate3d(-4.5%, 7%, 0); }
+  }
+  .cover-cinema-mask {
     background:
-      linear-gradient(180deg, #020c18 0, #020c18 15%, rgba(2,12,24,.94) 24%, rgba(2,12,24,.16) 43%, rgba(2,12,24,.08) 58%, rgba(2,12,24,.52) 70%, #020c18 82%, #020c18 100%),
-      linear-gradient(90deg, #020c18 0, rgba(2,12,24,.96) 25%, rgba(2,12,24,.8) 50%, rgba(2,12,24,.2) 76%, rgba(2,12,24,.04) 100%);
+      linear-gradient(180deg, rgba(2,10,20,.58) 0, rgba(2,10,20,.16) 35%, rgba(2,10,20,.08) 58%, rgba(2,10,20,.68) 100%),
+      linear-gradient(90deg, rgba(2,12,24,.84) 0, rgba(2,12,24,.58) 52%, rgba(2,12,24,.08) 100%);
   }
   .cover-hero::before {
     background:
@@ -1010,7 +1036,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
   .risk-orbit::after { animation: none; }
   html.js .reveal, html.js .reveal.is-visible { opacity: 1; transform: none; }
   .quote-updated { animation: none; }
-  .cover-visual, .cover-glow, .kline-world, .kline-reveal, .cover-cloud-veil { animation: none; }
+  .cover-cinema, .cover-visual, .cover-glow, .kline-world, .kline-reveal, .cover-cloud-veil { animation: none; }
   .kline-reveal { opacity: 1; clip-path: inset(0); }
 }
 """
@@ -1068,11 +1094,11 @@ LIVE_SCRIPT = r"""
   const coverVideo = document.querySelector("[data-cover-video]");
   if (coverVideo) {
     const nestedPage = /\/results\//.test(window.location.pathname);
-    coverVideo.src = `${nestedPage ? "../" : ""}assets/hero-cloudbreak-reference.mp4`;
+    coverVideo.src = `${nestedPage ? "../" : ""}assets/hero-cloudbreak-aigc-v1.webm`;
     const syncCoverPlayback = () => {
       if (reduceMotion || document.hidden) {
         coverVideo.pause();
-        if (reduceMotion && coverVideo.readyState >= 1) coverVideo.currentTime = .05;
+        if (reduceMotion && coverVideo.readyState >= 1) coverVideo.currentTime = .3;
       } else {
         coverVideo.play().catch(() => {});
       }
@@ -1355,8 +1381,8 @@ def render_report(
     )[:30]
     trade_date = max((item.date for item in evaluations), default="无数据")
     generated = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M")
-    cover_desktop = _asset_data_uri("hero-cloud-market-v3-clean.webp")
-    cover_mobile = _asset_data_uri("hero-cloud-market-v3-clean-mobile.webp")
+    cover_desktop = _asset_data_uri("hero-cloud-market-v2.webp")
+    cover_mobile = _asset_data_uri("hero-cloud-market-v2-mobile.webp")
     main_stats = strategy_stats(strategy_state)
     secondary_stats = secondary_strategy_stats(strategy_state)
     active_rows = "".join(_position_row(item) for item in strategy_state["active"])
@@ -1414,7 +1440,7 @@ def render_report(
     <section class="cover-hero reveal" style="--cover-desktop:url('{cover_desktop}');--cover-mobile:url('{cover_mobile}')">
       <div class="cover-stage" aria-hidden="true">
         <video class="cover-video" data-cover-video autoplay muted loop playsinline preload="auto" poster="{cover_desktop}"></video>
-        <div class="cover-video-mask"></div>
+        <div class="cover-cinema-mask"></div>
       </div>
       <div class="cover-inner">
         <div class="cover-copy">
