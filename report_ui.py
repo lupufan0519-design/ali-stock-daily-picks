@@ -638,7 +638,7 @@ def render_report(
     <section class="hero">
       <div>
         <p class="eyebrow">A-share signal dashboard</p>
-        <h1>让收盘信号与盘中变化，一眼分开。</h1>
+        <h1>有人找机会，有人专挑风险</h1>
         <p class="hero-copy">主选、次选严格按收盘规则更新；盘中仅刷新价格、涨跌幅与跟踪收益，不改变策略信号。</p>
       </div>
       <aside class="hero-aside" aria-live="polite">
@@ -694,7 +694,7 @@ def render_report(
 
     <section class="section" id="signals">
       <div class="section-head"><div><span class="section-kicker">Daily selection</span><h2>今日严格入选</h2>
-      <p class="section-copy">只认 selected=true 且 eligible=true。盘中行情不会让股票提前进入本区。</p></div><span class="count-badge">{len(selected)} 只</span></div>
+      </div><span class="count-badge">{len(selected)} 只</span></div>
 {legend}
       <div class="panel table-scroll"><table><thead><tr><th>股票</th><th>收盘 / 涨跌</th><th>近42日 K 线与龙虎线</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>连续黄柱</th></tr></thead>
       <tbody>{selected_rows or empty7}</tbody></table></div>
