@@ -1,0 +1,11 @@
+{
+  "bottom_lookback_days": 5,
+  "cross_lookback_days": 5,
+  "limit_up_lookback_days": 42,
+  "yellow_consecutive_days": 2,
+  "history_bars": 180,
+  "minimum_history_bars": 100,
+  "workers": 4,
+  "include_st": false,
+  "near_match_minimum": 3
+}

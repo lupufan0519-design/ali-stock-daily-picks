@@ -1,0 +1,61 @@
+name: Daily close screening
+
+on:
+  schedule:
+    - cron: "22,37 7 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: stock-pages
+  cancel-in-progress: false
+
+jobs:
+  screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      TZ: Asia/Shanghai
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - name: Run full-market close screening
+        id: screening
+        run: python cloud_daily.py
+      - name: Refresh closing quotes
+        if: steps.screening.outputs.changed == 'true'
+        run: python intraday.py --result cloud_snapshot.json
+      - name: Build static site
+        if: steps.screening.outputs.changed == 'true'
+        run: python prepare_site.py
+      - name: Persist strategy state
+        if: steps.screening.outputs.changed == 'true'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- results/latest.html cloud_snapshot.json strategy/state.json "strategy/卢氏龙虎趋势池_最新.csv" cache/universe.json
+          git commit -m "Update daily report ${{ steps.screening.outputs.trade_date }}"
+          git push origin main
+      - if: steps.screening.outputs.changed == 'true'
+        uses: actions/configure-pages@v5
+      - if: steps.screening.outputs.changed == 'true'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - name: Deploy GitHub Pages
+        if: steps.screening.outputs.changed == 'true'
+        id: deployment
+        uses: actions/deploy-pages@v4
