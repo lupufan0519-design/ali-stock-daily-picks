@@ -700,12 +700,16 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
   background-image: var(--cover-desktop);
   background-position: center;
   background-size: cover;
-  animation: cover-camera 18s ease-in-out infinite alternate;
+  transform-origin: 66% 22%;
+  animation: cover-camera 7s cubic-bezier(.22,.72,.2,1) infinite;
   will-change: transform;
 }
 @keyframes cover-camera {
-  from { transform: scale(1.03) translate3d(-.35%, 0, 0); }
-  to { transform: scale(1.085) translate3d(.65%, -.7%, 0); }
+  0% { transform: scale(1.03) translate3d(1.5%, -4%, 0); }
+  12% { transform: scale(1.05) translate3d(1%, -3%, 0); }
+  48% { transform: scale(1.13) translate3d(-1.5%, 1%, 0); }
+  68% { transform: scale(1.22) translate3d(-3.5%, 4.5%, 0); }
+  86%, 100% { transform: scale(1.3) translate3d(-5.5%, 7.5%, 0); }
 }
 .cover-hero::before {
   content: "";
@@ -727,12 +731,14 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
   border-radius: 50%;
   background: radial-gradient(circle, rgba(186,231,255,.18), transparent 62%);
   mix-blend-mode: screen;
-  animation: cover-glow-breathe 7s ease-in-out infinite alternate;
+  animation: cover-glow-breathe 7s cubic-bezier(.22,.72,.2,1) infinite;
   pointer-events: none;
 }
 @keyframes cover-glow-breathe {
-  from { opacity: .42; transform: translate3d(0, 1.5%, 0) scale(.94); }
-  to { opacity: .9; transform: translate3d(-2%, -1%, 0) scale(1.08); }
+  0%, 18% { opacity: .2; transform: translate3d(5%, 7%, 0) scale(.86); }
+  50% { opacity: .48; transform: translate3d(1%, 2%, 0) scale(.98); }
+  72% { opacity: .82; transform: translate3d(-2%, -1%, 0) scale(1.1); }
+  86%, 100% { opacity: 1; transform: translate3d(-4%, -3%, 0) scale(1.2); }
 }
 .kline-camera {
   position: absolute;
@@ -856,10 +862,10 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
   pointer-events: none;
 }
 @keyframes cloud-veil-part {
-  0%, 30% { opacity: .72; transform: translate3d(2%, 2%, 0) scale(1.04); }
-  62% { opacity: .46; transform: translate3d(-1%, -1%, 0) scale(.98); }
-  86% { opacity: .28; transform: translate3d(-2%, -2%, 0) scale(.94); }
-  100% { opacity: .72; transform: translate3d(2%, 2%, 0) scale(1.04); }
+  0%, 26% { opacity: .76; transform: translate3d(3%, 3%, 0) scale(1.08); }
+  54% { opacity: .62; transform: translate3d(0, 0, 0) scale(1.02); }
+  72% { opacity: .34; transform: translate3d(-3%, -4%, 0) scale(.94); }
+  86%, 100% { opacity: .16; transform: translate3d(-5%, -7%, 0) scale(.88); }
 }
 .cover-inner {
   position: relative;
@@ -960,7 +966,16 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
   .cover-visual {
     background-image: var(--cover-mobile);
     background-position: center;
-    animation-duration: 24s;
+    transform-origin: 63% 22%;
+    animation-name: cover-camera-mobile;
+    animation-duration: 8s;
+  }
+  @keyframes cover-camera-mobile {
+    0% { transform: scale(1.04) translate3d(1%, -3%, 0); }
+    14% { transform: scale(1.055) translate3d(.5%, -2.2%, 0); }
+    52% { transform: scale(1.11) translate3d(-1%, .8%, 0); }
+    72% { transform: scale(1.16) translate3d(-2.5%, 3%, 0); }
+    88%, 100% { transform: scale(1.2) translate3d(-4%, 5%, 0); }
   }
   .cover-hero::before {
     background:
@@ -993,8 +1008,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
   .cover-note { right: 20px; bottom: 42px; width: min(315px, 84vw); font-size: 14px; }
   .cover-glow { width: 90%; height: 70%; }
   .kline-camera { transform: translateX(28%); }
-  .kline-world { animation-duration: 8s; }
-  .kline-reveal, .cover-cloud-veil { animation-duration: 8s; }
+  .cover-glow, .kline-world, .kline-reveal, .cover-cloud-veil { animation-duration: 8s; }
   .cover-candle { width: clamp(9px, 2.8vw, 13px); }
   .cover-cloud-veil { left: 0; right: -20%; filter: blur(10px); }
   .cover-hero + .live-rail { margin-top: 14px; }
