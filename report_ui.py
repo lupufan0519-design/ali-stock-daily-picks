@@ -377,19 +377,399 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .state.neutral { background: #26344a; }
   .events strong, .events ul { color: #fde68a; }
 }
+
+/* Risk radar workstation — one signature motion, everything else stays quiet. */
+:root {
+  --petrol: #0b3440;
+  --petrol-deep: #061f28;
+  --gold: #d6ae63;
+  --gold-soft: #f4e6c7;
+}
+button { font: inherit; }
+.top-actions { display: flex; align-items: center; gap: 8px; }
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--muted-strong);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+.theme-toggle:hover { transform: translateY(-1px); border-color: var(--gold); color: var(--accent); }
+.theme-toggle svg { width: 19px; height: 19px; }
+.hero { align-items: stretch; grid-template-columns: minmax(0, 1.25fr) minmax(330px, .75fr); padding-top: 58px; }
+.hero-copy-block { display: flex; flex-direction: column; justify-content: center; padding: 18px 0; }
+h1 {
+  font-family: "Bahnschrift SemiCondensed", "Arial Narrow", "Microsoft YaHei", sans-serif;
+  font-stretch: condensed;
+  font-weight: 760;
+  letter-spacing: -.045em;
+}
+.opportunity-word { color: var(--primary); }
+.risk-word {
+  position: relative;
+  display: inline-block;
+  color: var(--positive);
+}
+.risk-word::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: .04em;
+  left: 0;
+  height: .09em;
+  border-radius: 99px;
+  background: currentColor;
+  opacity: .24;
+}
+.risk-stage {
+  --coverage-angle: 0deg;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  align-items: center;
+  gap: 22px;
+  min-height: 264px;
+  padding: 28px;
+  border: 1px solid rgba(214, 174, 99, .3);
+  border-radius: 30px;
+  background:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px),
+    radial-gradient(circle at 24% 42%, rgba(214, 174, 99, .14), transparent 32%),
+    linear-gradient(145deg, var(--petrol), var(--petrol-deep));
+  background-size: 22px 22px, 22px 22px, auto, auto;
+  color: #f7fbfc;
+  box-shadow: 0 30px 70px rgba(6, 31, 40, .2);
+}
+.risk-stage::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  right: -55px;
+  bottom: -85px;
+  width: 220px;
+  height: 220px;
+  border: 1px solid rgba(214, 174, 99, .15);
+  border-radius: 50%;
+}
+.risk-orbit {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 150px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+.risk-orbit::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: conic-gradient(from -42deg, var(--gold) 0 var(--coverage-angle), rgba(255,255,255,.12) var(--coverage-angle) 360deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 0);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 0);
+}
+.risk-orbit::after {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-top-color: rgba(214, 174, 99, .9);
+  border-radius: inherit;
+  animation: radar-sweep 8s linear infinite;
+}
+@keyframes radar-sweep { to { transform: rotate(360deg); } }
+.risk-lens {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 108px;
+  aspect-ratio: 1;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 50%;
+  background: rgba(5, 26, 34, .72);
+  box-shadow: inset 0 0 30px rgba(214,174,99,.08);
+  text-align: center;
+}
+.risk-lens span { color: #b8ccd1; font-size: 11px; letter-spacing: .12em; }
+.risk-lens strong { display: block; margin-top: 2px; color: var(--gold-soft); font: 730 18px/1.2 ui-monospace, Consolas, monospace; }
+.risk-meta { min-width: 0; }
+.risk-stage .status-title { color: #fff; font-size: 16px; }
+.risk-stage .status-detail { color: #b8ccd1; }
+.risk-stage .timestamp { border-color: rgba(255,255,255,.12); color: #8faab1; }
+.risk-stage .timestamp strong { color: #eef7f8; }
+.risk-stage .status-dot { background: #58d2a3; box-shadow: 0 0 0 5px rgba(88,210,163,.12); }
+.risk-stage .status-dot.stale { background: #f2c572; box-shadow: 0 0 0 5px rgba(242,197,114,.12); }
+.risk-stage .status-dot.error { background: #ff8a80; box-shadow: 0 0 0 5px rgba(255,138,128,.12); }
+.live-rail {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  margin: 6px 0 32px;
+  padding: 13px 14px 13px 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  box-shadow: 0 10px 28px rgba(31,42,68,.04);
+}
+.live-rail-label { display: flex; align-items: center; gap: 9px; color: var(--muted-strong); font-size: 13px; font-weight: 720; }
+.live-rail-label::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--positive); box-shadow: 0 0 0 4px var(--positive-soft); }
+.ticker-track {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.ticker-item {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0 12px;
+  min-width: 152px;
+  min-height: 48px;
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface-soft);
+  color: var(--text);
+  scroll-snap-align: start;
+}
+.ticker-item:hover { border-color: var(--line-strong); text-decoration: none; }
+.ticker-name { max-width: 7em; overflow: hidden; font-size: 12px; font-weight: 720; text-overflow: ellipsis; white-space: nowrap; }
+.ticker-price { grid-row: span 2; align-self: center; font: 720 15px/1.2 ui-monospace, Consolas, monospace; }
+.ticker-change { font: 650 11px/1.2 ui-monospace, Consolas, monospace; }
+.ticker-empty { color: var(--muted); font-size: 12px; }
+.kpi, .panel, .rule {
+  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+.kpi:hover, .rule:hover { transform: translateY(-2px); border-color: var(--line-strong); box-shadow: 0 14px 34px rgba(31,42,68,.08); }
+.pool-switcher {
+  display: inline-flex;
+  gap: 5px;
+  margin: 2px 0 16px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-soft);
+}
+.pool-tab {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted-strong);
+  cursor: pointer;
+  font-weight: 720;
+  touch-action: manipulation;
+}
+.pool-tab[aria-selected="true"] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 5px 18px rgba(31,42,68,.08);
+}
+[hidden] { display: none !important; }
+html.js .reveal { opacity: 0; transform: translateY(14px); }
+html.js .reveal.is-visible { opacity: 1; transform: translateY(0); transition: opacity 520ms ease, transform 520ms cubic-bezier(.2,.8,.2,1); }
+.quote-updated { animation: quote-flash 700ms ease; }
+@keyframes quote-flash { 50% { background: color-mix(in srgb, var(--gold) 20%, transparent); } }
+.mobile-dock { display: none; }
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f7fb; --surface: #ffffff; --surface-soft: #f8fafc; --surface-blue: #eff6ff;
+  --text: #172033; --muted: #667085; --muted-strong: #475467; --line: #dfe5ef; --line-strong: #cbd5e1;
+  --primary: #1e40af; --primary-2: #2563eb; --accent: #b45309; --positive: #b42318; --positive-soft: #fff1f0;
+  --negative: #087443; --negative-soft: #ecfdf3; --warning: #a15c07; --warning-soft: #fffaeb;
+}
+html[data-theme="light"] body {
+  background: radial-gradient(circle at 8% -10%, rgba(37,99,235,.12), transparent 28rem), linear-gradient(180deg, #f8fafc 0, var(--bg) 34rem);
+}
+html[data-theme="light"] .topbar { background: rgba(248,250,252,.88); }
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b1220; --surface: #111a2b; --surface-soft: #151f32; --surface-blue: #172554;
+  --text: #edf2f7; --muted: #9aa8bc; --muted-strong: #c0cad8; --line: #26344a; --line-strong: #3b4b64;
+  --primary: #93c5fd; --primary-2: #60a5fa; --accent: #fbbf24; --positive: #ff8a80; --positive-soft: #3a2024;
+  --negative: #6ee7b7; --negative-soft: #12392d; --warning: #fcd34d; --warning-soft: #352b13;
+}
+html[data-theme="dark"] body {
+  background: radial-gradient(circle at 8% -10%, rgba(37,99,235,.22), transparent 28rem), linear-gradient(180deg, #101827 0, var(--bg) 34rem);
+}
+html[data-theme="dark"] .topbar { background: rgba(11,18,32,.86); }
+html[data-theme="dark"] tbody tr:hover { background: #152136; }
+@media (max-width: 760px) {
+  .shell { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
+  .brand span:last-child { font-size: 14px; }
+  .hero { grid-template-columns: 1fr; padding-top: 30px; }
+  .hero-copy-block { padding: 0; }
+  .hero-copy { font-size: 15px; }
+  .risk-stage { grid-template-columns: 112px minmax(0, 1fr); min-height: 204px; padding: 21px; border-radius: 24px; }
+  .risk-orbit { width: 112px; }
+  .risk-lens { width: 80px; }
+  .risk-lens strong { font-size: 14px; }
+  .risk-lens span { font-size: 9px; }
+  .live-rail { grid-template-columns: 1fr; gap: 8px; margin-top: 0; padding: 12px; }
+  .pool-switcher { display: flex; width: 100%; }
+  .pool-tab { flex: 1 1 0; padding-inline: 10px; }
+  .mobile-dock {
+    position: fixed;
+    z-index: 30;
+    right: 12px;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    left: 12px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    min-height: 66px;
+    padding: 7px;
+    border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+    border-radius: 19px;
+    background: color-mix(in srgb, var(--surface) 90%, transparent);
+    box-shadow: 0 20px 48px rgba(6,31,40,.18);
+    backdrop-filter: blur(18px);
+  }
+  .mobile-dock a {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 3px;
+    min-width: 44px;
+    min-height: 50px;
+    border-radius: 13px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    touch-action: manipulation;
+  }
+  .mobile-dock a:hover, .mobile-dock a:focus-visible { background: var(--surface-soft); color: var(--primary); text-decoration: none; }
+  .mobile-dock svg { width: 19px; height: 19px; }
+}
+@media (max-width: 430px) {
+  h1 { font-size: clamp(35px, 11vw, 44px); line-height: 1.05; }
+  .risk-stage { grid-template-columns: 94px minmax(0, 1fr); gap: 16px; padding: 18px 16px; }
+  .risk-orbit { width: 94px; }
+  .risk-lens { width: 66px; }
+  .risk-lens span { letter-spacing: .04em; }
+  .status-detail { font-size: 12px; }
+  .timestamp { margin-top: 12px; padding-top: 10px; }
+  .timestamp strong { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .risk-orbit::after { animation: none; }
+  html.js .reveal, html.js .reveal.is-visible { opacity: 1; transform: none; }
+  .quote-updated { animation: none; }
+}
 """
 
 
 LIVE_SCRIPT = r"""
 (() => {
+  const root = document.documentElement;
+  const themeButton = document.querySelector("#theme-toggle");
+  const mediaTheme = window.matchMedia("(prefers-color-scheme: dark)");
+  const savedTheme = window.localStorage.getItem("lushi-theme");
+  const applyTheme = (theme) => {
+    root.dataset.theme = theme;
+    if (themeButton) {
+      const next = theme === "dark" ? "浅色" : "深色";
+      themeButton.setAttribute("aria-label", `切换到${next}模式`);
+      themeButton.setAttribute("title", `切换到${next}模式`);
+    }
+  };
+  applyTheme(savedTheme || (mediaTheme.matches ? "dark" : "light"));
+  themeButton?.addEventListener("click", () => {
+    const next = root.dataset.theme === "dark" ? "light" : "dark";
+    window.localStorage.setItem("lushi-theme", next);
+    applyTheme(next);
+  });
+
+  const tabs = [...document.querySelectorAll("[data-pool-tab]")];
+  const panels = [...document.querySelectorAll("[data-pool-panel]")];
+  const selectPool = (name) => {
+    tabs.forEach((tab) => {
+      const selected = tab.dataset.poolTab === name;
+      tab.setAttribute("aria-selected", String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+    });
+    panels.forEach((panel) => { panel.hidden = panel.dataset.poolPanel !== name; });
+  };
+  tabs.forEach((tab) => tab.addEventListener("click", () => selectPool(tab.dataset.poolTab)));
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reveals = document.querySelectorAll(".reveal");
+  if (reduceMotion || !("IntersectionObserver" in window)) {
+    reveals.forEach((item) => item.classList.add("is-visible"));
+  } else {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: .08 });
+    reveals.forEach((item) => observer.observe(item));
+  }
+
   const status = document.querySelector("#market-status");
   const detail = document.querySelector("#market-detail");
   const quoteTime = document.querySelector("#quote-time");
   const dot = document.querySelector("#status-dot");
+  const lensValue = document.querySelector("#lens-value");
+  const riskStage = document.querySelector(".risk-stage");
+  const ticker = document.querySelector("#ticker-track");
   const formatPct = (value) => `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
   const setTone = (element, value) => {
     element.classList.toggle("positive", value >= 0);
     element.classList.toggle("negative", value < 0);
+  };
+  const quoteHref = (quote) => {
+    const prefix = Number(quote.market) === 1 ? "sh" : Number(quote.market) === 0 ? "sz" : "bj";
+    return `https://quote.eastmoney.com/${prefix}${quote.code}.html`;
+  };
+  const paintTicker = (quotes) => {
+    if (!ticker) return;
+    ticker.replaceChildren();
+    Object.values(quotes).slice(0, 18).forEach((quote) => {
+      const item = document.createElement("a");
+      item.className = "ticker-item";
+      item.href = quoteHref(quote);
+      item.target = "_blank";
+      item.rel = "noreferrer";
+      item.setAttribute("aria-label", `${quote.name} ${Number(quote.price).toFixed(2)} 元，涨跌幅 ${formatPct(Number(quote.change_pct))}`);
+      const name = document.createElement("span");
+      name.className = "ticker-name";
+      name.textContent = quote.name || quote.code;
+      const price = document.createElement("strong");
+      price.className = "ticker-price";
+      price.textContent = Number(quote.price).toFixed(2);
+      const change = document.createElement("span");
+      change.className = "ticker-change";
+      change.textContent = formatPct(Number(quote.change_pct));
+      setTone(change, Number(quote.change_pct));
+      item.append(name, price, change);
+      ticker.append(item);
+    });
+    if (!ticker.children.length) {
+      const empty = document.createElement("span");
+      empty.className = "ticker-empty";
+      empty.textContent = "当前没有需要刷新的跟踪行情";
+      ticker.append(empty);
+    }
   };
   async function refreshLive() {
     try {
@@ -400,6 +780,12 @@ LIVE_SCRIPT = r"""
       detail.textContent = data.note || "盘中行情只更新价格，不改变收盘筛选信号";
       quoteTime.textContent = data.generated_at_display || data.generated_at;
       dot.className = `status-dot ${data.is_stale ? "stale" : ""}`;
+      const targetCount = Number(data.target_count || 0);
+      const quoteCount = Number(data.quote_count || 0);
+      const coverage = targetCount ? Math.min(1, quoteCount / targetCount) : 1;
+      if (lensValue) lensValue.textContent = targetCount ? `${quoteCount}/${targetCount}` : "已就绪";
+      if (riskStage) riskStage.style.setProperty("--coverage-angle", `${coverage * 360}deg`);
+      paintTicker(data.quotes || {});
       Object.entries(data.quotes || {}).forEach(([code, quote]) => {
         document.querySelectorAll(`[data-live-code="${code}"]`).forEach((row) => {
           const price = row.querySelector("[data-live-price]");
@@ -415,12 +801,16 @@ LIVE_SCRIPT = r"""
             ret.textContent = formatPct(value);
             setTone(ret, value);
           }
+          row.classList.remove("quote-updated");
+          void row.offsetWidth;
+          row.classList.add("quote-updated");
         });
       });
     } catch (error) {
-      dot.className = "status-dot stale";
+      dot.className = "status-dot error";
       status.textContent = "实时行情暂不可用";
       detail.textContent = "当前仍显示最近一次已验证的收盘数据";
+      if (lensValue) lensValue.textContent = "离线";
     }
   }
   refreshLive();
@@ -617,6 +1007,7 @@ def render_report(
   <meta name="theme-color" content="#f8fafc">
   <meta name="description" content="卢氏龙虎趋势池：沪深 A 股主选、次选与盘中行情跟踪">
   <title>卢氏龙虎趋势池 · {trade_date}</title>
+  <script>document.documentElement.classList.add("js")</script>
   <style>{STYLES}</style>
 </head>
 <body>
@@ -629,29 +1020,44 @@ def render_report(
       </span>
       <span>卢氏龙虎趋势池</span>
     </a>
-    <nav class="nav" aria-label="页面导航">
-      <a href="#pool">趋势池</a><a href="#signals">今日信号</a><a href="#watch">观察区</a><a href="#rules">规则</a>
-    </nav>
+    <div class="top-actions">
+      <nav class="nav" aria-label="页面导航">
+        <a href="#pool">趋势池</a><a href="#signals">今日信号</a><a href="#watch">观察区</a><a href="#rules">规则</a>
+      </nav>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换显示模式" title="切换显示模式">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v2.1m0 14.2v2.1M2.8 12h2.1m14.2 0h2.1M5.5 5.5 7 7m10 10 1.5 1.5m0-13L17 7M7 17l-1.5 1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
   </header>
 
   <main id="content">
-    <section class="hero">
-      <div>
+    <section class="hero reveal">
+      <div class="hero-copy-block">
         <p class="eyebrow">A-share signal dashboard</p>
-        <h1>有人找机会，有人专挑风险</h1>
+        <h1>有人找<span class="opportunity-word">机会</span>，<br>有人专挑<span class="risk-word">风险</span></h1>
         <p class="hero-copy">主选、次选严格按收盘规则更新；盘中仅刷新价格、涨跌幅与跟踪收益，不改变策略信号。</p>
       </div>
-      <aside class="hero-aside" aria-live="polite">
-        <div class="status-line">
-          <span class="status-dot" id="status-dot" aria-hidden="true"></span>
-          <div><div class="status-title" id="market-status">收盘数据已验证</div>
-          <div class="status-detail" id="market-detail">交易日 {trade_date} · 云端行情自动刷新</div></div>
+      <aside class="risk-stage" aria-live="polite">
+        <div class="risk-orbit" aria-hidden="true">
+          <div class="risk-lens"><div><span>盘中覆盖</span><strong id="lens-value">等待行情</strong></div></div>
         </div>
-        <div class="timestamp">最新行情时间<strong id="quote-time">{generated}</strong></div>
+        <div class="risk-meta">
+          <div class="status-line">
+            <span class="status-dot" id="status-dot" aria-hidden="true"></span>
+            <div><div class="status-title" id="market-status">收盘数据已验证</div>
+            <div class="status-detail" id="market-detail">交易日 {trade_date} · 云端行情自动刷新</div></div>
+          </div>
+          <div class="timestamp">最新行情时间<strong id="quote-time">{generated}</strong></div>
+        </div>
       </aside>
     </section>
 
-    <section class="kpi-grid" aria-label="核心概览">
+    <section class="live-rail reveal" aria-label="盘中行情">
+      <div class="live-rail-label">跟踪行情</div>
+      <div class="ticker-track" id="ticker-track"><span class="ticker-empty">正在连接最新行情…</span></div>
+    </section>
+
+    <section class="kpi-grid reveal" aria-label="核心概览">
       <article class="kpi"><span class="kpi-label">主选跟踪</span><strong class="kpi-value">{main_stats['active_count']}</strong><span class="kpi-note">严格四项同时满足</span></article>
       <article class="kpi"><span class="kpi-label">次选跟踪</span><strong class="kpi-value">{secondary_stats['active_count']}</strong><span class="kpi-note">龙虎 + 黄柱 + 另一项</span></article>
       <article class="kpi"><span class="kpi-label">今日严格命中</span><strong class="kpi-value">{len(selected)}</strong><span class="kpi-note">eligible=true</span></article>
@@ -659,11 +1065,15 @@ def render_report(
       <article class="kpi"><span class="kpi-label">市场扫描</span><strong class="kpi-value">{scanned}</strong><span class="kpi-note">失败 {len(errors)} 只 · ST 排除</span></article>
     </section>
 
-    <section class="section" id="pool">
+    <section class="section reveal" id="pool">
       <div class="section-head"><div><span class="section-kicker">Tracked portfolio</span><h2>{POOL_NAME}</h2>
       <p class="section-copy">加入日收盘价作为基准，盘中收益由最新行情计算；策略状态只在收盘完整扫描后变化。</p></div></div>
 {_events(events)}
-      <article class="panel">
+      <div class="pool-switcher" role="tablist" aria-label="趋势池区域切换">
+        <button class="pool-tab" id="tab-main" type="button" role="tab" aria-selected="true" aria-controls="pool-main" data-pool-tab="main">主选区 · {main_stats['active_count']}</button>
+        <button class="pool-tab" id="tab-secondary" type="button" role="tab" aria-selected="false" aria-controls="pool-secondary" data-pool-tab="secondary" tabindex="-1">次选区 · {secondary_stats['active_count']}</button>
+      </div>
+      <article class="panel" id="pool-main" role="tabpanel" aria-labelledby="tab-main" data-pool-panel="main">
         <div class="panel-head"><div><h3>主选区</h3><p>四项条件同时满足，龙虎信号连续两日失效后移出</p></div><span class="count-badge">{main_stats['active_count']} 只</span></div>
         <div class="metrics">
           {_metric('当前成功率', _pct(main_stats['current_success_rate']))}
@@ -677,7 +1087,7 @@ def render_report(
         <tbody>{active_rows or empty6}</tbody></table></div>
       </article>
 
-      <article class="panel">
+      <article class="panel" id="pool-secondary" role="tabpanel" aria-labelledby="tab-secondary" data-pool-panel="secondary" hidden>
         <div class="panel-head"><div><h3>次选区</h3><p>龙腾跃虎与连续黄柱必选，再满足见底或42日涨停之一</p></div><span class="count-badge">{secondary_stats['active_count']} 只</span></div>
         <div class="metrics">
           {_metric('当前成功率', _pct(secondary_stats['current_success_rate']))}
@@ -692,7 +1102,7 @@ def render_report(
       </article>
     </section>
 
-    <section class="section" id="signals">
+    <section class="section reveal" id="signals">
       <div class="section-head"><div><span class="section-kicker">Daily selection</span><h2>今日严格入选</h2>
       </div><span class="count-badge">{len(selected)} 只</span></div>
 {legend}
@@ -700,7 +1110,7 @@ def render_report(
       <tbody>{selected_rows or empty7}</tbody></table></div>
     </section>
 
-    <section class="section" id="watch">
+    <section class="section reveal" id="watch">
       <div class="section-head"><div><span class="section-kicker">Watchlist</span><h2>观察区</h2>
       <p class="section-copy">满足至少三项的接近标的，仅用于观察，不纳入主选或次选收益。</p></div><span class="count-badge">{len(near)} 只</span></div>
 {legend}
@@ -708,7 +1118,7 @@ def render_report(
       <tbody>{near_rows or empty8}</tbody></table></div>
     </section>
 
-    <section class="section" id="rules">
+    <section class="section reveal" id="rules">
       <div class="section-head"><div><span class="section-kicker">Methodology</span><h2>筛选规则</h2></div></div>
       <div class="rules">
         <article class="rule"><span class="rule-num">01</span><strong>可能见底</strong><p>最近 {cfg['bottom_lookback_days']} 个交易日出现信号。</p></article>
@@ -718,7 +1128,7 @@ def render_report(
       </div>
     </section>
 
-    <section class="section">
+    <section class="section reveal">
       <div class="panel">
         <details><summary>查看主选区历史移出记录</summary>
           <div class="table-scroll"><table><thead><tr><th>股票</th><th>加入</th><th>移出</th><th>收益</th><th>时长</th><th>原因</th></tr></thead><tbody>{closed_rows or empty6}</tbody></table></div>
@@ -733,6 +1143,12 @@ def render_report(
   </main>
   <footer>收盘交易日 {trade_date} · 报告生成 {generated} · 沪深 A 股 {scanned} 只 · 数据失败 {len(errors)} 只</footer>
 </div>
+<nav class="mobile-dock" aria-label="手机快捷导航">
+  <a href="#content"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19V10l8-6 8 6v9H4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 19v-5h5v5" stroke="currentColor" stroke-width="1.8"/></svg><span>概览</span></a>
+  <a href="#pool"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 17l5-5 4 3 7-8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 7h4v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>趋势池</span></a>
+  <a href="#signals"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>信号</span></a>
+  <a href="#rules"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 4h12v16H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 8h6m-6 4h6m-6 4h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>规则</span></a>
+</nav>
 <script>{LIVE_SCRIPT}</script>
 </body>
 </html>"""
