@@ -688,28 +688,28 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
 .cover-stage {
   position: absolute;
   z-index: 0;
-  inset: -3%;
-  transform: translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0);
-  transition: transform 380ms cubic-bezier(.2,.8,.2,1);
+  inset: -8%;
+  overflow: hidden;
+  background: #061421 var(--cover-desktop) center / cover no-repeat;
   pointer-events: none;
-  will-change: transform;
 }
-.cover-visual {
+.cover-video {
   position: absolute;
   inset: 0;
-  background-image: var(--cover-desktop);
-  background-position: center;
-  background-size: cover;
-  transform-origin: 66% 22%;
-  animation: cover-camera 7s cubic-bezier(.22,.72,.2,1) infinite;
-  will-change: transform;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 65%;
+  transform: scale(1.06);
+  filter: saturate(1.08) contrast(1.04);
+  background: #061421;
 }
-@keyframes cover-camera {
-  0% { transform: scale(1.03) translate3d(1.5%, -4%, 0); }
-  12% { transform: scale(1.05) translate3d(1%, -3%, 0); }
-  48% { transform: scale(1.13) translate3d(-1.5%, 1%, 0); }
-  68% { transform: scale(1.22) translate3d(-3.5%, 4.5%, 0); }
-  86%, 100% { transform: scale(1.3) translate3d(-5.5%, 7.5%, 0); }
+.cover-video-mask {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, #020c18 0, #020c18 14%, rgba(2,12,24,.92) 23%, rgba(2,12,24,.22) 38%, transparent 56%, rgba(2,12,24,.5) 72%, #020c18 85%, #020c18 100%),
+    linear-gradient(90deg, #020c18 0, #020c18 36%, rgba(2,12,24,.96) 44%, rgba(2,12,24,.48) 58%, rgba(2,12,24,.08) 72%);
 }
 .cover-hero::before {
   content: "";
@@ -717,8 +717,8 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
   z-index: 1;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(2,12,24,.68) 0, rgba(2,12,24,.34) 37%, rgba(2,12,24,.03) 67%, rgba(2,12,24,.18) 100%),
-    linear-gradient(180deg, rgba(2,10,20,.06) 0, rgba(2,10,20,.02) 50%, rgba(2,10,20,.58) 100%);
+    radial-gradient(circle at 76% 26%, rgba(174,225,255,.11), transparent 25%),
+    linear-gradient(180deg, rgba(2,10,20,.18) 0, transparent 52%, rgba(2,10,20,.28) 100%);
   pointer-events: none;
 }
 .cover-glow {
@@ -958,24 +958,15 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
   .cover-copy { width: 62vw; }
   .cover-live { top: 310px; width: min(300px, 38vw); }
   .cover-note { width: 48vw; }
-  .kline-camera { transform: translateX(8%); }
 }
 @media (max-width: 760px) {
   .cover-hero { width: calc(100% + 32px); min-height: 680px; margin-left: -16px; }
-  .cover-stage { inset: -2%; }
-  .cover-visual {
-    background-image: var(--cover-mobile);
-    background-position: center;
-    transform-origin: 63% 22%;
-    animation-name: cover-camera-mobile;
-    animation-duration: 8s;
-  }
-  @keyframes cover-camera-mobile {
-    0% { transform: scale(1.04) translate3d(1%, -3%, 0); }
-    14% { transform: scale(1.055) translate3d(.5%, -2.2%, 0); }
-    52% { transform: scale(1.11) translate3d(-1%, .8%, 0); }
-    72% { transform: scale(1.16) translate3d(-2.5%, 3%, 0); }
-    88%, 100% { transform: scale(1.2) translate3d(-4%, 5%, 0); }
+  .cover-stage { inset: -6%; background-image: var(--cover-mobile); }
+  .cover-video { object-position: 58% 62%; transform: scale(1.16); }
+  .cover-video-mask {
+    background:
+      linear-gradient(180deg, #020c18 0, #020c18 15%, rgba(2,12,24,.94) 24%, rgba(2,12,24,.16) 43%, rgba(2,12,24,.08) 58%, rgba(2,12,24,.52) 70%, #020c18 82%, #020c18 100%),
+      linear-gradient(90deg, #020c18 0, rgba(2,12,24,.96) 25%, rgba(2,12,24,.8) 50%, rgba(2,12,24,.2) 76%, rgba(2,12,24,.04) 100%);
   }
   .cover-hero::before {
     background:
@@ -1006,11 +997,6 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
     padding: 14px 15px;
   }
   .cover-note { right: 20px; bottom: 42px; width: min(315px, 84vw); font-size: 14px; }
-  .cover-glow { width: 90%; height: 70%; }
-  .kline-camera { transform: translateX(28%); }
-  .cover-glow, .kline-world, .kline-reveal, .cover-cloud-veil { animation-duration: 8s; }
-  .cover-candle { width: clamp(9px, 2.8vw, 13px); }
-  .cover-cloud-veil { left: 0; right: -20%; filter: blur(10px); }
   .cover-hero + .live-rail { margin-top: 14px; }
 }
 @media (max-width: 430px) {
@@ -1024,7 +1010,6 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
   .risk-orbit::after { animation: none; }
   html.js .reveal, html.js .reveal.is-visible { opacity: 1; transform: none; }
   .quote-updated { animation: none; }
-  .cover-stage { transform: none; transition: none; }
   .cover-visual, .cover-glow, .kline-world, .kline-reveal, .cover-cloud-veil { animation: none; }
   .kline-reveal { opacity: 1; clip-path: inset(0); }
 }
@@ -1080,25 +1065,21 @@ LIVE_SCRIPT = r"""
     reveals.forEach((item) => observer.observe(item));
   }
 
-  const coverHero = document.querySelector(".cover-hero");
-  const coverStage = document.querySelector(".cover-stage");
-  if (coverHero && coverStage && !reduceMotion && window.matchMedia("(pointer: fine)").matches) {
-    let coverFrame = 0;
-    coverHero.addEventListener("pointermove", (event) => {
-      if (coverFrame) return;
-      coverFrame = window.requestAnimationFrame(() => {
-        const rect = coverHero.getBoundingClientRect();
-        const x = ((event.clientX - rect.left) / rect.width - .5) * -12;
-        const y = ((event.clientY - rect.top) / rect.height - .5) * -8;
-        coverStage.style.setProperty("--parallax-x", `${x}px`);
-        coverStage.style.setProperty("--parallax-y", `${y}px`);
-        coverFrame = 0;
-      });
-    }, { passive: true });
-    coverHero.addEventListener("pointerleave", () => {
-      coverStage.style.setProperty("--parallax-x", "0px");
-      coverStage.style.setProperty("--parallax-y", "0px");
-    }, { passive: true });
+  const coverVideo = document.querySelector("[data-cover-video]");
+  if (coverVideo) {
+    const nestedPage = /\/results\//.test(window.location.pathname);
+    coverVideo.src = `${nestedPage ? "../" : ""}assets/hero-cloudbreak-reference.mp4`;
+    const syncCoverPlayback = () => {
+      if (reduceMotion || document.hidden) {
+        coverVideo.pause();
+        if (reduceMotion && coverVideo.readyState >= 1) coverVideo.currentTime = .05;
+      } else {
+        coverVideo.play().catch(() => {});
+      }
+    };
+    coverVideo.addEventListener("loadedmetadata", syncCoverPlayback, { once: true });
+    document.addEventListener("visibilitychange", syncCoverPlayback);
+    syncCoverPlayback();
   }
 
   const status = document.querySelector("#market-status");
@@ -1431,12 +1412,10 @@ def render_report(
 
   <main id="content">
     <section class="cover-hero reveal" style="--cover-desktop:url('{cover_desktop}');--cover-mobile:url('{cover_mobile}')">
-      <div class="cover-stage" aria-hidden="true"><div class="cover-visual"></div></div>
-      <div class="cover-glow" aria-hidden="true"></div>
-      <div class="kline-camera" aria-hidden="true">
-        <div class="kline-world"><div class="kline-reveal">{_cover_candles()}</div></div>
+      <div class="cover-stage" aria-hidden="true">
+        <video class="cover-video" data-cover-video autoplay muted loop playsinline preload="auto" poster="{cover_desktop}"></video>
+        <div class="cover-video-mask"></div>
       </div>
-      <div class="cover-cloud-veil" aria-hidden="true"></div>
       <div class="cover-inner">
         <div class="cover-copy">
           <p class="cover-eyebrow">A-share risk & opportunity</p>
