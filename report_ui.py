@@ -1094,7 +1094,7 @@ LIVE_SCRIPT = r"""
   const coverVideo = document.querySelector("[data-cover-video]");
   if (coverVideo) {
     const nestedPage = /\/results\//.test(window.location.pathname);
-    coverVideo.src = `${nestedPage ? "../" : ""}assets/hero-cloudbreak-aigc-v1.webm`;
+    coverVideo.src = `${nestedPage ? "../" : ""}assets/hero-cloudbreak-aigc-v2.webm`;
     const syncCoverPlayback = () => {
       if (reduceMotion || document.hidden) {
         coverVideo.pause();
@@ -1381,8 +1381,8 @@ def render_report(
     )[:30]
     trade_date = max((item.date for item in evaluations), default="无数据")
     generated = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M")
-    cover_desktop = _asset_data_uri("hero-cloud-market-v2.webp")
-    cover_mobile = _asset_data_uri("hero-cloud-market-v2-mobile.webp")
+    cover_desktop = _asset_data_uri("hero-aigc-v2-poster.webp")
+    cover_mobile = _asset_data_uri("hero-aigc-v2-poster-mobile.webp")
     main_stats = strategy_stats(strategy_state)
     secondary_stats = secondary_strategy_stats(strategy_state)
     active_rows = "".join(_position_row(item) for item in strategy_state["active"])
