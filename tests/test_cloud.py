@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime
 
 from cloud_daily import compact_snapshot
-from intraday import collect_targets, market_state
+from intraday import collect_targets, market_state, parse_tencent_quotes
 
 
 class CloudWorkflowTests(unittest.TestCase):
@@ -80,6 +80,32 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertEqual(label, "盘中行情")
         label, _ = market_state(datetime(2026, 7, 24, 12, 0))
         self.assertEqual(label, "午间休市")
+
+    def test_parse_tencent_quotes_uses_realtime_timestamp(self):
+        raw = (
+            'v_sz002038="51~双鹭药业~002038~5.57~5.29~5.27~258234'
+            + "~0" * 23
+            + "~20260727104200~0.28~5.29~5.70~5.22"
+            + '~5.57/258234/142691351~";'
+        )
+        quotes = parse_tencent_quotes(
+            raw,
+            [
+                {
+                    "code": "002038",
+                    "name": "双鹭药业",
+                    "market": 0,
+                    "scope": "observation",
+                }
+            ],
+        )
+        self.assertEqual(quotes["002038"]["price"], 5.57)
+        self.assertEqual(quotes["002038"]["change_pct"], 5.29)
+        self.assertEqual(
+            quotes["002038"]["server_time"],
+            "2026-07-27T10:42:00+08:00",
+        )
+        self.assertEqual(quotes["002038"]["amount"], 142691351.0)
 
 
 if __name__ == "__main__":

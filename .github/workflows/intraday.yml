@@ -2,10 +2,9 @@ name: Intraday market refresh
 
 on:
   schedule:
-    - cron: "2-57/5 1-2 * * 1-5"
-    - cron: "2-32/5 3 * * 1-5"
-    - cron: "2-57/5 5-6 * * 1-5"
-    - cron: "2-12/5 7 * * 1-5"
+    # Every five minutes from 09:00 to 15:59 China Standard Time.
+    # The trading-window step below skips pre-open, lunch break, and post-close runs.
+    - cron: "*/5 1-7 * * 1-5"
   workflow_dispatch:
 
 permissions:
@@ -15,7 +14,7 @@ permissions:
 
 concurrency:
   group: stock-pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   refresh:
@@ -29,19 +28,55 @@ jobs:
       PYTHONUTF8: "1"
     steps:
       - uses: actions/checkout@v6
+
+      - name: Check Shanghai trading window
+        id: market
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          python - <<'PY'
+          import os
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+
+          now = datetime.now(ZoneInfo("Asia/Shanghai"))
+          hhmm = now.strftime("%H:%M")
+          trading = (
+              now.weekday() < 5
+              and (
+                  "09:15" <= hhmm <= "11:30"
+                  or "13:00" <= hhmm <= "15:00"
+              )
+          )
+          should_run = trading or os.environ["EVENT_NAME"] == "workflow_dispatch"
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"run={'true' if should_run else 'false'}\n")
+          print(
+              f"Shanghai time {now:%Y-%m-%d %H:%M:%S}; "
+              f"trading={trading}; run={should_run}"
+          )
+          PY
+
       - uses: actions/setup-python@v6
+        if: steps.market.outputs.run == 'true'
         with:
           python-version: "3.12"
           cache: pip
-      - run: python -m pip install -r requirements.txt
+      - if: steps.market.outputs.run == 'true'
+        run: python -m pip install -r requirements.txt
       - name: Refresh tracked quotes
+        if: steps.market.outputs.run == 'true'
         run: python intraday.py --result cloud_snapshot.json
       - name: Build static site
+        if: steps.market.outputs.run == 'true'
         run: python prepare_site.py
       - uses: actions/configure-pages@v5
+        if: steps.market.outputs.run == 'true'
       - uses: actions/upload-pages-artifact@v4
+        if: steps.market.outputs.run == 'true'
         with:
           path: _site
       - name: Deploy GitHub Pages
+        if: steps.market.outputs.run == 'true'
         id: deployment
         uses: actions/deploy-pages@v4

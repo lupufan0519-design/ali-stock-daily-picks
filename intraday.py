@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Iterable, Sequence
+from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
 
@@ -90,7 +92,68 @@ def chunks(items: Sequence[dict], size: int = 80) -> Iterable[Sequence[dict]]:
         yield items[start : start + size]
 
 
-def fetch_quotes(targets: Sequence[dict]) -> tuple[dict[str, dict], str]:
+def parse_tencent_quotes(raw: str, targets: Sequence[dict]) -> dict[str, dict]:
+    by_code = {str(item["code"]): item for item in targets}
+    quotes: dict[str, dict] = {}
+    for payload in re.findall(r'v_[^=]+="([^"]*)";', raw):
+        fields = payload.split("~")
+        if len(fields) < 36:
+            continue
+        code = fields[2]
+        target = by_code.get(code)
+        if target is None:
+            continue
+        try:
+            amount_parts = fields[35].split("/")
+            amount = float(amount_parts[2]) if len(amount_parts) >= 3 else 0.0
+            timestamp = fields[30]
+            server_time = (
+                datetime.strptime(timestamp, "%Y%m%d%H%M%S")
+                .replace(tzinfo=SHANGHAI)
+                .isoformat(timespec="seconds")
+            )
+            quotes[code] = {
+                "code": code,
+                "name": str(target.get("name") or fields[1]),
+                "market": int(target["market"]),
+                "scope": target.get("scope", ""),
+                "price": float(fields[3]),
+                "pre_close": float(fields[4]),
+                "open": float(fields[5]),
+                "high": float(fields[33]),
+                "low": float(fields[34]),
+                "change_pct": float(fields[32]),
+                "volume": float(fields[6]),
+                "amount": amount,
+                "server_time": server_time,
+            }
+        except (ValueError, IndexError):
+            continue
+    return quotes
+
+
+def fetch_tencent_quotes(targets: Sequence[dict]) -> dict[str, dict]:
+    symbols = [
+        f"{'sh' if int(item['market']) == 1 else 'sz'}{item['code']}"
+        for item in targets
+    ]
+    url = "https://qt.gtimg.cn/q=" + ",".join(symbols)
+    request = Request(
+        url,
+        headers={
+            "Referer": "https://finance.qq.com/",
+            "User-Agent": "Mozilla/5.0 (compatible; ali-stock-daily-picks/1.0)",
+        },
+    )
+    with urlopen(request, timeout=12) as response:
+        raw = response.read().decode("gbk", errors="replace")
+    quotes = parse_tencent_quotes(raw, targets)
+    if not quotes:
+        raise RuntimeError("腾讯行情接口未返回有效报价")
+    return quotes
+
+
+def fetch_xmtdx_quotes(targets: Sequence[dict]) -> tuple[dict[str, dict], str]:
     from xmtdx import Market, TdxClient
 
     if not targets:
@@ -140,19 +203,66 @@ def fetch_quotes(targets: Sequence[dict]) -> tuple[dict[str, dict], str]:
     raise RuntimeError(f"行情服务器均不可用：{last_error}")
 
 
+def fetch_quotes(
+    targets: Sequence[dict],
+) -> tuple[dict[str, dict], str, str]:
+    if not targets:
+        return {}, "", ""
+    try:
+        quotes = fetch_tencent_quotes(targets)
+        if len(quotes) == len(targets):
+            return quotes, "tencent", "qt.gtimg.cn"
+    except Exception as exc:
+        tencent_error = exc
+    else:
+        tencent_error = RuntimeError(
+            f"腾讯行情仅返回 {len(quotes)}/{len(targets)} 只"
+        )
+
+    try:
+        quotes, host = fetch_xmtdx_quotes(targets)
+        return quotes, "xmtdx", host
+    except Exception as xmtdx_error:
+        raise RuntimeError(
+            f"腾讯行情失败：{tencent_error}；通达信行情失败：{xmtdx_error}"
+        ) from xmtdx_error
+
+
 def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
     local_now = now or datetime.now(SHANGHAI)
     targets = collect_targets(payload)
     label, note = market_state(local_now)
-    quotes, host = fetch_quotes(targets)
+    quotes, source, host = fetch_quotes(targets)
+    quote_times = [
+        datetime.fromisoformat(str(item["server_time"]))
+        for item in quotes.values()
+        if "T" in str(item.get("server_time", ""))
+    ]
+    latest_quote_time = max(quote_times) if quote_times else None
+    quote_age_seconds = (
+        max(0, int((local_now - latest_quote_time).total_seconds()))
+        if latest_quote_time
+        else None
+    )
+    stale = not bool(quotes) or (
+        label == "盘中行情"
+        and quote_age_seconds is not None
+        and quote_age_seconds > 600
+    )
     return {
         "generated_at": local_now.isoformat(timespec="seconds"),
         "generated_at_display": local_now.strftime("%Y-%m-%d %H:%M:%S"),
         "market_label": label,
         "note": note,
-        "is_stale": not bool(quotes),
-        "source": "xmtdx",
+        "is_stale": stale,
+        "source": source,
         "source_host": host,
+        "latest_quote_time": (
+            latest_quote_time.isoformat(timespec="seconds")
+            if latest_quote_time
+            else ""
+        ),
+        "quote_age_seconds": quote_age_seconds,
         "close_trade_date": str(payload.get("trade_date", "")),
         "target_count": len(targets),
         "quote_count": len(quotes),
