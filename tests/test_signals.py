@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from screener import Bar, Stock, ema, has_yellow_segment, is_intraday_snapshot, is_st_name, limit_up_price, load_config, make_sparkline, price_limit_rate, rolling_cci, xma
+from screener import Bar, Stock, append_line_coefficients, ema, has_yellow_segment, is_intraday_snapshot, is_st_name, limit_up_price, line_series, load_config, make_sparkline, price_limit_rate, rolling_cci, xma
 
 
 class SignalMathTests(unittest.TestCase):
@@ -28,6 +28,7 @@ class SignalMathTests(unittest.TestCase):
         config = load_config(ROOT / "config.json")
         self.assertFalse(config["include_st"])
         self.assertEqual(config["limit_up_lookback_days"], 42)
+        self.assertEqual(config["yellow_consecutive_days"], 1)
 
     def test_cci_has_warmup(self):
         bars = [Bar(f"2026-01-{i:02d}", i, i + 1, i - 1, i, 1, 1) for i in range(1, 20)]
@@ -37,6 +38,44 @@ class SignalMathTests(unittest.TestCase):
 
     def test_xma_uses_centered_partial_windows(self):
         self.assertEqual(xma([1, 2, 3, 4, 5], 3), [1.5, 2.0, 3.0, 4.0, 4.5])
+
+    def test_next_bar_line_coefficients_match_full_formula(self):
+        bars = [
+            Bar(
+                f"2026-01-{(i % 28) + 1:02d}",
+                10 + i * 0.02,
+                10.6 + i * 0.02,
+                9.5 + i * 0.02,
+                10.1 + i * 0.02,
+                1,
+                1,
+            )
+            for i in range(100)
+        ]
+        coefficients = append_line_coefficients(bars)
+        low, high = 11.2, 12.7
+        probe = Bar("2026-07-31", 12.0, high, low, 12.3, 1, 1)
+        dragon, tiger = line_series([*bars, probe])
+
+        def value(parts):
+            return parts[0] + parts[1] * low + parts[2] * high
+
+        self.assertAlmostEqual(value(coefficients["dragon"]), dragon[-1], places=8)
+        self.assertAlmostEqual(value(coefficients["tiger"]), tiger[-1], places=8)
+        self.assertAlmostEqual(
+            value(coefficients["previous_dragon"]),
+            dragon[-2],
+            places=8,
+        )
+        self.assertAlmostEqual(
+            value(coefficients["previous_tiger"]),
+            tiger[-2],
+            places=8,
+        )
+        for parts, expected in zip(coefficients["dragon_tail"], dragon[-6:]):
+            self.assertAlmostEqual(value(parts), expected, places=8)
+        for parts, expected in zip(coefficients["tiger_tail"], tiger[-6:]):
+            self.assertAlmostEqual(value(parts), expected, places=8)
 
     def test_partial_body_below_dragon_is_yellow(self):
         bar = Bar("2026-07-22", 10.60, 10.72, 10.21, 10.25, 1, 1)

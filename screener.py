@@ -8,7 +8,7 @@ import math
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
@@ -77,6 +77,7 @@ class Evaluation:
     eligible: bool
     selected: bool
     chart: str
+    live_seed: dict = field(default_factory=dict)
 
 
 def load_config(path: Path) -> dict:
@@ -165,6 +166,15 @@ def latest_true_date(flags: Sequence[bool], bars: Sequence[Bar], lookback: int) 
         if flags[i]:
             return bars[i].date
     return ""
+
+
+def latest_true_age(flags: Sequence[bool], lookback: int) -> int:
+    """Return trading-bar age of the latest signal, or -1 when absent."""
+    start = max(0, len(flags) - lookback)
+    for i in range(len(flags) - 1, start - 1, -1):
+        if flags[i]:
+            return len(flags) - 1 - i
+    return -1
 
 
 def is_st_name(name: str) -> bool:
@@ -272,6 +282,116 @@ def make_sparkline(bars: Sequence[Bar], dragon: Sequence[float], tiger: Sequence
     )
 
 
+def append_line_coefficients(bars: Sequence[Bar]) -> dict[str, list]:
+    """Encode exact next-bar dragon/tiger values as linear high/low functions."""
+
+    def values(low: float, high: float) -> tuple[list[float], list[float]]:
+        probe = Bar(
+            date="",
+            open=0.0,
+            high=high,
+            low=low,
+            close=0.0,
+            volume=1.0,
+            amount=0.0,
+        )
+        dragon, tiger = line_series([*bars, probe])
+        return dragon[-6:], tiger[-6:]
+
+    base = values(0.0, 0.0)
+    low_unit = values(1.0, 0.0)
+    high_unit = values(0.0, 1.0)
+
+    def coeff(series_index: int, index: int) -> list[float]:
+        return [
+            round(base[series_index][index], 10),
+            round(
+                low_unit[series_index][index] - base[series_index][index],
+                10,
+            ),
+            round(
+                high_unit[series_index][index] - base[series_index][index],
+                10,
+            ),
+        ]
+
+    dragon_tail = [coeff(0, index) for index in range(-6, 0)]
+    tiger_tail = [coeff(1, index) for index in range(-6, 0)]
+    return {
+        "dragon": dragon_tail[-1],
+        "tiger": tiger_tail[-1],
+        "previous_dragon": dragon_tail[-2],
+        "previous_tiger": tiger_tail[-2],
+        "dragon_tail": dragon_tail,
+        "tiger_tail": tiger_tail,
+    }
+
+
+def make_live_seed(
+    stock: Stock,
+    bars: Sequence[Bar],
+    cfg: dict,
+    *,
+    bottom_flags: Sequence[bool],
+    cross_flags: Sequence[bool],
+    limit_flags: Sequence[bool],
+    yellow_count: int,
+    bottom_date: str,
+    cross_date: str,
+    limit_date: str,
+    bottom_ok: bool,
+    cross_ok: bool,
+    limit_ok: bool,
+    yellow_ok: bool,
+    dragon_above_tiger: bool,
+) -> dict:
+    typical = [
+        (bar.high + bar.low + bar.close) / 3.0
+        for bar in bars[-13:]
+    ]
+    matched = sum((bottom_ok, cross_ok, limit_ok, yellow_ok))
+    eligible = bool(cfg["include_st"] or not is_st_name(stock.name))
+    return {
+        "code": stock.code,
+        "name": stock.name,
+        "market": stock.market,
+        "base_date": bars[-1].date,
+        "previous_close": round(float(bars[-1].close), 4),
+        "min_close_15": round(min(bar.close for bar in bars[-15:]), 4),
+        "typical_13": [round(value, 6) for value in typical],
+        "next_limit_price": round(
+            limit_up_price(bars[-1].close, price_limit_rate(stock)),
+            4,
+        ),
+        "line_coefficients": append_line_coefficients(bars),
+        "cross_tail_dates": [bar.date for bar in bars[-4:]],
+        "bottom_date": bottom_date,
+        "cross_date": cross_date,
+        "limit_up_date": limit_date,
+        "bottom_age": latest_true_age(
+            bottom_flags,
+            cfg["bottom_lookback_days"],
+        ),
+        "cross_age": latest_true_age(
+            cross_flags,
+            cfg["cross_lookback_days"],
+        ),
+        "limit_up_age": latest_true_age(
+            limit_flags,
+            cfg["limit_up_lookback_days"],
+        ),
+        "bottom_ok": bottom_ok,
+        "cross_ok": cross_ok,
+        "limit_up_ok": limit_ok,
+        "yellow_ok": yellow_ok,
+        "yellow_count": yellow_count,
+        "matched_count": matched,
+        "dragon_above_tiger": dragon_above_tiger,
+        "eligible": eligible,
+        "selected": eligible and matched == 4,
+    }
+
+
 def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
     as_of_date = cfg.get("_as_of_date")
     if as_of_date:
@@ -318,8 +438,26 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
     limit_ok = bool(limit_date)
     yellow_ok = yellow_count >= cfg["yellow_consecutive_days"]
     matched = sum((bottom_ok, cross_ok, limit_ok, yellow_ok))
+    dragon_above_tiger = dragon[-1] > tiger[-1]
     previous = bars[-2].close if len(bars) > 1 else bars[-1].close
     change_pct = (bars[-1].close / previous - 1.0) * 100.0 if previous else 0.0
+    live_seed = make_live_seed(
+        stock,
+        bars,
+        cfg,
+        bottom_flags=bottom_flags,
+        cross_flags=cross_flags,
+        limit_flags=limit_flags,
+        yellow_count=yellow_count,
+        bottom_date=bottom_date,
+        cross_date=cross_date,
+        limit_date=limit_date,
+        bottom_ok=bottom_ok,
+        cross_ok=cross_ok,
+        limit_ok=limit_ok,
+        yellow_ok=yellow_ok,
+        dragon_above_tiger=dragon_above_tiger,
+    )
 
     return Evaluation(
         code=stock.code,
@@ -337,10 +475,11 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
         limit_up_date=limit_date,
         yellow_count=yellow_count,
         matched_count=matched,
-        dragon_above_tiger=dragon[-1] > tiger[-1],
+        dragon_above_tiger=dragon_above_tiger,
         eligible=eligible,
         selected=eligible and matched == 4,
         chart=make_sparkline(bars, dragon, tiger),
+        live_seed=live_seed,
     )
 
 

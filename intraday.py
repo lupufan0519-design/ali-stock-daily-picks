@@ -4,6 +4,7 @@ import argparse
 import json
 import re
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Iterable, Sequence
@@ -23,11 +24,100 @@ def is_st_name(name: object) -> bool:
     return "ST" in str(name).upper()
 
 
+def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
+    """Decode the compact close-generated seed used by the intraday workflow."""
+    if isinstance(item, dict):
+        return item
+    if seed_format != 1 or not isinstance(item, list) or len(item) < 19:
+        return {}
+
+    def triples(values: object) -> list[list[float]]:
+        if not isinstance(values, list) or len(values) % 3:
+            return []
+        return [
+            [float(value) for value in values[index : index + 3]]
+            for index in range(0, len(values), 3)
+        ]
+
+    dragon_tail = triples(item[8])
+    tiger_tail = triples(item[9])
+    if len(dragon_tail) < 2 or len(tiger_tail) < 2:
+        return {}
+    flags = int(item[18])
+    return {
+        "code": str(item[0]),
+        "name": str(item[1]),
+        "market": int(item[2]),
+        "base_date": str(item[3]),
+        "previous_close": float(item[4]),
+        "min_close_15": float(item[5]),
+        "next_limit_price": float(item[6]),
+        "typical_13": [float(value) for value in item[7]],
+        "line_coefficients": {
+            "dragon_tail": dragon_tail,
+            "tiger_tail": tiger_tail,
+            "dragon": dragon_tail[-1],
+            "tiger": tiger_tail[-1],
+            "previous_dragon": dragon_tail[-2],
+            "previous_tiger": tiger_tail[-2],
+        },
+        "cross_tail_dates": [str(value) for value in item[10]],
+        "bottom_date": str(item[11]),
+        "cross_date": str(item[12]),
+        "limit_up_date": str(item[13]),
+        "bottom_age": int(item[14]),
+        "cross_age": int(item[15]),
+        "limit_up_age": int(item[16]),
+        "yellow_count": int(item[17]),
+        "bottom_ok": bool(flags & 1),
+        "cross_ok": bool(flags & 2),
+        "limit_up_ok": bool(flags & 4),
+        "yellow_ok": bool(flags & 8),
+        "dragon_above_tiger": bool(flags & 16),
+        "selected": bool(flags & 32),
+        "eligible": True,
+        "matched_count": sum(bool(flags & bit) for bit in (1, 2, 4, 8)),
+    }
+
+
+def live_seeds(payload: dict) -> list[dict]:
+    seed_format = int(payload.get("live_seed_format", 0))
+    return [
+        seed
+        for item in payload.get("live_universe", [])
+        if (seed := unpack_live_seed(item, seed_format))
+    ]
+
+
 def collect_targets(
     payload: dict,
     observation_limit: int | None = OBSERVATION_LIMIT,
 ) -> list[dict]:
-    """盘中跟踪策略池和页面候选，不重新计算收盘信号。"""
+    """Return the full lightweight universe when live signal seeds are present."""
+    universe = live_seeds(payload)
+    if universe:
+        return sorted(
+            [
+                {
+                    "code": str(item["code"]),
+                    "name": str(item.get("name", "")),
+                    "market": int(item["market"]),
+                    "scope": "universe",
+                }
+                for item in universe
+                if item.get("eligible")
+                and not is_st_name(item.get("name", ""))
+            ],
+            key=lambda item: (item["market"], item["code"]),
+        )
+    return collect_display_targets(payload, observation_limit)
+
+
+def collect_display_targets(
+    payload: dict,
+    observation_limit: int | None = OBSERVATION_LIMIT,
+) -> list[dict]:
+    """Return settled positions and close-confirmed rows visible on the page."""
     targets: dict[str, dict] = {}
     strategy = payload.get("strategy", {})
     for position in (
@@ -69,9 +159,9 @@ def market_state(now: datetime) -> tuple[str, str]:
         return "休市", "周末休市，页面保留最近一次已验证行情"
     hhmm = now.strftime("%H:%M")
     if "09:15" <= hhmm < "09:30":
-        return "集合竞价", "价格约每 5 分钟更新，收盘信号保持不变"
+        return "集合竞价", "主选与次选按最新行情预选；跟踪统计收盘后结算"
     if "09:30" <= hhmm <= "11:30" or "13:00" <= hhmm <= "15:00":
-        return "盘中行情", "价格约每 5 分钟更新，收盘信号保持不变"
+        return "盘中行情", "主选与次选约每 5 分钟重算；跟踪统计收盘后结算"
     if "11:30" < hhmm < "13:00":
         return "午间休市", "显示上午收盘行情，13:00 后继续刷新"
     if hhmm > "15:00":
@@ -162,7 +252,7 @@ def normalize_quote_time(value: object, now: datetime | None = None) -> str:
     return ""
 
 
-def fetch_tencent_quotes(targets: Sequence[dict]) -> dict[str, dict]:
+def fetch_tencent_quote_group(targets: Sequence[dict]) -> dict[str, dict]:
     symbols = [
         f"{'sh' if int(item['market']) == 1 else 'sz'}{item['code']}"
         for item in targets
@@ -177,7 +267,20 @@ def fetch_tencent_quotes(targets: Sequence[dict]) -> dict[str, dict]:
     )
     with urlopen(request, timeout=12) as response:
         raw = response.read().decode("gbk", errors="replace")
-    quotes = parse_tencent_quotes(raw, targets)
+    return parse_tencent_quotes(raw, targets)
+
+
+def fetch_tencent_quotes(targets: Sequence[dict]) -> dict[str, dict]:
+    groups = list(chunks(targets))
+    quotes: dict[str, dict] = {}
+    workers = min(8, len(groups))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = [
+            pool.submit(fetch_tencent_quote_group, group)
+            for group in groups
+        ]
+        for future in as_completed(futures):
+            quotes.update(future.result())
     if not quotes:
         raise RuntimeError("腾讯行情接口未返回有效报价")
     return quotes
@@ -258,11 +361,237 @@ def fetch_quotes(
         ) from xmtdx_error
 
 
+def coefficient_value(coefficients: Sequence[float], low: float, high: float) -> float:
+    return (
+        float(coefficients[0])
+        + float(coefficients[1]) * low
+        + float(coefficients[2]) * high
+    )
+
+
+def current_cci(typical_13: Sequence[float], high: float, low: float, close: float) -> float:
+    window = [float(value) for value in typical_13[-13:]]
+    window.append((high + low + close) / 3.0)
+    if len(window) < 14:
+        return 0.0
+    mean = sum(window) / 14
+    deviation = sum(abs(value - mean) for value in window) / 14
+    return 0.0 if deviation == 0 else (window[-1] - mean) / (0.015 * deviation)
+
+
+def _baseline_live_row(seed: dict, quote: dict) -> dict:
+    return {
+        "code": str(seed["code"]),
+        "name": str(seed.get("name", quote.get("name", ""))),
+        "market": int(seed["market"]),
+        "price": float(quote.get("price", seed.get("previous_close", 0.0))),
+        "change_pct": float(quote.get("change_pct", 0.0)),
+        "server_time": str(quote.get("server_time", "")),
+        "bottom_ok": bool(seed.get("bottom_ok")),
+        "cross_ok": bool(seed.get("cross_ok")),
+        "limit_up_ok": bool(seed.get("limit_up_ok")),
+        "yellow_ok": bool(seed.get("yellow_ok")),
+        "bottom_date": str(seed.get("bottom_date", "")),
+        "cross_date": str(seed.get("cross_date", "")),
+        "limit_up_date": str(seed.get("limit_up_date", "")),
+        "yellow_count": int(seed.get("yellow_count", 0)),
+        "matched_count": int(seed.get("matched_count", 0)),
+        "dragon_above_tiger": bool(seed.get("dragon_above_tiger")),
+        "eligible": bool(seed.get("eligible")),
+        "selected": bool(seed.get("selected")),
+    }
+
+
+def evaluate_live_seed(
+    seed: dict,
+    quote: dict,
+    cfg: dict,
+    close_trade_date: str,
+) -> dict | None:
+    """Re-evaluate one stock from today's OHLC without mutating settled state."""
+    if not seed.get("eligible") or is_st_name(seed.get("name", "")):
+        return None
+    price = float(quote.get("price", 0.0))
+    open_price = float(quote.get("open", 0.0))
+    high = float(quote.get("high", 0.0))
+    low = float(quote.get("low", 0.0))
+    server_time = str(quote.get("server_time", ""))
+    live_date = server_time[:10] if len(server_time) >= 10 else ""
+    if (
+        not live_date
+        or live_date <= close_trade_date
+        or live_date <= str(seed.get("base_date", ""))
+    ):
+        return _baseline_live_row(seed, quote)
+    if min(price, open_price, high, low) <= 0:
+        return None
+
+    coefficients = seed["line_coefficients"]
+    dragon_tail_coefficients = coefficients.get("dragon_tail")
+    tiger_tail_coefficients = coefficients.get("tiger_tail")
+    if dragon_tail_coefficients and tiger_tail_coefficients:
+        dragon_tail = [
+            coefficient_value(parts, low, high)
+            for parts in dragon_tail_coefficients
+        ]
+        tiger_tail = [
+            coefficient_value(parts, low, high)
+            for parts in tiger_tail_coefficients
+        ]
+    else:
+        dragon_tail = [
+            coefficient_value(coefficients["previous_dragon"], low, high),
+            coefficient_value(coefficients["dragon"], low, high),
+        ]
+        tiger_tail = [
+            coefficient_value(coefficients["previous_tiger"], low, high),
+            coefficient_value(coefficients["tiger"], low, high),
+        ]
+    dragon = dragon_tail[-1]
+    tiger = tiger_tail[-1]
+    dragon_above_tiger = dragon > tiger
+
+    new_bottom = bool(
+        price <= float(seed["min_close_15"]) + 1e-8
+        and high > low + 0.04
+        and current_cci(seed.get("typical_13", []), high, low, price) < -110
+    )
+    bottom_age = int(seed.get("bottom_age", -1))
+    prior_bottom = (
+        bottom_age >= 0
+        and bottom_age + 1 < int(cfg["bottom_lookback_days"])
+    )
+    bottom_ok = new_bottom or prior_bottom
+    bottom_date = (
+        live_date
+        if new_bottom
+        else str(seed.get("bottom_date", ""))
+        if prior_bottom
+        else ""
+    )
+
+    if len(dragon_tail) >= 6:
+        cross_flags = [
+            dragon_tail[index] > tiger_tail[index]
+            and dragon_tail[index - 1] <= tiger_tail[index - 1]
+            for index in range(1, len(dragon_tail))
+        ]
+        cross_dates = [
+            *list(seed.get("cross_tail_dates", []))[-4:],
+            live_date,
+        ]
+        cross_date = next(
+            (
+                date
+                for date, flag in reversed(list(zip(cross_dates, cross_flags)))
+                if flag
+            ),
+            "",
+        )
+        cross_ok = bool(cross_date and dragon_above_tiger)
+    else:
+        new_cross = bool(
+            dragon_above_tiger
+            and dragon_tail[-2] <= tiger_tail[-2]
+        )
+        cross_age = int(seed.get("cross_age", -1))
+        prior_cross = (
+            cross_age >= 0
+            and cross_age + 1 < int(cfg["cross_lookback_days"])
+        )
+        cross_ok = bool((new_cross or prior_cross) and dragon_above_tiger)
+        cross_date = (
+            live_date
+            if new_cross
+            else str(seed.get("cross_date", ""))
+            if prior_cross and dragon_above_tiger
+            else ""
+        )
+
+    new_limit_up = price + 1e-8 >= float(seed["next_limit_price"])
+    limit_age = int(seed.get("limit_up_age", -1))
+    prior_limit_up = (
+        limit_age >= 0
+        and limit_age + 1 < int(cfg["limit_up_lookback_days"])
+    )
+    limit_up_ok = new_limit_up or prior_limit_up
+    limit_up_date = (
+        live_date
+        if new_limit_up
+        else str(seed.get("limit_up_date", ""))
+        if prior_limit_up
+        else ""
+    )
+
+    yellow = dragon > min(open_price, price)
+    yellow_count = 1 if yellow else 0
+    yellow_ok = yellow_count >= int(cfg["yellow_consecutive_days"])
+    matched_count = sum((bottom_ok, cross_ok, limit_up_ok, yellow_ok))
+    selected = bool(seed.get("eligible") and matched_count == 4)
+    return {
+        "code": str(seed["code"]),
+        "name": str(seed.get("name", quote.get("name", ""))),
+        "market": int(seed["market"]),
+        "price": price,
+        "change_pct": float(quote.get("change_pct", 0.0)),
+        "server_time": server_time,
+        "bottom_ok": bottom_ok,
+        "cross_ok": cross_ok,
+        "limit_up_ok": limit_up_ok,
+        "yellow_ok": yellow_ok,
+        "bottom_date": bottom_date,
+        "cross_date": cross_date,
+        "limit_up_date": limit_up_date,
+        "yellow_count": yellow_count,
+        "matched_count": matched_count,
+        "dragon_above_tiger": dragon_above_tiger,
+        "eligible": True,
+        "selected": selected,
+    }
+
+
+def build_live_pools(payload: dict, quotes: dict[str, dict]) -> dict:
+    seeds = live_seeds(payload)
+    if not seeds:
+        return {"main": [], "secondary": [], "available": False}
+    cfg = payload.get("config", {})
+    close_trade_date = str(payload.get("trade_date", ""))
+    rows = []
+    for seed in seeds:
+        quote = quotes.get(str(seed.get("code", "")))
+        if quote is None:
+            continue
+        row = evaluate_live_seed(seed, quote, cfg, close_trade_date)
+        if row is not None:
+            rows.append(row)
+    main = [row for row in rows if row["selected"]]
+    secondary = [
+        row
+        for row in rows
+        if not row["selected"]
+        and row["cross_ok"]
+        and row["yellow_ok"]
+        and (row["bottom_ok"] or row["limit_up_ok"])
+    ]
+    sort_key = lambda row: (
+        row["matched_count"],
+        row["cross_ok"],
+        row["bottom_ok"],
+        row["limit_up_ok"],
+        row["yellow_count"],
+        row["change_pct"],
+    )
+    main.sort(key=sort_key, reverse=True)
+    secondary.sort(key=sort_key, reverse=True)
+    return {"main": main, "secondary": secondary, "available": True}
+
+
 def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
     local_now = now or datetime.now(SHANGHAI)
     targets = collect_targets(payload)
     label, note = market_state(local_now)
     quotes, source, host = fetch_quotes(targets)
+    live_pools = build_live_pools(payload, quotes)
     quote_times = [
         datetime.fromisoformat(str(item["server_time"]))
         for item in quotes.values()
@@ -279,6 +608,35 @@ def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
         and quote_age_seconds is not None
         and quote_age_seconds > 600
     )
+    display_codes = {
+        item["code"]
+        for item in (
+            list(live_pools.get("main", []))
+            + list(live_pools.get("secondary", []))
+        )
+    }
+    display_codes.update(
+        item["code"]
+        for item in collect_display_targets(payload)
+    )
+    display_quotes = {
+        code: quote
+        for code, quote in quotes.items()
+        if code in display_codes
+    }
+    live_dates = sorted(
+        {
+            str(item.get("server_time", ""))[:10]
+            for item in quotes.values()
+            if len(str(item.get("server_time", ""))) >= 10
+        }
+    )
+    live_trade_date = live_dates[-1] if live_dates else ""
+    selection_mode = (
+        "intraday"
+        if live_trade_date and live_trade_date > str(payload.get("trade_date", ""))
+        else "close"
+    )
     return {
         "generated_at": local_now.isoformat(timespec="seconds"),
         "generated_at_display": local_now.strftime("%Y-%m-%d %H:%M:%S"),
@@ -294,9 +652,12 @@ def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
         ),
         "quote_age_seconds": quote_age_seconds,
         "close_trade_date": str(payload.get("trade_date", "")),
+        "live_trade_date": live_trade_date,
+        "selection_mode": selection_mode,
+        "live_pools": live_pools,
         "target_count": len(targets),
         "quote_count": len(quotes),
-        "quotes": quotes,
+        "quotes": display_quotes,
     }
 
 

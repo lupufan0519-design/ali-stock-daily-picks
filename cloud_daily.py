@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parent
 STATE_PATH = ROOT / "strategy" / "state.json"
 LATEST_PATH = ROOT / "results" / "latest.json"
 SNAPSHOT_PATH = ROOT / "cloud_snapshot.json"
+LIVE_SEED_FORMAT = 1
 
 
 def read_last_trade_date() -> str:
@@ -22,9 +23,59 @@ def read_last_trade_date() -> str:
     return str(json.loads(STATE_PATH.read_text(encoding="utf-8")).get("last_trade_date", ""))
 
 
+def pack_live_seed(seed: dict) -> list:
+    coefficients = seed["line_coefficients"]
+    flags = sum(
+        (
+            1 if seed.get("bottom_ok") else 0,
+            2 if seed.get("cross_ok") else 0,
+            4 if seed.get("limit_up_ok") else 0,
+            8 if seed.get("yellow_ok") else 0,
+            16 if seed.get("dragon_above_tiger") else 0,
+            32 if seed.get("selected") else 0,
+        )
+    )
+    return [
+        str(seed["code"]),
+        str(seed.get("name", "")),
+        int(seed["market"]),
+        str(seed.get("base_date", "")),
+        float(seed["previous_close"]),
+        float(seed["min_close_15"]),
+        float(seed["next_limit_price"]),
+        list(seed.get("typical_13", [])),
+        [
+            value
+            for parts in coefficients["dragon_tail"]
+            for value in parts
+        ],
+        [
+            value
+            for parts in coefficients["tiger_tail"]
+            for value in parts
+        ],
+        list(seed.get("cross_tail_dates", [])),
+        str(seed.get("bottom_date", "")),
+        str(seed.get("cross_date", "")),
+        str(seed.get("limit_up_date", "")),
+        int(seed.get("bottom_age", -1)),
+        int(seed.get("cross_age", -1)),
+        int(seed.get("limit_up_age", -1)),
+        int(seed.get("yellow_count", 0)),
+        flags,
+    ]
+
+
 def compact_snapshot(payload: dict) -> dict:
     minimum = int(payload.get("config", {}).get("near_match_minimum", 3))
     rows = visible_observations(payload.get("results", []), minimum)
+    live_universe = [
+        pack_live_seed(row["live_seed"])
+        for row in payload.get("results", [])
+        if isinstance(row.get("live_seed"), dict)
+        and row["live_seed"].get("eligible")
+        and "ST" not in str(row["live_seed"].get("name", "")).upper()
+    ]
     keep = {
         "code",
         "name",
@@ -47,6 +98,8 @@ def compact_snapshot(payload: dict) -> dict:
         "config": payload.get("config", {}),
         "strategy": payload.get("strategy", {}),
         "results": [{key: row.get(key) for key in keep} for row in rows],
+        "live_seed_format": LIVE_SEED_FORMAT,
+        "live_universe": live_universe,
     }
 
 
