@@ -1,7 +1,7 @@
 {
   "version": 1,
   "pool_name": "卢氏龙虎趋势池",
-  "last_trade_date": "2026-07-30",
+  "last_trade_date": "2026-07-31",
   "active": [
     {
       "position_id": "301516_2026-07-30",
@@ -10,17 +10,18 @@
       "market": 0,
       "entry_date": "2026-07-30",
       "entry_price": 14.43,
-      "last_date": "2026-07-30",
-      "last_close": 14.43,
-      "return_pct": 0.0,
-      "best_return_pct": 0.0,
+      "last_date": "2026-07-31",
+      "last_close": 14.75,
+      "return_pct": 2.2176022176022103,
+      "best_return_pct": 2.2176022176022103,
       "worst_return_pct": 0.0,
-      "holding_days": 1,
+      "holding_days": 2,
       "missing_streak": 0,
       "signal_lost_date": "",
       "status": "龙线在虎线上方",
       "selected_dates": [
-        "2026-07-30"
+        "2026-07-30",
+        "2026-07-31"
       ]
     }
   ],
@@ -58,15 +59,33 @@
       "market": 1,
       "entry_date": "2026-07-24",
       "entry_price": 8.49,
-      "last_date": "2026-07-30",
-      "last_close": 8.8,
-      "return_pct": 3.6513545347467646,
-      "best_return_pct": 3.6513545347467646,
+      "last_date": "2026-07-31",
+      "last_close": 8.98,
+      "return_pct": 5.771495877502941,
+      "best_return_pct": 5.771495877502941,
       "worst_return_pct": 0.0,
-      "holding_days": 2,
+      "holding_days": 3,
       "status": "龙线在虎线上方",
       "selected_dates": [
         "2026-07-24"
+      ]
+    },
+    {
+      "position_id": "secondary_600062_2026-07-31",
+      "code": "600062",
+      "name": "华润双鹤",
+      "market": 1,
+      "entry_date": "2026-07-31",
+      "entry_price": 16.27,
+      "last_date": "2026-07-31",
+      "last_close": 16.27,
+      "return_pct": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "holding_days": 1,
+      "status": "龙线在虎线上方",
+      "selected_dates": [
+        "2026-07-31"
       ]
     }
   ],
