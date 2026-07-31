@@ -266,6 +266,16 @@ tbody tr:last-child td { border-bottom: 0; }
 .metric { min-height: 106px; padding: 16px; background: var(--surface); }
 .metric-label { color: var(--muted); font-size: 12px; }
 .metric-value { display: block; margin-top: 7px; font: 700 20px/1.3 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.settlement-note {
+  margin: 0;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-blue);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 650;
+}
+.live-pool-status { min-width: 150px; }
 .rules {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1075,9 +1085,9 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
             <span class="cover-count" id="lens-value">等待行情</span>
           </div>
           <div class="status-detail" id="market-detail">交易日 2026-07-30 · 云端行情自动刷新</div>
-          <div class="cover-time">最新行情<strong id="quote-time">2026-07-31 08:50</strong></div>
+          <div class="cover-time">最新行情<strong id="quote-time">2026-07-31 11:12</strong></div>
         </aside>
-        <p class="cover-note"><strong>机会可以等，风险必须先看。</strong>主选与次选只在收盘后确认，盘中变化不替你提前做决定。</p>
+        <p class="cover-note"><strong>机会可以等，风险必须先看。</strong>主选与次选盘中实时预选；跟踪收益、成功率等只在收盘后结算。</p>
       </div>
     </section>
 
@@ -1087,23 +1097,38 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
     </section>
 
     <section class="kpi-grid reveal" aria-label="核心概览">
-      <article class="kpi"><span class="kpi-label">主选跟踪</span><strong class="kpi-value">0</strong><span class="kpi-note">严格四项同时满足</span></article>
-      <article class="kpi"><span class="kpi-label">次选跟踪</span><strong class="kpi-value">1</strong><span class="kpi-note">龙虎 + 黄柱 + 另一项</span></article>
-      <article class="kpi"><span class="kpi-label">今日严格命中</span><strong class="kpi-value">0</strong><span class="kpi-note">eligible=true</span></article>
+      <article class="kpi"><span class="kpi-label">主选实时预选</span><strong class="kpi-value" data-live-main-count>1</strong><span class="kpi-note">严格四项同时满足</span></article>
+      <article class="kpi"><span class="kpi-label">次选实时预选</span><strong class="kpi-value" data-live-secondary-count>0</strong><span class="kpi-note">龙虎 + 黄柱 + 另一项</span></article>
+      <article class="kpi"><span class="kpi-label">收盘主选跟踪</span><strong class="kpi-value">0</strong><span class="kpi-note">仅收盘后结算</span></article>
       <article class="kpi"><span class="kpi-label">观察标的</span><strong class="kpi-value">30</strong><span class="kpi-note">仅观察，不计入选</span></article>
-      <article class="kpi"><span class="kpi-label">市场扫描</span><strong class="kpi-value">5208</strong><span class="kpi-note">失败 0 只 · ST 排除</span></article>
+      <article class="kpi"><span class="kpi-label">市场扫描</span><strong class="kpi-value">5209</strong><span class="kpi-note">失败 0 只 · ST 排除</span></article>
     </section>
 
     <section class="section reveal" id="pool">
       <div class="section-head"><div><span class="section-kicker">Tracked portfolio</span><h2>卢氏龙虎趋势池</h2>
-      <p class="section-copy">加入日收盘价作为基准，盘中收益由最新行情计算；策略状态只在收盘完整扫描后变化。</p></div></div>
-<div class="events"><strong>今日状态变动</strong><ul><li>600793 宜宾纸业：龙虎信号消失，已移出次选区，阶段收益 +0.00%</li></ul></div>
+      <p class="section-copy">主选、次选名单按最新行情实时预选；正式加入、移出、跟踪收益和成功率只在收盘完整扫描后结算。</p></div></div>
+
       <div class="pool-switcher" role="tablist" aria-label="趋势池区域切换">
-        <button class="pool-tab" id="tab-main" type="button" role="tab" aria-selected="true" aria-controls="pool-main" data-pool-tab="main">主选区 · 0</button>
-        <button class="pool-tab" id="tab-secondary" type="button" role="tab" aria-selected="false" aria-controls="pool-secondary" data-pool-tab="secondary" tabindex="-1">次选区 · 1</button>
+        <button class="pool-tab" id="tab-main" type="button" role="tab" aria-selected="true" aria-controls="pool-main" data-pool-tab="main">主选区 · <span data-live-main-count>1</span></button>
+        <button class="pool-tab" id="tab-secondary" type="button" role="tab" aria-selected="false" aria-controls="pool-secondary" data-pool-tab="secondary" tabindex="-1">次选区 · <span data-live-secondary-count>0</span></button>
       </div>
       <article class="panel" id="pool-main" role="tabpanel" aria-labelledby="tab-main" data-pool-panel="main">
-        <div class="panel-head"><div><h3>主选区</h3><p>四项条件同时满足，龙虎信号连续两日失效后移出</p></div><span class="count-badge">0 只</span></div>
+        <div class="panel-head"><div><h3>主选区</h3><p>四项条件同时满足；盘中名单约每 5 分钟重算</p></div><span class="count-badge"><span data-live-main-count>1</span> 只</span></div>
+        <div class="table-scroll"><table><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态</th></tr></thead>
+        <tbody id="live-main-body">
+    <tr data-live-code="301516">
+      <td><a class="stock-link" href="https://quote.eastmoney.com/sz301516.html" target="_blank" rel="noreferrer">中远通</a><span class="stock-code">301516</span></td>
+      <td><span class="numeric" data-live-price>14.43</span>
+          <span class="subline"><span class="numeric" data-live-change>-8.44%</span>
+          · <span data-live-time>2026-07-30 收盘</span></span></td>
+      <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-30</span></div></td>
+      <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-24</span></div></td>
+      <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-07</span></div></td>
+      <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">连续 1 根</span></div></td>
+      <td class="live-pool-status"><span class="state good">最近收盘主选信号</span>
+          <span class="subline">正式跟踪与统计以收盘状态为准</span></td>
+    </tr></tbody></table></div>
+        <p class="settlement-note">以下统计与跟踪明细截至 2026-07-30 收盘，盘中不会提前计入或移出。</p>
         <div class="metrics">
           <div class="metric"><span class="metric-label">当前成功率</span><strong class="metric-value"><span class="numeric positive">+0.00%</span></strong></div>
           <div class="metric"><span class="metric-label">样本平均收益</span><strong class="metric-value"><span class="numeric negative">-6.08%</span></strong></div>
@@ -1112,12 +1137,17 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
           <div class="metric"><span class="metric-label">信号待确认</span><strong class="metric-value">0 只</strong></div>
           <div class="metric"><span class="metric-label">累计样本</span><strong class="metric-value">1 只</strong></div>
         </div>
-        <div class="table-scroll"><table><thead><tr><th>股票</th><th>加入日 / 价格</th><th>最新价 / 日期</th><th>跟踪收益</th><th>时长</th><th>状态</th></tr></thead>
-        <tbody><tr><td class="empty" colspan="6">当前没有符合条件的记录</td></tr></tbody></table></div>
+        <details><summary>查看截至收盘的主选跟踪明细</summary>
+          <div class="table-scroll"><table><thead><tr><th>股票</th><th>加入日 / 价格</th><th>结算价 / 日期</th><th>结算收益</th><th>时长</th><th>状态</th></tr></thead>
+          <tbody><tr><td class="empty" colspan="6">当前没有符合条件的记录</td></tr></tbody></table></div>
+        </details>
       </article>
 
       <article class="panel" id="pool-secondary" role="tabpanel" aria-labelledby="tab-secondary" data-pool-panel="secondary" hidden>
-        <div class="panel-head"><div><h3>次选区</h3><p>龙腾跃虎与连续黄柱必选，再满足见底或42日涨停之一</p></div><span class="count-badge">1 只</span></div>
+        <div class="panel-head"><div><h3>次选区</h3><p>龙腾跃虎与黄柱必选，再满足见底或42日涨停之一</p></div><span class="count-badge"><span data-live-secondary-count>0</span> 只</span></div>
+        <div class="table-scroll"><table><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态</th></tr></thead>
+        <tbody id="live-secondary-body"><tr><td class="empty" colspan="7">当前没有符合条件的次选预选</td></tr></tbody></table></div>
+        <p class="settlement-note">以下统计与跟踪明细截至 2026-07-30 收盘，盘中不会提前计入或移出。</p>
         <div class="metrics">
           <div class="metric"><span class="metric-label">当前成功率</span><strong class="metric-value"><span class="numeric positive">+50.00%</span></strong></div>
           <div class="metric"><span class="metric-label">跟踪平均收益</span><strong class="metric-value"><span class="numeric positive">+3.65%</span></strong></div>
@@ -1126,23 +1156,25 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
           <div class="metric"><span class="metric-label">已移出</span><strong class="metric-value">1 只</strong></div>
           <div class="metric"><span class="metric-label">累计样本</span><strong class="metric-value">2 只</strong></div>
         </div>
-        <div class="table-scroll"><table><thead><tr><th>股票</th><th>加入日 / 价格</th><th>最新价 / 日期</th><th>跟踪收益</th><th>时长</th><th>状态</th></tr></thead>
-        <tbody>
-    <tr data-live-code="603648" data-entry-price="8.4900">
+        <details><summary>查看截至收盘的次选跟踪明细</summary>
+          <div class="table-scroll"><table><thead><tr><th>股票</th><th>加入日 / 价格</th><th>结算价 / 日期</th><th>结算收益</th><th>时长</th><th>状态</th></tr></thead>
+          <tbody>
+    <tr>
       <td><a class="stock-link" href="https://quote.eastmoney.com/sh603648.html" target="_blank" rel="noreferrer">畅联股份</a><span class="stock-code">603648</span></td>
       <td class="numeric">2026-07-24<span class="subline">8.49 元</span></td>
-      <td><span class="numeric" data-live-price>8.80</span>
-          <span class="subline" data-live-time>2026-07-30 收盘</span></td>
-      <td><span data-live-return><span class="numeric positive">+3.65%</span></span></td>
+      <td><span class="numeric">8.80</span>
+          <span class="subline">2026-07-30 收盘结算</span></td>
+      <td><span class="numeric positive">+3.65%</span></td>
       <td class="numeric">2 日</td>
       <td><span class="state good">龙线在虎线上方</span></td>
     </tr></tbody></table></div>
+        </details>
       </article>
     </section>
 
     <section class="section reveal" id="signals">
-      <div class="section-head"><div><span class="section-kicker">Daily selection</span><h2>今日严格入选</h2>
-      </div><span class="count-badge">0 只</span></div>
+      <div class="section-head"><div><span class="section-kicker">Daily selection</span><h2>最近收盘主选信号</h2>
+      </div><span class="count-badge">1 只</span></div>
 <div class="legend" aria-label="图表图例">
         <span><i style="background:#ef5350"></i>上涨 K 线</span>
         <span><i style="background:#26a69a"></i>下跌 K 线</span>
@@ -1151,7 +1183,18 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
         <span><i style="background:#55c6e8"></i>虎线</span>
       </div>
       <div class="panel table-scroll"><table><thead><tr><th>股票</th><th>收盘 / 涨跌</th><th>近42日 K 线与龙虎线</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>连续黄柱</th></tr></thead>
-      <tbody><tr><td class="empty" colspan="7">今日没有股票同时满足四项条件</td></tr></tbody></table></div>
+      <tbody>
+    <tr data-live-code="301516" data-entry-price="14.4300">
+      <td><a class="stock-link" href="https://quote.eastmoney.com/sz301516.html" target="_blank" rel="noreferrer">中远通</a><span class="stock-code">301516</span></td>
+      <td><span class="numeric" data-live-price>14.43</span>
+          <span class="subline"><span class="numeric" data-live-change>-8.44%</span>
+          · <span data-live-time>2026-07-30 收盘</span></span></td>
+      <td class="chart-cell"><svg class="spark" viewBox="0 0 420 176" role="img" aria-label="最近42日K线、龙线和虎线"><line x1="8" y1="10.0" x2="374" y2="10.0" stroke="#263348" stroke-width="1" stroke-dasharray="3 3"/><text x="378" y="13.5" fill="#91a0b5" font-size="10">21.78</text><line x1="8" y1="81.0" x2="374" y2="81.0" stroke="#263348" stroke-width="1" stroke-dasharray="3 3"/><text x="378" y="84.5" fill="#91a0b5" font-size="10">17.65</text><line x1="8" y1="152.0" x2="374" y2="152.0" stroke="#263348" stroke-width="1" stroke-dasharray="3 3"/><text x="378" y="155.5" fill="#91a0b5" font-size="10">13.52</text><g class="kbar normal"><title>2026-06-02 开17.76 高17.88 低17.04 收17.24</title><line x1="8.0" y1="77.0" x2="8.0" y2="91.5" stroke="#4dd599" stroke-width="1"/><rect x="5.3" y="79.1" width="5.5" height="8.9" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-03 开17.37 高17.54 低16.91 收17.27</title><line x1="16.8" y1="82.9" x2="16.8" y2="93.7" stroke="#4dd599" stroke-width="1"/><rect x="14.1" y="85.8" width="5.5" height="1.7" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-04 开17.05 高17.27 低16.58 收16.77</title><line x1="25.7" y1="87.5" x2="25.7" y2="99.4" stroke="#4dd599" stroke-width="1"/><rect x="22.9" y="91.3" width="5.5" height="4.8" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-05 开16.78 高17.22 低16.16 收16.92</title><line x1="34.5" y1="88.4" x2="34.5" y2="106.6" stroke="#ff5c70" stroke-width="1"/><rect x="31.8" y="93.5" width="5.5" height="2.4" fill="#ff5c70" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-08 开16.30 高16.69 低15.60 收15.92 黄柱</title><line x1="43.3" y1="97.5" x2="43.3" y2="116.2" stroke="#4dd599" stroke-width="1"/><rect x="40.6" y="104.2" width="5.5" height="6.5" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="40.6" y="109.3" width="5.5" height="1.5" fill="#f4d35e" rx="0.5"/></g><g class="kbar normal"><title>2026-06-09 开15.97 高16.56 低15.88 收16.16</title><line x1="52.1" y1="99.7" x2="52.1" y2="111.4" stroke="#ff5c70" stroke-width="1"/><rect x="49.4" y="106.6" width="5.5" height="3.3" fill="#ff5c70" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-10 开15.95 高16.11 低15.23 收15.53 黄柱</title><line x1="61.0" y1="107.5" x2="61.0" y2="122.6" stroke="#4dd599" stroke-width="1"/><rect x="58.2" y="110.2" width="5.5" height="7.2" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="58.2" y="114.4" width="5.5" height="3.0" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-11 开15.40 高15.53 低14.84 收15.07 黄柱</title><line x1="69.8" y1="117.4" x2="69.8" y2="129.3" stroke="#f4d35e" stroke-width="1"/><rect x="67.1" y="119.7" width="5.5" height="5.7" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-12 开15.20 高15.63 低15.04 收15.35 黄柱</title><line x1="78.6" y1="115.7" x2="78.6" y2="125.9" stroke="#ff5c70" stroke-width="1"/><rect x="75.9" y="120.5" width="5.5" height="2.6" fill="#ff5c70" rx="0.5"/><rect class="yellow-part" x="75.9" y="120.5" width="5.5" height="2.6" fill="#f4d35e" rx="0.5"/></g><g class="kbar normal"><title>2026-06-15 开15.36 高15.99 低15.36 收15.76</title><line x1="87.5" y1="109.5" x2="87.5" y2="120.4" stroke="#ff5c70" stroke-width="1"/><rect x="84.7" y="113.5" width="5.5" height="6.9" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-16 开15.83 高16.35 低15.41 收16.33</title><line x1="96.3" y1="103.3" x2="96.3" y2="119.5" stroke="#ff5c70" stroke-width="1"/><rect x="93.6" y="103.7" width="5.5" height="8.6" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-17 开16.20 高16.38 低15.89 收16.06</title><line x1="105.1" y1="102.8" x2="105.1" y2="111.3" stroke="#4dd599" stroke-width="1"/><rect x="102.4" y="105.9" width="5.5" height="2.4" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-18 开16.04 高16.10 低15.64 收15.76</title><line x1="114.0" y1="107.6" x2="114.0" y2="115.6" stroke="#4dd599" stroke-width="1"/><rect x="111.2" y="108.7" width="5.5" height="4.8" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-22 开15.74 高15.86 低14.94 收15.47</title><line x1="122.8" y1="111.8" x2="122.8" y2="127.6" stroke="#4dd599" stroke-width="1"/><rect x="120.0" y="113.8" width="5.5" height="4.6" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-23 开15.31 高15.79 低15.18 收15.31</title><line x1="131.6" y1="113.0" x2="131.6" y2="123.5" stroke="#ff5c70" stroke-width="1"/><rect x="128.9" y="121.2" width="5.5" height="1.5" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-24 开15.38 高15.67 低14.80 收15.00</title><line x1="140.4" y1="115.0" x2="140.4" y2="130.0" stroke="#4dd599" stroke-width="1"/><rect x="137.7" y="120.0" width="5.5" height="6.5" fill="#4dd599" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-25 开15.00 高15.29 低14.32 收14.48 黄柱</title><line x1="149.3" y1="121.6" x2="149.3" y2="138.2" stroke="#4dd599" stroke-width="1"/><rect x="146.5" y="126.6" width="5.5" height="8.9" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="146.5" y="130.2" width="5.5" height="5.3" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-26 开14.36 高14.57 低14.00 收14.15 黄柱</title><line x1="158.1" y1="133.9" x2="158.1" y2="143.7" stroke="#f4d35e" stroke-width="1"/><rect x="155.4" y="137.6" width="5.5" height="3.6" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-29 开14.10 高14.15 低13.52 收13.96 黄柱</title><line x1="166.9" y1="141.2" x2="166.9" y2="152.0" stroke="#f4d35e" stroke-width="1"/><rect x="164.2" y="142.0" width="5.5" height="2.4" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-30 开13.96 高14.23 低13.66 收14.15 黄柱</title><line x1="175.8" y1="139.8" x2="175.8" y2="149.6" stroke="#f4d35e" stroke-width="1"/><rect x="173.0" y="141.2" width="5.5" height="3.3" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-01 开14.46 高14.50 低14.12 收14.23 黄柱</title><line x1="184.6" y1="135.2" x2="184.6" y2="141.7" stroke="#f4d35e" stroke-width="1"/><rect x="181.8" y="135.8" width="5.5" height="4.0" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-02 开14.23 高15.05 低14.14 收14.21 黄柱</title><line x1="193.4" y1="125.7" x2="193.4" y2="141.3" stroke="#4dd599" stroke-width="1"/><rect x="190.7" y="139.8" width="5.5" height="1.5" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="190.7" y="139.8" width="5.5" height="1.5" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-03 开14.23 高14.80 低14.12 收14.45 黄柱</title><line x1="202.2" y1="130.0" x2="202.2" y2="141.7" stroke="#ff5c70" stroke-width="1"/><rect x="199.5" y="136.0" width="5.5" height="3.8" fill="#ff5c70" rx="0.5"/><rect class="yellow-part" x="199.5" y="136.0" width="5.5" height="3.8" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-06 开14.43 高15.70 低14.43 收15.60 黄柱</title><line x1="211.1" y1="114.5" x2="211.1" y2="136.4" stroke="#ff5c70" stroke-width="1"/><rect x="208.3" y="116.2" width="5.5" height="20.1" fill="#ff5c70" rx="0.5"/><rect class="yellow-part" x="208.3" y="130.3" width="5.5" height="6.0" fill="#f4d35e" rx="0.5"/></g><g class="kbar normal"><title>2026-07-07 开15.71 高18.72 低15.71 收18.72</title><line x1="219.9" y1="62.6" x2="219.9" y2="114.4" stroke="#ff5c70" stroke-width="1"/><rect x="217.2" y="62.6" width="5.5" height="51.7" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-08 开18.67 高19.57 低17.52 收19.12</title><line x1="228.7" y1="48.0" x2="228.7" y2="83.2" stroke="#ff5c70" stroke-width="1"/><rect x="226.0" y="55.7" width="5.5" height="7.7" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-09 开18.93 高19.30 低18.16 收19.13</title><line x1="237.6" y1="52.6" x2="237.6" y2="72.2" stroke="#ff5c70" stroke-width="1"/><rect x="234.8" y="55.6" width="5.5" height="3.4" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-10 开19.02 高21.78 低19.00 收20.65</title><line x1="246.4" y1="10.0" x2="246.4" y2="57.8" stroke="#ff5c70" stroke-width="1"/><rect x="243.7" y="29.4" width="5.5" height="28.0" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-13 开20.96 高21.50 低19.90 收20.06</title><line x1="255.2" y1="14.8" x2="255.2" y2="42.3" stroke="#4dd599" stroke-width="1"/><rect x="252.5" y="24.1" width="5.5" height="15.5" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-14 开19.99 高20.65 低18.90 收19.70</title><line x1="264.0" y1="29.4" x2="264.0" y2="59.5" stroke="#4dd599" stroke-width="1"/><rect x="261.3" y="40.8" width="5.5" height="5.0" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-15 开20.09 高20.69 低19.55 收20.39</title><line x1="272.9" y1="28.7" x2="272.9" y2="48.3" stroke="#ff5c70" stroke-width="1"/><rect x="270.1" y="33.9" width="5.5" height="5.2" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-16 开20.00 高20.60 低17.99 收18.30</title><line x1="281.7" y1="30.3" x2="281.7" y2="75.2" stroke="#4dd599" stroke-width="1"/><rect x="279.0" y="40.6" width="5.5" height="29.2" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-17 开18.31 高19.06 低17.60 收17.93</title><line x1="290.5" y1="56.8" x2="290.5" y2="81.9" stroke="#4dd599" stroke-width="1"/><rect x="287.8" y="69.7" width="5.5" height="6.5" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-20 开18.53 高18.64 低16.77 收17.15</title><line x1="299.4" y1="64.0" x2="299.4" y2="96.1" stroke="#4dd599" stroke-width="1"/><rect x="296.6" y="65.9" width="5.5" height="23.7" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-21 开17.32 高17.94 低15.68 收17.81</title><line x1="308.2" y1="76.0" x2="308.2" y2="114.9" stroke="#ff5c70" stroke-width="1"/><rect x="305.5" y="78.2" width="5.5" height="8.4" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-22 开17.51 高17.61 低16.38 收17.11</title><line x1="317.0" y1="81.7" x2="317.0" y2="102.8" stroke="#4dd599" stroke-width="1"/><rect x="314.3" y="83.4" width="5.5" height="6.9" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-23 开16.81 高17.20 低16.68 收16.88</title><line x1="325.9" y1="88.7" x2="325.9" y2="97.7" stroke="#ff5c70" stroke-width="1"/><rect x="323.1" y="94.2" width="5.5" height="1.5" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-24 开16.55 高16.80 低16.00 收16.08</title><line x1="334.7" y1="95.6" x2="334.7" y2="109.4" stroke="#4dd599" stroke-width="1"/><rect x="331.9" y="99.9" width="5.5" height="8.1" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-27 开15.92 高16.60 低15.71 收16.58</title><line x1="343.5" y1="99.1" x2="343.5" y2="114.4" stroke="#ff5c70" stroke-width="1"/><rect x="340.8" y="99.4" width="5.5" height="11.3" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-28 开16.17 高16.44 低15.86 收16.10</title><line x1="352.3" y1="101.8" x2="352.3" y2="111.8" stroke="#4dd599" stroke-width="1"/><rect x="349.6" y="106.4" width="5.5" height="1.5" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-29 开16.10 高16.15 低15.60 收15.76</title><line x1="361.2" y1="106.8" x2="361.2" y2="116.2" stroke="#4dd599" stroke-width="1"/><rect x="358.4" y="107.6" width="5.5" height="5.8" fill="#4dd599" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-30 开15.75 高15.75 低14.42 收14.43 黄柱</title><line x1="370.0" y1="113.7" x2="370.0" y2="136.5" stroke="#4dd599" stroke-width="1"/><rect x="367.3" y="113.7" width="5.5" height="22.7" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="367.3" y="120.3" width="5.5" height="16.0" fill="#f4d35e" rx="0.5"/></g><polyline points="8.0,97.2 16.8,100.4 25.7,103.4 34.5,106.4 43.3,109.3 52.1,112.0 61.0,114.4 69.8,116.8 78.6,118.9 87.5,120.8 96.3,122.6 105.1,124.2 114.0,125.7 122.8,127.1 131.6,128.3 140.4,129.3 149.3,130.2 158.1,130.8 166.9,131.3 175.8,131.5 184.6,131.5 193.4,131.3 202.2,130.9 211.1,130.3 219.9,129.6 228.7,128.6 237.6,127.6 246.4,126.7 255.2,125.8 264.0,125.1 272.9,124.7 281.7,124.4 290.5,124.1 299.4,123.8 308.2,123.5 317.0,123.1 325.9,122.7 334.7,122.3 343.5,121.9 352.3,121.4 361.2,120.9 370.0,120.3" fill="none" stroke="#ff5c70" stroke-width="2" stroke-linejoin="round"/><polyline points="8.0,78.2 16.8,79.9 25.7,81.7 34.5,83.6 43.3,85.6 52.1,87.6 61.0,89.7 69.8,91.8 78.6,93.9 87.5,95.9 96.3,98.0 105.1,100.0 114.0,102.0 122.8,103.9 131.6,105.8 140.4,107.6 149.3,109.3 158.1,111.0 166.9,112.6 175.8,114.0 184.6,115.3 193.4,116.6 202.2,117.7 211.1,118.6 219.9,119.5 228.7,120.2 237.6,120.8 246.4,121.2 255.2,121.6 264.0,121.8 272.9,122.1 281.7,122.2 290.5,122.4 299.4,122.5 308.2,122.6 317.0,122.6 325.9,122.6 334.7,122.6 343.5,122.5 352.3,122.4 361.2,122.3 370.0,122.2" fill="none" stroke="#55c6e8" stroke-width="2" stroke-linejoin="round"/><text x="8" y="171" fill="#91a0b5" font-size="10">06-02</text><text x="370" y="171" fill="#91a0b5" font-size="10" text-anchor="end">07-30</text></svg></td>
+      <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-30</span></div></td>
+      <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-24</span></div></td>
+      <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-07</span></div></td>
+      <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">连续 1 根</span></div></td>
+    </tr></tbody></table></div>
     </section>
 
     <section class="section reveal" id="watch">
@@ -1212,18 +1255,6 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
       <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-24</span></div></td>
       <td><div class="signal"><span class="signal-mark no">—</span><span class="subline">连续 0 根</span></div></td>
       <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-06-08</span></div></td>
-      <td><span class="state neutral">龙虎优先</span></td>
-    </tr>
-    <tr data-live-code="301516" data-entry-price="14.4300">
-      <td><a class="stock-link" href="https://quote.eastmoney.com/sz301516.html" target="_blank" rel="noreferrer">中远通</a><span class="stock-code">301516</span></td>
-      <td><span class="numeric" data-live-price>14.43</span>
-          <span class="subline"><span class="numeric" data-live-change>-8.44%</span>
-          · <span data-live-time>2026-07-30 收盘</span></span></td>
-      <td class="chart-cell"><svg class="spark" viewBox="0 0 420 176" role="img" aria-label="最近42日K线、龙线和虎线"><line x1="8" y1="10.0" x2="374" y2="10.0" stroke="#263348" stroke-width="1" stroke-dasharray="3 3"/><text x="378" y="13.5" fill="#91a0b5" font-size="10">21.78</text><line x1="8" y1="81.0" x2="374" y2="81.0" stroke="#263348" stroke-width="1" stroke-dasharray="3 3"/><text x="378" y="84.5" fill="#91a0b5" font-size="10">17.65</text><line x1="8" y1="152.0" x2="374" y2="152.0" stroke="#263348" stroke-width="1" stroke-dasharray="3 3"/><text x="378" y="155.5" fill="#91a0b5" font-size="10">13.52</text><g class="kbar normal"><title>2026-06-02 开17.76 高17.88 低17.04 收17.24</title><line x1="8.0" y1="77.0" x2="8.0" y2="91.5" stroke="#4dd599" stroke-width="1"/><rect x="5.3" y="79.1" width="5.5" height="8.9" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-03 开17.37 高17.54 低16.91 收17.27</title><line x1="16.8" y1="82.9" x2="16.8" y2="93.7" stroke="#4dd599" stroke-width="1"/><rect x="14.1" y="85.8" width="5.5" height="1.7" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-04 开17.05 高17.27 低16.58 收16.77</title><line x1="25.7" y1="87.5" x2="25.7" y2="99.4" stroke="#4dd599" stroke-width="1"/><rect x="22.9" y="91.3" width="5.5" height="4.8" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-05 开16.78 高17.22 低16.16 收16.92</title><line x1="34.5" y1="88.4" x2="34.5" y2="106.6" stroke="#ff5c70" stroke-width="1"/><rect x="31.8" y="93.5" width="5.5" height="2.4" fill="#ff5c70" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-08 开16.30 高16.69 低15.60 收15.92 黄柱</title><line x1="43.3" y1="97.5" x2="43.3" y2="116.2" stroke="#4dd599" stroke-width="1"/><rect x="40.6" y="104.2" width="5.5" height="6.5" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="40.6" y="109.3" width="5.5" height="1.5" fill="#f4d35e" rx="0.5"/></g><g class="kbar normal"><title>2026-06-09 开15.97 高16.56 低15.88 收16.16</title><line x1="52.1" y1="99.7" x2="52.1" y2="111.4" stroke="#ff5c70" stroke-width="1"/><rect x="49.4" y="106.6" width="5.5" height="3.3" fill="#ff5c70" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-10 开15.95 高16.11 低15.23 收15.53 黄柱</title><line x1="61.0" y1="107.5" x2="61.0" y2="122.6" stroke="#4dd599" stroke-width="1"/><rect x="58.2" y="110.2" width="5.5" height="7.2" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="58.2" y="114.4" width="5.5" height="3.0" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-11 开15.40 高15.53 低14.84 收15.07 黄柱</title><line x1="69.8" y1="117.4" x2="69.8" y2="129.3" stroke="#f4d35e" stroke-width="1"/><rect x="67.1" y="119.7" width="5.5" height="5.7" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-12 开15.20 高15.63 低15.04 收15.35 黄柱</title><line x1="78.6" y1="115.7" x2="78.6" y2="125.9" stroke="#ff5c70" stroke-width="1"/><rect x="75.9" y="120.5" width="5.5" height="2.6" fill="#ff5c70" rx="0.5"/><rect class="yellow-part" x="75.9" y="120.5" width="5.5" height="2.6" fill="#f4d35e" rx="0.5"/></g><g class="kbar normal"><title>2026-06-15 开15.36 高15.99 低15.36 收15.76</title><line x1="87.5" y1="109.5" x2="87.5" y2="120.4" stroke="#ff5c70" stroke-width="1"/><rect x="84.7" y="113.5" width="5.5" height="6.9" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-16 开15.83 高16.35 低15.41 收16.33</title><line x1="96.3" y1="103.3" x2="96.3" y2="119.5" stroke="#ff5c70" stroke-width="1"/><rect x="93.6" y="103.7" width="5.5" height="8.6" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-17 开16.20 高16.38 低15.89 收16.06</title><line x1="105.1" y1="102.8" x2="105.1" y2="111.3" stroke="#4dd599" stroke-width="1"/><rect x="102.4" y="105.9" width="5.5" height="2.4" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-18 开16.04 高16.10 低15.64 收15.76</title><line x1="114.0" y1="107.6" x2="114.0" y2="115.6" stroke="#4dd599" stroke-width="1"/><rect x="111.2" y="108.7" width="5.5" height="4.8" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-22 开15.74 高15.86 低14.94 收15.47</title><line x1="122.8" y1="111.8" x2="122.8" y2="127.6" stroke="#4dd599" stroke-width="1"/><rect x="120.0" y="113.8" width="5.5" height="4.6" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-23 开15.31 高15.79 低15.18 收15.31</title><line x1="131.6" y1="113.0" x2="131.6" y2="123.5" stroke="#ff5c70" stroke-width="1"/><rect x="128.9" y="121.2" width="5.5" height="1.5" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-24 开15.38 高15.67 低14.80 收15.00</title><line x1="140.4" y1="115.0" x2="140.4" y2="130.0" stroke="#4dd599" stroke-width="1"/><rect x="137.7" y="120.0" width="5.5" height="6.5" fill="#4dd599" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-25 开15.00 高15.29 低14.32 收14.48 黄柱</title><line x1="149.3" y1="121.6" x2="149.3" y2="138.2" stroke="#4dd599" stroke-width="1"/><rect x="146.5" y="126.6" width="5.5" height="8.9" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="146.5" y="130.2" width="5.5" height="5.3" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-26 开14.36 高14.57 低14.00 收14.15 黄柱</title><line x1="158.1" y1="133.9" x2="158.1" y2="143.7" stroke="#f4d35e" stroke-width="1"/><rect x="155.4" y="137.6" width="5.5" height="3.6" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-29 开14.10 高14.15 低13.52 收13.96 黄柱</title><line x1="166.9" y1="141.2" x2="166.9" y2="152.0" stroke="#f4d35e" stroke-width="1"/><rect x="164.2" y="142.0" width="5.5" height="2.4" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-06-30 开13.96 高14.23 低13.66 收14.15 黄柱</title><line x1="175.8" y1="139.8" x2="175.8" y2="149.6" stroke="#f4d35e" stroke-width="1"/><rect x="173.0" y="141.2" width="5.5" height="3.3" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-01 开14.46 高14.50 低14.12 收14.23 黄柱</title><line x1="184.6" y1="135.2" x2="184.6" y2="141.7" stroke="#f4d35e" stroke-width="1"/><rect x="181.8" y="135.8" width="5.5" height="4.0" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-02 开14.23 高15.05 低14.14 收14.21 黄柱</title><line x1="193.4" y1="125.7" x2="193.4" y2="141.3" stroke="#4dd599" stroke-width="1"/><rect x="190.7" y="139.8" width="5.5" height="1.5" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="190.7" y="139.8" width="5.5" height="1.5" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-03 开14.23 高14.80 低14.12 收14.45 黄柱</title><line x1="202.2" y1="130.0" x2="202.2" y2="141.7" stroke="#ff5c70" stroke-width="1"/><rect x="199.5" y="136.0" width="5.5" height="3.8" fill="#ff5c70" rx="0.5"/><rect class="yellow-part" x="199.5" y="136.0" width="5.5" height="3.8" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-06 开14.43 高15.70 低14.43 收15.60 黄柱</title><line x1="211.1" y1="114.5" x2="211.1" y2="136.4" stroke="#ff5c70" stroke-width="1"/><rect x="208.3" y="116.2" width="5.5" height="20.1" fill="#ff5c70" rx="0.5"/><rect class="yellow-part" x="208.3" y="130.3" width="5.5" height="6.0" fill="#f4d35e" rx="0.5"/></g><g class="kbar normal"><title>2026-07-07 开15.71 高18.72 低15.71 收18.72</title><line x1="219.9" y1="62.6" x2="219.9" y2="114.4" stroke="#ff5c70" stroke-width="1"/><rect x="217.2" y="62.6" width="5.5" height="51.7" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-08 开18.67 高19.57 低17.52 收19.12</title><line x1="228.7" y1="48.0" x2="228.7" y2="83.2" stroke="#ff5c70" stroke-width="1"/><rect x="226.0" y="55.7" width="5.5" height="7.7" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-09 开18.93 高19.30 低18.16 收19.13</title><line x1="237.6" y1="52.6" x2="237.6" y2="72.2" stroke="#ff5c70" stroke-width="1"/><rect x="234.8" y="55.6" width="5.5" height="3.4" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-10 开19.02 高21.78 低19.00 收20.65</title><line x1="246.4" y1="10.0" x2="246.4" y2="57.8" stroke="#ff5c70" stroke-width="1"/><rect x="243.7" y="29.4" width="5.5" height="28.0" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-13 开20.96 高21.50 低19.90 收20.06</title><line x1="255.2" y1="14.8" x2="255.2" y2="42.3" stroke="#4dd599" stroke-width="1"/><rect x="252.5" y="24.1" width="5.5" height="15.5" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-14 开19.99 高20.65 低18.90 收19.70</title><line x1="264.0" y1="29.4" x2="264.0" y2="59.5" stroke="#4dd599" stroke-width="1"/><rect x="261.3" y="40.8" width="5.5" height="5.0" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-15 开20.09 高20.69 低19.55 收20.39</title><line x1="272.9" y1="28.7" x2="272.9" y2="48.3" stroke="#ff5c70" stroke-width="1"/><rect x="270.1" y="33.9" width="5.5" height="5.2" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-16 开20.00 高20.60 低17.99 收18.30</title><line x1="281.7" y1="30.3" x2="281.7" y2="75.2" stroke="#4dd599" stroke-width="1"/><rect x="279.0" y="40.6" width="5.5" height="29.2" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-17 开18.31 高19.06 低17.60 收17.93</title><line x1="290.5" y1="56.8" x2="290.5" y2="81.9" stroke="#4dd599" stroke-width="1"/><rect x="287.8" y="69.7" width="5.5" height="6.5" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-20 开18.53 高18.64 低16.77 收17.15</title><line x1="299.4" y1="64.0" x2="299.4" y2="96.1" stroke="#4dd599" stroke-width="1"/><rect x="296.6" y="65.9" width="5.5" height="23.7" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-21 开17.32 高17.94 低15.68 收17.81</title><line x1="308.2" y1="76.0" x2="308.2" y2="114.9" stroke="#ff5c70" stroke-width="1"/><rect x="305.5" y="78.2" width="5.5" height="8.4" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-22 开17.51 高17.61 低16.38 收17.11</title><line x1="317.0" y1="81.7" x2="317.0" y2="102.8" stroke="#4dd599" stroke-width="1"/><rect x="314.3" y="83.4" width="5.5" height="6.9" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-23 开16.81 高17.20 低16.68 收16.88</title><line x1="325.9" y1="88.7" x2="325.9" y2="97.7" stroke="#ff5c70" stroke-width="1"/><rect x="323.1" y="94.2" width="5.5" height="1.5" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-24 开16.55 高16.80 低16.00 收16.08</title><line x1="334.7" y1="95.6" x2="334.7" y2="109.4" stroke="#4dd599" stroke-width="1"/><rect x="331.9" y="99.9" width="5.5" height="8.1" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-27 开15.92 高16.60 低15.71 收16.58</title><line x1="343.5" y1="99.1" x2="343.5" y2="114.4" stroke="#ff5c70" stroke-width="1"/><rect x="340.8" y="99.4" width="5.5" height="11.3" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-28 开16.17 高16.44 低15.86 收16.10</title><line x1="352.3" y1="101.8" x2="352.3" y2="111.8" stroke="#4dd599" stroke-width="1"/><rect x="349.6" y="106.4" width="5.5" height="1.5" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-29 开16.10 高16.15 低15.60 收15.76</title><line x1="361.2" y1="106.8" x2="361.2" y2="116.2" stroke="#4dd599" stroke-width="1"/><rect x="358.4" y="107.6" width="5.5" height="5.8" fill="#4dd599" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-30 开15.75 高15.75 低14.42 收14.43 黄柱</title><line x1="370.0" y1="113.7" x2="370.0" y2="136.5" stroke="#4dd599" stroke-width="1"/><rect x="367.3" y="113.7" width="5.5" height="22.7" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="367.3" y="120.3" width="5.5" height="16.0" fill="#f4d35e" rx="0.5"/></g><polyline points="8.0,97.2 16.8,100.4 25.7,103.4 34.5,106.4 43.3,109.3 52.1,112.0 61.0,114.4 69.8,116.8 78.6,118.9 87.5,120.8 96.3,122.6 105.1,124.2 114.0,125.7 122.8,127.1 131.6,128.3 140.4,129.3 149.3,130.2 158.1,130.8 166.9,131.3 175.8,131.5 184.6,131.5 193.4,131.3 202.2,130.9 211.1,130.3 219.9,129.6 228.7,128.6 237.6,127.6 246.4,126.7 255.2,125.8 264.0,125.1 272.9,124.7 281.7,124.4 290.5,124.1 299.4,123.8 308.2,123.5 317.0,123.1 325.9,122.7 334.7,122.3 343.5,121.9 352.3,121.4 361.2,120.9 370.0,120.3" fill="none" stroke="#ff5c70" stroke-width="2" stroke-linejoin="round"/><polyline points="8.0,78.2 16.8,79.9 25.7,81.7 34.5,83.6 43.3,85.6 52.1,87.6 61.0,89.7 69.8,91.8 78.6,93.9 87.5,95.9 96.3,98.0 105.1,100.0 114.0,102.0 122.8,103.9 131.6,105.8 140.4,107.6 149.3,109.3 158.1,111.0 166.9,112.6 175.8,114.0 184.6,115.3 193.4,116.6 202.2,117.7 211.1,118.6 219.9,119.5 228.7,120.2 237.6,120.8 246.4,121.2 255.2,121.6 264.0,121.8 272.9,122.1 281.7,122.2 290.5,122.4 299.4,122.5 308.2,122.6 317.0,122.6 325.9,122.6 334.7,122.6 343.5,122.5 352.3,122.4 361.2,122.3 370.0,122.2" fill="none" stroke="#55c6e8" stroke-width="2" stroke-linejoin="round"/><text x="8" y="171" fill="#91a0b5" font-size="10">06-02</text><text x="370" y="171" fill="#91a0b5" font-size="10" text-anchor="end">07-30</text></svg></td>
-      <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-24</span></div></td>
-      <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-30</span></div></td>
-      <td><div class="signal"><span class="signal-mark no">—</span><span class="subline">连续 1 根</span></div></td>
-      <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-07</span></div></td>
       <td><span class="state neutral">龙虎优先</span></td>
     </tr>
     <tr data-live-code="000876" data-entry-price="7.0000">
@@ -1525,6 +1556,18 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
       <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">连续 10 根</span></div></td>
       <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-21</span></div></td>
       <td><span class="state neutral">见底候选</span></td>
+    </tr>
+    <tr data-live-code="603256" data-entry-price="125.1600">
+      <td><a class="stock-link" href="https://quote.eastmoney.com/sh603256.html" target="_blank" rel="noreferrer">宏和科技</a><span class="stock-code">603256</span></td>
+      <td><span class="numeric" data-live-price>125.16</span>
+          <span class="subline"><span class="numeric" data-live-change>-10.00%</span>
+          · <span data-live-time>2026-07-30 收盘</span></span></td>
+      <td class="chart-cell"><svg class="spark" viewBox="0 0 420 176" role="img" aria-label="最近42日K线、龙线和虎线"><line x1="8" y1="10.0" x2="374" y2="10.0" stroke="#263348" stroke-width="1" stroke-dasharray="3 3"/><text x="378" y="13.5" fill="#91a0b5" font-size="10">304.00</text><line x1="8" y1="81.0" x2="374" y2="81.0" stroke="#263348" stroke-width="1" stroke-dasharray="3 3"/><text x="378" y="84.5" fill="#91a0b5" font-size="10">214.58</text><line x1="8" y1="152.0" x2="374" y2="152.0" stroke="#263348" stroke-width="1" stroke-dasharray="3 3"/><text x="378" y="155.5" fill="#91a0b5" font-size="10">125.16</text><g class="kbar yellow"><title>2026-06-02 开163.75 高200.13 低163.75 收198.80 黄柱</title><line x1="8.0" y1="92.5" x2="8.0" y2="121.4" stroke="#ff5c70" stroke-width="1"/><rect x="5.3" y="93.5" width="5.5" height="27.8" fill="#ff5c70" rx="0.5"/><rect class="yellow-part" x="5.3" y="118.3" width="5.5" height="3.1" fill="#f4d35e" rx="0.5"/></g><g class="kbar normal"><title>2026-06-03 开195.00 高207.67 低190.05 收197.37</title><line x1="16.8" y1="86.5" x2="16.8" y2="100.5" stroke="#ff5c70" stroke-width="1"/><rect x="14.1" y="94.7" width="5.5" height="1.9" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-04 开194.00 高198.61 低192.59 收195.01</title><line x1="25.7" y1="93.7" x2="25.7" y2="98.5" stroke="#ff5c70" stroke-width="1"/><rect x="22.9" y="96.5" width="5.5" height="1.5" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-05 开192.00 高210.49 低190.10 收196.06</title><line x1="34.5" y1="84.2" x2="34.5" y2="100.4" stroke="#ff5c70" stroke-width="1"/><rect x="31.8" y="95.7" width="5.5" height="3.2" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-08 开186.60 高195.00 低182.30 收188.56</title><line x1="43.3" y1="96.5" x2="43.3" y2="106.6" stroke="#ff5c70" stroke-width="1"/><rect x="40.6" y="101.7" width="5.5" height="1.6" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-09 开197.02 高207.34 低192.00 收207.34</title><line x1="52.1" y1="86.7" x2="52.1" y2="98.9" stroke="#ff5c70" stroke-width="1"/><rect x="49.4" y="86.7" width="5.5" height="8.2" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-10 开201.21 高203.33 低188.00 收197.85</title><line x1="61.0" y1="89.9" x2="61.0" y2="102.1" stroke="#4dd599" stroke-width="1"/><rect x="58.2" y="91.6" width="5.5" height="2.7" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-11 开196.80 高215.00 低193.77 收211.00</title><line x1="69.8" y1="80.7" x2="69.8" y2="97.5" stroke="#ff5c70" stroke-width="1"/><rect x="67.1" y="83.8" width="5.5" height="11.3" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-12 开216.00 高225.01 低207.89 收207.89</title><line x1="78.6" y1="72.7" x2="78.6" y2="86.3" stroke="#4dd599" stroke-width="1"/><rect x="75.9" y="79.9" width="5.5" height="6.4" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-15 开212.05 高228.68 低203.55 收228.68</title><line x1="87.5" y1="69.8" x2="87.5" y2="89.8" stroke="#ff5c70" stroke-width="1"/><rect x="84.7" y="69.8" width="5.5" height="13.2" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-16 开237.02 高251.55 低234.66 收251.55</title><line x1="96.3" y1="51.6" x2="96.3" y2="65.1" stroke="#ff5c70" stroke-width="1"/><rect x="93.6" y="51.6" width="5.5" height="11.5" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-17 开256.00 高276.00 低253.00 收258.90</title><line x1="105.1" y1="32.2" x2="105.1" y2="50.5" stroke="#ff5c70" stroke-width="1"/><rect x="102.4" y="45.8" width="5.5" height="2.3" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-18 开244.70 高264.30 低244.70 收257.80</title><line x1="114.0" y1="41.5" x2="114.0" y2="57.1" stroke="#ff5c70" stroke-width="1"/><rect x="111.2" y="46.7" width="5.5" height="10.4" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-22 开257.75 高274.07 低251.18 收263.01</title><line x1="122.8" y1="33.8" x2="122.8" y2="51.9" stroke="#ff5c70" stroke-width="1"/><rect x="120.0" y="42.5" width="5.5" height="4.2" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-23 开260.36 高260.36 低242.42 收247.90</title><line x1="131.6" y1="44.7" x2="131.6" y2="58.9" stroke="#4dd599" stroke-width="1"/><rect x="128.9" y="44.7" width="5.5" height="9.9" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-24 开243.01 高272.00 低243.01 收267.98</title><line x1="140.4" y1="35.4" x2="140.4" y2="58.4" stroke="#ff5c70" stroke-width="1"/><rect x="137.7" y="38.6" width="5.5" height="19.8" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-25 开267.99 高287.59 低262.00 收276.76</title><line x1="149.3" y1="23.0" x2="149.3" y2="43.3" stroke="#ff5c70" stroke-width="1"/><rect x="146.5" y="31.6" width="5.5" height="7.0" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-26 开275.39 高304.00 低275.39 收297.00</title><line x1="158.1" y1="10.0" x2="158.1" y2="32.7" stroke="#ff5c70" stroke-width="1"/><rect x="155.4" y="15.6" width="5.5" height="17.2" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-06-29 开287.00 高287.00 低267.30 收267.30</title><line x1="166.9" y1="23.5" x2="166.9" y2="39.1" stroke="#4dd599" stroke-width="1"/><rect x="164.2" y="23.5" width="5.5" height="15.6" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-06-30 开256.02 高280.00 低256.02 收265.33</title><line x1="175.8" y1="29.1" x2="175.8" y2="48.1" stroke="#ff5c70" stroke-width="1"/><rect x="173.0" y="40.7" width="5.5" height="7.4" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-01 开268.55 高269.90 低249.40 收255.97</title><line x1="184.6" y1="37.1" x2="184.6" y2="53.4" stroke="#4dd599" stroke-width="1"/><rect x="181.8" y="38.1" width="5.5" height="10.0" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-02 开244.90 高253.20 低233.00 收233.23</title><line x1="193.4" y1="50.3" x2="193.4" y2="66.4" stroke="#4dd599" stroke-width="1"/><rect x="190.7" y="56.9" width="5.5" height="9.3" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-03 开233.24 高251.90 低228.70 收238.00</title><line x1="202.2" y1="51.4" x2="202.2" y2="69.8" stroke="#ff5c70" stroke-width="1"/><rect x="199.5" y="62.4" width="5.5" height="3.8" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-06 开238.23 高241.74 低214.20 收219.33</title><line x1="211.1" y1="59.4" x2="211.1" y2="81.3" stroke="#4dd599" stroke-width="1"/><rect x="208.3" y="62.2" width="5.5" height="15.0" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-07 开219.34 高224.78 低213.01 收218.35</title><line x1="219.9" y1="72.9" x2="219.9" y2="82.2" stroke="#4dd599" stroke-width="1"/><rect x="217.2" y="77.2" width="5.5" height="1.5" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-08 开222.72 高223.99 低204.68 收205.00</title><line x1="228.7" y1="73.5" x2="228.7" y2="88.9" stroke="#4dd599" stroke-width="1"/><rect x="226.0" y="74.5" width="5.5" height="14.1" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-09 开209.04 高215.00 低201.18 收213.65</title><line x1="237.6" y1="80.7" x2="237.6" y2="91.6" stroke="#ff5c70" stroke-width="1"/><rect x="234.8" y="81.7" width="5.5" height="3.7" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-10 开215.00 高224.14 低206.00 收206.03</title><line x1="246.4" y1="73.4" x2="246.4" y2="87.8" stroke="#4dd599" stroke-width="1"/><rect x="243.7" y="80.7" width="5.5" height="7.1" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-13 开202.00 高206.29 低185.45 收189.00</title><line x1="255.2" y1="87.6" x2="255.2" y2="104.1" stroke="#4dd599" stroke-width="1"/><rect x="252.5" y="91.0" width="5.5" height="10.3" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-14 开189.02 高207.90 低186.56 收206.05</title><line x1="264.0" y1="86.3" x2="264.0" y2="103.2" stroke="#ff5c70" stroke-width="1"/><rect x="261.3" y="87.8" width="5.5" height="13.5" fill="#ff5c70" rx="0.5"/></g><g class="kbar normal"><title>2026-07-15 开206.00 高209.83 低190.02 收190.20</title><line x1="272.9" y1="84.8" x2="272.9" y2="100.5" stroke="#4dd599" stroke-width="1"/><rect x="270.1" y="87.8" width="5.5" height="12.5" fill="#4dd599" rx="0.5"/></g><g class="kbar normal"><title>2026-07-16 开178.04 高187.88 低173.79 收177.00</title><line x1="281.7" y1="102.2" x2="281.7" y2="113.4" stroke="#4dd599" stroke-width="1"/><rect x="279.0" y="110.0" width="5.5" height="1.5" fill="#4dd599" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-17 开176.80 高179.79 低159.30 收160.28 黄柱</title><line x1="290.5" y1="108.6" x2="290.5" y2="124.9" stroke="#4dd599" stroke-width="1"/><rect x="287.8" y="111.0" width="5.5" height="13.1" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="287.8" y="118.6" width="5.5" height="5.5" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-20 开165.60 高167.48 低144.25 收144.25 黄柱</title><line x1="299.4" y1="118.4" x2="299.4" y2="136.8" stroke="#4dd599" stroke-width="1"/><rect x="296.6" y="119.9" width="5.5" height="17.0" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="296.6" y="119.9" width="5.5" height="16.9" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-21 开152.13 高158.68 低134.01 收158.68 黄柱</title><line x1="308.2" y1="125.4" x2="308.2" y2="145.0" stroke="#f4d35e" stroke-width="1"/><rect x="305.5" y="125.4" width="5.5" height="5.2" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-22 开159.12 高169.50 低154.00 收155.06 黄柱</title><line x1="317.0" y1="116.8" x2="317.0" y2="129.1" stroke="#4dd599" stroke-width="1"/><rect x="314.3" y="125.0" width="5.5" height="3.2" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="314.3" y="125.0" width="5.5" height="3.2" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-23 开158.16 高167.90 低152.35 收153.83 黄柱</title><line x1="325.9" y1="118.1" x2="325.9" y2="130.4" stroke="#4dd599" stroke-width="1"/><rect x="323.1" y="125.8" width="5.5" height="3.4" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="323.1" y="125.8" width="5.5" height="3.4" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-24 开150.81 高152.00 低144.21 收145.77 黄柱</title><line x1="334.7" y1="130.7" x2="334.7" y2="136.9" stroke="#f4d35e" stroke-width="1"/><rect x="331.9" y="131.6" width="5.5" height="4.0" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-27 开147.67 高160.35 低144.39 收160.35 黄柱</title><line x1="343.5" y1="124.1" x2="343.5" y2="136.7" stroke="#ff5c70" stroke-width="1"/><rect x="340.8" y="124.1" width="5.5" height="10.1" fill="#ff5c70" rx="0.5"/><rect class="yellow-part" x="340.8" y="126.9" width="5.5" height="7.2" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-28 开157.31 高164.60 低146.50 收148.64 黄柱</title><line x1="352.3" y1="120.7" x2="352.3" y2="135.1" stroke="#4dd599" stroke-width="1"/><rect x="349.6" y="126.5" width="5.5" height="6.9" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="349.6" y="128.3" width="5.5" height="5.1" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-29 开148.63 高154.99 低133.97 收139.07 黄柱</title><line x1="361.2" y1="128.3" x2="361.2" y2="145.0" stroke="#4dd599" stroke-width="1"/><rect x="358.4" y="133.4" width="5.5" height="7.6" fill="#4dd599" rx="0.5"/><rect class="yellow-part" x="358.4" y="133.4" width="5.5" height="7.6" fill="#f4d35e" rx="0.5"/></g><g class="kbar yellow"><title>2026-07-30 开134.11 高138.99 低125.16 收125.16 黄柱</title><line x1="370.0" y1="141.0" x2="370.0" y2="152.0" stroke="#f4d35e" stroke-width="1"/><rect x="367.3" y="144.9" width="5.5" height="7.1" fill="#f4d35e" rx="0.5"/></g><polyline points="8.0,118.3 16.8,115.9 25.7,113.6 34.5,111.4 43.3,109.4 52.1,107.4 61.0,105.5 69.8,103.7 78.6,102.0 87.5,100.5 96.3,99.2 105.1,98.0 114.0,97.1 122.8,96.4 131.6,96.0 140.4,95.9 149.3,95.9 158.1,96.3 166.9,97.0 175.8,97.9 184.6,99.0 193.4,100.2 202.2,101.7 211.1,103.3 219.9,104.9 228.7,106.7 237.6,108.6 246.4,110.7 255.2,112.8 264.0,115.1 272.9,116.2 281.7,117.3 290.5,118.6 299.4,119.9 308.2,121.3 317.0,122.7 325.9,124.1 334.7,125.5 343.5,126.9 352.3,128.3 361.2,129.6 370.0,130.9" fill="none" stroke="#ff5c70" stroke-width="2" stroke-linejoin="round"/><polyline points="8.0,144.3 16.8,142.1 25.7,139.9 34.5,137.8 43.3,135.6 52.1,133.4 61.0,131.3 69.8,129.1 78.6,127.1 87.5,125.0 96.3,123.0 105.1,121.1 114.0,119.3 122.8,117.5 131.6,115.8 140.4,114.3 149.3,112.9 158.1,111.6 166.9,110.5 175.8,109.5 184.6,108.7 193.4,108.1 202.2,107.6 211.1,107.2 219.9,107.1 228.7,107.0 237.6,107.2 246.4,107.4 255.2,107.8 264.0,108.4 272.9,109.0 281.7,109.6 290.5,110.3 299.4,111.1 308.2,111.9 317.0,112.7 325.9,113.6 334.7,114.5 343.5,115.4 352.3,116.4 361.2,117.4 370.0,118.5" fill="none" stroke="#55c6e8" stroke-width="2" stroke-linejoin="round"/><text x="8" y="171" fill="#91a0b5" font-size="10">06-02</text><text x="370" y="171" fill="#91a0b5" font-size="10" text-anchor="end">07-30</text></svg></td>
+      <td><div class="signal"><span class="signal-mark no">—</span><span class="subline">未出现</span></div></td>
+      <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-30</span></div></td>
+      <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">连续 10 根</span></div></td>
+      <td><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-27</span></div></td>
+      <td><span class="state neutral">见底候选</span></td>
     </tr></tbody></table></div>
     </section>
 
@@ -1534,7 +1577,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
         <article class="rule"><span class="rule-num">01</span><strong>可能见底</strong><p>最近 5 个交易日出现信号。</p></article>
         <article class="rule"><span class="rule-num">02</span><strong>龙腾跃虎</strong><p>最近 5 日出现交叉，且龙线仍在虎线上方。</p></article>
         <article class="rule"><span class="rule-num">03</span><strong>近期涨停</strong><p>最近 42 个交易日至少一次收盘涨停。</p></article>
-        <article class="rule"><span class="rule-num">04</span><strong>连续黄柱</strong><p>实体在龙线下方的部分呈黄色，连续至少 2 日。</p></article>
+        <article class="rule"><span class="rule-num">04</span><strong>连续黄柱</strong><p>实体在龙线下方的部分呈黄色，连续至少 1 日。</p></article>
       </div>
     </section>
 
@@ -1567,7 +1610,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
 
     <p class="disclaimer">本页面按技术条件机械筛选，不构成投资建议。收益按每只股票等权计算，未计手续费、滑点和实际仓位；免费公开行情仅适合个人研究与小范围分享。</p>
   </main>
-  <footer>收盘交易日 2026-07-30 · 报告生成 2026-07-31 08:50 · 沪深 A 股 5208 只 · 数据失败 0 只</footer>
+  <footer>收盘交易日 2026-07-30 · 报告生成 2026-07-31 11:12 · 沪深 A 股 5209 只 · 数据失败 0 只</footer>
 </div>
 <nav class="mobile-dock" aria-label="手机快捷导航">
   <a href="#content"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19V10l8-6 8 6v9H4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 19v-5h5v5" stroke="currentColor" stroke-width="1.8"/></svg><span>概览</span></a>
@@ -1666,6 +1709,107 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
     const prefix = Number(quote.market) === 1 ? "sh" : Number(quote.market) === 0 ? "sz" : "bj";
     return `https://quote.eastmoney.com/${prefix}${quote.code}.html`;
   };
+  const signalCell = (ok, note) => {
+    const cell = document.createElement("td");
+    const signal = document.createElement("div");
+    signal.className = "signal";
+    const mark = document.createElement("span");
+    mark.className = `signal-mark ${ok ? "yes" : "no"}`;
+    mark.textContent = ok ? "✓" : "—";
+    const subline = document.createElement("span");
+    subline.className = "subline";
+    subline.textContent = note || (ok ? "已满足" : "未命中");
+    signal.append(mark, subline);
+    cell.append(signal);
+    return cell;
+  };
+  const paintPoolRows = (rows, area, mode) => {
+    const body = document.querySelector(`#live-${area}-body`);
+    if (!body) return;
+    body.replaceChildren();
+    if (!rows.length) {
+      const row = document.createElement("tr");
+      const cell = document.createElement("td");
+      cell.className = "empty";
+      cell.colSpan = 7;
+      cell.textContent = `当前没有符合条件的${area === "main" ? "主选" : "次选"}预选`;
+      row.append(cell);
+      body.append(row);
+      return;
+    }
+    rows.forEach((item) => {
+      const row = document.createElement("tr");
+      row.dataset.liveCode = item.code;
+
+      const stockCell = document.createElement("td");
+      const link = document.createElement("a");
+      link.className = "stock-link";
+      link.href = quoteHref(item);
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.textContent = item.name || item.code;
+      const code = document.createElement("span");
+      code.className = "stock-code";
+      code.textContent = item.code;
+      stockCell.append(link, code);
+
+      const priceCell = document.createElement("td");
+      const price = document.createElement("span");
+      price.className = "numeric";
+      price.dataset.livePrice = "";
+      price.textContent = Number(item.price).toFixed(2);
+      const quoteLine = document.createElement("span");
+      quoteLine.className = "subline";
+      const change = document.createElement("span");
+      change.className = "numeric";
+      change.dataset.liveChange = "";
+      change.textContent = formatPct(Number(item.change_pct));
+      setTone(change, Number(item.change_pct));
+      const time = document.createElement("span");
+      time.dataset.liveTime = "";
+      const displayTime = formatQuoteTime(item.server_time);
+      time.textContent = displayTime ? `${displayTime} 行情` : "最新行情";
+      quoteLine.append(change, document.createTextNode(" · "), time);
+      priceCell.append(price, quoteLine);
+
+      const statusCell = document.createElement("td");
+      statusCell.className = "live-pool-status";
+      const state = document.createElement("span");
+      state.className = `state ${mode === "intraday" ? "warn" : "good"}`;
+      const areaLabel = area === "main" ? "主选" : "次选";
+      state.textContent = mode === "intraday" ? `盘中${areaLabel}预选` : `收盘${areaLabel}`;
+      const settlement = document.createElement("span");
+      settlement.className = "subline";
+      settlement.textContent = mode === "intraday"
+        ? "待收盘确认，不计入跟踪统计"
+        : "跟踪与统计已按收盘结算";
+      statusCell.append(state, settlement);
+
+      row.append(
+        stockCell,
+        priceCell,
+        signalCell(Boolean(item.bottom_ok), item.bottom_date || "未命中"),
+        signalCell(Boolean(item.cross_ok), item.cross_date || "未命中"),
+        signalCell(Boolean(item.limit_up_ok), item.limit_up_date || "未命中"),
+        signalCell(Boolean(item.yellow_ok), `连续 ${Number(item.yellow_count || 0)} 根`),
+        statusCell,
+      );
+      body.append(row);
+    });
+  };
+  const paintLivePools = (pools, mode) => {
+    if (!pools || !pools.available) return;
+    const main = Array.isArray(pools.main) ? pools.main : [];
+    const secondary = Array.isArray(pools.secondary) ? pools.secondary : [];
+    document.querySelectorAll("[data-live-main-count]").forEach((node) => {
+      node.textContent = String(main.length);
+    });
+    document.querySelectorAll("[data-live-secondary-count]").forEach((node) => {
+      node.textContent = String(secondary.length);
+    });
+    paintPoolRows(main, "main", mode);
+    paintPoolRows(secondary, "secondary", mode);
+  };
   const paintTicker = (quotes) => {
     if (!ticker) return;
     ticker.replaceChildren();
@@ -1702,7 +1846,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       status.textContent = data.market_label || "行情已更新";
-      detail.textContent = data.note || "盘中行情只更新价格，不改变收盘筛选信号";
+      detail.textContent = data.note || "主选与次选盘中重算；跟踪统计收盘后结算";
       quoteTime.textContent = data.generated_at_display || data.generated_at;
       dot.className = `status-dot ${data.is_stale ? "stale" : ""}`;
       const targetCount = Number(data.target_count || 0);
@@ -1710,22 +1854,17 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
       const coverage = targetCount ? Math.min(1, quoteCount / targetCount) : 1;
       if (lensValue) lensValue.textContent = targetCount ? `${quoteCount}/${targetCount}` : "已就绪";
       if (riskStage) riskStage.style.setProperty("--coverage-angle", `${coverage * 360}deg`);
+      paintLivePools(data.live_pools || {}, data.selection_mode || "close");
       paintTicker(data.quotes || {});
       Object.entries(data.quotes || {}).forEach(([code, quote]) => {
         document.querySelectorAll(`[data-live-code="${code}"]`).forEach((row) => {
           const price = row.querySelector("[data-live-price]");
           const change = row.querySelector("[data-live-change]");
-          const ret = row.querySelector("[data-live-return]");
           const time = row.querySelector("[data-live-time]");
           if (price) price.textContent = Number(quote.price).toFixed(2);
           if (change) {
             change.textContent = formatPct(Number(quote.change_pct));
             setTone(change, Number(quote.change_pct));
-          }
-          if (ret && row.dataset.entryPrice) {
-            const value = (Number(quote.price) / Number(row.dataset.entryPrice) - 1) * 100;
-            ret.textContent = formatPct(value);
-            setTone(ret, value);
           }
           if (time) {
             const stamp = String(quote.server_time || data.latest_quote_time || "");
