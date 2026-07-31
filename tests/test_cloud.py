@@ -110,7 +110,11 @@ class CloudWorkflowTests(unittest.TestCase):
                     "market": 0,
                     "eligible": True,
                     "selected": False,
-                    "matched_count": 3,
+                    "matched_count": 2,
+                    "observation_yellow_ok": True,
+                    "observation_yellow_date": "2026-07-24",
+                    "observation_yellow_count": 1,
+                    "observation_matched_count": 3,
                     "cross_ok": True,
                     "bottom_ok": False,
                     "yellow_ok": True,
@@ -271,7 +275,7 @@ class CloudWorkflowTests(unittest.TestCase):
             ],
         }
         snapshot = compact_snapshot(payload)
-        self.assertEqual(snapshot["live_seed_format"], 2)
+        self.assertEqual(snapshot["live_seed_format"], 3)
         self.assertEqual(
             [item[0] for item in snapshot["live_universe"]],
             ["600001"],
@@ -282,6 +286,7 @@ class CloudWorkflowTests(unittest.TestCase):
         )
         self.assertEqual(seed["code"], "600001")
         self.assertTrue(seed["eligible"])
+        self.assertEqual(seed["observation_matched_count"], 2)
 
     def test_compact_snapshot_sorts_live_universe_and_result_keys(self):
         first = self.live_seed("600002")
@@ -332,6 +337,10 @@ class CloudWorkflowTests(unittest.TestCase):
                 "limit_up_ok",
                 "yellow_ok",
                 "matched_count",
+                "observation_yellow_ok",
+                "observation_yellow_date",
+                "observation_yellow_count",
+                "observation_matched_count",
                 "eligible",
                 "selected",
                 "cross_date",
@@ -442,6 +451,32 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertTrue(result["cross_ok"])
         self.assertTrue(result["yellow_ok"])
         self.assertEqual(result["yellow_date"], "2026-07-29")
+
+    def test_observation_yellow_does_not_require_a_cross(self):
+        cfg = {
+            "bottom_lookback_days": 5,
+            "cross_lookback_days": 5,
+            "limit_up_lookback_days": 42,
+            "yellow_consecutive_days": 1,
+        }
+        seed = self.live_seed("600009")
+        seed["line_coefficients"]["dragon_tail"] = [
+            [11.0, 0.0, 0.0] for _ in range(6)
+        ]
+        seed["line_coefficients"]["tiger_tail"] = [
+            [10.0, 0.0, 0.0] for _ in range(6)
+        ]
+        result = evaluate_live_seed(
+            seed,
+            self.live_quote("600009"),
+            cfg,
+            "2026-07-30",
+        )
+        self.assertFalse(result["cross_ok"])
+        self.assertFalse(result["yellow_ok"])
+        self.assertEqual(result["matched_count"], 2)
+        self.assertTrue(result["observation_yellow_ok"])
+        self.assertEqual(result["observation_matched_count"], 3)
 
     def test_live_cross_recomputes_the_full_five_day_window(self):
         cfg = {
@@ -606,8 +641,35 @@ class CloudWorkflowTests(unittest.TestCase):
             eligible=True,
             selected=True,
         )
+        observations = [
+            SimpleNamespace(
+                code=f"60010{index}",
+                name=f"观察示例{index}",
+                market=1,
+                date="2026-07-30",
+                close=10.0 + index,
+                change_pct=float(index),
+                chart='<svg aria-label="最近42日K线、龙线和虎线"></svg>',
+                cross_ok=True,
+                cross_date="2026-07-28",
+                bottom_ok=True,
+                bottom_date="2026-07-30",
+                yellow_ok=False,
+                yellow_count=0,
+                limit_up_ok=False,
+                limit_up_date="",
+                matched_count=2,
+                observation_yellow_ok=True,
+                observation_yellow_date="2026-07-30",
+                observation_yellow_count=1,
+                observation_matched_count=3,
+                eligible=True,
+                selected=False,
+            )
+            for index in range(7)
+        ]
         html = render_report(
-            [item],
+            [item, *observations],
             {
                 "near_match_minimum": 3,
                 "bottom_lookback_days": 5,
@@ -633,6 +695,10 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertIn("真实案例 · 隆盛科技", html)
         self.assertIn("趋势开始", html)
         self.assertIn("建议结束", html)
+        self.assertIn('class="case-dragon-line"', html)
+        self.assertIn('class="case-tiger-line"', html)
+        self.assertIn("默认展示优先级最高的 5 只", html)
+        self.assertIn("展开更多：其余 2 只观察标的", html)
         self.assertIn("100 次信号中，曾至少涨到 5%", html)
         self.assertIn("信号后第 13 个交易日", html)
         self.assertNotIn("首次达到5%中位数", html)

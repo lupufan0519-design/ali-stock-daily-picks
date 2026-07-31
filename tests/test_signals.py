@@ -29,6 +29,7 @@ class SignalMathTests(unittest.TestCase):
         self.assertFalse(config["include_st"])
         self.assertEqual(config["limit_up_lookback_days"], 42)
         self.assertEqual(config["yellow_consecutive_days"], 1)
+        self.assertEqual(config["near_match_minimum"], 3)
 
     def test_cci_has_warmup(self):
         bars = [Bar(f"2026-01-{i:02d}", i, i + 1, i - 1, i, 1, 1) for i in range(1, 20)]

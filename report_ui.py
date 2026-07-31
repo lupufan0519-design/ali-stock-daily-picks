@@ -388,15 +388,21 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 .trend-case-head strong { margin: 0; font-size: 15px; }
 .trend-case-head span { color: var(--muted); font-size: 11px; }
-.trend-case-badge {
+.trend-case-legend {
   flex: 0 0 auto;
-  padding: 5px 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 9px;
   border: 1px solid color-mix(in srgb, var(--case-start) 22%, var(--line));
   border-radius: 999px;
-  color: var(--case-start) !important;
   background: color-mix(in srgb, var(--case-start) 7%, var(--surface));
   font-weight: 750;
 }
+.trend-case-legend span { display: inline-flex; align-items: center; gap: 5px; color: var(--muted-strong); }
+.trend-case-legend i { display: block; width: 17px; height: 2px; border-radius: 999px; }
+.trend-case-legend .dragon { background: #ff5c70; box-shadow: 0 0 0 1px rgba(255,92,112,.08); }
+.trend-case-legend .tiger { background: #55c6e8; box-shadow: 0 0 0 1px rgba(85,198,232,.08); }
 .trend-case-canvas {
   position: relative;
   height: clamp(245px, 29vw, 320px);
@@ -419,6 +425,9 @@ tbody tr:last-child td { border-bottom: 0; }
 .case-candle:hover .case-body { filter: drop-shadow(0 0 5px currentColor); }
 .case-wave-fill { fill: url(#case-wave-fill); opacity: .44; }
 .case-wave-line { fill: none; stroke: color-mix(in srgb, var(--case-start) 52%, transparent); stroke-width: 1.4; }
+.case-dragon-line, .case-tiger-line { fill: none; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+.case-dragon-line { stroke: #ff5c70; }
+.case-tiger-line { stroke: #55c6e8; }
 .case-stop-line { stroke: var(--case-end); stroke-width: 1.25; stroke-dasharray: 5 4; }
 .case-stop-label { fill: var(--case-end); font: 750 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace; }
 .case-arrow-start, .case-arrow-end { fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
@@ -446,7 +455,7 @@ tbody tr:last-child td { border-bottom: 0; }
 .case-pin.start b { color: var(--case-start); }
 .case-pin.peak { top: 9px; left: 58%; border-color: color-mix(in srgb, var(--case-peak) 38%, var(--line)); }
 .case-pin.peak b { color: var(--case-peak); }
-.case-pin.end { right: 2%; top: 47%; border-color: color-mix(in srgb, var(--case-end) 38%, var(--line)); }
+.case-pin.end { right: 2%; top: 9px; border-color: color-mix(in srgb, var(--case-end) 38%, var(--line)); }
 .case-pin.end b { color: var(--case-end); }
 .trend-case-notes {
   display: grid;
@@ -535,7 +544,8 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .validation-lead { grid-template-columns: 1fr; }
   .validation-verdict { padding: 17px; }
   .trend-case { margin-top: 17px; }
-  .trend-case-head { padding: 13px 13px 9px; }
+  .trend-case-head { display: grid; gap: 8px; padding: 13px 13px 9px; }
+  .trend-case-legend { justify-self: start; }
   .trend-case-canvas { height: 245px; margin-inline: 6px; }
   .case-axis-label, .case-stop-label { display: none; }
   .case-pin { min-width: 82px; padding: 6px 7px; }
@@ -543,7 +553,7 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .case-pin small { font-size: 8.5px; }
   .case-pin.start { left: 1%; }
   .case-pin.peak { left: 44%; }
-  .case-pin.end { right: 1%; top: 51%; }
+  .case-pin.end { right: 1%; top: 9px; }
   .trend-case-notes { grid-template-columns: 1fr; }
   .trend-case-note { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 9px 12px; }
   .trend-case-note + .trend-case-note { border-top: 1px solid var(--line); border-left: 0; }
@@ -1736,6 +1746,17 @@ def _yellow_note(item) -> str:
     return f"{yellow_date or '交叉前后2日'} · {int(item.yellow_count)} 根"
 
 
+def _observation_yellow(item) -> tuple[bool, str]:
+    ok = bool(getattr(item, "observation_yellow_ok", item.yellow_ok))
+    date = str(
+        getattr(item, "observation_yellow_date", getattr(item, "yellow_date", ""))
+    )
+    count = int(
+        getattr(item, "observation_yellow_count", item.yellow_count)
+    )
+    return ok, f"{date or '未出现'} · 连续 {count} 根"
+
+
 def _evaluation_row(item, observation: bool = False) -> str:
     entry_price = float(item.close)
     chart = str(item.chart).replace(
@@ -1752,10 +1773,11 @@ def _evaluation_row(item, observation: bool = False) -> str:
       <td class="chart-cell">{chart}</td>"""
     if observation:
         priority = "龙虎优先" if item.cross_ok else "见底候选" if item.bottom_ok else "普通观察"
+        observation_yellow_ok, observation_yellow_note = _observation_yellow(item)
         return base + f"""
       <td>{_signal(item.cross_ok, item.cross_date or '未出现')}</td>
       <td>{_signal(item.bottom_ok, item.bottom_date or '未出现')}</td>
-      <td>{_signal(item.yellow_ok, _yellow_note(item))}</td>
+      <td>{_signal(observation_yellow_ok, observation_yellow_note)}</td>
       <td>{_signal(item.limit_up_ok, item.limit_up_date or '未出现')}</td>
       <td><span class="state neutral">{priority}</span></td>
     </tr>"""
@@ -1786,6 +1808,7 @@ def _live_pool_row(item, area: str) -> str:
 
 def _observation_compact_row(item) -> str:
     priority = "龙虎优先" if item.cross_ok else "见底候选" if item.bottom_ok else "普通观察"
+    observation_yellow_ok, observation_yellow_note = _observation_yellow(item)
     return f"""
     <tr data-live-code="{_esc(item.code)}">
       <td>{_stock_cell(item.code, item.name, int(item.market))}</td>
@@ -1794,7 +1817,7 @@ def _observation_compact_row(item) -> str:
           · <span data-live-time>{_esc(item.date)} 收盘</span></span></td>
       <td>{_signal(item.cross_ok, item.cross_date or '未出现')}</td>
       <td>{_signal(item.bottom_ok, item.bottom_date or '未出现')}</td>
-      <td>{_signal(item.yellow_ok, _yellow_note(item))}</td>
+      <td>{_signal(observation_yellow_ok, observation_yellow_note)}</td>
       <td>{_signal(item.limit_up_ok, item.limit_up_date or '未出现')}</td>
       <td><span class="state neutral">{priority}</span></td>
     </tr>"""
@@ -1842,6 +1865,8 @@ def _trend_case_chart() -> str:
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
         bars = payload["bars"]
+        dragon = [float(value) for value in payload["dragon"]]
+        tiger = [float(value) for value in payload["tiger"]]
         signal_index = next(
             index
             for index, bar in enumerate(bars)
@@ -1859,7 +1884,7 @@ def _trend_case_chart() -> str:
         )
     except (OSError, ValueError, KeyError, TypeError, StopIteration):
         return ""
-    if len(bars) < 3:
+    if len(bars) < 3 or len(dragon) != len(bars) or len(tiger) != len(bars):
         return ""
 
     width, height = 900.0, 320.0
@@ -1877,6 +1902,15 @@ def _trend_case_chart() -> str:
 
     def y_at(price: float) -> float:
         return top + (price_max - price) / (price_max - price_min) * plot_height
+
+    dragon_line = " ".join(
+        f"{x_at(index):.1f},{y_at(value):.1f}"
+        for index, value in enumerate(dragon)
+    )
+    tiger_line = " ".join(
+        f"{x_at(index):.1f},{y_at(value):.1f}"
+        for index, value in enumerate(tiger)
+    )
 
     grid = []
     for step in range(5):
@@ -1934,7 +1968,7 @@ def _trend_case_chart() -> str:
     exit_y = y_at(float(payload["exit_close"]))
     stop_price = float(payload["peak_close"]) * 0.8
     stop_y = y_at(stop_price)
-    end_path_start_x = min(width - right - 8, exit_x - 58)
+    end_path_start_x = min(width - right - 28, exit_x + 42)
     date_ticks = []
     for index in (0, signal_index, peak_index, exit_index, len(bars) - 1):
         date_ticks.append(
@@ -1947,7 +1981,7 @@ def _trend_case_chart() -> str:
     <div class="trend-case" aria-label="历史真实案例：隆盛科技趋势开始与建议结束点">
       <div class="trend-case-head">
         <div><strong>真实案例 · {_esc(payload['name'])} {_esc(payload['code'])}</strong><span>同一套实时可确认规则重放</span></div>
-        <span class="trend-case-badge">信号 → 高点 → 止盈</span>
+        <div class="trend-case-legend" aria-label="趋势线图例"><span><i class="dragon"></i>龙线</span><span><i class="tiger"></i>虎线</span></div>
       </div>
       <div class="trend-case-canvas">
         <div class="case-pin start"><b>趋势开始</b><small>{_esc(payload['signal_date'])}</small></div>
@@ -1968,12 +2002,14 @@ def _trend_case_chart() -> str:
           <path class="case-wave-fill" d="{wave_area}"/>
           <polyline class="case-wave-line" points="{wave_line}"/>
           {''.join(candles)}
+          <polyline class="case-tiger-line" points="{tiger_line}"/>
+          <polyline class="case-dragon-line" points="{dragon_line}"/>
           <line class="case-stop-line" x1="{peak_x:.1f}" y1="{stop_y:.1f}" x2="{exit_x:.1f}" y2="{stop_y:.1f}"/>
           <text class="case-stop-label" x="{peak_x+7:.1f}" y="{stop_y-6:.1f}">高点回撤20%</text>
           <line class="case-peak-guide" x1="{peak_x:.1f}" y1="{top+22:.1f}" x2="{peak_x:.1f}" y2="{peak_y-7:.1f}"/>
           <circle class="case-peak-ring" cx="{peak_x:.1f}" cy="{peak_y:.1f}" r="5"/>
           <path class="case-arrow-start" d="M {max(left+8,signal_x-63):.1f} {top+24:.1f} C {signal_x-51:.1f} {top+54:.1f}, {signal_x-17:.1f} {signal_y-24:.1f}, {signal_x:.1f} {signal_y-6:.1f}"/>
-          <path class="case-arrow-end" d="M {end_path_start_x:.1f} {top+115:.1f} C {exit_x-34:.1f} {top+142:.1f}, {exit_x-17:.1f} {exit_y-24:.1f}, {exit_x:.1f} {exit_y-5:.1f}"/>
+          <path class="case-arrow-end" d="M {end_path_start_x:.1f} {top+64:.1f} C {exit_x+34:.1f} {top+96:.1f}, {exit_x+15:.1f} {exit_y-26:.1f}, {exit_x:.1f} {exit_y-6:.1f}"/>
           {''.join(date_ticks)}
         </svg>
       </div>
@@ -2033,7 +2069,7 @@ def _validation_section() -> str:
       <p class="section-copy">逐日重放，每一天只使用当时已经存在的行情；XMA 尾部按当日可见数据重新计算，避免偷看未来。</p></div></div>
       <div class="validation-lead">
         <article class="validation-verdict"><strong>{_esc(verdict)}</strong>
-          <p>这里的“涨到过”是指信号出现后的 60 个交易日里，至少有一天收盘达到这个涨幅，并不代表第 60 天仍有同样收益。在 {int(forward_60['sample_count'])} 次完整信号中，每 100 次约有 {float(forward_60['rally_3pct_rate_pct']):.0f} 次涨到过 3%、{rally_5_rate:.0f} 次涨到过 5%、{float(forward_60['rally_10pct_rate_pct']):.0f} 次涨到过 10%。</p>
+          <p>这里的“涨到过”是指信号出现后的 60 个交易日里，至少有一天收盘达到这个涨幅，并不代表第 60 天仍有同样收益。同一只股票在不同的龙腾跃虎周期可以重复计入；同一次上穿后的连续满足日只记一次。在 {int(forward_60['sample_count'])} 次完整信号中，每 100 次约有 {float(forward_60['rally_3pct_rate_pct']):.0f} 次涨到过 3%、{rally_5_rate:.0f} 次涨到过 5%、{float(forward_60['rally_10pct_rate_pct']):.0f} 次涨到过 10%。</p>
           {_trend_case_chart()}
         </article>
         <div class="validation-facts">
@@ -2107,12 +2143,12 @@ def render_report(
         for item in secondary
     )
     selected_rows = "".join(_evaluation_row(item) for item in selected)
-    near_featured = near[:8]
-    near_compact = near[8:]
+    near_featured = near[:5]
+    near_compact = near[5:]
     near_rows = "".join(_evaluation_row(item, True) for item in near_featured)
     near_compact_rows = "".join(_observation_compact_row(item) for item in near_compact)
     near_compact_section = (
-        f"""<details class="panel"><summary>展开其余 {len(near_compact)} 只观察标的（轻量列表）</summary>
+        f"""<details class="panel"><summary>展开更多：其余 {len(near_compact)} 只观察标的</summary>
         <div class="table-scroll"><table><thead><tr><th>股票</th><th>价格 / 涨跌</th><th>龙腾跃虎</th><th>可能见底</th><th>连续黄柱</th><th>42日涨停</th><th>优先级</th></tr></thead>
         <tbody>{near_compact_rows}</tbody></table></div>
       </details>"""
@@ -2125,7 +2161,10 @@ def render_report(
     )
     empty6 = '<tr><td class="empty" colspan="6">当前没有符合条件的记录</td></tr>'
     empty7 = '<tr><td class="empty" colspan="7">今日没有股票同时满足四项条件</td></tr>'
-    empty8 = '<tr><td class="empty" colspan="8">当前没有满足三项条件的观察标的</td></tr>'
+    empty8 = (
+        f'<tr><td class="empty" colspan="8">当前没有满足至少 '
+        f'{cfg["near_match_minimum"]} 项条件的观察标的</td></tr>'
+    )
     validation_section = _validation_section()
     legend = """<div class="legend" aria-label="图表图例">
         <span><i style="background:#ef5350"></i>上涨 K 线</span>
@@ -2269,7 +2308,7 @@ def render_report(
 
     <section class="section reveal" id="watch">
       <div class="section-head"><div><span class="section-kicker">Watchlist</span><h2>观察区</h2>
-      <p class="section-copy">满足至少三项的接近标的，仅用于观察，不纳入主选或次选收益。优先展示前 {len(near_featured)} 只完整走势图，其余使用轻量列表。</p></div><span class="count-badge">{len(near)} 只</span></div>
+      <p class="section-copy">满足至少 {cfg['near_match_minimum']} 项的接近标的，仅用于观察，不纳入主选或次选收益。默认展示优先级最高的 {len(near_featured)} 只完整走势图，其余可展开查看。</p></div><span class="count-badge">{len(near)} 只</span></div>
 {legend}
       <div class="panel table-scroll"><table><thead><tr><th>股票</th><th>价格 / 涨跌</th><th>近42日 K 线与龙虎线</th><th>龙腾跃虎</th><th>可能见底</th><th>连续黄柱</th><th>42日涨停</th><th>优先级</th></tr></thead>
       <tbody>{near_rows or empty8}</tbody></table></div>

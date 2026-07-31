@@ -17,7 +17,7 @@ STATE_PATH = ROOT / "strategy" / "state.json"
 LATEST_PATH = ROOT / "results" / "latest.json"
 LATEST_HTML_PATH = ROOT / "results" / "latest.html"
 SNAPSHOT_PATH = ROOT / "cloud_snapshot.json"
-LIVE_SEED_FORMAT = 2
+LIVE_SEED_FORMAT = 3
 
 
 def snapshot_json(payload: dict) -> str:
@@ -41,6 +41,7 @@ def pack_live_seed(seed: dict) -> list:
             8 if seed.get("yellow_ok") else 0,
             16 if seed.get("dragon_above_tiger") else 0,
             32 if seed.get("selected") else 0,
+            64 if seed.get("observation_yellow_ok") else 0,
         )
     )
     return [
@@ -74,6 +75,8 @@ def pack_live_seed(seed: dict) -> list:
         list(seed.get("body_low_tail", [])),
         str(seed.get("yellow_date", "")),
         list(seed.get("body_low_tail_dates", [])),
+        int(seed.get("observation_yellow_count", 0)),
+        str(seed.get("observation_yellow_date", "")),
     ]
 
 
@@ -102,6 +105,10 @@ def compact_snapshot(payload: dict) -> dict:
         "limit_up_ok",
         "yellow_ok",
         "matched_count",
+        "observation_yellow_ok",
+        "observation_yellow_date",
+        "observation_yellow_count",
+        "observation_matched_count",
         "eligible",
         "selected",
         "cross_date",

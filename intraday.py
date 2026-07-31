@@ -29,7 +29,7 @@ def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
     """Decode the compact close-generated seed used by the intraday workflow."""
     if isinstance(item, dict):
         return item
-    if seed_format not in {1, 2} or not isinstance(item, list) or len(item) < 19:
+    if seed_format not in {1, 2, 3} or not isinstance(item, list) or len(item) < 19:
         return {}
 
     def triples(values: object) -> list[list[float]]:
@@ -90,6 +90,25 @@ def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
             [str(value) for value in item[21]]
             if seed_format >= 2 and len(item) > 21
             else []
+        ),
+        "observation_yellow_ok": (
+            bool(flags & 64) if seed_format >= 3 else bool(flags & 8)
+        ),
+        "observation_yellow_count": (
+            int(item[22])
+            if seed_format >= 3 and len(item) > 22
+            else int(item[17])
+        ),
+        "observation_yellow_date": (
+            str(item[23])
+            if seed_format >= 3 and len(item) > 23
+            else str(item[20])
+            if seed_format >= 2 and len(item) > 20
+            else ""
+        ),
+        "observation_matched_count": sum(
+            bool(flags & bit)
+            for bit in (1, 2, 4, 64 if seed_format >= 3 else 8)
         ),
     }
 
@@ -429,6 +448,18 @@ def _baseline_live_row(seed: dict, quote: dict) -> dict:
         "yellow_date": str(seed.get("yellow_date", "")),
         "yellow_count": int(seed.get("yellow_count", 0)),
         "matched_count": int(seed.get("matched_count", 0)),
+        "observation_yellow_ok": bool(
+            seed.get("observation_yellow_ok", seed.get("yellow_ok"))
+        ),
+        "observation_yellow_date": str(
+            seed.get("observation_yellow_date", seed.get("yellow_date", ""))
+        ),
+        "observation_yellow_count": int(
+            seed.get("observation_yellow_count", seed.get("yellow_count", 0))
+        ),
+        "observation_matched_count": int(
+            seed.get("observation_matched_count", seed.get("matched_count", 0))
+        ),
         "dragon_above_tiger": bool(seed.get("dragon_above_tiger")),
         "eligible": bool(seed.get("eligible")),
         "selected": bool(seed.get("selected")),
@@ -507,6 +538,9 @@ def evaluate_live_seed(
     yellow_count = 1 if yellow else 0
     yellow_ok = False
     yellow_date = live_date if yellow else ""
+    observation_yellow_count = yellow_count
+    observation_yellow_ok = yellow
+    observation_yellow_date = live_date if yellow else ""
     if len(dragon_tail) >= 6:
         cross_flags = [False] + [
             dragon_tail[index] > tiger_tail[index]
@@ -535,6 +569,18 @@ def evaluate_live_seed(
                 dragon_value > body_low
                 for dragon_value, body_low in zip(dragon_tail, body_lows)
             ]
+            observation_yellow_count = 0
+            for flag in reversed(yellow_flags):
+                if not flag:
+                    break
+                observation_yellow_count += 1
+            observation_yellow_ok = (
+                observation_yellow_count
+                >= int(cfg["yellow_consecutive_days"])
+            )
+            observation_yellow_date = (
+                live_date if observation_yellow_ok else ""
+            )
             paired_cross, paired_yellow, yellow_count = cross_yellow_pair(
                 cross_flags,
                 yellow_flags,
@@ -612,6 +658,9 @@ def evaluate_live_seed(
     )
 
     matched_count = sum((bottom_ok, cross_ok, limit_up_ok, yellow_ok))
+    observation_matched_count = sum(
+        (bottom_ok, cross_ok, limit_up_ok, observation_yellow_ok)
+    )
     selected = bool(seed.get("eligible") and matched_count == 4)
     return {
         "code": str(seed["code"]),
@@ -630,6 +679,10 @@ def evaluate_live_seed(
         "yellow_date": yellow_date,
         "yellow_count": yellow_count,
         "matched_count": matched_count,
+        "observation_yellow_ok": observation_yellow_ok,
+        "observation_yellow_date": observation_yellow_date,
+        "observation_yellow_count": observation_yellow_count,
+        "observation_matched_count": observation_matched_count,
         "dragon_above_tiger": dragon_above_tiger,
         "eligible": True,
         "selected": selected,

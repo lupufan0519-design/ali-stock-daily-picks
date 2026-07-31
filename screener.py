@@ -74,6 +74,10 @@ class Evaluation:
     yellow_date: str
     yellow_count: int
     matched_count: int
+    observation_yellow_ok: bool
+    observation_yellow_date: str
+    observation_yellow_count: int
+    observation_matched_count: int
     dragon_above_tiger: bool
     dragon_value: float
     tiger_value: float
@@ -472,6 +476,15 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
         limit_flags.append(bars[i].close + 1e-8 >= limit_up_price(bars[i - 1].close, rate))
     # 对齐原公式：K 线实体只要有一部分位于龙线下方，就计为黄柱。
     yellow_flags = [has_yellow_segment(bar, value) for value, bar in zip(dragon, bars)]
+    observation_yellow_count = 0
+    for flag in reversed(yellow_flags):
+        if not flag:
+            break
+        observation_yellow_count += 1
+    observation_yellow_ok = (
+        observation_yellow_count >= cfg["yellow_consecutive_days"]
+    )
+    observation_yellow_date = bars[-1].date if observation_yellow_ok else ""
 
     bottom_date = latest_true_date(
         bottom_flags, bars, cfg["bottom_lookback_days"]
@@ -498,6 +511,9 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
     limit_ok = bool(limit_date)
     yellow_ok = paired_cross_index >= 0
     matched = sum((bottom_ok, cross_ok, limit_ok, yellow_ok))
+    observation_matched = sum(
+        (bottom_ok, cross_ok, limit_ok, observation_yellow_ok)
+    )
     dragon_above_tiger = dragon[-1] > tiger[-1]
     previous = bars[-2].close if len(bars) > 1 else bars[-1].close
     change_pct = (bars[-1].close / previous - 1.0) * 100.0 if previous else 0.0
@@ -520,6 +536,14 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
         yellow_ok=yellow_ok,
         dragon_above_tiger=dragon_above_tiger,
     )
+    live_seed.update(
+        {
+            "observation_yellow_ok": observation_yellow_ok,
+            "observation_yellow_date": observation_yellow_date,
+            "observation_yellow_count": observation_yellow_count,
+            "observation_matched_count": observation_matched,
+        }
+    )
 
     return Evaluation(
         code=stock.code,
@@ -538,6 +562,10 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
         yellow_date=yellow_date,
         yellow_count=yellow_count,
         matched_count=matched,
+        observation_yellow_ok=observation_yellow_ok,
+        observation_yellow_date=observation_yellow_date,
+        observation_yellow_count=observation_yellow_count,
+        observation_matched_count=observation_matched,
         dragon_above_tiger=dragon_above_tiger,
         dragon_value=float(dragon[-1]),
         tiger_value=float(tiger[-1]),
@@ -917,7 +945,7 @@ def observation_row_html(item: Evaluation) -> str:
         <td>{item.chart}</td>
         <td>{mark(item.cross_ok)}<small>{cross_note}</small></td>
         <td>{mark(item.bottom_ok)}<small>{item.bottom_date or '未出现'}</small></td>
-        <td>{mark(item.yellow_ok)}<small>连续 {item.yellow_count} 根</small></td>
+        <td>{mark(item.observation_yellow_ok)}<small>{item.observation_yellow_date or '未出现'} · 连续 {item.observation_yellow_count} 根</small></td>
         <td>{mark(item.limit_up_ok)}<small>{item.limit_up_date or '未出现'}</small></td>
         <td>{priority}</td>
       </tr>"""
@@ -990,11 +1018,11 @@ def render_html(
     near = sorted([
         x
         for x in evaluations
-        if x.eligible and not x.selected and x.matched_count >= cfg["near_match_minimum"]
+        if x.eligible and not x.selected and x.observation_matched_count >= cfg["near_match_minimum"]
     ], key=lambda x: (
         x.cross_ok,
         x.bottom_ok,
-        x.yellow_ok,
+        x.observation_yellow_ok,
         x.limit_up_ok,
         x.cross_date,
         x.bottom_date,
@@ -1004,7 +1032,10 @@ def render_html(
     stats = strategy_stats(strategy_state)
     secondary_stats = secondary_strategy_stats(strategy_state)
     strict_rows = "".join(row_html(x) for x in selected) or '<tr><td colspan="7" class="empty">今日没有股票同时满足四项条件</td></tr>'
-    near_rows = "".join(observation_row_html(x) for x in near) or '<tr><td colspan="8" class="empty">今日没有满足三项条件的观察标的</td></tr>'
+    near_rows = "".join(observation_row_html(x) for x in near) or (
+        f'<tr><td colspan="8" class="empty">今日没有满足至少 '
+        f'{cfg["near_match_minimum"]} 项条件的观察标的</td></tr>'
+    )
     active_rows = "".join(active_position_row(x) for x in strategy_state["active"]) or '<tr><td colspan="6" class="empty">跟踪池目前为空</td></tr>'
     closed_rows = "".join(closed_position_row(x) for x in strategy_state["closed"][:50]) or '<tr><td colspan="6" class="empty">尚无移出记录</td></tr>'
     secondary_active_rows = "".join(
@@ -1064,7 +1095,7 @@ footer{{margin-top:25px;color:#738198;font-size:13px}}@media(max-width:900px){{.
 <p>当前成功率＝全部在池浮盈样本与已移出盈利样本占全部策略样本的比例；已完成胜率只统计已移出样本。收益按每只股票等权计算，未计手续费、滑点和实际仓位。</p>
 <div class="table-wrap"><table><thead><tr><th>股票</th><th>加入日/加入价</th><th>移出日/移出价</th><th>实现收益</th><th>持有时长</th><th>移出原因</th></tr></thead><tbody>{closed_rows}</tbody></table></div>
 
-<h2>观察区：满足三项</h2><p>按“龙腾跃虎 → 可能见底 → 连续黄柱 → 两月内涨停”排序。出现龙腾跃虎并同时出现可能见底的股票优先。</p>
+<h2>观察区：满足至少 {cfg['near_match_minimum']} 项</h2><p>按“龙腾跃虎 → 可能见底 → 连续黄柱 → 两月内涨停”排序。出现龙腾跃虎并同时出现可能见底的股票优先。</p>
 <div class="legend"><span><i class="dot" style="background:#ff5c70"></i>上涨 K 线</span><span><i class="dot" style="background:#4dd599"></i>下跌 K 线</span><span><i class="dot" style="background:#f4d35e"></i>龙线下方的实体部分</span><span><i class="dot" style="background:#ff5c70"></i>龙线</span><span><i class="dot" style="background:#55c6e8"></i>虎线</span><span>鼠标停在 K 线上可看开高低收</span></div>
 <div class="table-wrap"><table><thead><tr><th>股票</th><th>收盘</th><th>近42日 K 线 + 龙虎线</th><th>① 龙腾跃虎</th><th>② 可能见底</th><th>③ 连续黄柱</th><th>④ 两月内涨停</th><th>观察优先级</th></tr></thead><tbody>{near_rows}</tbody></table></div>
 <footer>生成时间 {generated} · 沪深 A 股 · 数据失败 {len(errors)} 只 · 页面可直接转发，打开时无需联网（股票详情链接除外）</footer>
