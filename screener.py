@@ -438,7 +438,7 @@ def fetch_chunk(host: str, stocks: Sequence[Stock], cfg: dict) -> tuple[list[Eva
     attempted: set[str] = set()
     try:
         with TdxClient(host, timeout=12, auto_reconnect=True) as client:
-            for stock in stocks:
+            for index, stock in enumerate(stocks):
                 try:
                     raw = client.get_security_bars(
                         Market(stock.market),
@@ -452,6 +452,19 @@ def fetch_chunk(host: str, stocks: Sequence[Stock], cfg: dict) -> tuple[list[Eva
                         results.append(item)
                 except Exception as exc:  # 单只股票失败不影响全市场
                     errors.append(f"{stock.code} {type(exc).__name__}: {exc}")
+                    # 连接或网络超时意味着当前会话已经不可用。继续逐只请求只会
+                    # 重复等待同一故障；把余下股票立即交回换服务器补扫。
+                    if isinstance(exc, (ConnectionError, TimeoutError, OSError)) or (
+                        "connection" in type(exc).__name__.lower()
+                        or "timeout" in type(exc).__name__.lower()
+                    ):
+                        remaining = stocks[index + 1 :]
+                        errors.extend(
+                            f"{remaining_stock.code} {type(exc).__name__}: {exc}"
+                            for remaining_stock in remaining
+                        )
+                        attempted.update(remaining_stock.code for remaining_stock in remaining)
+                        break
                 finally:
                     attempted.add(stock.code)
     except Exception as exc:
@@ -462,6 +475,88 @@ def fetch_chunk(host: str, stocks: Sequence[Stock], cfg: dict) -> tuple[list[Eva
             for stock in stocks
             if stock.code not in attempted
         )
+    return results, errors
+
+
+def retry_stock_across_hosts(
+    stock: Stock,
+    hosts: Sequence[str],
+    cfg: dict,
+    deadline: float,
+    *,
+    clock=time.monotonic,
+    fetcher=None,
+    budget_seconds: int = FINAL_RETRY_TIME_BUDGET_SECONDS,
+) -> tuple[list[Evaluation], list[str]]:
+    """逐台换服务器补扫一只股票，成功即停止，且不在预算后启动新请求。"""
+    if fetcher is None:
+        fetcher = fetch_chunk
+    last_errors: list[str] = []
+    for host in hosts:
+        if clock() >= deadline:
+            return [], [
+                f"{stock.code} FinalRetryBudgetExceeded: "
+                f"{budget_seconds}s budget exhausted"
+            ]
+        part_results, part_errors = fetcher(host, [stock], cfg)
+        if not part_errors:
+            return part_results, []
+        last_errors = part_errors
+    return [], last_errors
+
+
+def retry_failed_individually(
+    stocks: Sequence[Stock],
+    hosts: Sequence[str],
+    cfg: dict,
+    worker_count: int,
+    *,
+    time_budget: int = FINAL_RETRY_TIME_BUDGET_SECONDS,
+    clock=time.monotonic,
+    fetcher=None,
+) -> tuple[list[Evaluation], list[str]]:
+    """有界并发补扫失败股票，按输入顺序稳定汇总结果与错误。"""
+    if not stocks:
+        return [], []
+    if fetcher is None:
+        fetcher = fetch_chunk
+    deadline = clock() + time_budget
+    ordered: list[tuple[list[Evaluation], list[str]] | None] = [None] * len(stocks)
+
+    def run_one(index: int, stock: Stock):
+        try:
+            part_results, part_errors = retry_stock_across_hosts(
+                stock,
+                hosts,
+                cfg,
+                deadline,
+                clock=clock,
+                fetcher=fetcher,
+                budget_seconds=time_budget,
+            )
+        except Exception as exc:  # 防止单个 future 中断整轮补扫
+            part_results = []
+            part_errors = [f"{stock.code} {type(exc).__name__}: {exc}"]
+        return index, part_results, part_errors
+
+    final_workers = min(max(worker_count, 1), len(stocks))
+    with ThreadPoolExecutor(max_workers=final_workers) as pool:
+        futures = [
+            pool.submit(run_one, index, stock)
+            for index, stock in enumerate(stocks)
+        ]
+        for future in as_completed(futures):
+            index, part_results, part_errors = future.result()
+            ordered[index] = (part_results, part_errors)
+
+    results: list[Evaluation] = []
+    errors: list[str] = []
+    for item in ordered:
+        if item is None:
+            continue
+        part_results, part_errors = item
+        results.extend(part_results)
+        errors.extend(part_errors)
     return results, errors
 
 
@@ -486,6 +581,7 @@ def scan_market(cfg: dict, codes: set[str] | None = None) -> tuple[list[Evaluati
     print(f"行情服务器 {worker_count} 个；待扫描 {len(universe)} 只沪深A股", flush=True)
     evaluations: list[Evaluation] = []
     errors: list[str] = []
+    initial_started = time.monotonic()
     with ThreadPoolExecutor(max_workers=worker_count) as pool:
         futures = [
             pool.submit(fetch_chunk, hosts[i], part, cfg)
@@ -498,6 +594,11 @@ def scan_market(cfg: dict, codes: set[str] | None = None) -> tuple[list[Evaluati
             errors.extend(part_errors)
             finished += 1
             print(f"扫描进度 {finished}/{worker_count}", flush=True)
+    print(
+        f"首轮扫描完成，用时 {time.monotonic() - initial_started:.1f} 秒；"
+        f"失败 {len(errors)} 只",
+        flush=True,
+    )
 
     # 某台公共服务器偶发整批超时时，换服务器只重试失败股票。
     for attempt in range(1, 4):
@@ -508,6 +609,7 @@ def scan_market(cfg: dict, codes: set[str] | None = None) -> tuple[list[Evaluati
         print(f"第 {attempt} 次补扫 {len(retry_stocks)} 只失败股票", flush=True)
         errors = []
         retry_workers = min(worker_count, len(retry_stocks))
+        retry_started = time.monotonic()
         with ThreadPoolExecutor(max_workers=retry_workers) as pool:
             futures = [
                 pool.submit(
@@ -522,37 +624,33 @@ def scan_market(cfg: dict, codes: set[str] | None = None) -> tuple[list[Evaluati
                 part_results, part_errors = future.result()
                 evaluations.extend(part_results)
                 errors.extend(part_errors)
+        print(
+            f"第 {attempt} 次补扫完成，用时 {time.monotonic() - retry_started:.1f} 秒；"
+            f"仍失败 {len(errors)} 只",
+            flush=True,
+        )
     if errors:
         failed_codes = {line.split(" ", 1)[0] for line in errors}
         retry_stocks = [s for s in universe if s.code in failed_codes]
         if len(retry_stocks) <= FINAL_INDIVIDUAL_RETRY_LIMIT:
-            print(f"逐只换服务器补扫 {len(retry_stocks)} 只", flush=True)
-            final_errors: list[str] = []
-            retry_deadline = time.monotonic() + FINAL_RETRY_TIME_BUDGET_SECONDS
-            for index, stock in enumerate(retry_stocks):
-                if time.monotonic() >= retry_deadline:
-                    final_errors.extend(
-                        f"{remaining.code} FinalRetryBudgetExceeded: "
-                        f"{FINAL_RETRY_TIME_BUDGET_SECONDS}s budget exhausted"
-                        for remaining in retry_stocks[index:]
-                    )
-                    break
-                last_errors: list[str] = []
-                for host in hosts:
-                    if time.monotonic() >= retry_deadline:
-                        last_errors = [
-                            f"{stock.code} FinalRetryBudgetExceeded: "
-                            f"{FINAL_RETRY_TIME_BUDGET_SECONDS}s budget exhausted"
-                        ]
-                        break
-                    part_results, part_errors = fetch_chunk(host, [stock], cfg)
-                    if not part_errors:
-                        evaluations.extend(part_results)
-                        last_errors = []
-                        break
-                    last_errors = part_errors
-                final_errors.extend(last_errors)
+            print(
+                f"逐只并发换服务器补扫 {len(retry_stocks)} 只（{worker_count} 路）",
+                flush=True,
+            )
+            final_started = time.monotonic()
+            part_results, final_errors = retry_failed_individually(
+                retry_stocks,
+                hosts,
+                cfg,
+                worker_count,
+            )
+            evaluations.extend(part_results)
             errors = final_errors
+            print(
+                f"逐只并发补扫完成，用时 {time.monotonic() - final_started:.1f} 秒；"
+                f"仍失败 {len(errors)} 只",
+                flush=True,
+            )
         else:
             print(
                 f"仍有 {len(retry_stocks)} 只失败，超过逐只补扫上限 "

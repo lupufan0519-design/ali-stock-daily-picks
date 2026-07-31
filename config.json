@@ -5,7 +5,7 @@
   "yellow_consecutive_days": 2,
   "history_bars": 180,
   "minimum_history_bars": 100,
-  "workers": 4,
+  "workers": 5,
   "include_st": false,
   "near_match_minimum": 3
 }
