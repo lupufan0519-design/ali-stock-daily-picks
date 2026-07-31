@@ -10,6 +10,8 @@ from typing import Iterable, Sequence
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
+from observation import OBSERVATION_LIMIT, visible_observations
+
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_RESULT = ROOT / "results" / "latest.json"
@@ -21,8 +23,11 @@ def is_st_name(name: object) -> bool:
     return "ST" in str(name).upper()
 
 
-def collect_targets(payload: dict, observation_limit: int = 12) -> list[dict]:
-    """盘中只跟踪策略池和少量接近标的，不重新计算收盘信号。"""
+def collect_targets(
+    payload: dict,
+    observation_limit: int | None = OBSERVATION_LIMIT,
+) -> list[dict]:
+    """盘中跟踪策略池和页面候选，不重新计算收盘信号。"""
     targets: dict[str, dict] = {}
     strategy = payload.get("strategy", {})
     for position in (
@@ -40,25 +45,12 @@ def collect_targets(payload: dict, observation_limit: int = 12) -> list[dict]:
         }
 
     minimum = int(payload.get("config", {}).get("near_match_minimum", 3))
-    candidates = [
-        row
-        for row in payload.get("results", [])
-        if row.get("eligible")
-        and not row.get("selected")
-        and int(row.get("matched_count", 0)) >= minimum
-        and not is_st_name(row.get("name", ""))
-    ]
-    candidates.sort(
-        key=lambda row: (
-            bool(row.get("cross_ok")),
-            bool(row.get("bottom_ok")),
-            bool(row.get("yellow_ok")),
-            bool(row.get("limit_up_ok")),
-            str(row.get("cross_date", "")),
-        ),
-        reverse=True,
+    candidates = visible_observations(
+        payload.get("results", []),
+        minimum,
+        observation_limit,
     )
-    for row in candidates[:observation_limit]:
+    for row in candidates:
         code = str(row["code"])
         targets.setdefault(
             code,
@@ -132,6 +124,40 @@ def parse_tencent_quotes(raw: str, targets: Sequence[dict]) -> dict[str, dict]:
     return quotes
 
 
+def normalize_quote_time(value: object, now: datetime | None = None) -> str:
+    """Normalize provider timestamps to an Asia/Shanghai ISO timestamp."""
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    try:
+        parsed = datetime.fromisoformat(text)
+    except ValueError:
+        parsed = None
+    if parsed is not None:
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=SHANGHAI)
+        return parsed.astimezone(SHANGHAI).isoformat(timespec="seconds")
+
+    reference = now or datetime.now(SHANGHAI)
+    reference = (
+        reference.replace(tzinfo=SHANGHAI)
+        if reference.tzinfo is None
+        else reference.astimezone(SHANGHAI)
+    )
+    for pattern in ("%H:%M:%S.%f", "%H:%M:%S", "%H:%M"):
+        try:
+            parsed_time = datetime.strptime(text, pattern).time()
+            parsed = datetime.combine(
+                reference.date(),
+                parsed_time,
+                tzinfo=SHANGHAI,
+            )
+            return parsed.isoformat(timespec="seconds")
+        except ValueError:
+            continue
+    return ""
+
+
 def fetch_tencent_quotes(targets: Sequence[dict]) -> dict[str, dict]:
     symbols = [
         f"{'sh' if int(item['market']) == 1 else 'sz'}{item['code']}"
@@ -194,7 +220,7 @@ def fetch_xmtdx_quotes(targets: Sequence[dict]) -> tuple[dict[str, dict], str]:
                             "change_pct": change_pct,
                             "volume": float(quote.vol),
                             "amount": float(quote.amount),
-                            "server_time": str(quote.server_time),
+                            "server_time": normalize_quote_time(quote.server_time),
                         }
             if quotes:
                 return quotes, host

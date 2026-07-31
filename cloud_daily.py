@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 import screener
+from observation import visible_observations
 
 
 ROOT = Path(__file__).resolve().parent
@@ -23,29 +24,7 @@ def read_last_trade_date() -> str:
 
 def compact_snapshot(payload: dict) -> dict:
     minimum = int(payload.get("config", {}).get("near_match_minimum", 3))
-    rows = [
-        row
-        for row in payload.get("results", [])
-        if row.get("eligible")
-        and (
-            row.get("selected")
-            or (
-                row.get("cross_ok")
-                and row.get("yellow_ok")
-                and (row.get("bottom_ok") or row.get("limit_up_ok"))
-            )
-            or int(row.get("matched_count", 0)) >= minimum
-        )
-    ]
-    rows.sort(
-        key=lambda row: (
-            bool(row.get("selected")),
-            int(row.get("matched_count", 0)),
-            bool(row.get("cross_ok")),
-            str(row.get("cross_date", "")),
-        ),
-        reverse=True,
-    )
+    rows = visible_observations(payload.get("results", []), minimum)
     keep = {
         "code",
         "name",
@@ -67,7 +46,7 @@ def compact_snapshot(payload: dict) -> dict:
         "generated_at": payload.get("generated_at"),
         "config": payload.get("config", {}),
         "strategy": payload.get("strategy", {}),
-        "results": [{key: row.get(key) for key in keep} for row in rows[:40]],
+        "results": [{key: row.get(key) for key in keep} for row in rows],
     }
 
 

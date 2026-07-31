@@ -431,21 +431,33 @@ def fetch_chunk(host: str, stocks: Sequence[Stock], cfg: dict) -> tuple[list[Eva
 
     results: list[Evaluation] = []
     errors: list[str] = []
-    with TdxClient(host, timeout=12, auto_reconnect=True) as client:
-        for stock in stocks:
-            try:
-                raw = client.get_security_bars(
-                    Market(stock.market),
-                    stock.code,
-                    KlineCategory.DAY,
-                    0,
-                    cfg["history_bars"],
-                )
-                item = evaluate(stock, convert_bars(raw), cfg)
-                if item is not None:
-                    results.append(item)
-            except Exception as exc:  # 单只股票失败不影响全市场
-                errors.append(f"{stock.code} {type(exc).__name__}: {exc}")
+    attempted: set[str] = set()
+    try:
+        with TdxClient(host, timeout=12, auto_reconnect=True) as client:
+            for stock in stocks:
+                try:
+                    raw = client.get_security_bars(
+                        Market(stock.market),
+                        stock.code,
+                        KlineCategory.DAY,
+                        0,
+                        cfg["history_bars"],
+                    )
+                    item = evaluate(stock, convert_bars(raw), cfg)
+                    if item is not None:
+                        results.append(item)
+                except Exception as exc:  # 单只股票失败不影响全市场
+                    errors.append(f"{stock.code} {type(exc).__name__}: {exc}")
+                finally:
+                    attempted.add(stock.code)
+    except Exception as exc:
+        # 公共服务器可能在建立连接时整批失败。把未尝试的股票交回
+        # scan_market 的换服务器补扫流程，不能让 future.result() 终止全场扫描。
+        errors.extend(
+            f"{stock.code} {type(exc).__name__}: {exc}"
+            for stock in stocks
+            if stock.code not in attempted
+        )
     return results, errors
 
 

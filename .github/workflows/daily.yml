@@ -11,19 +11,20 @@ permissions:
   id-token: write
 
 concurrency:
-  group: stock-pages
+  group: stock-pages-daily
   cancel-in-progress: false
 
 jobs:
   screen:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 45
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     env:
       TZ: Asia/Shanghai
       PYTHONUTF8: "1"
+      PYTHONUNBUFFERED: "1"
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6

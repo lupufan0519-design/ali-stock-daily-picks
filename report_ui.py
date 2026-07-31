@@ -6,6 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Sequence
 
+from observation import visible_observations
 from strategy_tracker import POOL_NAME, secondary_strategy_stats, strategy_stats
 
 
@@ -1115,7 +1116,16 @@ LIVE_SCRIPT = r"""
   const lensValue = document.querySelector("#lens-value");
   const riskStage = document.querySelector(".risk-stage, .cover-hero");
   const ticker = document.querySelector("#ticker-track");
-  const formatPct = (value) => `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+      const formatPct = (value) => `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+      const formatQuoteTime = (value) => {
+        const stamp = String(value || "").trim();
+        if (!stamp) return "";
+        const dated = stamp.match(/^\d{4}-\d{2}-\d{2}[T ](\d{2}:\d{2})/);
+        if (dated) return `${stamp.slice(5, 10)} ${dated[1]}`;
+        const timed = stamp.match(/^(\d{2}:\d{2})(?::\d{2}(?:\.\d+)?)?$/);
+        if (timed) return timed[1];
+        return stamp.slice(0, 16);
+      };
   const setTone = (element, value) => {
     element.classList.toggle("positive", value >= 0);
     element.classList.toggle("negative", value < 0);
@@ -1174,6 +1184,7 @@ LIVE_SCRIPT = r"""
           const price = row.querySelector("[data-live-price]");
           const change = row.querySelector("[data-live-change]");
           const ret = row.querySelector("[data-live-return]");
+          const time = row.querySelector("[data-live-time]");
           if (price) price.textContent = Number(quote.price).toFixed(2);
           if (change) {
             change.textContent = formatPct(Number(quote.change_pct));
@@ -1183,6 +1194,11 @@ LIVE_SCRIPT = r"""
             const value = (Number(quote.price) / Number(row.dataset.entryPrice) - 1) * 100;
             ret.textContent = formatPct(value);
             setTone(ret, value);
+          }
+          if (time) {
+            const stamp = String(quote.server_time || data.latest_quote_time || "");
+            const display = formatQuoteTime(stamp);
+            time.textContent = display ? `${display} 行情` : "最新行情";
           }
           row.classList.remove("quote-updated");
           void row.offsetWidth;
@@ -1263,7 +1279,7 @@ def _position_row(position: dict) -> str:
       <td>{_stock_cell(position['code'], position['name'], int(position['market']))}</td>
       <td class="numeric">{position['entry_date']}<span class="subline">{entry:.2f} 元</span></td>
       <td><span class="numeric" data-live-price>{float(position['last_close']):.2f}</span>
-          <span class="subline">{_esc(position['last_date'])}</span></td>
+          <span class="subline" data-live-time>{_esc(position['last_date'])} 收盘</span></td>
       <td><span data-live-return>{_pct(float(position['return_pct']))}</span></td>
       <td class="numeric">{int(position['holding_days'])} 日</td>
       <td><span class="state {status_class}">{_esc(position['status'])}</span></td>
@@ -1288,7 +1304,8 @@ def _evaluation_row(item, observation: bool = False) -> str:
     <tr data-live-code="{_esc(item.code)}" data-entry-price="{entry_price:.4f}">
       <td>{_stock_cell(item.code, item.name, int(item.market))}</td>
       <td><span class="numeric" data-live-price>{entry_price:.2f}</span>
-          <span class="subline numeric" data-live-change>{item.change_pct:+.2f}%</span></td>
+          <span class="subline"><span class="numeric" data-live-change>{item.change_pct:+.2f}%</span>
+          · <span data-live-time>{_esc(item.date)} 收盘</span></span></td>
       <td class="chart-cell">{item.chart}</td>"""
     if observation:
         priority = "龙虎优先" if item.cross_ok else "见底候选" if item.bottom_ok else "普通观察"
@@ -1361,24 +1378,10 @@ def render_report(
         and item.yellow_ok
         and (item.bottom_ok or item.limit_up_ok)
     ]
-    near = sorted(
-        [
-            item
-            for item in evaluations
-            if item.eligible
-            and not item.selected
-            and item.matched_count >= cfg["near_match_minimum"]
-        ],
-        key=lambda item: (
-            item.cross_ok,
-            item.bottom_ok,
-            item.yellow_ok,
-            item.limit_up_ok,
-            item.cross_date,
-            item.bottom_date,
-        ),
-        reverse=True,
-    )[:30]
+    near = visible_observations(
+        evaluations,
+        cfg["near_match_minimum"],
+    )
     trade_date = max((item.date for item in evaluations), default="无数据")
     generated = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M")
     cover_desktop = _asset_data_uri("hero-aigc-v2-poster.webp")
