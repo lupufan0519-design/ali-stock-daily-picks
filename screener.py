@@ -899,13 +899,13 @@ def closed_position_row(position: dict) -> str:
 def event_text(event: dict) -> str:
     label = {
         "added": "加入跟踪池",
-        "signal_lost": "龙虎信号消失，进入待移出观察",
-        "signal_restored": "龙虎信号恢复，取消移出提示",
-        "removed": "连续第二个交易日未恢复，已移出",
+        "signal_lost": "龙虎信号转弱",
+        "signal_restored": "龙虎信号恢复",
+        "removed": "趋势结束，已移出主选区",
         "ineligible_removed": "股票名称含 ST，已移出",
         "secondary_added": "加入次选区",
-        "secondary_removed": "龙虎信号消失，已移出次选区",
-        "secondary_promoted": "条件补齐，已转入主选区",
+        "secondary_removed": "趋势结束，已移出次选区",
+        "secondary_promoted": "条件补齐，已转入主选区；持有期不断开",
     }.get(event.get("type"), "状态更新")
     return_label = "阶段收益" if event.get("type") == "secondary_promoted" else "移出收益"
     suffix = f"，{return_label} {event['return_pct']:+.2f}%" if "return_pct" in event else ""
@@ -968,10 +968,10 @@ footer{{margin-top:25px;color:#738198;font-size:13px}}@media(max-width:900px){{.
 <h2>{POOL_NAME}</h2>
 {event_block}
 <h3>主选区</h3>
-<p>入选日收盘价作为加入价。龙线不再高于虎线时当天提示；下一交易日仍未恢复，收盘后移出。</p>
+<p>入选日收盘价作为加入价。龙线收盘不再高于虎线时确认趋势结束，当日收盘后移出。</p>
 <div class="stats">
   <div class="stat"><small>跟踪中</small><b>{stats['active_count']} 只</b></div>
-  <div class="stat"><small>信号消失待确认</small><b>{stats['warning_count']} 只</b></div>
+  <div class="stat"><small>已移出</small><b>{stats['closed_count']} 只</b></div>
   <div class="stat"><small>当前成功率</small><b>{pct_html(stats['current_success_rate'])}</b></div>
   <div class="stat"><small>样本平均收益</small><b>{pct_html(stats['all_average_return'])}</b></div>
   <div class="stat"><small>已完成胜率</small><b>{pct_html(stats['closed_success_rate'])}</b></div>
@@ -980,7 +980,7 @@ footer{{margin-top:25px;color:#738198;font-size:13px}}@media(max-width:900px){{.
 <div class="table-wrap"><table><thead><tr><th>股票</th><th>加入日/加入价</th><th>最新日/收盘价</th><th>加入日至今收益</th><th>跟踪时长</th><th>龙虎信号</th></tr></thead><tbody>{active_rows}</tbody></table></div>
 
 <h3>次选区</h3>
-<p>近期龙腾跃虎与连续黄柱必须同时满足，并在“可能见底”或两月内涨停中至少再满足一项。黄柱指 K 线实体有一部分位于龙线下方；龙线不再高于虎线时，当日收盘后立即移出；条件补齐时转入主选区。</p>
+<p>近期龙腾跃虎与连续黄柱必须同时满足，并在“可能见底”或两月内涨停中至少再满足一项。黄柱指 K 线实体有一部分位于龙线下方；龙线收盘不再高于虎线时确认趋势结束；条件补齐时转入主选区并保留原持有期。</p>
 <div class="stats">
   <div class="stat"><small>次选跟踪中</small><b>{secondary_stats['active_count']} 只</b></div>
   <div class="stat"><small>当前成功率</small><b>{pct_html(secondary_stats['current_success_rate'])}</b></div>
@@ -1060,7 +1060,7 @@ def write_strategy_csv(state: dict, trade_date: str, publish_latest: bool = True
     paths = (dated_path, latest_path) if publish_latest else (dated_path,)
     for path in paths:
         with path.open("w", newline="", encoding="utf-8-sig") as f:
-            writer = csv.writer(f)
+            writer = csv.writer(f, lineterminator="\n")
             writer.writerow(["区域", "状态", "代码", "名称", "加入日", "加入价", "最新/移出日", "最新/移出价", "收益", "交易日数", "龙虎信号", "移出日", "移出价", "移出原因"])
             writer.writerows(rows)
     return latest_path
@@ -1082,7 +1082,7 @@ def write_outputs(
     json_path = OUTPUT_DIR / f"选股结果_{trade_date}.json"
 
     with csv_path.open("w", newline="", encoding="utf-8-sig") as f:
-        writer = csv.writer(f)
+        writer = csv.writer(f, lineterminator="\n")
         writer.writerow(["代码", "名称", "交易日", "收盘", "涨跌幅", "见底日期", "龙腾跃虎日期", "涨停日期", "连续黄柱", "龙线在虎线上方", "是否排除ST", "命中项数", "严格入选"])
         for x in evaluations:
             writer.writerow([x.code, x.name, x.date, f"{x.close:.2f}", f"{x.change_pct:.2f}%", x.bottom_date, x.cross_date, x.limit_up_date, x.yellow_count, "是" if x.dragon_above_tiger else "否", "否" if x.eligible else "是", x.matched_count, "是" if x.selected else "否"])

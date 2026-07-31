@@ -139,26 +139,25 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
                 position["signal_lost_date"] = ""
                 position["status"] = "龙线在虎线上方"
             else:
-                position["missing_streak"] = int(position.get("missing_streak", 0)) + 1
-                if position["missing_streak"] == 1:
-                    position["signal_lost_date"] = trade_date
-                    position["status"] = "信号消失·下一交易日仍未恢复则移出"
-                    events.append({"type": "signal_lost", "code": position["code"], "name": position["name"]})
-                else:
-                    position["status"] = "已移出"
-                    position["exit_date"] = trade_date
-                    position["exit_price"] = position["last_close"]
-                    position["exit_return_pct"] = position["return_pct"]
-                    position["exit_reason"] = "龙线连续第二个交易日未高于虎线"
-                    state["closed"].append(position)
-                    events.append({"type": "removed", "code": position["code"], "name": position["name"], "return_pct": position["return_pct"]})
-                    continue
+                position["missing_streak"] = 1
+                position["signal_lost_date"] = trade_date
+                position["status"] = "已移出"
+                position["exit_date"] = trade_date
+                position["exit_price"] = position["last_close"]
+                position["exit_return_pct"] = position["return_pct"]
+                position["exit_reason"] = "趋势结束：龙线收盘不再高于虎线"
+                state["closed"].append(position)
+                events.append({"type": "removed", "code": position["code"], "name": position["name"], "return_pct": position["return_pct"]})
+                continue
         elif not position.get("status"):
             position["status"] = "龙线在虎线上方"
         still_active.append(position)
 
     state["active"] = still_active
     active_by_code = {position["code"]: position for position in state["active"]}
+    secondary_position_codes = {
+        position["code"] for position in state["secondary_active"]
+    }
     for row in rows:
         if not _eligible(row) or not row.get("selected"):
             continue
@@ -167,6 +166,9 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             dates = active_by_code[code].setdefault("selected_dates", [])
             if trade_date not in dates:
                 dates.append(trade_date)
+            continue
+        if code in secondary_position_codes:
+            # 次选升级由下方流程原位转入，保留最初加入日和加入价。
             continue
         price = float(row["close"])
         position = {
@@ -231,10 +233,26 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             exit_reason = ""
             event_type = ""
             if row.get("selected"):
-                exit_reason = "满足全部条件，升级进入主选区"
                 event_type = "secondary_promoted"
+                position["status"] = "龙线在虎线上方"
+                position["origin_area"] = position.get(
+                    "origin_area",
+                    "secondary",
+                )
+                dates = position.setdefault("selected_dates", [])
+                if trade_date not in dates:
+                    dates.append(trade_date)
+                state["active"].append(position)
+                active_by_code[position["code"]] = position
+                events.append({
+                    "type": event_type,
+                    "code": position["code"],
+                    "name": position["name"],
+                    "return_pct": position["return_pct"],
+                })
+                continue
             elif not _dragon_above_tiger(row):
-                exit_reason = "龙线不再高于虎线"
+                exit_reason = "趋势结束：龙线收盘不再高于虎线"
                 event_type = "secondary_removed"
             if exit_reason:
                 position["status"] = "已移出"

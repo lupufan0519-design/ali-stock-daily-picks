@@ -40,34 +40,27 @@ def row(
 
 
 class StrategyTrackerTests(unittest.TestCase):
-    def test_add_warn_and_remove_on_second_missing_day(self):
+    def test_add_and_remove_on_first_confirmed_missing_day(self):
         state, events = update_state(empty_state(), [row("2026-07-20", selected=True)], "2026-07-20")
         self.assertEqual(events[0]["type"], "added")
         self.assertEqual(len(state["active"]), 1)
 
         state, events = update_state(state, [row("2026-07-21", close=9.5, dragon_above=False)], "2026-07-21")
-        self.assertEqual(state["active"][0]["missing_streak"], 1)
-        self.assertEqual(events[0]["type"], "signal_lost")
-
-        state, events = update_state(state, [row("2026-07-22", close=9.0, dragon_above=False)], "2026-07-22")
         self.assertEqual(len(state["active"]), 0)
         self.assertEqual(len(state["closed"]), 1)
-        self.assertAlmostEqual(state["closed"][0]["exit_return_pct"], -10.0)
+        self.assertAlmostEqual(state["closed"][0]["exit_return_pct"], -5.0)
+        self.assertEqual(
+            state["closed"][0]["exit_reason"],
+            "趋势结束：龙线收盘不再高于虎线",
+        )
         self.assertEqual(events[0]["type"], "removed")
 
-    def test_signal_restored_cancels_warning(self):
-        state, _ = update_state(empty_state(), [row("2026-07-20", selected=True)], "2026-07-20")
-        state, _ = update_state(state, [row("2026-07-21", dragon_above=False)], "2026-07-21")
-        state, events = update_state(state, [row("2026-07-22", close=10.5, dragon_above=True)], "2026-07-22")
-        self.assertEqual(state["active"][0]["missing_streak"], 0)
-        self.assertEqual(events[0]["type"], "signal_restored")
-
-    def test_same_day_rerun_is_idempotent(self):
+    def test_same_day_rerun_does_not_duplicate_exit(self):
         state, _ = update_state(empty_state(), [row("2026-07-20", selected=True)], "2026-07-20")
         state, _ = update_state(state, [row("2026-07-21", dragon_above=False)], "2026-07-21")
         state, _ = update_state(state, [row("2026-07-21", dragon_above=False)], "2026-07-21")
-        self.assertEqual(state["active"][0]["missing_streak"], 1)
-        self.assertEqual(state["active"][0]["holding_days"], 2)
+        self.assertEqual(state["active"], [])
+        self.assertEqual(len(state["closed"]), 1)
 
     def test_stats_use_mark_to_market_and_closed_records(self):
         state, _ = update_state(empty_state(), [row("2026-07-20", selected=True)], "2026-07-20")
@@ -150,10 +143,14 @@ class StrategyTrackerTests(unittest.TestCase):
         state, events = update_state(state, [strict], "2026-07-21")
         self.assertEqual(len(state["active"]), 1)
         self.assertEqual(len(state["secondary_active"]), 0)
-        self.assertEqual(state["secondary_closed"][0]["exit_reason"], "满足全部条件，升级进入主选区")
+        self.assertEqual(state["secondary_closed"], [])
+        self.assertEqual(state["active"][0]["entry_date"], "2026-07-20")
+        self.assertEqual(state["active"][0]["entry_price"], 10.0)
+        self.assertEqual(state["active"][0]["last_close"], 10.5)
+        self.assertEqual(state["active"][0]["origin_area"], "secondary")
         self.assertEqual(
             {event["type"] for event in events},
-            {"added", "secondary_promoted"},
+            {"secondary_promoted"},
         )
 
     def test_replay_state_stops_at_requested_date(self):

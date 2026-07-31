@@ -15,6 +15,9 @@ def main() -> int:
     args.site.mkdir(parents=True, exist_ok=True)
     shutil.copy2(ROOT / "results" / "latest.html", args.site / "index.html")
     shutil.copy2(ROOT / "results" / "live.json", args.site / "live.json")
+    validation = ROOT / "results" / "rolling_validation.json"
+    if validation.exists():
+        shutil.copy2(validation, args.site / "rolling_validation.json")
     assets = ROOT / "assets"
     if assets.exists():
         shutil.copytree(assets, args.site / "assets", dirs_exist_ok=True)

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import html
+import json
 from datetime import datetime
+from pathlib import Path
 from typing import Sequence
 
 from observation import visible_observations
@@ -347,6 +349,38 @@ tbody tr:last-child td { border-bottom: 0; }
 .rule-num { color: var(--primary); font: 750 13px/1 ui-monospace, SFMono-Regular, Consolas, monospace; }
 .rule strong { display: block; margin: 10px 0 4px; }
 .rule p { margin: 0; color: var(--muted); font-size: 13px; }
+.validation-lead {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(260px, .85fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.validation-verdict {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(145deg, var(--surface), var(--surface-blue));
+}
+.validation-verdict strong { display: block; margin-bottom: 7px; font-size: 19px; }
+.validation-verdict p { margin: 0; color: var(--muted-strong); }
+.validation-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.validation-fact {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+.validation-fact span { display: block; color: var(--muted); font-size: 12px; }
+.validation-fact strong { display: block; margin-top: 5px; font-size: 20px; }
+.validation-method {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
 .events {
   margin-bottom: 18px;
   padding: 16px 18px;
@@ -396,6 +430,7 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .panel-head { padding: 16px; }
   .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .rules { grid-template-columns: 1fr; }
+  .validation-lead { grid-template-columns: 1fr; }
   th, td { padding: 12px 14px; }
   .chart-cell { min-width: 320px; }
   .pool-group-head { padding-inline: 14px; }
@@ -1637,13 +1672,13 @@ def _observation_compact_row(item) -> str:
 def _events(events: Sequence[dict]) -> str:
     labels = {
         "added": "加入主选区",
-        "signal_lost": "龙虎信号消失，进入待确认",
+        "signal_lost": "龙虎信号转弱",
         "signal_restored": "龙虎信号恢复",
-        "removed": "连续第二个交易日未恢复，已移出",
+        "removed": "趋势结束，已移出主选区",
         "ineligible_removed": "股票名称含 ST，已移出",
         "secondary_added": "加入次选区",
-        "secondary_removed": "龙虎信号消失，已移出次选区",
-        "secondary_promoted": "条件补齐，升级主选区",
+        "secondary_removed": "趋势结束，已移出次选区",
+        "secondary_promoted": "条件补齐，升级主选区；持有期不断开",
     }
     items = []
     for event in events:
@@ -1668,6 +1703,70 @@ def _metric(label: str, value: str) -> str:
         f'<div class="metric"><span class="metric-label">{label}</span>'
         f'<strong class="metric-value">{value}</strong></div>'
     )
+
+
+def _validation_section() -> str:
+    path = Path(__file__).resolve().parent / "results" / "rolling_validation.json"
+    if not path.exists():
+        return ""
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        coverage = payload["coverage"]
+        forward = payload["cross_forward_returns"]["overall"]
+        exits = payload["exit_rules"]
+        one_day = exits["death_cross_1"]["summary"]
+        two_day = exits["death_cross_2"]["summary"]
+        weakening = exits["weakening_or_cross"]["summary"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return ""
+
+    five_day = forward["5"]
+    supports_every_time = int(five_day["negative_count"]) == 0
+    verdict = (
+        "样本支持每次上涨"
+        if supports_every_time
+        else "历史样本不支持“交叉后每次都会涨”"
+    )
+    quality = (
+        "完整"
+        if int(coverage.get("error_count", 0)) == 0
+        else f"缺失 {int(coverage.get('error_count', 0))} 只"
+    )
+
+    def exit_row(name: str, stats: dict, note: str) -> str:
+        return f"""
+        <tr>
+          <td><strong>{_esc(name)}</strong><span class="subline">{_esc(note)}</span></td>
+          <td class="numeric">{int(stats['closed_count'])}</td>
+          <td>{_pct(float(stats['median_pct']))}</td>
+          <td>{_pct(float(stats['positive_rate_pct']))}</td>
+          <td class="numeric">{float(stats['average_holding_bars']):.1f} 日</td>
+          <td>{_pct(float(stats['average_worst_return_pct']))}</td>
+          <td>{_pct(float(stats['average_peak_giveback_pct']))}</td>
+        </tr>"""
+
+    return f"""
+    <section class="section reveal" id="validation">
+      <div class="section-head"><div><span class="section-kicker">Walk-forward evidence</span><h2>历史滚动验证</h2>
+      <p class="section-copy">逐日重放，每一天只使用当时已经存在的行情；XMA 尾部按当日可见数据重新计算，避免偷看未来。</p></div></div>
+      <div class="validation-lead">
+        <article class="validation-verdict"><strong>{_esc(verdict)}</strong>
+          <p>龙腾跃虎后第 5 个该股交易日：中位收益 {_pct(float(five_day['median_pct']))}，上涨占比 {_pct(float(five_day['positive_rate_pct']))}，{int(five_day['negative_count'])}/{int(five_day['sample_count'])} 个样本没有上涨。交叉更适合作为候选触发器，不能单独视为收益保证。</p>
+        </article>
+        <div class="validation-facts">
+          <div class="validation-fact"><span>覆盖股票</span><strong>{int(coverage['analyzed_stock_count'])}</strong></div>
+          <div class="validation-fact"><span>数据质量</span><strong>{_esc(quality)}</strong></div>
+          <div class="validation-fact"><span>时间范围</span><strong>{_esc(str(coverage['start_date'])[:4])}—{_esc(str(coverage['end_date'])[:4])}</strong></div>
+          <div class="validation-fact"><span>上穿样本</span><strong>{int(five_day['sample_count'])}</strong></div>
+        </div>
+      </div>
+      <article class="panel">
+        <div class="panel-head"><div><h3>趋势结束规则比较</h3><p>次选升级主选只算条件补齐，持有期不断开；以下比较同一套趋势结束逻辑。</p></div></div>
+        <div class="table-scroll"><table><thead><tr><th>退出规则</th><th>已结束样本</th><th>收益中位数</th><th>盈利占比</th><th>平均持有</th><th>平均最差浮动</th><th>平均高点回吐</th></tr></thead>
+        <tbody>{exit_row('首次死叉', one_day, '龙线首次不高于虎线')}{exit_row('两日确认', two_day, '连续两日不高于虎线')}{exit_row('提前转弱', weakening, '龙虎差与龙线连续收窄')}</tbody></table></div>
+        <p class="validation-method">口径：信号日收盘加入、退出信号日收盘移出，不计费用与滑点。当前上市股票样本存在幸存者偏差，历史价格未复权；平均收益容易受极端除权样本影响，因此本区优先比较中位数、盈利占比、回撤与分年度稳定性。本结果用于规则验证，不构成收益承诺。</p>
+      </article>
+    </section>"""
 
 
 def render_report(
@@ -1740,6 +1839,7 @@ def render_report(
     empty6 = '<tr><td class="empty" colspan="6">当前没有符合条件的记录</td></tr>'
     empty7 = '<tr><td class="empty" colspan="7">今日没有股票同时满足四项条件</td></tr>'
     empty8 = '<tr><td class="empty" colspan="8">当前没有满足三项条件的观察标的</td></tr>'
+    validation_section = _validation_section()
     legend = """<div class="legend" aria-label="图表图例">
         <span><i style="background:#ef5350"></i>上涨 K 线</span>
         <span><i style="background:#26a69a"></i>下跌 K 线</span>
@@ -1771,7 +1871,7 @@ def render_report(
     </a>
     <div class="top-actions">
       <nav class="nav" aria-label="页面导航">
-        <a href="#pool">趋势池</a><a href="#signals">今日信号</a><a href="#watch">观察区</a><a href="#rules">规则</a>
+        <a href="#pool">趋势池</a><a href="#signals">今日信号</a><a href="#watch">观察区</a><a href="#validation">验证</a><a href="#rules">规则</a>
       </nav>
       <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换显示模式" title="切换显示模式">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v2.1m0 14.2v2.1M2.8 12h2.1m14.2 0h2.1M5.5 5.5 7 7m10 10 1.5 1.5m0-13L17 7M7 17l-1.5 1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -1830,7 +1930,7 @@ def render_report(
         <button class="pool-tab" id="tab-secondary" type="button" role="tab" aria-selected="false" aria-controls="pool-secondary" data-pool-tab="secondary" tabindex="-1">次选区 · <span data-area-secondary-count>{secondary_area_count}</span></button>
       </div>
       <article class="panel" id="pool-main" role="tabpanel" aria-labelledby="tab-main" data-pool-panel="main">
-        <div class="panel-head"><div><h3>主选区</h3><p>盘中预选与收盘跟踪合并去重；候选名单约每 5 分钟重算</p>
+        <div class="panel-head"><div><h3>主选区</h3><p>盘中预选与收盘跟踪合并去重；龙线收盘不再高于虎线时确认趋势结束</p>
           <div class="pool-composition"><span>盘中预选 <strong data-live-main-count>{len(selected)}</strong> 只</span><span>收盘跟踪 <strong data-tracked-main-count>{tracked_main_count}</strong> 只</span><span>重复股票只计一次</span></div>
         </div><span class="count-badge"><span data-area-main-count>{main_area_count}</span> 只</span></div>
         <div class="pool-group-head"><strong>盘中实时预选</strong><span>随最新行情重算</span></div>
@@ -1845,13 +1945,13 @@ def render_report(
           {_metric('样本平均收益', _pct(main_stats['all_average_return']))}
           {_metric('已完成胜率', _pct(main_stats['closed_success_rate']))}
           {_metric('累计实现收益', _pct(main_stats['realized_compound_return']))}
-          {_metric('信号待确认', f"{main_stats['warning_count']} 只")}
+          {_metric('已移出', f"{main_stats['closed_count']} 只")}
           {_metric('累计样本', f"{main_stats['sample_count']} 只")}
         </div>
       </article>
 
       <article class="panel" id="pool-secondary" role="tabpanel" aria-labelledby="tab-secondary" data-pool-panel="secondary" hidden>
-        <div class="panel-head"><div><h3>次选区</h3><p>盘中预选与收盘跟踪合并去重；候选需龙虎、黄柱及另一项</p>
+        <div class="panel-head"><div><h3>次选区</h3><p>候选需龙虎、黄柱及另一项；升级主选时保留原加入日和加入价</p>
           <div class="pool-composition"><span>盘中预选 <strong data-live-secondary-count>{len(secondary)}</strong> 只</span><span>收盘跟踪 <strong data-tracked-secondary-count>{tracked_secondary_count}</strong> 只</span><span>重复股票只计一次</span></div>
         </div><span class="count-badge"><span data-area-secondary-count>{secondary_area_count}</span> 只</span></div>
         <div class="pool-group-head"><strong>盘中实时预选</strong><span>随最新行情重算</span></div>
@@ -1898,6 +1998,8 @@ def render_report(
         <article class="rule"><span class="rule-num">04</span><strong>连续黄柱</strong><p>实体在龙线下方的部分呈黄色，连续至少 {cfg['yellow_consecutive_days']} 日。</p></article>
       </div>
     </section>
+
+{validation_section}
 
     <section class="section reveal">
       <div class="panel">

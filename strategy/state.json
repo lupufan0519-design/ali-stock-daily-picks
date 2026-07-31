@@ -2,7 +2,28 @@
   "version": 1,
   "pool_name": "卢氏龙虎趋势池",
   "last_trade_date": "2026-07-30",
-  "active": [],
+  "active": [
+    {
+      "position_id": "301516_2026-07-30",
+      "code": "301516",
+      "name": "中远通",
+      "market": 0,
+      "entry_date": "2026-07-30",
+      "entry_price": 14.43,
+      "last_date": "2026-07-30",
+      "last_close": 14.43,
+      "return_pct": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "holding_days": 1,
+      "missing_streak": 0,
+      "signal_lost_date": "",
+      "status": "龙线在虎线上方",
+      "selected_dates": [
+        "2026-07-30"
+      ]
+    }
+  ],
   "closed": [
     {
       "position_id": "603898_2026-07-20",
