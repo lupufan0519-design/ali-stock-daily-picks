@@ -1,9 +1,10 @@
+import json
 import unittest
 from datetime import datetime
 from types import SimpleNamespace
 
 from cloud_gate import parse_tencent_trade_date, should_screen
-from cloud_daily import bootstrap_payload, compact_snapshot
+from cloud_daily import bootstrap_payload, compact_snapshot, snapshot_json
 from intraday import (
     build_live_pools,
     collect_tracking_codes,
@@ -14,7 +15,7 @@ from intraday import (
     parse_tencent_quotes,
     unpack_live_seed,
 )
-from report_ui import LIVE_SCRIPT, _evaluation_row, _position_row
+from report_ui import LIVE_SCRIPT, _evaluation_row, _position_row, render_report
 
 
 class CloudWorkflowTests(unittest.TestCase):
@@ -273,6 +274,64 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertEqual(seed["code"], "600001")
         self.assertTrue(seed["eligible"])
 
+    def test_compact_snapshot_sorts_live_universe_and_result_keys(self):
+        first = self.live_seed("600002")
+        first["market"] = 1
+        second = self.live_seed("000001")
+        second["market"] = 0
+        payload = {
+            "trade_date": "2026-07-30",
+            "config": {"near_match_minimum": 3},
+            "strategy": {"active": [], "secondary_active": []},
+            "results": [
+                {
+                    **first,
+                    "date": "2026-07-30",
+                    "close": 10.0,
+                    "change_pct": 0.0,
+                    "matched_count": 3,
+                    "cross_ok": True,
+                    "live_seed": first,
+                },
+                {
+                    **second,
+                    "date": "2026-07-30",
+                    "close": 10.0,
+                    "change_pct": 0.0,
+                    "matched_count": 3,
+                    "cross_ok": True,
+                    "live_seed": second,
+                },
+            ],
+        }
+        snapshot = compact_snapshot(payload)
+        self.assertEqual(
+            [item[0] for item in snapshot["live_universe"]],
+            ["000001", "600002"],
+        )
+        self.assertEqual(
+            list(snapshot["results"][0]),
+            [
+                "code",
+                "name",
+                "market",
+                "date",
+                "close",
+                "change_pct",
+                "bottom_ok",
+                "cross_ok",
+                "limit_up_ok",
+                "yellow_ok",
+                "matched_count",
+                "eligible",
+                "selected",
+                "cross_date",
+            ],
+        )
+        encoded = snapshot_json(snapshot)
+        self.assertNotIn("\n", encoded)
+        self.assertLess(len(encoded), len(json.dumps(snapshot, indent=2)))
+
     def test_bootstrap_payload_does_not_change_strategy_state(self):
         strategy = {
             "last_trade_date": "2026-07-30",
@@ -499,6 +558,53 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertIn("data-area-secondary-count", LIVE_SCRIPT)
         self.assertIn("tracking_codes", LIVE_SCRIPT)
         self.assertNotIn('row.querySelector("[data-live-return]")', LIVE_SCRIPT)
+
+    def test_report_separates_live_and_settled_dates_and_defers_video(self):
+        item = SimpleNamespace(
+            code="301516",
+            name="中远通",
+            market=0,
+            date="2026-07-30",
+            close=14.43,
+            change_pct=-8.44,
+            chart='<svg aria-label="最近42日K线、龙线和虎线"></svg>',
+            cross_ok=True,
+            cross_date="2026-07-28",
+            bottom_ok=True,
+            bottom_date="2026-07-30",
+            yellow_ok=True,
+            yellow_count=1,
+            limit_up_ok=True,
+            limit_up_date="2026-07-07",
+            matched_count=4,
+            eligible=True,
+            selected=True,
+        )
+        html = render_report(
+            [item],
+            {
+                "near_match_minimum": 3,
+                "bottom_lookback_days": 5,
+                "cross_lookback_days": 5,
+                "limit_up_lookback_days": 42,
+                "yellow_consecutive_days": 1,
+            },
+            5209,
+            [],
+            {
+                "active": [],
+                "closed": [],
+                "secondary_active": [],
+                "secondary_closed": [],
+            },
+            [],
+        )
+        self.assertIn("data-live-trade-date", html)
+        self.assertIn("data-close-trade-date", html)
+        self.assertIn('preload="none"', html)
+        self.assertIn('class="pool-table"', html)
+        self.assertIn("中远通 最近42日K线", html)
+        self.assertNotIn("hero-aigc-v2-poster.webp;base64", html)
 
 
 if __name__ == "__main__":

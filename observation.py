@@ -21,6 +21,7 @@ def observation_sort_key(item: Any) -> tuple:
         bool(_value(item, "limit_up_ok", False)),
         str(_value(item, "cross_date", "")),
         str(_value(item, "bottom_date", "")),
+        str(_value(item, "code", "")),
     )
 
 

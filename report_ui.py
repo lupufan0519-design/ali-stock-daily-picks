@@ -1,16 +1,11 @@
 from __future__ import annotations
 
-import base64
 import html
 from datetime import datetime
-from pathlib import Path
 from typing import Sequence
 
 from observation import visible_observations
 from strategy_tracker import POOL_NAME, secondary_strategy_stats, strategy_stats
-
-
-ASSET_DIR = Path(__file__).resolve().parent / "assets"
 
 
 STYLES = r"""
@@ -281,6 +276,62 @@ tbody tr:last-child td { border-bottom: 0; }
   font-size: 13px;
   font-weight: 650;
 }
+.pool-composition {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 9px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.pool-composition span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 3px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+.pool-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 18px 9px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.pool-group-head strong { font-size: 14px; }
+.pool-group-head span { color: var(--muted); font-size: 12px; }
+.pool-group-head.settled {
+  border-top: 1px solid var(--line);
+  background: var(--surface-soft);
+}
+.date-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+.date-chip {
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 10px;
+  background: rgba(4,20,35,.32);
+  color: rgba(236,248,255,.7);
+  font-size: 10px;
+}
+.date-chip strong {
+  display: block;
+  overflow: hidden;
+  margin-top: 1px;
+  color: #fff;
+  font: 690 12px/1.3 ui-monospace, SFMono-Regular, Consolas, monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .live-pool-status { min-width: 150px; }
 .rules {
   display: grid;
@@ -347,6 +398,60 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .rules { grid-template-columns: 1fr; }
   th, td { padding: 12px 14px; }
   .chart-cell { min-width: 320px; }
+  .pool-group-head { padding-inline: 14px; }
+  .pool-table-shell { overflow: visible; }
+  .pool-table, .pool-table tbody { display: block; }
+  .pool-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .pool-table tbody {
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+  }
+  .pool-table tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 10px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    background: var(--surface);
+    box-shadow: 0 8px 22px rgba(31,42,68,.045);
+  }
+  .pool-table td {
+    display: flex;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .pool-table td::before {
+    content: attr(data-label);
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 720;
+    letter-spacing: .04em;
+  }
+  .pool-table td:first-child,
+  .pool-table td:last-child { grid-column: 1 / -1; }
+  .pool-table td.empty {
+    display: block;
+    grid-column: 1 / -1;
+    padding: 20px 4px;
+  }
+  .pool-table td.empty::before { display: none; }
+  .pool-table .stock-link { min-height: 30px; }
+  .pool-table .signal { min-width: 0; }
+  .pool-table .live-pool-status { min-width: 0; }
 }
 @media (max-width: 430px) {
   h1 { font-size: 34px; }
@@ -701,13 +806,20 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
   z-index: 0;
   inset: -4%;
   overflow: hidden;
-  background: #061421 var(--cover-desktop) center / cover no-repeat;
+  background-color: #061421;
+  background-image: var(--cover-desktop);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
   pointer-events: none;
 }
 .cover-cinema {
   position: absolute;
   inset: 0;
-  background: var(--cover-desktop) center / cover no-repeat;
+  background-image: var(--cover-desktop);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
   transform-origin: 72% 28%;
   animation: cover-cinema-flight 4.466s cubic-bezier(.18,.66,.18,1) infinite;
   will-change: transform;
@@ -720,7 +832,10 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
   object-fit: cover;
   object-position: center;
   background: #061421;
+  opacity: 0;
+  transition: opacity 420ms ease;
 }
+.cover-video.is-ready { opacity: 1; }
 @keyframes cover-cinema-flight {
   0% { transform: scale(1.02) translate3d(0, 0, 0); }
   18% { transform: scale(1.1) translate3d(-1%, 1%, 0); }
@@ -1104,8 +1219,8 @@ LIVE_SCRIPT = r"""
 
   const coverVideo = document.querySelector("[data-cover-video]");
   if (coverVideo) {
-    const nestedPage = /\/results\//.test(window.location.pathname);
-    coverVideo.src = `${nestedPage ? "../" : ""}assets/hero-cloudbreak-aigc-v2.webm`;
+    const saveData = Boolean(navigator.connection?.saveData);
+    const narrowScreen = window.matchMedia("(max-width: 760px)").matches;
     const syncCoverPlayback = () => {
       if (reduceMotion || document.hidden) {
         coverVideo.pause();
@@ -1114,14 +1229,34 @@ LIVE_SCRIPT = r"""
         coverVideo.play().catch(() => {});
       }
     };
+    const loadCoverVideo = () => {
+      if (coverVideo.src || reduceMotion || saveData) return;
+      const nestedPage = /\/results\//.test(window.location.pathname);
+      coverVideo.src = `${nestedPage ? "../" : ""}assets/hero-cloudbreak-aigc-v2.webm`;
+      coverVideo.load();
+    };
+    coverVideo.addEventListener("playing", () => coverVideo.classList.add("is-ready"));
     coverVideo.addEventListener("loadedmetadata", syncCoverPlayback, { once: true });
     document.addEventListener("visibilitychange", syncCoverPlayback);
-    syncCoverPlayback();
+    if (!reduceMotion && !saveData) {
+      if (narrowScreen) {
+        const deferLoad = () => loadCoverVideo();
+        if ("requestIdleCallback" in window) {
+          window.requestIdleCallback(deferLoad, { timeout: 1600 });
+        } else {
+          window.setTimeout(deferLoad, 800);
+        }
+      } else {
+        loadCoverVideo();
+      }
+    }
   }
 
   const status = document.querySelector("#market-status");
   const detail = document.querySelector("#market-detail");
   const quoteTime = document.querySelector("#quote-time");
+  const liveTradeDate = document.querySelector("[data-live-trade-date]");
+  const closeTradeDate = document.querySelector("[data-close-trade-date]");
   const dot = document.querySelector("#status-dot");
   const lensValue = document.querySelector("#lens-value");
   const riskStage = document.querySelector(".risk-stage, .cover-hero");
@@ -1144,8 +1279,9 @@ LIVE_SCRIPT = r"""
     const prefix = Number(quote.market) === 1 ? "sh" : Number(quote.market) === 0 ? "sz" : "bj";
     return `https://quote.eastmoney.com/${prefix}${quote.code}.html`;
   };
-  const signalCell = (ok, note) => {
+  const signalCell = (ok, note, label) => {
     const cell = document.createElement("td");
+    cell.dataset.label = label;
     const signal = document.createElement("div");
     signal.className = "signal";
     const mark = document.createElement("span");
@@ -1177,6 +1313,7 @@ LIVE_SCRIPT = r"""
       row.dataset.liveCode = item.code;
 
       const stockCell = document.createElement("td");
+      stockCell.dataset.label = "股票";
       const link = document.createElement("a");
       link.className = "stock-link";
       link.href = quoteHref(item);
@@ -1189,6 +1326,7 @@ LIVE_SCRIPT = r"""
       stockCell.append(link, code);
 
       const priceCell = document.createElement("td");
+      priceCell.dataset.label = "最新行情";
       const price = document.createElement("span");
       price.className = "numeric";
       price.dataset.livePrice = "";
@@ -1208,6 +1346,7 @@ LIVE_SCRIPT = r"""
       priceCell.append(price, quoteLine);
 
       const statusCell = document.createElement("td");
+      statusCell.dataset.label = "状态";
       statusCell.className = "live-pool-status";
       const state = document.createElement("span");
       state.className = `state ${mode === "intraday" ? "warn" : "good"}`;
@@ -1223,10 +1362,10 @@ LIVE_SCRIPT = r"""
       row.append(
         stockCell,
         priceCell,
-        signalCell(Boolean(item.bottom_ok), item.bottom_date || "未命中"),
-        signalCell(Boolean(item.cross_ok), item.cross_date || "未命中"),
-        signalCell(Boolean(item.limit_up_ok), item.limit_up_date || "未命中"),
-        signalCell(Boolean(item.yellow_ok), `连续 ${Number(item.yellow_count || 0)} 根`),
+        signalCell(Boolean(item.bottom_ok), item.bottom_date || "未命中", "可能见底"),
+        signalCell(Boolean(item.cross_ok), item.cross_date || "未命中", "龙腾跃虎"),
+        signalCell(Boolean(item.limit_up_ok), item.limit_up_date || "未命中", "42日涨停"),
+        signalCell(Boolean(item.yellow_ok), `连续 ${Number(item.yellow_count || 0)} 根`, "黄柱"),
         statusCell,
       );
       body.append(row);
@@ -1248,6 +1387,12 @@ LIVE_SCRIPT = r"""
     });
     document.querySelectorAll("[data-live-secondary-count]").forEach((node) => {
       node.textContent = String(secondary.length);
+    });
+    document.querySelectorAll("[data-tracked-main-count]").forEach((node) => {
+      node.textContent = String(trackedMain.length);
+    });
+    document.querySelectorAll("[data-tracked-secondary-count]").forEach((node) => {
+      node.textContent = String(trackedSecondary.length);
     });
     document.querySelectorAll("[data-area-main-count]").forEach((node) => {
       node.textContent = String(mainAreaCount);
@@ -1296,6 +1441,15 @@ LIVE_SCRIPT = r"""
       status.textContent = data.market_label || "行情已更新";
       detail.textContent = data.note || "主选与次选盘中重算；跟踪统计收盘后结算";
       quoteTime.textContent = data.generated_at_display || data.generated_at;
+      if (liveTradeDate) {
+        liveTradeDate.textContent = data.live_trade_date || data.close_trade_date || "等待行情";
+      }
+      if (closeTradeDate) {
+        closeTradeDate.textContent = data.close_trade_date || closeTradeDate.textContent;
+      }
+      if (data.live_trade_date || data.close_trade_date) {
+        document.title = `卢氏龙虎趋势池 · 盘中 ${data.live_trade_date || "—"} · 结算 ${data.close_trade_date || "—"}`;
+      }
       dot.className = `status-dot ${data.is_stale ? "stale" : ""}`;
       const targetCount = Number(data.target_count || 0);
       const quoteCount = Number(data.quote_count || 0);
@@ -1339,11 +1493,6 @@ LIVE_SCRIPT = r"""
   window.setInterval(refreshLive, 60_000);
 })();
 """
-
-
-def _asset_data_uri(filename: str, mime: str = "image/webp") -> str:
-    payload = (ASSET_DIR / filename).read_bytes()
-    return f"data:{mime};base64,{base64.b64encode(payload).decode('ascii')}"
 
 
 def _cover_candles() -> str:
@@ -1399,13 +1548,13 @@ def _position_row(position: dict) -> str:
     entry = float(position["entry_price"])
     return f"""
     <tr>
-      <td>{_stock_cell(position['code'], position['name'], int(position['market']))}</td>
-      <td class="numeric">{position['entry_date']}<span class="subline">{entry:.2f} 元</span></td>
-      <td><span class="numeric">{float(position['last_close']):.2f}</span>
+      <td data-label="股票">{_stock_cell(position['code'], position['name'], int(position['market']))}</td>
+      <td data-label="加入日 / 价格" class="numeric">{position['entry_date']}<span class="subline">{entry:.2f} 元</span></td>
+      <td data-label="结算价 / 日期"><span class="numeric">{float(position['last_close']):.2f}</span>
           <span class="subline">{_esc(position['last_date'])} 收盘结算</span></td>
-      <td>{_pct(float(position['return_pct']))}</td>
-      <td class="numeric">{int(position['holding_days'])} 日</td>
-      <td><span class="state {status_class}">{_esc(position['status'])}</span></td>
+      <td data-label="结算收益">{_pct(float(position['return_pct']))}</td>
+      <td data-label="跟踪时长" class="numeric">{int(position['holding_days'])} 日</td>
+      <td data-label="状态"><span class="state {status_class}">{_esc(position['status'])}</span></td>
     </tr>"""
 
 
@@ -1423,13 +1572,18 @@ def _closed_row(position: dict) -> str:
 
 def _evaluation_row(item, observation: bool = False) -> str:
     entry_price = float(item.close)
+    chart = str(item.chart).replace(
+        'aria-label="最近',
+        f'aria-label="{_esc(item.name)} 最近',
+        1,
+    )
     base = f"""
     <tr data-live-code="{_esc(item.code)}" data-entry-price="{entry_price:.4f}">
       <td>{_stock_cell(item.code, item.name, int(item.market))}</td>
       <td><span class="numeric" data-live-price>{entry_price:.2f}</span>
           <span class="subline"><span class="numeric" data-live-change>{item.change_pct:+.2f}%</span>
           · <span data-live-time>{_esc(item.date)} 收盘</span></span></td>
-      <td class="chart-cell">{item.chart}</td>"""
+      <td class="chart-cell">{chart}</td>"""
     if observation:
         priority = "龙虎优先" if item.cross_ok else "见底候选" if item.bottom_ok else "普通观察"
         return base + f"""
@@ -1451,16 +1605,32 @@ def _live_pool_row(item, area: str) -> str:
     label = "最近收盘主选信号" if area == "main" else "最近收盘次选信号"
     return f"""
     <tr data-live-code="{_esc(item.code)}">
+      <td data-label="股票">{_stock_cell(item.code, item.name, int(item.market))}</td>
+      <td data-label="最新行情"><span class="numeric" data-live-price>{float(item.close):.2f}</span>
+          <span class="subline"><span class="numeric" data-live-change>{item.change_pct:+.2f}%</span>
+          · <span data-live-time>{_esc(item.date)} 收盘</span></span></td>
+      <td data-label="可能见底">{_signal(item.bottom_ok, item.bottom_date or '未命中')}</td>
+      <td data-label="龙腾跃虎">{_signal(item.cross_ok, item.cross_date or '未命中')}</td>
+      <td data-label="42日涨停">{_signal(item.limit_up_ok, item.limit_up_date or '未命中')}</td>
+      <td data-label="黄柱">{_signal(item.yellow_ok, f'连续 {item.yellow_count} 根')}</td>
+      <td data-label="状态" class="live-pool-status"><span class="state good">{label}</span>
+          <span class="subline">正式跟踪与统计以收盘状态为准</span></td>
+    </tr>"""
+
+
+def _observation_compact_row(item) -> str:
+    priority = "龙虎优先" if item.cross_ok else "见底候选" if item.bottom_ok else "普通观察"
+    return f"""
+    <tr data-live-code="{_esc(item.code)}">
       <td>{_stock_cell(item.code, item.name, int(item.market))}</td>
       <td><span class="numeric" data-live-price>{float(item.close):.2f}</span>
           <span class="subline"><span class="numeric" data-live-change>{item.change_pct:+.2f}%</span>
           · <span data-live-time>{_esc(item.date)} 收盘</span></span></td>
-      <td>{_signal(item.bottom_ok, item.bottom_date or '未命中')}</td>
-      <td>{_signal(item.cross_ok, item.cross_date or '未命中')}</td>
-      <td>{_signal(item.limit_up_ok, item.limit_up_date or '未命中')}</td>
+      <td>{_signal(item.cross_ok, item.cross_date or '未出现')}</td>
+      <td>{_signal(item.bottom_ok, item.bottom_date or '未出现')}</td>
       <td>{_signal(item.yellow_ok, f'连续 {item.yellow_count} 根')}</td>
-      <td class="live-pool-status"><span class="state good">{label}</span>
-          <span class="subline">正式跟踪与统计以收盘状态为准</span></td>
+      <td>{_signal(item.limit_up_ok, item.limit_up_date or '未出现')}</td>
+      <td><span class="state neutral">{priority}</span></td>
     </tr>"""
 
 
@@ -1524,10 +1694,12 @@ def render_report(
     )
     trade_date = max((item.date for item in evaluations), default="无数据")
     generated = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M")
-    cover_desktop = _asset_data_uri("hero-aigc-v2-poster.webp")
-    cover_mobile = _asset_data_uri("hero-aigc-v2-poster-mobile.webp")
+    cover_desktop = "assets/hero-aigc-v2-poster.webp"
+    cover_mobile = "assets/hero-aigc-v2-poster-mobile.webp"
     main_stats = strategy_stats(strategy_state)
     secondary_stats = secondary_strategy_stats(strategy_state)
+    tracked_main_count = len(strategy_state["active"])
+    tracked_secondary_count = len(strategy_state.get("secondary_active", []))
     active_rows = "".join(_position_row(item) for item in strategy_state["active"])
     secondary_active_rows = "".join(
         _position_row(item) for item in strategy_state.get("secondary_active", [])
@@ -1549,7 +1721,18 @@ def render_report(
         for item in secondary
     )
     selected_rows = "".join(_evaluation_row(item) for item in selected)
-    near_rows = "".join(_evaluation_row(item, True) for item in near)
+    near_featured = near[:8]
+    near_compact = near[8:]
+    near_rows = "".join(_evaluation_row(item, True) for item in near_featured)
+    near_compact_rows = "".join(_observation_compact_row(item) for item in near_compact)
+    near_compact_section = (
+        f"""<details class="panel"><summary>展开其余 {len(near_compact)} 只观察标的（轻量列表）</summary>
+        <div class="table-scroll"><table><thead><tr><th>股票</th><th>价格 / 涨跌</th><th>龙腾跃虎</th><th>可能见底</th><th>连续黄柱</th><th>42日涨停</th><th>优先级</th></tr></thead>
+        <tbody>{near_compact_rows}</tbody></table></div>
+      </details>"""
+        if near_compact
+        else ""
+    )
     closed_rows = "".join(_closed_row(item) for item in strategy_state["closed"][:50])
     secondary_closed_rows = "".join(
         _closed_row(item) for item in strategy_state.get("secondary_closed", [])[:50]
@@ -1571,7 +1754,8 @@ def render_report(
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8fafc">
   <meta name="description" content="卢氏龙虎趋势池：沪深 A 股主选、次选与盘中行情跟踪">
-  <title>卢氏龙虎趋势池 · {trade_date}</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%231e40af'/%3E%3Cpath d='M15 43V27m11 16V18m11 25V31m11 12V12' stroke='white' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <title>卢氏龙虎趋势池 · 结算 {trade_date}</title>
   <script>document.documentElement.classList.add("js")</script>
   <style>{STYLES}</style>
 </head>
@@ -1596,9 +1780,9 @@ def render_report(
   </header>
 
   <main id="content">
-    <section class="cover-hero reveal" style="--cover-desktop:url('{cover_desktop}');--cover-mobile:url('{cover_mobile}')">
+    <section class="cover-hero reveal" style="--cover-desktop:url('{cover_desktop}'),url('../{cover_desktop}');--cover-mobile:url('{cover_mobile}'),url('../{cover_mobile}')">
       <div class="cover-stage" aria-hidden="true">
-        <video class="cover-video" data-cover-video autoplay muted loop playsinline preload="auto" poster="{cover_desktop}"></video>
+        <video class="cover-video" data-cover-video muted loop playsinline preload="none"></video>
         <div class="cover-cinema-mask"></div>
       </div>
       <div class="cover-inner">
@@ -1615,6 +1799,10 @@ def render_report(
           </div>
           <div class="status-detail" id="market-detail">交易日 {trade_date} · 云端行情自动刷新</div>
           <div class="cover-time">最新行情<strong id="quote-time">{generated}</strong></div>
+          <div class="date-strip">
+            <span class="date-chip">盘中行情日<strong data-live-trade-date>等待行情</strong></span>
+            <span class="date-chip">收盘结算日<strong data-close-trade-date>{trade_date}</strong></span>
+          </div>
         </aside>
         <p class="cover-note"><strong>机会可以等，风险必须先看。</strong>主选与次选盘中实时预选；跟踪收益、成功率等只在收盘后结算。</p>
       </div>
@@ -1642,10 +1830,16 @@ def render_report(
         <button class="pool-tab" id="tab-secondary" type="button" role="tab" aria-selected="false" aria-controls="pool-secondary" data-pool-tab="secondary" tabindex="-1">次选区 · <span data-area-secondary-count>{secondary_area_count}</span></button>
       </div>
       <article class="panel" id="pool-main" role="tabpanel" aria-labelledby="tab-main" data-pool-panel="main">
-        <div class="panel-head"><div><h3>主选区</h3><p>盘中预选与收盘跟踪合并去重；候选名单约每 5 分钟重算</p></div><span class="count-badge"><span data-area-main-count>{main_area_count}</span> 只</span></div>
-        <div class="table-scroll"><table><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态</th></tr></thead>
+        <div class="panel-head"><div><h3>主选区</h3><p>盘中预选与收盘跟踪合并去重；候选名单约每 5 分钟重算</p>
+          <div class="pool-composition"><span>盘中预选 <strong data-live-main-count>{len(selected)}</strong> 只</span><span>收盘跟踪 <strong data-tracked-main-count>{tracked_main_count}</strong> 只</span><span>重复股票只计一次</span></div>
+        </div><span class="count-badge"><span data-area-main-count>{main_area_count}</span> 只</span></div>
+        <div class="pool-group-head"><strong>盘中实时预选</strong><span>随最新行情重算</span></div>
+        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态</th></tr></thead>
         <tbody id="live-main-body">{main_pool_rows or '<tr><td class="empty" colspan="7">当前没有符合条件的主选预选</td></tr>'}</tbody></table></div>
-        <p class="settlement-note">以下统计与跟踪明细截至 {trade_date} 收盘，盘中不会提前计入或移出。</p>
+        <div class="pool-group-head settled"><strong>收盘跟踪</strong><span>截至 {trade_date} 收盘</span></div>
+        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>加入日 / 价格</th><th>结算价 / 日期</th><th>结算收益</th><th>时长</th><th>状态</th></tr></thead>
+        <tbody>{active_rows or empty6}</tbody></table></div>
+        <p class="settlement-note">跟踪收益、成功率和状态变动只在收盘完整扫描后结算。</p>
         <div class="metrics">
           {_metric('当前成功率', _pct(main_stats['current_success_rate']))}
           {_metric('样本平均收益', _pct(main_stats['all_average_return']))}
@@ -1654,17 +1848,19 @@ def render_report(
           {_metric('信号待确认', f"{main_stats['warning_count']} 只")}
           {_metric('累计样本', f"{main_stats['sample_count']} 只")}
         </div>
-        <details><summary>查看截至收盘的主选跟踪明细</summary>
-          <div class="table-scroll"><table><thead><tr><th>股票</th><th>加入日 / 价格</th><th>结算价 / 日期</th><th>结算收益</th><th>时长</th><th>状态</th></tr></thead>
-          <tbody>{active_rows or empty6}</tbody></table></div>
-        </details>
       </article>
 
       <article class="panel" id="pool-secondary" role="tabpanel" aria-labelledby="tab-secondary" data-pool-panel="secondary" hidden>
-        <div class="panel-head"><div><h3>次选区</h3><p>盘中预选与收盘跟踪合并去重；候选需龙虎、黄柱及另一项</p></div><span class="count-badge"><span data-area-secondary-count>{secondary_area_count}</span> 只</span></div>
-        <div class="table-scroll"><table><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态</th></tr></thead>
+        <div class="panel-head"><div><h3>次选区</h3><p>盘中预选与收盘跟踪合并去重；候选需龙虎、黄柱及另一项</p>
+          <div class="pool-composition"><span>盘中预选 <strong data-live-secondary-count>{len(secondary)}</strong> 只</span><span>收盘跟踪 <strong data-tracked-secondary-count>{tracked_secondary_count}</strong> 只</span><span>重复股票只计一次</span></div>
+        </div><span class="count-badge"><span data-area-secondary-count>{secondary_area_count}</span> 只</span></div>
+        <div class="pool-group-head"><strong>盘中实时预选</strong><span>随最新行情重算</span></div>
+        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态</th></tr></thead>
         <tbody id="live-secondary-body">{secondary_pool_rows or '<tr><td class="empty" colspan="7">当前没有符合条件的次选预选</td></tr>'}</tbody></table></div>
-        <p class="settlement-note">以下统计与跟踪明细截至 {trade_date} 收盘，盘中不会提前计入或移出。</p>
+        <div class="pool-group-head settled"><strong>收盘跟踪</strong><span>截至 {trade_date} 收盘</span></div>
+        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>加入日 / 价格</th><th>结算价 / 日期</th><th>结算收益</th><th>时长</th><th>状态</th></tr></thead>
+        <tbody>{secondary_active_rows or empty6}</tbody></table></div>
+        <p class="settlement-note">跟踪收益、成功率和状态变动只在收盘完整扫描后结算。</p>
         <div class="metrics">
           {_metric('当前成功率', _pct(secondary_stats['current_success_rate']))}
           {_metric('跟踪平均收益', _pct(secondary_stats['active_average_return']))}
@@ -1673,10 +1869,6 @@ def render_report(
           {_metric('已移出', f"{secondary_stats['closed_count']} 只")}
           {_metric('累计样本', f"{secondary_stats['sample_count']} 只")}
         </div>
-        <details><summary>查看截至收盘的次选跟踪明细</summary>
-          <div class="table-scroll"><table><thead><tr><th>股票</th><th>加入日 / 价格</th><th>结算价 / 日期</th><th>结算收益</th><th>时长</th><th>状态</th></tr></thead>
-          <tbody>{secondary_active_rows or empty6}</tbody></table></div>
-        </details>
       </article>
     </section>
 
@@ -1690,10 +1882,11 @@ def render_report(
 
     <section class="section reveal" id="watch">
       <div class="section-head"><div><span class="section-kicker">Watchlist</span><h2>观察区</h2>
-      <p class="section-copy">满足至少三项的接近标的，仅用于观察，不纳入主选或次选收益。</p></div><span class="count-badge">{len(near)} 只</span></div>
+      <p class="section-copy">满足至少三项的接近标的，仅用于观察，不纳入主选或次选收益。优先展示前 {len(near_featured)} 只完整走势图，其余使用轻量列表。</p></div><span class="count-badge">{len(near)} 只</span></div>
 {legend}
       <div class="panel table-scroll"><table><thead><tr><th>股票</th><th>价格 / 涨跌</th><th>近42日 K 线与龙虎线</th><th>龙腾跃虎</th><th>可能见底</th><th>连续黄柱</th><th>42日涨停</th><th>优先级</th></tr></thead>
       <tbody>{near_rows or empty8}</tbody></table></div>
+      {near_compact_section}
     </section>
 
     <section class="section reveal" id="rules">

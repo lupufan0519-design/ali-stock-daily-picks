@@ -20,6 +20,11 @@ SNAPSHOT_PATH = ROOT / "cloud_snapshot.json"
 LIVE_SEED_FORMAT = 1
 
 
+def snapshot_json(payload: dict) -> str:
+    """Serialize generated numeric seeds without review-only whitespace."""
+    return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+
+
 def read_last_trade_date() -> str:
     if not STATE_PATH.exists():
         return ""
@@ -72,14 +77,17 @@ def pack_live_seed(seed: dict) -> list:
 def compact_snapshot(payload: dict) -> dict:
     minimum = int(payload.get("config", {}).get("near_match_minimum", 3))
     rows = visible_observations(payload.get("results", []), minimum)
-    live_universe = [
+    live_universe = sorted(
+        [
         pack_live_seed(row["live_seed"])
         for row in payload.get("results", [])
         if isinstance(row.get("live_seed"), dict)
         and row["live_seed"].get("eligible")
         and "ST" not in str(row["live_seed"].get("name", "")).upper()
-    ]
-    keep = {
+        ],
+        key=lambda item: (int(item[2]), str(item[0])),
+    )
+    keep = (
         "code",
         "name",
         "market",
@@ -94,7 +102,7 @@ def compact_snapshot(payload: dict) -> dict:
         "eligible",
         "selected",
         "cross_date",
-    }
+    )
     return {
         "trade_date": payload.get("trade_date"),
         "generated_at": payload.get("generated_at"),
@@ -158,7 +166,7 @@ def bootstrap_live_snapshot() -> int:
         )
 
     SNAPSHOT_PATH.write_text(
-        json.dumps(compact_snapshot(payload), ensure_ascii=False, indent=2),
+        snapshot_json(compact_snapshot(payload)),
         encoding="utf-8",
     )
     LATEST_HTML_PATH.write_text(
@@ -207,7 +215,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.snapshot_only:
         payload = json.loads(LATEST_PATH.read_text(encoding="utf-8"))
         SNAPSHOT_PATH.write_text(
-            json.dumps(compact_snapshot(payload), ensure_ascii=False, indent=2),
+            snapshot_json(compact_snapshot(payload)),
             encoding="utf-8",
         )
         print(f"云端快照已生成：{SNAPSHOT_PATH}")
@@ -222,7 +230,7 @@ def main(argv: list[str] | None = None) -> int:
     changed = bool(trade_date and trade_date > before)
     if changed:
         SNAPSHOT_PATH.write_text(
-            json.dumps(compact_snapshot(payload), ensure_ascii=False, indent=2),
+            snapshot_json(compact_snapshot(payload)),
             encoding="utf-8",
         )
     write_github_output("changed", "true" if changed else "false")
