@@ -206,6 +206,10 @@ def write_github_output(name: str, value: str) -> None:
             stream.write(f"{name}={value}\n")
 
 
+def should_publish_close(trade_date: str, before: str, force: bool) -> bool:
+    return bool(trade_date and (trade_date > before or force))
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="云端收盘筛选与状态持久化")
     mode = parser.add_mutually_exclusive_group()
@@ -237,7 +241,8 @@ def main(argv: list[str] | None = None) -> int:
         return exit_code
     payload = json.loads(LATEST_PATH.read_text(encoding="utf-8"))
     trade_date = str(payload.get("trade_date", ""))
-    changed = bool(trade_date and trade_date > before)
+    force_publish = os.environ.get("FORCE_RUN", "").strip().lower() == "true"
+    changed = should_publish_close(trade_date, before, force_publish)
     if changed:
         SNAPSHOT_PATH.write_text(
             snapshot_json(compact_snapshot(payload)),
@@ -245,7 +250,10 @@ def main(argv: list[str] | None = None) -> int:
         )
     write_github_output("changed", "true" if changed else "false")
     write_github_output("trade_date", trade_date)
-    print(f"云端收盘检查：原交易日 {before or '无'}，最新交易日 {trade_date}，更新={changed}")
+    print(
+        f"云端收盘检查：原交易日 {before or '无'}，最新交易日 {trade_date}，"
+        f"强制发布={force_publish}，更新={changed}"
+    )
     return 0
 
 

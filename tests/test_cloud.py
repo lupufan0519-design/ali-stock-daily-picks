@@ -5,7 +5,12 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from cloud_gate import parse_tencent_trade_date, should_screen
-from cloud_daily import bootstrap_payload, compact_snapshot, snapshot_json
+from cloud_daily import (
+    bootstrap_payload,
+    compact_snapshot,
+    should_publish_close,
+    snapshot_json,
+)
 from intraday import (
     build_live_pools,
     collect_tracking_codes,
@@ -21,6 +26,14 @@ from screener import Bar, cross_yellow_pair, forward_adjust_bars
 
 
 class CloudWorkflowTests(unittest.TestCase):
+    def test_force_refresh_publishes_the_same_trade_date(self):
+        self.assertFalse(
+            should_publish_close("2026-07-31", "2026-07-31", False)
+        )
+        self.assertTrue(
+            should_publish_close("2026-07-31", "2026-07-31", True)
+        )
+
     @staticmethod
     def live_seed(code="600001", bottom_age=0, limit_age=0, name="实时示例"):
         return {
