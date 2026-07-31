@@ -62,11 +62,15 @@ jobs:
         id: screening
         env:
           BOOTSTRAP_LIVE: ${{ inputs.bootstrap_live || false }}
+          FORCE_RUN: ${{ inputs.force || false }}
         run: |
           if [ "$BOOTSTRAP_LIVE" = "true" ]; then
             python cloud_daily.py --bootstrap-live
           else
             python cloud_daily.py
+          fi
+          if [ "$FORCE_RUN" = "true" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
       - name: Refresh closing quotes
         if: steps.screening.outputs.changed == 'true'
