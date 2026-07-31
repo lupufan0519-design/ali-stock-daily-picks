@@ -630,6 +630,12 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertIn('preload="none"', html)
         self.assertIn('class="pool-table"', html)
         self.assertIn("中远通 最近42日K线", html)
+        self.assertIn("真实案例 · 隆盛科技", html)
+        self.assertIn("趋势开始", html)
+        self.assertIn("建议结束", html)
+        self.assertIn("100 次信号中，曾至少涨到 5%", html)
+        self.assertIn("信号后第 13 个交易日", html)
+        self.assertNotIn("首次达到5%中位数", html)
         self.assertNotIn("hero-aigc-v2-poster.webp;base64", html)
 
 

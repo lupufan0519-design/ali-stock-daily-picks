@@ -356,6 +356,8 @@ tbody tr:last-child td { border-bottom: 0; }
   margin-bottom: 14px;
 }
 .validation-verdict {
+  display: flex;
+  flex-direction: column;
   padding: 22px;
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
@@ -363,6 +365,106 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 .validation-verdict strong { display: block; margin-bottom: 7px; font-size: 19px; }
 .validation-verdict p { margin: 0; color: var(--muted-strong); }
+.trend-case {
+  --case-up: #e43b36;
+  --case-down: #139b68;
+  --case-start: #2457d6;
+  --case-end: #d4512f;
+  --case-peak: #b7790b;
+  --case-grid: color-mix(in srgb, var(--line) 76%, transparent);
+  margin-top: 20px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--line-strong) 72%, transparent);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--surface) 91%, transparent);
+  box-shadow: 0 14px 34px rgba(30, 64, 175, .08);
+}
+.trend-case-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 17px 10px;
+}
+.trend-case-head strong { margin: 0; font-size: 15px; }
+.trend-case-head span { color: var(--muted); font-size: 11px; }
+.trend-case-badge {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border: 1px solid color-mix(in srgb, var(--case-start) 22%, var(--line));
+  border-radius: 999px;
+  color: var(--case-start) !important;
+  background: color-mix(in srgb, var(--case-start) 7%, var(--surface));
+  font-weight: 750;
+}
+.trend-case-canvas {
+  position: relative;
+  height: clamp(245px, 29vw, 320px);
+  margin: 0 10px;
+  overflow: hidden;
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-blue) 34%, transparent), transparent 48%),
+    var(--surface-soft);
+}
+.trend-case-svg { display: block; width: 100%; height: 100%; }
+.trend-case-svg line, .trend-case-svg path, .trend-case-svg rect, .trend-case-svg circle { vector-effect: non-scaling-stroke; }
+.case-grid { stroke: var(--case-grid); stroke-width: 1; stroke-dasharray: 3 5; }
+.case-axis-label { fill: var(--muted); font: 600 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.case-wick { stroke-width: 1.25; }
+.case-candle.up .case-wick { stroke: var(--case-up); }
+.case-candle.up .case-body { fill: var(--case-up); }
+.case-candle.down .case-wick { stroke: var(--case-down); }
+.case-candle.down .case-body { fill: var(--case-down); }
+.case-candle:hover .case-body { filter: drop-shadow(0 0 5px currentColor); }
+.case-wave-fill { fill: url(#case-wave-fill); opacity: .44; }
+.case-wave-line { fill: none; stroke: color-mix(in srgb, var(--case-start) 52%, transparent); stroke-width: 1.4; }
+.case-stop-line { stroke: var(--case-end); stroke-width: 1.25; stroke-dasharray: 5 4; }
+.case-stop-label { fill: var(--case-end); font: 750 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.case-arrow-start, .case-arrow-end { fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.case-arrow-start { stroke: var(--case-start); marker-end: url(#case-arrow-blue); }
+.case-arrow-end { stroke: var(--case-end); marker-end: url(#case-arrow-red); }
+.case-peak-ring { fill: var(--surface); stroke: var(--case-peak); stroke-width: 2.5; }
+.case-peak-guide { stroke: var(--case-peak); stroke-width: 1; stroke-dasharray: 3 4; }
+.case-pin {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  gap: 1px;
+  min-width: 96px;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: 0 8px 22px rgba(23,32,51,.12);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+.case-pin b { font-size: 12px; line-height: 1.15; }
+.case-pin small { color: var(--muted); font: 650 10px/1.25 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.case-pin.start { top: 9px; left: 7%; border-color: color-mix(in srgb, var(--case-start) 34%, var(--line)); }
+.case-pin.start b { color: var(--case-start); }
+.case-pin.peak { top: 9px; left: 58%; border-color: color-mix(in srgb, var(--case-peak) 38%, var(--line)); }
+.case-pin.peak b { color: var(--case-peak); }
+.case-pin.end { right: 2%; top: 47%; border-color: color-mix(in srgb, var(--case-end) 38%, var(--line)); }
+.case-pin.end b { color: var(--case-end); }
+.trend-case-notes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+}
+.trend-case-note { padding: 11px 13px 13px; }
+.trend-case-note + .trend-case-note { border-left: 1px solid var(--line); }
+.trend-case-note span { display: block; color: var(--muted); font-size: 10px; }
+.trend-case-note strong { margin: 3px 0 0; font-size: 13px; }
+.trend-case-note.start strong { color: var(--case-start); }
+.trend-case-note.peak strong { color: var(--case-peak); }
+.trend-case-note.end strong { color: var(--case-end); }
+.trend-case-foot { padding: 0 15px 14px; color: var(--muted); font-size: 10px; }
+.reveal.is-visible .case-candle { animation: case-candle-in 420ms both; animation-delay: calc(var(--i) * 12ms); }
+.reveal.is-visible .case-arrow-start, .reveal.is-visible .case-arrow-end { stroke-dasharray: 280; animation: case-arrow-draw 900ms 520ms both; }
+@keyframes case-candle-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes case-arrow-draw { from { stroke-dashoffset: 280; } to { stroke-dashoffset: 0; } }
 .validation-facts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -431,6 +533,21 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .rules { grid-template-columns: 1fr; }
   .validation-lead { grid-template-columns: 1fr; }
+  .validation-verdict { padding: 17px; }
+  .trend-case { margin-top: 17px; }
+  .trend-case-head { padding: 13px 13px 9px; }
+  .trend-case-canvas { height: 245px; margin-inline: 6px; }
+  .case-axis-label, .case-stop-label { display: none; }
+  .case-pin { min-width: 82px; padding: 6px 7px; }
+  .case-pin b { font-size: 10px; }
+  .case-pin small { font-size: 8.5px; }
+  .case-pin.start { left: 1%; }
+  .case-pin.peak { left: 44%; }
+  .case-pin.end { right: 1%; top: 51%; }
+  .trend-case-notes { grid-template-columns: 1fr; }
+  .trend-case-note { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 9px 12px; }
+  .trend-case-note + .trend-case-note { border-top: 1px solid var(--line); border-left: 0; }
+  .trend-case-note strong { text-align: right; }
   th, td { padding: 12px 14px; }
   .chart-cell { min-width: 320px; }
   .pool-group-head { padding-inline: 14px; }
@@ -487,6 +604,9 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .pool-table .stock-link { min-height: 30px; }
   .pool-table .signal { min-width: 0; }
   .pool-table .live-pool-status { min-width: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal.is-visible .case-candle, .reveal.is-visible .case-arrow-start, .reveal.is-visible .case-arrow-end { animation: none; }
 }
 @media (max-width: 430px) {
   h1 { font-size: 34px; }
@@ -1562,6 +1682,12 @@ def _pct(value: float | None) -> str:
     return f'<span class="numeric {css}">{value:+.2f}%</span>'
 
 
+def _rate(value: float | None) -> str:
+    if value is None:
+        return "—"
+    return f'<span class="numeric positive">{value:.2f}%</span>'
+
+
 def _stock_cell(code: str, name: str, market: int) -> str:
     return (
         f'<a class="stock-link" href="{_link(code, market)}" target="_blank" '
@@ -1711,6 +1837,155 @@ def _metric(label: str, value: str) -> str:
     )
 
 
+def _trend_case_chart() -> str:
+    path = Path(__file__).resolve().parent / "results" / "trend_case.json"
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        bars = payload["bars"]
+        signal_index = next(
+            index
+            for index, bar in enumerate(bars)
+            if bar["date"] == payload["signal_date"]
+        )
+        peak_index = next(
+            index
+            for index, bar in enumerate(bars)
+            if bar["date"] == payload["peak_date"]
+        )
+        exit_index = next(
+            index
+            for index, bar in enumerate(bars)
+            if bar["date"] == payload["exit_date"]
+        )
+    except (OSError, ValueError, KeyError, TypeError, StopIteration):
+        return ""
+    if len(bars) < 3:
+        return ""
+
+    width, height = 900.0, 320.0
+    left, right, top, bottom = 45.0, 20.0, 39.0, 33.0
+    plot_width = width - left - right
+    plot_height = height - top - bottom
+    lowest = min(float(bar["low"]) for bar in bars)
+    highest = max(float(bar["high"]) for bar in bars)
+    padding = max((highest - lowest) * 0.07, 0.5)
+    price_min = lowest - padding
+    price_max = highest + padding
+
+    def x_at(index: int) -> float:
+        return left + plot_width * index / max(1, len(bars) - 1)
+
+    def y_at(price: float) -> float:
+        return top + (price_max - price) / (price_max - price_min) * plot_height
+
+    grid = []
+    for step in range(5):
+        price = price_min + (price_max - price_min) * step / 4
+        y = y_at(price)
+        grid.append(
+            f'<line class="case-grid" x1="{left:.1f}" y1="{y:.1f}" '
+            f'x2="{width-right:.1f}" y2="{y:.1f}"/>'
+            f'<text class="case-axis-label" x="7" y="{y+3:.1f}">{price:.1f}</text>'
+        )
+
+    candle_width = max(3.2, min(8.6, plot_width / len(bars) * 0.52))
+    candles = []
+    for index, bar in enumerate(bars):
+        open_price = float(bar["open"])
+        close_price = float(bar["close"])
+        x = x_at(index)
+        y_open = y_at(open_price)
+        y_close = y_at(close_price)
+        y_high = y_at(float(bar["high"]))
+        y_low = y_at(float(bar["low"]))
+        body_y = min(y_open, y_close)
+        body_height = max(1.5, abs(y_open - y_close))
+        tone = "up" if close_price >= open_price else "down"
+        title = (
+            f"{bar['date']} 开{open_price:.2f} 高{float(bar['high']):.2f} "
+            f"低{float(bar['low']):.2f} 收{close_price:.2f}"
+        )
+        candles.append(
+            f'<g class="case-candle {tone}" style="--i:{index}">'
+            f'<title>{_esc(title)}</title>'
+            f'<line class="case-wick" x1="{x:.1f}" y1="{y_high:.1f}" '
+            f'x2="{x:.1f}" y2="{y_low:.1f}"/>'
+            f'<rect class="case-body" x="{x-candle_width/2:.1f}" y="{body_y:.1f}" '
+            f'width="{candle_width:.1f}" height="{body_height:.1f}" rx="1"/>'
+            "</g>"
+        )
+
+    wave_points = [
+        (x_at(index), y_at(float(bars[index]["close"])))
+        for index in range(signal_index, exit_index + 1)
+    ]
+    wave_line = " ".join(f"{x:.1f},{y:.1f}" for x, y in wave_points)
+    wave_area = (
+        f"M {wave_points[0][0]:.1f} {height-bottom:.1f} "
+        + " ".join(f"L {x:.1f} {y:.1f}" for x, y in wave_points)
+        + f" L {wave_points[-1][0]:.1f} {height-bottom:.1f} Z"
+    )
+
+    signal_x = x_at(signal_index)
+    signal_y = y_at(float(bars[signal_index]["high"]))
+    peak_x = x_at(peak_index)
+    peak_y = y_at(float(payload["peak_close"]))
+    exit_x = x_at(exit_index)
+    exit_y = y_at(float(payload["exit_close"]))
+    stop_price = float(payload["peak_close"]) * 0.8
+    stop_y = y_at(stop_price)
+    end_path_start_x = min(width - right - 8, exit_x - 58)
+    date_ticks = []
+    for index in (0, signal_index, peak_index, exit_index, len(bars) - 1):
+        date_ticks.append(
+            f'<text class="case-axis-label" text-anchor="middle" '
+            f'x="{x_at(index):.1f}" y="{height-10:.1f}">'
+            f'{_esc(str(bars[index]["date"])[5:])}</text>'
+        )
+
+    return f"""
+    <div class="trend-case" aria-label="历史真实案例：隆盛科技趋势开始与建议结束点">
+      <div class="trend-case-head">
+        <div><strong>真实案例 · {_esc(payload['name'])} {_esc(payload['code'])}</strong><span>同一套实时可确认规则重放</span></div>
+        <span class="trend-case-badge">信号 → 高点 → 止盈</span>
+      </div>
+      <div class="trend-case-canvas">
+        <div class="case-pin start"><b>趋势开始</b><small>{_esc(payload['signal_date'])}</small></div>
+        <div class="case-pin peak"><b>波段高点</b><small>+{float(payload['peak_return_pct']):.2f}%</small></div>
+        <div class="case-pin end"><b>建议结束</b><small>{_esc(payload['exit_date'])}</small></div>
+        <svg class="trend-case-svg" viewBox="0 0 900 320" preserveAspectRatio="none" role="img" aria-labelledby="trend-case-title trend-case-desc">
+          <title id="trend-case-title">隆盛科技历史案例K线图</title>
+          <desc id="trend-case-desc">2025年8月7日确认趋势开始，9月17日到达波段高点，10月14日按最高收盘回撤20%建议结束。</desc>
+          <defs>
+            <linearGradient id="case-wave-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#2457d6" stop-opacity=".22"/>
+              <stop offset="1" stop-color="#2457d6" stop-opacity="0"/>
+            </linearGradient>
+            <marker id="case-arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#2457d6"/></marker>
+            <marker id="case-arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#d4512f"/></marker>
+          </defs>
+          {''.join(grid)}
+          <path class="case-wave-fill" d="{wave_area}"/>
+          <polyline class="case-wave-line" points="{wave_line}"/>
+          {''.join(candles)}
+          <line class="case-stop-line" x1="{peak_x:.1f}" y1="{stop_y:.1f}" x2="{exit_x:.1f}" y2="{stop_y:.1f}"/>
+          <text class="case-stop-label" x="{peak_x+7:.1f}" y="{stop_y-6:.1f}">高点回撤20%</text>
+          <line class="case-peak-guide" x1="{peak_x:.1f}" y1="{top+22:.1f}" x2="{peak_x:.1f}" y2="{peak_y-7:.1f}"/>
+          <circle class="case-peak-ring" cx="{peak_x:.1f}" cy="{peak_y:.1f}" r="5"/>
+          <path class="case-arrow-start" d="M {max(left+8,signal_x-63):.1f} {top+24:.1f} C {signal_x-51:.1f} {top+54:.1f}, {signal_x-17:.1f} {signal_y-24:.1f}, {signal_x:.1f} {signal_y-6:.1f}"/>
+          <path class="case-arrow-end" d="M {end_path_start_x:.1f} {top+115:.1f} C {exit_x-34:.1f} {top+142:.1f}, {exit_x-17:.1f} {exit_y-24:.1f}, {exit_x:.1f} {exit_y-5:.1f}"/>
+          {''.join(date_ticks)}
+        </svg>
+      </div>
+      <div class="trend-case-notes">
+        <div class="trend-case-note start"><span>信号确认</span><strong>{_esc(payload['signal_date'])} · {float(payload['signal_close']):.2f}元</strong></div>
+        <div class="trend-case-note peak"><span>最高收盘</span><strong>{_esc(payload['peak_date'])} · +{float(payload['peak_return_pct']):.2f}%</strong></div>
+        <div class="trend-case-note end"><span>建议结束</span><strong>{_esc(payload['exit_date'])} · +{float(payload['exit_return_pct']):.2f}%</strong></div>
+      </div>
+      <div class="trend-case-foot">建议结束点按“达到 5% 浮盈后，较最高收盘价回撤 20%”计算；未计费用、滑点和涨跌停无法成交。</div>
+    </div>"""
+
+
 def _validation_section() -> str:
     path = Path(__file__).resolve().parent / "results" / "rolling_validation.json"
     if not path.exists():
@@ -1733,28 +2008,22 @@ def _validation_section() -> str:
     rally_5_rate = float(forward_60["rally_5pct_rate_pct"])
     any_rally_rate = float(forward_60["rally_occurrence_rate_pct"])
     if rally_5_rate >= 70.0:
-        verdict = "多数实时可确认信号在60日内达到过5%收盘浮盈"
+        verdict = f"每100次信号，约有{rally_5_rate:.0f}次在60个交易日内涨到过5%"
     elif rally_5_rate >= 50.0:
-        verdict = "过半实时可确认信号在60日内达到过5%收盘浮盈"
+        verdict = f"每100次信号，约有{rally_5_rate:.0f}次在60个交易日内涨到过5%"
     elif any_rally_rate >= 50.0:
-        verdict = "信号后出现过上涨，但达到5%的比例不足一半"
+        verdict = "多数信号曾经上涨，但每100次中不到50次涨到过5%"
     else:
         verdict = "历史样本未验证信号后多数能形成5%涨势"
-    quality = (
-        "完整"
-        if int(coverage.get("error_count", 0)) == 0
-        else f"缺失 {int(coverage.get('error_count', 0))} 只"
-    )
-
     def take_profit_row(name: str, stats: dict, note: str) -> str:
         return f"""
         <tr>
           <td><strong>{_esc(name)}</strong><span class="subline">{_esc(note)}</span></td>
           <td class="numeric">{int(stats['successful_trend_count'])}</td>
           <td>{_pct(float(stats['median_pct']))}</td>
-          <td>{_pct(float(stats['positive_rate_pct']))}</td>
-          <td>{_pct(float(stats['premature_exit_rate_pct']))}</td>
-          <td>{_pct(float(stats['median_retained_peak_pct']))}</td>
+          <td>{_rate(float(stats['positive_rate_pct']))}</td>
+          <td>{_rate(float(stats['premature_exit_rate_pct']))}</td>
+          <td>{_rate(float(stats['median_retained_peak_pct']))}</td>
           <td class="numeric">第 {float(stats['median_exit_day']):.1f} 日</td>
         </tr>"""
 
@@ -1764,24 +2033,25 @@ def _validation_section() -> str:
       <p class="section-copy">逐日重放，每一天只使用当时已经存在的行情；XMA 尾部按当日可见数据重新计算，避免偷看未来。</p></div></div>
       <div class="validation-lead">
         <article class="validation-verdict"><strong>{_esc(verdict)}</strong>
-          <p>基础启动只认“近 5 日龙腾跃虎、龙线仍在虎线上方，且上穿日前 2 日、当天或后 2 个交易日内出现黄柱”，不要求见底或 42 日涨停，同一轮多头周期只记一次。未来 60 个交易日内，{_pct(float(forward_60['rally_3pct_rate_pct']))} 达到过 3%，{_pct(rally_5_rate)} 达到过 5%，{_pct(float(forward_60['rally_10pct_rate_pct']))} 达到过 10%；最高收盘涨幅中位数为 {_pct(float(forward_60['max_close_return']['median_pct']))}。</p>
+          <p>这里的“涨到过”是指信号出现后的 60 个交易日里，至少有一天收盘达到这个涨幅，并不代表第 60 天仍有同样收益。在 {int(forward_60['sample_count'])} 次完整信号中，每 100 次约有 {float(forward_60['rally_3pct_rate_pct']):.0f} 次涨到过 3%、{rally_5_rate:.0f} 次涨到过 5%、{float(forward_60['rally_10pct_rate_pct']):.0f} 次涨到过 10%。</p>
+          {_trend_case_chart()}
         </article>
         <div class="validation-facts">
-          <div class="validation-fact"><span>完整60日样本</span><strong>{int(forward_60['sample_count'])}</strong></div>
-          <div class="validation-fact"><span>60日内达到5%</span><strong>{_pct(rally_5_rate)}</strong></div>
-          <div class="validation-fact"><span>60日内达到10%</span><strong>{_pct(float(forward_60['rally_10pct_rate_pct']))}</strong></div>
-          <div class="validation-fact"><span>首次达到5%中位数</span><strong>第 {float(forward_60['median_first_5pct_day']):.1f} 日</strong></div>
-          <div class="validation-fact"><span>达到5%后的到顶中位数</span><strong>第 {float(forward_60['median_peak_day_for_5pct']):.1f} 日</strong></div>
-          <div class="validation-fact"><span>成功趋势峰值区间</span><strong>第 {float(trailing_20['p25_peak_day']):.0f}–{float(trailing_20['p75_peak_day']):.0f} 日</strong></div>
-          <div class="validation-fact"><span>覆盖股票</span><strong>{int(coverage['analyzed_stock_count'])}</strong></div>
-          <div class="validation-fact"><span>数据质量</span><strong>{_esc(quality)}</strong></div>
+          <div class="validation-fact"><span>有完整后续60日的信号</span><strong>{int(forward_60['sample_count'])} 次</strong></div>
+          <div class="validation-fact"><span>100 次信号中，曾至少涨到 5%</span><strong>约 {rally_5_rate:.0f} 次</strong></div>
+          <div class="validation-fact"><span>100 次信号中，曾至少涨到 10%</span><strong>约 {float(forward_60['rally_10pct_rate_pct']):.0f} 次</strong></div>
+          <div class="validation-fact"><span>能涨到 5% 的案例，通常何时第一次达到</span><strong>信号后第 {float(forward_60['median_first_5pct_day']):.0f} 个交易日</strong></div>
+          <div class="validation-fact"><span>能涨到 5% 的案例，最高收盘价通常何时出现</span><strong>信号后第 {float(forward_60['median_peak_day_for_5pct']):.0f} 个交易日</strong></div>
+          <div class="validation-fact"><span>其中一半案例的最高点出现时间</span><strong>信号后第 {float(trailing_20['p25_peak_day']):.0f}–{float(trailing_20['p75_peak_day']):.0f} 日</strong></div>
+          <div class="validation-fact"><span>回测覆盖股票</span><strong>{int(coverage['analyzed_stock_count'])} 只</strong></div>
+          <div class="validation-fact"><span>未取得完整历史行情</span><strong>{int(coverage.get('error_count', 0))} 只</strong></div>
         </div>
       </div>
       <article class="panel">
         <div class="panel-head"><div><h3>止盈规则比较</h3><p>只在信号后曾达到 5% 收盘浮盈的样本中比较；所有方案最迟在第 60 个后续交易日结束。</p></div></div>
-        <div class="table-scroll"><table><thead><tr><th>规则</th><th>成功趋势样本</th><th>退出收益中位数</th><th>盈利占比</th><th>过早退出</th><th>保留峰值</th><th>退出日中位数</th></tr></thead>
+        <div class="table-scroll"><table><thead><tr><th>规则</th><th>涨到过 5% 的案例</th><th>结束时通常收益</th><th>最终仍盈利</th><th>在最高点前结束</th><th>保住最高涨幅</th><th>通常何时结束</th></tr></thead>
         <tbody>{take_profit_row('龙虎转弱（仅预警）', weakening, '连续两日龙线下行且龙虎差收窄，不触发移出')}{take_profit_row('峰值回撤 10%', trailing_10, '达到5%浮盈后启动')}{take_profit_row('峰值回撤 15%', trailing_15, '达到5%浮盈后启动')}{take_profit_row('正式采用：峰值回撤 20%', trailing_20, '达到5%浮盈后启动；第60日兜底')}</tbody></table></div>
-        <p class="validation-method">正式规则：龙虎连续两日转弱只显示风险预警；持仓曾达到 5% 收盘浮盈后，当前收盘价较跟踪期最高收盘价回撤 20% 时止盈；未触发者在第 60 个后续交易日结束。历史完整图口径的 60 日达到 5% 比例为 {_pct(float(chart_60['rally_5pct_rate_pct']))}，但双重 XMA 会随未来数据回绘，这一数值只用于解释历史图形，不能当作实时可执行成功率。时间范围 {_esc(str(coverage['start_date']))}—{_esc(str(coverage['end_date']))}；当前上市股票样本存在幸存者偏差，历史价格未复权，未计费用、滑点和涨跌停无法成交。本结果用于规则验证，不构成收益承诺。</p>
+        <p class="validation-method">正式规则：龙虎连续两日转弱只显示风险预警；持仓曾达到 5% 收盘浮盈后，当前收盘价较跟踪期最高收盘价回撤 20% 时止盈；未触发者在第 60 个后续交易日结束。历史完整图口径的 60 日达到 5% 比例为 {_rate(float(chart_60['rally_5pct_rate_pct']))}，但双重 XMA 会随未来数据回绘，这一数值只用于解释历史图形，不能当作实时可执行成功率。时间范围 {_esc(str(coverage['start_date']))}—{_esc(str(coverage['end_date']))}；当前上市股票样本存在幸存者偏差，历史价格未复权，未计费用、滑点和涨跌停无法成交。本结果用于规则验证，不构成收益承诺。</p>
       </article>
     </section>"""
 
