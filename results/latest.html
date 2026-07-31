@@ -354,6 +354,8 @@ tbody tr:last-child td { border-bottom: 0; }
   margin-bottom: 14px;
 }
 .validation-verdict {
+  display: flex;
+  flex-direction: column;
   padding: 22px;
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
@@ -361,6 +363,106 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 .validation-verdict strong { display: block; margin-bottom: 7px; font-size: 19px; }
 .validation-verdict p { margin: 0; color: var(--muted-strong); }
+.trend-case {
+  --case-up: #e43b36;
+  --case-down: #139b68;
+  --case-start: #2457d6;
+  --case-end: #d4512f;
+  --case-peak: #b7790b;
+  --case-grid: color-mix(in srgb, var(--line) 76%, transparent);
+  margin-top: 20px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--line-strong) 72%, transparent);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--surface) 91%, transparent);
+  box-shadow: 0 14px 34px rgba(30, 64, 175, .08);
+}
+.trend-case-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 17px 10px;
+}
+.trend-case-head strong { margin: 0; font-size: 15px; }
+.trend-case-head span { color: var(--muted); font-size: 11px; }
+.trend-case-badge {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border: 1px solid color-mix(in srgb, var(--case-start) 22%, var(--line));
+  border-radius: 999px;
+  color: var(--case-start) !important;
+  background: color-mix(in srgb, var(--case-start) 7%, var(--surface));
+  font-weight: 750;
+}
+.trend-case-canvas {
+  position: relative;
+  height: clamp(245px, 29vw, 320px);
+  margin: 0 10px;
+  overflow: hidden;
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-blue) 34%, transparent), transparent 48%),
+    var(--surface-soft);
+}
+.trend-case-svg { display: block; width: 100%; height: 100%; }
+.trend-case-svg line, .trend-case-svg path, .trend-case-svg rect, .trend-case-svg circle { vector-effect: non-scaling-stroke; }
+.case-grid { stroke: var(--case-grid); stroke-width: 1; stroke-dasharray: 3 5; }
+.case-axis-label { fill: var(--muted); font: 600 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.case-wick { stroke-width: 1.25; }
+.case-candle.up .case-wick { stroke: var(--case-up); }
+.case-candle.up .case-body { fill: var(--case-up); }
+.case-candle.down .case-wick { stroke: var(--case-down); }
+.case-candle.down .case-body { fill: var(--case-down); }
+.case-candle:hover .case-body { filter: drop-shadow(0 0 5px currentColor); }
+.case-wave-fill { fill: url(#case-wave-fill); opacity: .44; }
+.case-wave-line { fill: none; stroke: color-mix(in srgb, var(--case-start) 52%, transparent); stroke-width: 1.4; }
+.case-stop-line { stroke: var(--case-end); stroke-width: 1.25; stroke-dasharray: 5 4; }
+.case-stop-label { fill: var(--case-end); font: 750 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.case-arrow-start, .case-arrow-end { fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.case-arrow-start { stroke: var(--case-start); marker-end: url(#case-arrow-blue); }
+.case-arrow-end { stroke: var(--case-end); marker-end: url(#case-arrow-red); }
+.case-peak-ring { fill: var(--surface); stroke: var(--case-peak); stroke-width: 2.5; }
+.case-peak-guide { stroke: var(--case-peak); stroke-width: 1; stroke-dasharray: 3 4; }
+.case-pin {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  gap: 1px;
+  min-width: 96px;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: 0 8px 22px rgba(23,32,51,.12);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+.case-pin b { font-size: 12px; line-height: 1.15; }
+.case-pin small { color: var(--muted); font: 650 10px/1.25 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.case-pin.start { top: 9px; left: 7%; border-color: color-mix(in srgb, var(--case-start) 34%, var(--line)); }
+.case-pin.start b { color: var(--case-start); }
+.case-pin.peak { top: 9px; left: 58%; border-color: color-mix(in srgb, var(--case-peak) 38%, var(--line)); }
+.case-pin.peak b { color: var(--case-peak); }
+.case-pin.end { right: 2%; top: 47%; border-color: color-mix(in srgb, var(--case-end) 38%, var(--line)); }
+.case-pin.end b { color: var(--case-end); }
+.trend-case-notes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+}
+.trend-case-note { padding: 11px 13px 13px; }
+.trend-case-note + .trend-case-note { border-left: 1px solid var(--line); }
+.trend-case-note span { display: block; color: var(--muted); font-size: 10px; }
+.trend-case-note strong { margin: 3px 0 0; font-size: 13px; }
+.trend-case-note.start strong { color: var(--case-start); }
+.trend-case-note.peak strong { color: var(--case-peak); }
+.trend-case-note.end strong { color: var(--case-end); }
+.trend-case-foot { padding: 0 15px 14px; color: var(--muted); font-size: 10px; }
+.reveal.is-visible .case-candle { animation: case-candle-in 420ms both; animation-delay: calc(var(--i) * 12ms); }
+.reveal.is-visible .case-arrow-start, .reveal.is-visible .case-arrow-end { stroke-dasharray: 280; animation: case-arrow-draw 900ms 520ms both; }
+@keyframes case-candle-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes case-arrow-draw { from { stroke-dashoffset: 280; } to { stroke-dashoffset: 0; } }
 .validation-facts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -429,6 +531,21 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .rules { grid-template-columns: 1fr; }
   .validation-lead { grid-template-columns: 1fr; }
+  .validation-verdict { padding: 17px; }
+  .trend-case { margin-top: 17px; }
+  .trend-case-head { padding: 13px 13px 9px; }
+  .trend-case-canvas { height: 245px; margin-inline: 6px; }
+  .case-axis-label, .case-stop-label { display: none; }
+  .case-pin { min-width: 82px; padding: 6px 7px; }
+  .case-pin b { font-size: 10px; }
+  .case-pin small { font-size: 8.5px; }
+  .case-pin.start { left: 1%; }
+  .case-pin.peak { left: 44%; }
+  .case-pin.end { right: 1%; top: 51%; }
+  .trend-case-notes { grid-template-columns: 1fr; }
+  .trend-case-note { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 9px 12px; }
+  .trend-case-note + .trend-case-note { border-top: 1px solid var(--line); border-left: 0; }
+  .trend-case-note strong { text-align: right; }
   th, td { padding: 12px 14px; }
   .chart-cell { min-width: 320px; }
   .pool-group-head { padding-inline: 14px; }
@@ -485,6 +602,9 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .pool-table .stock-link { min-height: 30px; }
   .pool-table .signal { min-width: 0; }
   .pool-table .live-pool-status { min-width: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal.is-visible .case-candle, .reveal.is-visible .case-arrow-start, .reveal.is-visible .case-arrow-end { animation: none; }
 }
 @media (max-width: 430px) {
   h1 { font-size: 34px; }
@@ -1239,7 +1359,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
             <span class="cover-count" id="lens-value">等待行情</span>
           </div>
           <div class="status-detail" id="market-detail">交易日 2026-07-31 · 云端行情自动刷新</div>
-          <div class="cover-time">最新行情<strong id="quote-time">2026-07-31 17:32</strong></div>
+          <div class="cover-time">最新行情<strong id="quote-time">2026-07-31 18:10</strong></div>
           <div class="date-strip">
             <span class="date-chip">盘中行情日<strong data-live-trade-date>等待行情</strong></span>
             <span class="date-chip">收盘结算日<strong data-close-trade-date>2026-07-31</strong></span>
@@ -1408,61 +1528,102 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
       <div class="section-head"><div><span class="section-kicker">Walk-forward evidence</span><h2>历史滚动验证</h2>
       <p class="section-copy">逐日重放，每一天只使用当时已经存在的行情；XMA 尾部按当日可见数据重新计算，避免偷看未来。</p></div></div>
       <div class="validation-lead">
-        <article class="validation-verdict"><strong>多数实时可确认信号在60日内达到过5%收盘浮盈</strong>
-          <p>基础启动只认“近 5 日龙腾跃虎、龙线仍在虎线上方，且上穿日前 2 日、当天或后 2 个交易日内出现黄柱”，不要求见底或 42 日涨停，同一轮多头周期只记一次。未来 60 个交易日内，<span class="numeric positive">+79.63%</span> 达到过 3%，<span class="numeric positive">+72.84%</span> 达到过 5%，<span class="numeric positive">+60.18%</span> 达到过 10%；最高收盘涨幅中位数为 <span class="numeric positive">+15.70%</span>。</p>
+        <article class="validation-verdict"><strong>每100次信号，约有73次在60个交易日内涨到过5%</strong>
+          <p>这里的“涨到过”是指信号出现后的 60 个交易日里，至少有一天收盘达到这个涨幅，并不代表第 60 天仍有同样收益。在 1193 次完整信号中，每 100 次约有 80 次涨到过 3%、73 次涨到过 5%、60 次涨到过 10%。</p>
+          
+    <div class="trend-case" aria-label="历史真实案例：隆盛科技趋势开始与建议结束点">
+      <div class="trend-case-head">
+        <div><strong>真实案例 · 隆盛科技 300680</strong><span>同一套实时可确认规则重放</span></div>
+        <span class="trend-case-badge">信号 → 高点 → 止盈</span>
+      </div>
+      <div class="trend-case-canvas">
+        <div class="case-pin start"><b>趋势开始</b><small>2025-08-07</small></div>
+        <div class="case-pin peak"><b>波段高点</b><small>+56.20%</small></div>
+        <div class="case-pin end"><b>建议结束</b><small>2025-10-14</small></div>
+        <svg class="trend-case-svg" viewBox="0 0 900 320" preserveAspectRatio="none" role="img" aria-labelledby="trend-case-title trend-case-desc">
+          <title id="trend-case-title">隆盛科技历史案例K线图</title>
+          <desc id="trend-case-desc">2025年8月7日确认趋势开始，9月17日到达波段高点，10月14日按最高收盘回撤20%建议结束。</desc>
+          <defs>
+            <linearGradient id="case-wave-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#2457d6" stop-opacity=".22"/>
+              <stop offset="1" stop-color="#2457d6" stop-opacity="0"/>
+            </linearGradient>
+            <marker id="case-arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#2457d6"/></marker>
+            <marker id="case-arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#d4512f"/></marker>
+          </defs>
+          <line class="case-grid" x1="45.0" y1="287.0" x2="880.0" y2="287.0"/><text class="case-axis-label" x="7" y="290.0">33.2</text><line class="case-grid" x1="45.0" y1="225.0" x2="880.0" y2="225.0"/><text class="case-axis-label" x="7" y="228.0">42.7</text><line class="case-grid" x1="45.0" y1="163.0" x2="880.0" y2="163.0"/><text class="case-axis-label" x="7" y="166.0">52.1</text><line class="case-grid" x1="45.0" y1="101.0" x2="880.0" y2="101.0"/><text class="case-axis-label" x="7" y="104.0">61.6</text><line class="case-grid" x1="45.0" y1="39.0" x2="880.0" y2="39.0"/><text class="case-axis-label" x="7" y="42.0">71.0</text>
+          <path class="case-wave-fill" d="M 130.2 287.0 L 130.2 227.0 L 147.2 228.2 L 164.3 223.5 L 181.3 232.9 L 198.4 232.6 L 215.4 246.4 L 232.4 236.1 L 249.5 238.6 L 266.5 203.8 L 283.6 213.8 L 300.6 215.5 L 317.7 217.3 L 334.7 216.6 L 351.7 214.9 L 368.8 225.6 L 385.8 224.7 L 402.9 221.8 L 419.9 214.7 L 436.9 196.2 L 454.0 207.0 L 471.0 217.7 L 488.1 193.3 L 505.1 176.3 L 522.1 185.5 L 539.2 194.1 L 556.2 160.0 L 573.3 141.2 L 590.3 110.6 L 607.3 98.0 L 624.4 70.8 L 641.4 93.5 L 658.5 112.4 L 675.5 112.1 L 692.6 84.9 L 709.6 74.8 L 726.6 89.0 L 743.7 81.8 L 760.7 79.0 L 777.8 91.8 L 794.8 104.6 L 811.8 110.0 L 828.9 133.5 L 845.9 163.5 L 845.9 287.0 Z"/>
+          <polyline class="case-wave-line" points="130.2,227.0 147.2,228.2 164.3,223.5 181.3,232.9 198.4,232.6 215.4,246.4 232.4,236.1 249.5,238.6 266.5,203.8 283.6,213.8 300.6,215.5 317.7,217.3 334.7,216.6 351.7,214.9 368.8,225.6 385.8,224.7 402.9,221.8 419.9,214.7 436.9,196.2 454.0,207.0 471.0,217.7 488.1,193.3 505.1,176.3 522.1,185.5 539.2,194.1 556.2,160.0 573.3,141.2 590.3,110.6 607.3,98.0 624.4,70.8 641.4,93.5 658.5,112.4 675.5,112.1 692.6,84.9 709.6,74.8 726.6,89.0 743.7,81.8 760.7,79.0 777.8,91.8 794.8,104.6 811.8,110.0 828.9,133.5 845.9,163.5"/>
+          <g class="case-candle up" style="--i:0"><title>2025-07-31 开35.54 高36.79 低35.53 收36.03</title><line class="case-wick" x1="45.0" y1="263.5" x2="45.0" y2="271.8"/><rect class="case-body" x="40.7" y="268.5" width="8.6" height="3.2" rx="1"/></g><g class="case-candle up" style="--i:1"><title>2025-08-01 开36.26 高37.27 低36.00 收36.78</title><line class="case-wick" x1="62.0" y1="260.4" x2="62.0" y2="268.7"/><rect class="case-body" x="57.7" y="263.6" width="8.6" height="3.4" rx="1"/></g><g class="case-candle up" style="--i:2"><title>2025-08-04 开37.19 高39.69 低36.78 收39.25</title><line class="case-wick" x1="79.1" y1="244.5" x2="79.1" y2="263.6"/><rect class="case-body" x="74.8" y="247.4" width="8.6" height="13.5" rx="1"/></g><g class="case-candle up" style="--i:3"><title>2025-08-05 开40.27 高41.96 低39.61 收41.69</title><line class="case-wick" x1="96.1" y1="229.6" x2="96.1" y2="245.0"/><rect class="case-body" x="91.8" y="231.3" width="8.6" height="9.3" rx="1"/></g><g class="case-candle up" style="--i:4"><title>2025-08-06 开41.03 高43.43 低40.61 收42.49</title><line class="case-wick" x1="113.2" y1="219.9" x2="113.2" y2="238.4"/><rect class="case-body" x="108.9" y="226.1" width="8.6" height="9.6" rx="1"/></g><g class="case-candle down" style="--i:5"><title>2025-08-07 开43.00 高43.42 低41.64 收42.35</title><line class="case-wick" x1="130.2" y1="220.0" x2="130.2" y2="231.7"/><rect class="case-body" x="125.9" y="222.8" width="8.6" height="4.3" rx="1"/></g><g class="case-candle up" style="--i:6"><title>2025-08-08 开42.02 高43.75 低41.70 收42.17</title><line class="case-wick" x1="147.2" y1="217.8" x2="147.2" y2="231.3"/><rect class="case-body" x="142.9" y="228.2" width="8.6" height="1.5" rx="1"/></g><g class="case-candle up" style="--i:7"><title>2025-08-11 开42.10 高43.81 低42.01 收42.89</title><line class="case-wick" x1="164.3" y1="217.4" x2="164.3" y2="229.2"/><rect class="case-body" x="160.0" y="223.5" width="8.6" height="5.2" rx="1"/></g><g class="case-candle down" style="--i:8"><title>2025-08-12 开43.36 高43.36 低41.28 收41.45</title><line class="case-wick" x1="181.3" y1="220.4" x2="181.3" y2="234.0"/><rect class="case-body" x="177.0" y="220.4" width="8.6" height="12.5" rx="1"/></g><g class="case-candle down" style="--i:9"><title>2025-08-13 开41.55 高42.37 低41.18 收41.50</title><line class="case-wick" x1="198.4" y1="226.9" x2="198.4" y2="234.7"/><rect class="case-body" x="194.1" y="232.3" width="8.6" height="1.5" rx="1"/></g><g class="case-candle down" style="--i:10"><title>2025-08-14 开41.22 高41.39 低38.70 收39.40</title><line class="case-wick" x1="215.4" y1="233.3" x2="215.4" y2="251.0"/><rect class="case-body" x="211.1" y="234.4" width="8.6" height="11.9" rx="1"/></g><g class="case-candle up" style="--i:11"><title>2025-08-15 开39.35 高41.78 低39.30 收40.96</title><line class="case-wick" x1="232.4" y1="230.8" x2="232.4" y2="247.0"/><rect class="case-body" x="228.1" y="236.1" width="8.6" height="10.6" rx="1"/></g><g class="case-candle down" style="--i:12"><title>2025-08-18 开41.27 高41.62 低40.15 收40.58</title><line class="case-wick" x1="249.5" y1="231.8" x2="249.5" y2="241.5"/><rect class="case-body" x="245.2" y="234.1" width="8.6" height="4.5" rx="1"/></g><g class="case-candle up" style="--i:13"><title>2025-08-19 开40.57 高45.96 低39.26 收45.89</title><line class="case-wick" x1="266.5" y1="203.3" x2="266.5" y2="247.3"/><rect class="case-body" x="262.2" y="203.8" width="8.6" height="34.9" rx="1"/></g><g class="case-candle down" style="--i:14"><title>2025-08-20 开45.00 高45.26 低43.76 收44.36</title><line class="case-wick" x1="283.6" y1="207.9" x2="283.6" y2="217.8"/><rect class="case-body" x="279.3" y="209.6" width="8.6" height="4.2" rx="1"/></g><g class="case-candle up" style="--i:15"><title>2025-08-21 开44.00 高45.85 低43.00 收44.11</title><line class="case-wick" x1="300.6" y1="204.0" x2="300.6" y2="222.8"/><rect class="case-body" x="296.3" y="215.5" width="8.6" height="1.5" rx="1"/></g><g class="case-candle down" style="--i:16"><title>2025-08-22 开44.36 高45.15 低43.78 收43.83</title><line class="case-wick" x1="317.7" y1="208.6" x2="317.7" y2="217.6"/><rect class="case-body" x="313.4" y="213.8" width="8.6" height="3.5" rx="1"/></g><g class="case-candle down" style="--i:17"><title>2025-08-25 开44.00 高44.85 低43.26 收43.94</title><line class="case-wick" x1="334.7" y1="210.6" x2="334.7" y2="221.0"/><rect class="case-body" x="330.4" y="216.2" width="8.6" height="1.5" rx="1"/></g><g class="case-candle up" style="--i:18"><title>2025-08-26 开44.00 高46.36 低43.70 收44.19</title><line class="case-wick" x1="351.7" y1="200.7" x2="351.7" y2="218.2"/><rect class="case-body" x="347.4" y="214.9" width="8.6" height="1.5" rx="1"/></g><g class="case-candle down" style="--i:19"><title>2025-08-27 开44.03 高44.84 低42.56 收42.57</title><line class="case-wick" x1="368.8" y1="210.7" x2="368.8" y2="225.6"/><rect class="case-body" x="364.5" y="216.0" width="8.6" height="9.6" rx="1"/></g><g class="case-candle up" style="--i:20"><title>2025-08-28 开42.23 高43.25 低41.23 收42.71</title><line class="case-wick" x1="385.8" y1="221.1" x2="385.8" y2="234.4"/><rect class="case-body" x="381.5" y="224.7" width="8.6" height="3.1" rx="1"/></g><g class="case-candle up" style="--i:21"><title>2025-08-29 开42.50 高44.32 低41.67 收43.14</title><line class="case-wick" x1="402.9" y1="214.1" x2="402.9" y2="231.5"/><rect class="case-body" x="398.6" y="221.8" width="8.6" height="4.2" rx="1"/></g><g class="case-candle up" style="--i:22"><title>2025-09-01 开43.14 高45.80 低43.14 收44.23</title><line class="case-wick" x1="419.9" y1="204.4" x2="419.9" y2="221.8"/><rect class="case-body" x="415.6" y="214.7" width="8.6" height="7.2" rx="1"/></g><g class="case-candle up" style="--i:23"><title>2025-09-02 开43.60 高48.38 低41.71 收47.04</title><line class="case-wick" x1="436.9" y1="187.4" x2="436.9" y2="231.2"/><rect class="case-body" x="432.6" y="196.2" width="8.6" height="22.6" rx="1"/></g><g class="case-candle down" style="--i:24"><title>2025-09-03 开48.01 高48.48 低45.09 收45.40</title><line class="case-wick" x1="454.0" y1="186.8" x2="454.0" y2="209.0"/><rect class="case-body" x="449.7" y="189.9" width="8.6" height="17.1" rx="1"/></g><g class="case-candle down" style="--i:25"><title>2025-09-04 开45.62 高46.60 低42.60 收43.77</title><line class="case-wick" x1="471.0" y1="199.1" x2="471.0" y2="225.4"/><rect class="case-body" x="466.7" y="205.6" width="8.6" height="12.1" rx="1"/></g><g class="case-candle up" style="--i:26"><title>2025-09-05 开43.45 高47.88 低43.45 收47.49</title><line class="case-wick" x1="488.1" y1="190.7" x2="488.1" y2="219.8"/><rect class="case-body" x="483.8" y="193.3" width="8.6" height="26.5" rx="1"/></g><g class="case-candle up" style="--i:27"><title>2025-09-08 开48.00 高50.96 低47.55 收50.08</title><line class="case-wick" x1="505.1" y1="170.5" x2="505.1" y2="192.9"/><rect class="case-body" x="500.8" y="176.3" width="8.6" height="13.6" rx="1"/></g><g class="case-candle down" style="--i:28"><title>2025-09-09 开49.61 高49.99 低48.48 收48.67</title><line class="case-wick" x1="522.1" y1="176.9" x2="522.1" y2="186.8"/><rect class="case-body" x="517.8" y="179.4" width="8.6" height="6.2" rx="1"/></g><g class="case-candle down" style="--i:29"><title>2025-09-10 开47.69 高49.86 低47.05 收47.36</title><line class="case-wick" x1="539.2" y1="177.7" x2="539.2" y2="196.2"/><rect class="case-body" x="534.9" y="192.0" width="8.6" height="2.2" rx="1"/></g><g class="case-candle up" style="--i:30"><title>2025-09-11 开47.26 高54.43 低46.65 收52.56</title><line class="case-wick" x1="556.2" y1="147.7" x2="556.2" y2="198.8"/><rect class="case-body" x="551.9" y="160.0" width="8.6" height="34.8" rx="1"/></g><g class="case-candle up" style="--i:31"><title>2025-09-12 开53.02 高56.66 低53.02 收55.43</title><line class="case-wick" x1="573.3" y1="133.1" x2="573.3" y2="157.0"/><rect class="case-body" x="569.0" y="141.2" width="8.6" height="15.8" rx="1"/></g><g class="case-candle up" style="--i:32"><title>2025-09-15 开56.84 高63.65 低55.36 收60.09</title><line class="case-wick" x1="590.3" y1="87.2" x2="590.3" y2="141.6"/><rect class="case-body" x="586.0" y="110.6" width="8.6" height="21.3" rx="1"/></g><g class="case-candle down" style="--i:33"><title>2025-09-16 开62.03 高62.88 低60.57 收62.01</title><line class="case-wick" x1="607.3" y1="92.3" x2="607.3" y2="107.4"/><rect class="case-body" x="603.0" y="97.9" width="8.6" height="1.5" rx="1"/></g><g class="case-candle up" style="--i:34"><title>2025-09-17 开61.00 高67.50 低60.00 收66.15</title><line class="case-wick" x1="624.4" y1="62.0" x2="624.4" y2="111.2"/><rect class="case-body" x="620.1" y="70.8" width="8.6" height="33.8" rx="1"/></g><g class="case-candle down" style="--i:35"><title>2025-09-18 开67.08 高67.60 低59.08 收62.70</title><line class="case-wick" x1="641.4" y1="61.3" x2="641.4" y2="117.2"/><rect class="case-body" x="637.1" y="64.7" width="8.6" height="28.7" rx="1"/></g><g class="case-candle down" style="--i:36"><title>2025-09-19 开61.20 高61.50 低58.67 收59.81</title><line class="case-wick" x1="658.5" y1="101.3" x2="658.5" y2="119.9"/><rect class="case-body" x="654.2" y="103.3" width="8.6" height="9.1" rx="1"/></g><g class="case-candle up" style="--i:37"><title>2025-09-22 开59.22 高61.47 低58.98 收59.86</title><line class="case-wick" x1="675.5" y1="101.5" x2="675.5" y2="117.9"/><rect class="case-body" x="671.2" y="112.1" width="8.6" height="4.2" rx="1"/></g><g class="case-candle up" style="--i:38"><title>2025-09-23 开60.21 高64.20 低60.01 收64.01</title><line class="case-wick" x1="692.6" y1="83.6" x2="692.6" y2="111.1"/><rect class="case-body" x="688.3" y="84.9" width="8.6" height="24.9" rx="1"/></g><g class="case-candle up" style="--i:39"><title>2025-09-24 开62.17 高66.60 低61.82 收65.55</title><line class="case-wick" x1="709.6" y1="67.9" x2="709.6" y2="99.2"/><rect class="case-body" x="705.3" y="74.8" width="8.6" height="22.2" rx="1"/></g><g class="case-candle down" style="--i:40"><title>2025-09-25 开65.27 高65.40 低62.38 收63.38</title><line class="case-wick" x1="726.6" y1="75.8" x2="726.6" y2="95.6"/><rect class="case-body" x="722.3" y="76.6" width="8.6" height="12.4" rx="1"/></g><g class="case-candle up" style="--i:41"><title>2025-09-26 开63.00 高68.68 低62.99 收64.48</title><line class="case-wick" x1="743.7" y1="54.2" x2="743.7" y2="91.6"/><rect class="case-body" x="739.4" y="81.8" width="8.6" height="9.7" rx="1"/></g><g class="case-candle down" style="--i:42"><title>2025-09-29 开65.00 高65.90 低62.57 收64.90</title><line class="case-wick" x1="760.7" y1="72.5" x2="760.7" y2="94.3"/><rect class="case-body" x="756.4" y="78.4" width="8.6" height="1.5" rx="1"/></g><g class="case-candle down" style="--i:43"><title>2025-09-30 开64.31 高64.71 低61.50 收62.96</title><line class="case-wick" x1="777.8" y1="80.3" x2="777.8" y2="101.3"/><rect class="case-body" x="773.5" y="82.9" width="8.6" height="8.9" rx="1"/></g><g class="case-candle down" style="--i:44"><title>2025-10-09 开61.16 高62.32 低59.73 收61.00</title><line class="case-wick" x1="794.8" y1="96.0" x2="794.8" y2="113.0"/><rect class="case-body" x="790.5" y="103.6" width="8.6" height="1.5" rx="1"/></g><g class="case-candle down" style="--i:45"><title>2025-10-10 开62.47 高64.48 低59.90 收60.18</title><line class="case-wick" x1="811.8" y1="81.8" x2="811.8" y2="111.8"/><rect class="case-body" x="807.5" y="95.0" width="8.6" height="15.0" rx="1"/></g><g class="case-candle up" style="--i:46"><title>2025-10-13 开56.11 高58.10 低54.83 收56.60</title><line class="case-wick" x1="828.9" y1="123.7" x2="828.9" y2="145.1"/><rect class="case-body" x="824.6" y="133.5" width="8.6" height="3.2" rx="1"/></g><g class="case-candle down" style="--i:47"><title>2025-10-14 开57.00 高57.30 低51.75 收52.03</title><line class="case-wick" x1="845.9" y1="128.9" x2="845.9" y2="165.3"/><rect class="case-body" x="841.6" y="130.9" width="8.6" height="32.6" rx="1"/></g><g class="case-candle up" style="--i:48"><title>2025-10-15 开53.08 高56.20 低52.34 收55.62</title><line class="case-wick" x1="863.0" y1="136.1" x2="863.0" y2="161.5"/><rect class="case-body" x="858.7" y="139.9" width="8.6" height="16.7" rx="1"/></g><g class="case-candle up" style="--i:49"><title>2025-10-16 开54.63 高55.72 低54.40 收55.00</title><line class="case-wick" x1="880.0" y1="139.3" x2="880.0" y2="147.9"/><rect class="case-body" x="875.7" y="144.0" width="8.6" height="2.4" rx="1"/></g>
+          <line class="case-stop-line" x1="624.4" y1="157.7" x2="845.9" y2="157.7"/>
+          <text class="case-stop-label" x="631.4" y="151.7">高点回撤20%</text>
+          <line class="case-peak-guide" x1="624.4" y1="61.0" x2="624.4" y2="63.8"/>
+          <circle class="case-peak-ring" cx="624.4" cy="70.8" r="5"/>
+          <path class="case-arrow-start" d="M 67.2 63.0 C 79.2 93.0, 113.2 196.0, 130.2 214.0"/>
+          <path class="case-arrow-end" d="M 787.9 154.0 C 811.9 181.0, 828.9 139.5, 845.9 158.5"/>
+          <text class="case-axis-label" text-anchor="middle" x="45.0" y="310.0">07-31</text><text class="case-axis-label" text-anchor="middle" x="130.2" y="310.0">08-07</text><text class="case-axis-label" text-anchor="middle" x="624.4" y="310.0">09-17</text><text class="case-axis-label" text-anchor="middle" x="845.9" y="310.0">10-14</text><text class="case-axis-label" text-anchor="middle" x="880.0" y="310.0">10-16</text>
+        </svg>
+      </div>
+      <div class="trend-case-notes">
+        <div class="trend-case-note start"><span>信号确认</span><strong>2025-08-07 · 42.35元</strong></div>
+        <div class="trend-case-note peak"><span>最高收盘</span><strong>2025-09-17 · +56.20%</strong></div>
+        <div class="trend-case-note end"><span>建议结束</span><strong>2025-10-14 · +22.86%</strong></div>
+      </div>
+      <div class="trend-case-foot">建议结束点按“达到 5% 浮盈后，较最高收盘价回撤 20%”计算；未计费用、滑点和涨跌停无法成交。</div>
+    </div>
         </article>
         <div class="validation-facts">
-          <div class="validation-fact"><span>完整60日样本</span><strong>1193</strong></div>
-          <div class="validation-fact"><span>60日内达到5%</span><strong><span class="numeric positive">+72.84%</span></strong></div>
-          <div class="validation-fact"><span>60日内达到10%</span><strong><span class="numeric positive">+60.18%</span></strong></div>
-          <div class="validation-fact"><span>首次达到5%中位数</span><strong>第 13.0 日</strong></div>
-          <div class="validation-fact"><span>达到5%后的到顶中位数</span><strong>第 44.0 日</strong></div>
-          <div class="validation-fact"><span>成功趋势峰值区间</span><strong>第 25–55 日</strong></div>
-          <div class="validation-fact"><span>覆盖股票</span><strong>4999</strong></div>
-          <div class="validation-fact"><span>数据质量</span><strong>缺失 5 只</strong></div>
+          <div class="validation-fact"><span>有完整后续60日的信号</span><strong>1193 次</strong></div>
+          <div class="validation-fact"><span>100 次信号中，曾至少涨到 5%</span><strong>约 73 次</strong></div>
+          <div class="validation-fact"><span>100 次信号中，曾至少涨到 10%</span><strong>约 60 次</strong></div>
+          <div class="validation-fact"><span>能涨到 5% 的案例，通常何时第一次达到</span><strong>信号后第 13 个交易日</strong></div>
+          <div class="validation-fact"><span>能涨到 5% 的案例，最高收盘价通常何时出现</span><strong>信号后第 44 个交易日</strong></div>
+          <div class="validation-fact"><span>其中一半案例的最高点出现时间</span><strong>信号后第 25–55 日</strong></div>
+          <div class="validation-fact"><span>回测覆盖股票</span><strong>4999 只</strong></div>
+          <div class="validation-fact"><span>未取得完整历史行情</span><strong>5 只</strong></div>
         </div>
       </div>
       <article class="panel">
         <div class="panel-head"><div><h3>止盈规则比较</h3><p>只在信号后曾达到 5% 收盘浮盈的样本中比较；所有方案最迟在第 60 个后续交易日结束。</p></div></div>
-        <div class="table-scroll"><table><thead><tr><th>规则</th><th>成功趋势样本</th><th>退出收益中位数</th><th>盈利占比</th><th>过早退出</th><th>保留峰值</th><th>退出日中位数</th></tr></thead>
+        <div class="table-scroll"><table><thead><tr><th>规则</th><th>涨到过 5% 的案例</th><th>结束时通常收益</th><th>最终仍盈利</th><th>在最高点前结束</th><th>保住最高涨幅</th><th>通常何时结束</th></tr></thead>
         <tbody>
         <tr>
           <td><strong>龙虎转弱（仅预警）</strong><span class="subline">连续两日龙线下行且龙虎差收窄，不触发移出</span></td>
           <td class="numeric">869</td>
           <td><span class="numeric positive">+7.22%</span></td>
-          <td><span class="numeric positive">+89.07%</span></td>
-          <td><span class="numeric positive">+57.88%</span></td>
-          <td><span class="numeric positive">+30.93%</span></td>
+          <td><span class="numeric positive">89.07%</span></td>
+          <td><span class="numeric positive">57.88%</span></td>
+          <td><span class="numeric positive">30.93%</span></td>
           <td class="numeric">第 23.0 日</td>
         </tr>
         <tr>
           <td><strong>峰值回撤 10%</strong><span class="subline">达到5%浮盈后启动</span></td>
           <td class="numeric">869</td>
           <td><span class="numeric positive">+9.59%</span></td>
-          <td><span class="numeric positive">+75.03%</span></td>
-          <td><span class="numeric positive">+35.56%</span></td>
-          <td><span class="numeric positive">+35.60%</span></td>
+          <td><span class="numeric positive">75.03%</span></td>
+          <td><span class="numeric positive">35.56%</span></td>
+          <td><span class="numeric positive">35.60%</span></td>
           <td class="numeric">第 31.0 日</td>
         </tr>
         <tr>
           <td><strong>峰值回撤 15%</strong><span class="subline">达到5%浮盈后启动</span></td>
           <td class="numeric">869</td>
           <td><span class="numeric positive">+11.58%</span></td>
-          <td><span class="numeric positive">+75.37%</span></td>
-          <td><span class="numeric positive">+13.46%</span></td>
-          <td><span class="numeric positive">+43.92%</span></td>
+          <td><span class="numeric positive">75.37%</span></td>
+          <td><span class="numeric positive">13.46%</span></td>
+          <td><span class="numeric positive">43.92%</span></td>
           <td class="numeric">第 60.0 日</td>
         </tr>
         <tr>
           <td><strong>正式采用：峰值回撤 20%</strong><span class="subline">达到5%浮盈后启动；第60日兜底</span></td>
           <td class="numeric">869</td>
           <td><span class="numeric positive">+12.77%</span></td>
-          <td><span class="numeric positive">+76.29%</span></td>
-          <td><span class="numeric positive">+4.72%</span></td>
-          <td><span class="numeric positive">+52.21%</span></td>
+          <td><span class="numeric positive">76.29%</span></td>
+          <td><span class="numeric positive">4.72%</span></td>
+          <td><span class="numeric positive">52.21%</span></td>
           <td class="numeric">第 60.0 日</td>
         </tr></tbody></table></div>
-        <p class="validation-method">正式规则：龙虎连续两日转弱只显示风险预警；持仓曾达到 5% 收盘浮盈后，当前收盘价较跟踪期最高收盘价回撤 20% 时止盈；未触发者在第 60 个后续交易日结束。历史完整图口径的 60 日达到 5% 比例为 <span class="numeric positive">+99.19%</span>，但双重 XMA 会随未来数据回绘，这一数值只用于解释历史图形，不能当作实时可执行成功率。时间范围 2023-09-22—2026-07-31；当前上市股票样本存在幸存者偏差，历史价格未复权，未计费用、滑点和涨跌停无法成交。本结果用于规则验证，不构成收益承诺。</p>
+        <p class="validation-method">正式规则：龙虎连续两日转弱只显示风险预警；持仓曾达到 5% 收盘浮盈后，当前收盘价较跟踪期最高收盘价回撤 20% 时止盈；未触发者在第 60 个后续交易日结束。历史完整图口径的 60 日达到 5% 比例为 <span class="numeric positive">99.19%</span>，但双重 XMA 会随未来数据回绘，这一数值只用于解释历史图形，不能当作实时可执行成功率。时间范围 2023-09-22—2026-07-31；当前上市股票样本存在幸存者偏差，历史价格未复权，未计费用、滑点和涨跌停无法成交。本结果用于规则验证，不构成收益承诺。</p>
       </article>
     </section>
 
@@ -1495,7 +1656,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
 
     <p class="disclaimer">本页面按技术条件机械筛选，不构成投资建议。收益按每只股票等权计算，未计手续费、滑点和实际仓位；免费公开行情仅适合个人研究与小范围分享。</p>
   </main>
-  <footer>收盘交易日 2026-07-31 · 报告生成 2026-07-31 17:32 · 沪深 A 股 5209 只 · 数据失败 0 只</footer>
+  <footer>收盘交易日 2026-07-31 · 报告生成 2026-07-31 18:10 · 沪深 A 股 5209 只 · 数据失败 0 只</footer>
 </div>
 <nav class="mobile-dock" aria-label="手机快捷导航">
   <a href="#content"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19V10l8-6 8 6v9H4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 19v-5h5v5" stroke="currentColor" stroke-width="1.8"/></svg><span>概览</span></a>
