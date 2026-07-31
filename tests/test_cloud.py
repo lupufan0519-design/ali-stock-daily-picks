@@ -21,7 +21,13 @@ from intraday import (
     parse_tencent_quotes,
     unpack_live_seed,
 )
-from report_ui import LIVE_SCRIPT, _evaluation_row, _position_row, render_report
+from report_ui import (
+    LIVE_SCRIPT,
+    _evaluation_row,
+    _position_row,
+    _trend_case_chart,
+    render_report,
+)
 from screener import Bar, cross_yellow_pair, forward_adjust_bars
 
 
@@ -546,6 +552,18 @@ class CloudWorkflowTests(unittest.TestCase):
                 min(bars[index]["open"], bars[index]["close"]),
             )
 
+    def test_trend_case_separates_cross_from_confirmation_in_a_signal_zoom(self):
+        html = _trend_case_chart()
+        self.assertIn("信号形成放大图", html)
+        self.assertIn("2月5日为回看上穿日；2月11日为当天首次确认日", html)
+        self.assertIn("当天首次确认", html)
+        self.assertEqual(html.count('class="case-arrow-start"'), 1)
+        self.assertEqual(html.count('class="case-cross-guide"'), 1)
+        self.assertEqual(html.count('class="case-dragon-line"'), 1)
+        self.assertEqual(html.count('class="case-tiger-line"'), 1)
+        self.assertEqual(html.count('class="case-yellow-body qualified"'), 2)
+        self.assertEqual(html.count('class="case-yellow-body contextual"'), 4)
+
     def test_yellow_window_can_extend_after_the_cross_without_looking_before(self):
         cross = [False, True, False, False, False, False, False]
         yellow = [True, False, False, False, False, False, True]
@@ -796,7 +814,7 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertIn("建议结束", html)
         self.assertIn('class="case-dragon-line"', html)
         self.assertIn('class="case-tiger-line"', html)
-        self.assertIn('class="case-yellow-body"', html)
+        self.assertIn('class="case-yellow-body qualified"', html)
         self.assertIn("通达信前复权日线", html)
         self.assertIn("2025-02-05 / 2025-01-24、2025-01-27 / 2025-02-11", html)
         self.assertIn("默认展示优先级最高的 5 只", html)

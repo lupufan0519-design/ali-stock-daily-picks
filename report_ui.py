@@ -358,6 +358,7 @@ tbody tr:last-child td { border-bottom: 0; }
 .validation-verdict {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   padding: 22px;
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
@@ -373,6 +374,7 @@ tbody tr:last-child td { border-bottom: 0; }
   --case-peak: #b7790b;
   --case-grid: color-mix(in srgb, var(--line) 76%, transparent);
   margin-top: 20px;
+  min-width: 0;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--line-strong) 72%, transparent);
   border-radius: 18px;
@@ -403,6 +405,36 @@ tbody tr:last-child td { border-bottom: 0; }
 .trend-case-legend i { display: block; width: 17px; height: 2px; border-radius: 999px; }
 .trend-case-legend .dragon { background: #ff5c70; box-shadow: 0 0 0 1px rgba(255,92,112,.08); }
 .trend-case-legend .tiger { background: #55c6e8; box-shadow: 0 0 0 1px rgba(85,198,232,.08); }
+.trend-case-legend .yellow-formula,
+.trend-case-legend .yellow-qualified { width: 10px; height: 10px; border-radius: 2px; }
+.trend-case-legend .yellow-formula { background: color-mix(in srgb, #f4d35e 48%, transparent); }
+.trend-case-legend .yellow-qualified { border: 1.5px solid #b7790b; background: #f4d35e; }
+.trend-case-signal {
+  margin: 0 10px 10px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--case-start) 20%, var(--line));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface-blue) 42%, var(--surface));
+}
+.trend-case-signal-head,
+.trend-case-wave-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 12px 5px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.trend-case-signal-head strong,
+.trend-case-wave-head strong { margin: 0; color: var(--text); font-size: 12px; }
+.trend-case-signal-head span { text-align: right; }
+.trend-case-signal-canvas { height: 188px; }
+.trend-case-signal-svg { display: block; width: 100%; height: 100%; }
+.trend-case-signal-svg line,
+.trend-case-signal-svg path,
+.trend-case-signal-svg rect,
+.trend-case-signal-svg circle { vector-effect: non-scaling-stroke; }
 .trend-case-canvas {
   position: relative;
   height: clamp(245px, 29vw, 320px);
@@ -423,6 +455,9 @@ tbody tr:last-child td { border-bottom: 0; }
 .case-candle.down .case-wick { stroke: var(--case-down); }
 .case-candle.down .case-body { fill: var(--case-down); }
 .case-yellow-body { fill: #f4d35e; stroke: #d8ad12; stroke-width: .45; }
+.case-yellow-body.contextual { opacity: .48; stroke-width: .25; }
+.case-yellow-body.qualified { opacity: 1; stroke: #a96700; stroke-width: 1.15; filter: drop-shadow(0 0 2px rgba(183,121,11,.36)); }
+.case-yellow-label { fill: #8d5a00; font: 800 9px/1 "Microsoft YaHei", sans-serif; }
 .case-candle:hover .case-body { filter: drop-shadow(0 0 5px currentColor); }
 .case-wave-fill { fill: url(#case-wave-fill); opacity: .44; }
 .case-wave-line { fill: none; stroke: color-mix(in srgb, var(--case-start) 52%, transparent); stroke-width: 1.4; }
@@ -431,6 +466,7 @@ tbody tr:last-child td { border-bottom: 0; }
 .case-tiger-line { stroke: #55c6e8; }
 .case-cross-guide { stroke: var(--case-start); stroke-width: 1; stroke-dasharray: 3 4; opacity: .62; }
 .case-cross-ring { fill: var(--surface); stroke: var(--case-start); stroke-width: 2.2; }
+.case-cross-label { fill: var(--case-start); font: 800 11px/1 "Microsoft YaHei", sans-serif; }
 .case-stop-line { stroke: var(--case-end); stroke-width: 1.25; stroke-dasharray: 5 4; }
 .case-stop-label { fill: var(--case-end); font: 750 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace; }
 .case-arrow-start, .case-arrow-end { fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
@@ -468,7 +504,7 @@ tbody tr:last-child td { border-bottom: 0; }
 .trend-case-note { padding: 11px 13px 13px; }
 .trend-case-note + .trend-case-note { border-left: 1px solid var(--line); }
 .trend-case-note span { display: block; color: var(--muted); font-size: 10px; }
-.trend-case-note strong { margin: 3px 0 0; font-size: 13px; }
+.trend-case-note strong { min-width: 0; margin: 3px 0 0; overflow-wrap: anywhere; font-size: 13px; }
 .trend-case-note.start strong { color: var(--case-start); }
 .trend-case-note.peak strong { color: var(--case-peak); }
 .trend-case-note.end strong { color: var(--case-end); }
@@ -548,7 +584,11 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .validation-verdict { padding: 17px; }
   .trend-case { margin-top: 17px; }
   .trend-case-head { display: grid; gap: 8px; padding: 13px 13px 9px; }
-  .trend-case-legend { justify-self: start; }
+  .trend-case-legend { justify-self: start; flex-wrap: wrap; border-radius: 12px; }
+  .trend-case-signal { margin-inline: 6px; }
+  .trend-case-signal-head { display: grid; gap: 3px; }
+  .trend-case-signal-head span { text-align: left; }
+  .trend-case-signal-canvas { height: 178px; }
   .trend-case-canvas { height: 245px; margin-inline: 6px; }
   .case-axis-label, .case-stop-label { display: none; }
   .case-pin { min-width: 82px; padding: 6px 7px; }
@@ -560,7 +600,7 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .trend-case-notes { grid-template-columns: 1fr; }
   .trend-case-note { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 9px 12px; }
   .trend-case-note + .trend-case-note { border-top: 1px solid var(--line); border-left: 0; }
-  .trend-case-note strong { text-align: right; }
+  .trend-case-note strong { max-width: 68%; text-align: right; }
   th, td { padding: 12px 14px; }
   .chart-cell { min-width: 320px; }
   .pool-group-head { padding-inline: 14px; }
@@ -1901,16 +1941,23 @@ def _trend_case_chart() -> str:
     ):
         return ""
 
+    formula_yellow_dates = {
+        str(bar["date"])
+        for index, bar in enumerate(bars[: len(dragon)])
+        if dragon[index] > min(float(bar["open"]), float(bar["close"]))
+    }
+    zoom_end_index = min(
+        signal_index,
+        len(dragon) - 1,
+        cross_index,
+    )
+
     width, height = 900.0, 320.0
     left, right, top, bottom = 45.0, 20.0, 39.0, 33.0
     plot_width = width - left - right
     plot_height = height - top - bottom
-    lowest = min(
-        [float(bar["low"]) for bar in bars] + dragon + tiger
-    )
-    highest = max(
-        [float(bar["high"]) for bar in bars] + dragon + tiger
-    )
+    lowest = min(float(bar["low"]) for bar in bars)
+    highest = max(float(bar["high"]) for bar in bars)
     padding = max((highest - lowest) * 0.07, 0.5)
     price_min = lowest - padding
     price_max = highest + padding
@@ -1920,15 +1967,6 @@ def _trend_case_chart() -> str:
 
     def y_at(price: float) -> float:
         return top + (price_max - price) / (price_max - price_min) * plot_height
-
-    dragon_line = " ".join(
-        f"{x_at(index):.1f},{y_at(value):.1f}"
-        for index, value in enumerate(dragon)
-    )
-    tiger_line = " ".join(
-        f"{x_at(index):.1f},{y_at(value):.1f}"
-        for index, value in enumerate(tiger)
-    )
 
     grid = []
     for step in range(5):
@@ -1957,19 +1995,6 @@ def _trend_case_chart() -> str:
             f"{bar['date']} 开{open_price:.2f} 高{float(bar['high']):.2f} "
             f"低{float(bar['low']):.2f} 收{close_price:.2f}"
         )
-        yellow_part = ""
-        if bar["date"] in yellow_dates and index < len(dragon):
-            body_low = min(open_price, close_price)
-            body_high = max(open_price, close_price)
-            yellow_top_price = min(body_high, dragon[index])
-            if yellow_top_price > body_low:
-                yellow_y = y_at(yellow_top_price)
-                yellow_height = max(1.5, y_at(body_low) - yellow_y)
-                yellow_part = (
-                    f'<rect class="case-yellow-body" '
-                    f'x="{x-candle_width/2:.1f}" y="{yellow_y:.1f}" '
-                    f'width="{candle_width:.1f}" height="{yellow_height:.1f}" rx="1"/>'
-                )
         candles.append(
             f'<g class="case-candle {tone}" style="--i:{index}">'
             f'<title>{_esc(title)}</title>'
@@ -1977,9 +2002,132 @@ def _trend_case_chart() -> str:
             f'x2="{x:.1f}" y2="{y_low:.1f}"/>'
             f'<rect class="case-body" x="{x-candle_width/2:.1f}" y="{body_y:.1f}" '
             f'width="{candle_width:.1f}" height="{body_height:.1f}" rx="1"/>'
-            f'{yellow_part}'
             "</g>"
         )
+
+    zoom_width, zoom_height = 900.0, 188.0
+    zoom_left, zoom_right, zoom_top, zoom_bottom = 45.0, 20.0, 24.0, 27.0
+    zoom_bars = bars[: zoom_end_index + 1]
+    zoom_dragon = dragon[: zoom_end_index + 1]
+    zoom_tiger = tiger[: zoom_end_index + 1]
+    zoom_lowest = min(
+        [float(bar["low"]) for bar in zoom_bars]
+        + zoom_dragon
+        + zoom_tiger
+    )
+    zoom_highest = max(
+        [float(bar["high"]) for bar in zoom_bars]
+        + zoom_dragon
+        + zoom_tiger
+    )
+    zoom_padding = max((zoom_highest - zoom_lowest) * 0.1, 0.08)
+    zoom_price_min = zoom_lowest - zoom_padding
+    zoom_price_max = zoom_highest + zoom_padding
+    zoom_plot_width = zoom_width - zoom_left - zoom_right
+    zoom_plot_height = zoom_height - zoom_top - zoom_bottom
+
+    def zoom_x_at(index: int) -> float:
+        return zoom_left + zoom_plot_width * index / max(1, len(zoom_bars) - 1)
+
+    def zoom_y_at(price: float) -> float:
+        return (
+            zoom_top
+            + (zoom_price_max - price)
+            / (zoom_price_max - zoom_price_min)
+            * zoom_plot_height
+        )
+
+    zoom_grid = []
+    for step in range(3):
+        price = zoom_price_min + (zoom_price_max - zoom_price_min) * step / 2
+        y = zoom_y_at(price)
+        zoom_grid.append(
+            f'<line class="case-grid" x1="{zoom_left:.1f}" y1="{y:.1f}" '
+            f'x2="{zoom_width-zoom_right:.1f}" y2="{y:.1f}"/>'
+            f'<text class="case-axis-label" x="7" y="{y+3:.1f}">{price:.2f}</text>'
+        )
+
+    zoom_candle_width = max(
+        8.0,
+        min(22.0, zoom_plot_width / max(1, len(zoom_bars)) * 0.3),
+    )
+    zoom_candles = []
+    for index, bar in enumerate(zoom_bars):
+        open_price = float(bar["open"])
+        close_price = float(bar["close"])
+        body_low = min(open_price, close_price)
+        body_high = max(open_price, close_price)
+        x = zoom_x_at(index)
+        y_open = zoom_y_at(open_price)
+        y_close = zoom_y_at(close_price)
+        y_high = zoom_y_at(float(bar["high"]))
+        y_low = zoom_y_at(float(bar["low"]))
+        body_y = min(y_open, y_close)
+        body_height = max(2.0, abs(y_open - y_close))
+        tone = "up" if close_price >= open_price else "down"
+        title = (
+            f"{bar['date']} 开{open_price:.2f} 高{float(bar['high']):.2f} "
+            f"低{float(bar['low']):.2f} 收{close_price:.2f}"
+        )
+        yellow_part = ""
+        if str(bar["date"]) in formula_yellow_dates:
+            yellow_top_price = min(body_high, zoom_dragon[index])
+            if yellow_top_price > body_low:
+                yellow_y = zoom_y_at(yellow_top_price)
+                yellow_height = max(2.2, zoom_y_at(body_low) - yellow_y)
+                yellow_kind = (
+                    "qualified" if str(bar["date"]) in yellow_dates
+                    else "contextual"
+                )
+                yellow_part = (
+                    f'<rect class="case-yellow-body {yellow_kind}" '
+                    f'x="{x-zoom_candle_width/2:.1f}" y="{yellow_y:.1f}" '
+                    f'width="{zoom_candle_width:.1f}" height="{yellow_height:.1f}" rx="1"/>'
+                )
+        yellow_label = (
+            f'<text class="case-yellow-label" text-anchor="middle" '
+            f'x="{x:.1f}" y="{zoom_top+10:.1f}">有效</text>'
+            if str(bar["date"]) in yellow_dates
+            else ""
+        )
+        zoom_candles.append(
+            f'<g class="case-candle {tone}" style="--i:{index}">'
+            f'<title>{_esc(title)}</title>'
+            f'<line class="case-wick" x1="{x:.1f}" y1="{y_high:.1f}" '
+            f'x2="{x:.1f}" y2="{y_low:.1f}"/>'
+            f'<rect class="case-body" x="{x-zoom_candle_width/2:.1f}" y="{body_y:.1f}" '
+            f'width="{zoom_candle_width:.1f}" height="{body_height:.1f}" rx="1"/>'
+            f'{yellow_part}{yellow_label}</g>'
+        )
+
+    zoom_dragon_line = " ".join(
+        f"{zoom_x_at(index):.1f},{zoom_y_at(value):.1f}"
+        for index, value in enumerate(zoom_dragon)
+    )
+    zoom_tiger_line = " ".join(
+        f"{zoom_x_at(index):.1f},{zoom_y_at(value):.1f}"
+        for index, value in enumerate(zoom_tiger)
+    )
+    zoom_cross_x = zoom_x_at(cross_index)
+    zoom_cross_y = zoom_y_at(zoom_dragon[cross_index])
+    zoom_tick_indices = sorted(
+        {
+            0,
+            cross_index,
+            zoom_end_index,
+            *(
+                index
+                for index, bar in enumerate(zoom_bars)
+                if str(bar["date"]) in yellow_dates
+            ),
+        }
+    )
+    zoom_date_ticks = "".join(
+        f'<text class="case-axis-label" text-anchor="middle" '
+        f'x="{zoom_x_at(index):.1f}" y="{zoom_height-8:.1f}">'
+        f'{_esc(str(zoom_bars[index]["date"])[5:])}</text>'
+        for index in zoom_tick_indices
+    )
 
     wave_points = [
         (x_at(index), y_at(float(bars[index]["close"])))
@@ -1994,8 +2142,6 @@ def _trend_case_chart() -> str:
 
     signal_x = x_at(signal_index)
     signal_y = y_at(float(bars[signal_index]["high"]))
-    cross_x = x_at(cross_index)
-    cross_y = y_at(dragon[cross_index])
     peak_x = x_at(peak_index)
     peak_y = y_at(float(payload["peak_close"]))
     exit_x = x_at(exit_index)
@@ -2022,11 +2168,27 @@ def _trend_case_chart() -> str:
     return f"""
     <div class="trend-case" aria-label="历史真实案例：{_esc(payload['name'])}信号确认与建议结束点">
       <div class="trend-case-head">
-        <div><strong>真实案例 · {_esc(payload['name'])} {_esc(payload['code'])}</strong><span>前复权 · 截至信号日的数据截面</span></div>
-        <div class="trend-case-legend" aria-label="趋势线图例"><span><i class="dragon"></i>龙线</span><span><i class="tiger"></i>虎线</span><span><i style="background:#f4d35e"></i>黄柱</span></div>
+        <div><strong>真实案例 · {_esc(payload['name'])} {_esc(payload['code'])}</strong><span>前复权 · 逐日无未来数据重放</span></div>
+        <div class="trend-case-legend" aria-label="信号放大图图例"><span><i class="dragon"></i>龙线</span><span><i class="tiger"></i>虎线</span><span><i class="yellow-formula"></i>公式黄柱</span><span><i class="yellow-qualified"></i>有效窗口黄柱</span></div>
       </div>
+      <div class="trend-case-signal">
+        <div class="trend-case-signal-head"><strong>信号形成放大图</strong><span>2月5日为回看上穿日；2月11日为当天首次确认日</span></div>
+        <div class="trend-case-signal-canvas">
+          <svg class="trend-case-signal-svg" viewBox="0 0 900 188" preserveAspectRatio="none" role="img" aria-label="龙腾跃虎与黄柱信号放大图">
+            {''.join(zoom_grid)}
+            {''.join(zoom_candles)}
+            <polyline class="case-tiger-line" points="{zoom_tiger_line}"/>
+            <polyline class="case-dragon-line" points="{zoom_dragon_line}"/>
+            <line class="case-cross-guide" x1="{zoom_cross_x:.1f}" y1="{zoom_top+12:.1f}" x2="{zoom_cross_x:.1f}" y2="{zoom_cross_y-6:.1f}"/>
+            <circle class="case-cross-ring" cx="{zoom_cross_x:.1f}" cy="{zoom_cross_y:.1f}" r="5"/>
+            <text class="case-cross-label" text-anchor="end" x="{zoom_cross_x-8:.1f}" y="{zoom_top+10:.1f}">龙腾跃虎</text>
+            {zoom_date_ticks}
+          </svg>
+        </div>
+      </div>
+      <div class="trend-case-wave-head"><strong>确认后的完整波段</strong><span>蓝箭头只指当天首次确认，红箭头指建议结束</span></div>
       <div class="trend-case-canvas">
-        <div class="case-pin start"><b>信号确认</b><small>{_esc(payload['signal_date'])}</small></div>
+        <div class="case-pin start"><b>当天首次确认</b><small>{_esc(payload['signal_date'])}</small></div>
         <div class="case-pin peak"><b>波段高点</b><small>+{float(payload['peak_return_pct']):.2f}%</small></div>
         <div class="case-pin end"><b>建议结束</b><small>{_esc(payload['exit_date'])}</small></div>
         <svg class="trend-case-svg" viewBox="0 0 900 320" preserveAspectRatio="none" role="img" aria-labelledby="trend-case-title trend-case-desc">
@@ -2044,11 +2206,7 @@ def _trend_case_chart() -> str:
           <path class="case-wave-fill" d="{wave_area}"/>
           <polyline class="case-wave-line" points="{wave_line}"/>
           {''.join(candles)}
-          <polyline class="case-tiger-line" points="{tiger_line}"/>
-          <polyline class="case-dragon-line" points="{dragon_line}"/>
           {stop_markup}
-          <line class="case-cross-guide" x1="{cross_x:.1f}" y1="{top+22:.1f}" x2="{cross_x:.1f}" y2="{cross_y-6:.1f}"/>
-          <circle class="case-cross-ring" cx="{cross_x:.1f}" cy="{cross_y:.1f}" r="4.5"/>
           <line class="case-peak-guide" x1="{peak_x:.1f}" y1="{top+22:.1f}" x2="{peak_x:.1f}" y2="{peak_y-7:.1f}"/>
           <circle class="case-peak-ring" cx="{peak_x:.1f}" cy="{peak_y:.1f}" r="5"/>
           <path class="case-arrow-start" d="M {max(left+8,signal_x-63):.1f} {top+24:.1f} C {signal_x-51:.1f} {top+54:.1f}, {signal_x-17:.1f} {signal_y-24:.1f}, {signal_x:.1f} {signal_y-6:.1f}"/>
@@ -2057,11 +2215,11 @@ def _trend_case_chart() -> str:
         </svg>
       </div>
       <div class="trend-case-notes">
-        <div class="trend-case-note start"><span>上穿 / 黄柱 / 确认</span><strong>{_esc(payload['cross_date'])} / {_esc('、'.join(sorted(yellow_dates)))} / {_esc(payload['signal_date'])}</strong></div>
+        <div class="trend-case-note start"><span>回看上穿 / 有效黄柱 / 当天首次确认</span><strong>{_esc(payload['cross_date'])} / {_esc('、'.join(sorted(yellow_dates)))} / {_esc(payload['signal_date'])}</strong></div>
         <div class="trend-case-note peak"><span>最高收盘</span><strong>{_esc(payload['peak_date'])} · +{float(payload['peak_return_pct']):.2f}%</strong></div>
         <div class="trend-case-note end"><span>建议结束</span><strong>{_esc(payload['exit_date'])} · +{float(payload['exit_return_pct']):.2f}%</strong></div>
       </div>
-      <div class="trend-case-foot">{_esc(payload['source'])}。龙线、虎线只绘制到信号确认日，保证图上的上穿和黄柱与回测当日使用的是同一份数据；本例按“{_esc(payload['exit_reason'])}”。未计费用、滑点和涨跌停无法成交。</div>
+      <div class="trend-case-foot">{_esc(payload['source'])}。上方放大图使用 2月11日当天实际可见的数据截面：双重 XMA 会重算最近线段，因此图上回看的上穿落在 2月5日，但完整条件到 2月11日才首次可确认。淡黄表示按公式出现的黄柱，金色描边表示落在策略有效窗口内的黄柱。下方只展示确认后的价格波段，避免龙虎线与翻倍行情共用纵轴后被压扁。本例按“{_esc(payload['exit_reason'])}”。未计费用、滑点和涨跌停无法成交。</div>
     </div>"""
 
 
