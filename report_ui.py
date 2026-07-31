@@ -1232,15 +1232,28 @@ LIVE_SCRIPT = r"""
       body.append(row);
     });
   };
-  const paintLivePools = (pools, mode) => {
+  const paintLivePools = (pools, mode, trackingCodes) => {
     if (!pools || !pools.available) return;
     const main = Array.isArray(pools.main) ? pools.main : [];
     const secondary = Array.isArray(pools.secondary) ? pools.secondary : [];
+    const trackedMain = Array.isArray(trackingCodes?.main) ? trackingCodes.main : [];
+    const trackedSecondary = Array.isArray(trackingCodes?.secondary) ? trackingCodes.secondary : [];
+    const mainAreaCount = new Set([...main.map((item) => item.code), ...trackedMain]).size;
+    const secondaryAreaCount = new Set([
+      ...secondary.map((item) => item.code),
+      ...trackedSecondary,
+    ]).size;
     document.querySelectorAll("[data-live-main-count]").forEach((node) => {
       node.textContent = String(main.length);
     });
     document.querySelectorAll("[data-live-secondary-count]").forEach((node) => {
       node.textContent = String(secondary.length);
+    });
+    document.querySelectorAll("[data-area-main-count]").forEach((node) => {
+      node.textContent = String(mainAreaCount);
+    });
+    document.querySelectorAll("[data-area-secondary-count]").forEach((node) => {
+      node.textContent = String(secondaryAreaCount);
     });
     paintPoolRows(main, "main", mode);
     paintPoolRows(secondary, "secondary", mode);
@@ -1289,7 +1302,11 @@ LIVE_SCRIPT = r"""
       const coverage = targetCount ? Math.min(1, quoteCount / targetCount) : 1;
       if (lensValue) lensValue.textContent = targetCount ? `${quoteCount}/${targetCount}` : "已就绪";
       if (riskStage) riskStage.style.setProperty("--coverage-angle", `${coverage * 360}deg`);
-      paintLivePools(data.live_pools || {}, data.selection_mode || "close");
+      paintLivePools(
+        data.live_pools || {},
+        data.selection_mode || "close",
+        data.tracking_codes || {},
+      );
       paintTicker(data.quotes || {});
       Object.entries(data.quotes || {}).forEach(([code, quote]) => {
         document.querySelectorAll(`[data-live-code="${code}"]`).forEach((row) => {
@@ -1515,6 +1532,17 @@ def render_report(
     secondary_active_rows = "".join(
         _position_row(item) for item in strategy_state.get("secondary_active", [])
     )
+    main_area_count = len(
+        {item.code for item in selected}
+        | {str(item["code"]) for item in strategy_state["active"]}
+    )
+    secondary_area_count = len(
+        {item.code for item in secondary}
+        | {
+            str(item["code"])
+            for item in strategy_state.get("secondary_active", [])
+        }
+    )
     main_pool_rows = "".join(_live_pool_row(item, "main") for item in selected)
     secondary_pool_rows = "".join(
         _live_pool_row(item, "secondary")
@@ -1610,11 +1638,11 @@ def render_report(
       <p class="section-copy">主选、次选名单按最新行情实时预选；正式加入、移出、跟踪收益和成功率只在收盘完整扫描后结算。</p></div></div>
 {_events(events)}
       <div class="pool-switcher" role="tablist" aria-label="趋势池区域切换">
-        <button class="pool-tab" id="tab-main" type="button" role="tab" aria-selected="true" aria-controls="pool-main" data-pool-tab="main">主选区 · <span data-live-main-count>{len(selected)}</span></button>
-        <button class="pool-tab" id="tab-secondary" type="button" role="tab" aria-selected="false" aria-controls="pool-secondary" data-pool-tab="secondary" tabindex="-1">次选区 · <span data-live-secondary-count>{len(secondary)}</span></button>
+        <button class="pool-tab" id="tab-main" type="button" role="tab" aria-selected="true" aria-controls="pool-main" data-pool-tab="main">主选区 · <span data-area-main-count>{main_area_count}</span></button>
+        <button class="pool-tab" id="tab-secondary" type="button" role="tab" aria-selected="false" aria-controls="pool-secondary" data-pool-tab="secondary" tabindex="-1">次选区 · <span data-area-secondary-count>{secondary_area_count}</span></button>
       </div>
       <article class="panel" id="pool-main" role="tabpanel" aria-labelledby="tab-main" data-pool-panel="main">
-        <div class="panel-head"><div><h3>主选区</h3><p>四项条件同时满足；盘中名单约每 5 分钟重算</p></div><span class="count-badge"><span data-live-main-count>{len(selected)}</span> 只</span></div>
+        <div class="panel-head"><div><h3>主选区</h3><p>盘中预选与收盘跟踪合并去重；候选名单约每 5 分钟重算</p></div><span class="count-badge"><span data-area-main-count>{main_area_count}</span> 只</span></div>
         <div class="table-scroll"><table><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态</th></tr></thead>
         <tbody id="live-main-body">{main_pool_rows or '<tr><td class="empty" colspan="7">当前没有符合条件的主选预选</td></tr>'}</tbody></table></div>
         <p class="settlement-note">以下统计与跟踪明细截至 {trade_date} 收盘，盘中不会提前计入或移出。</p>
@@ -1633,7 +1661,7 @@ def render_report(
       </article>
 
       <article class="panel" id="pool-secondary" role="tabpanel" aria-labelledby="tab-secondary" data-pool-panel="secondary" hidden>
-        <div class="panel-head"><div><h3>次选区</h3><p>龙腾跃虎与黄柱必选，再满足见底或42日涨停之一</p></div><span class="count-badge"><span data-live-secondary-count>{len(secondary)}</span> 只</span></div>
+        <div class="panel-head"><div><h3>次选区</h3><p>盘中预选与收盘跟踪合并去重；候选需龙虎、黄柱及另一项</p></div><span class="count-badge"><span data-area-secondary-count>{secondary_area_count}</span> 只</span></div>
         <div class="table-scroll"><table><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态</th></tr></thead>
         <tbody id="live-secondary-body">{secondary_pool_rows or '<tr><td class="empty" colspan="7">当前没有符合条件的次选预选</td></tr>'}</tbody></table></div>
         <p class="settlement-note">以下统计与跟踪明细截至 {trade_date} 收盘，盘中不会提前计入或移出。</p>

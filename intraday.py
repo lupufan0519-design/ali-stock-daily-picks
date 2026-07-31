@@ -154,6 +154,24 @@ def collect_display_targets(
     return sorted(targets.values(), key=lambda item: (item["market"], item["code"]))
 
 
+def collect_tracking_codes(payload: dict) -> dict[str, list[str]]:
+    strategy = payload.get("strategy", {})
+
+    def codes(key: str) -> list[str]:
+        return sorted(
+            {
+                str(item["code"])
+                for item in strategy.get(key, [])
+                if item.get("code") and not is_st_name(item.get("name", ""))
+            }
+        )
+
+    return {
+        "main": codes("active"),
+        "secondary": codes("secondary_active"),
+    }
+
+
 def market_state(now: datetime) -> tuple[str, str]:
     if now.weekday() >= 5:
         return "休市", "周末休市，页面保留最近一次已验证行情"
@@ -655,6 +673,7 @@ def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
         "live_trade_date": live_trade_date,
         "selection_mode": selection_mode,
         "live_pools": live_pools,
+        "tracking_codes": collect_tracking_codes(payload),
         "target_count": len(targets),
         "quote_count": len(quotes),
         "quotes": display_quotes,

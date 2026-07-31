@@ -6,6 +6,7 @@ from cloud_gate import parse_tencent_trade_date, should_screen
 from cloud_daily import bootstrap_payload, compact_snapshot
 from intraday import (
     build_live_pools,
+    collect_tracking_codes,
     collect_targets,
     evaluate_live_seed,
     market_state,
@@ -155,6 +156,24 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertEqual(
             [item["code"] for item in collect_targets(payload)],
             ["600001", "600002"],
+        )
+
+    def test_area_tracking_codes_are_unique_and_exclude_st(self):
+        payload = {
+            "strategy": {
+                "active": [
+                    {"code": "600001", "name": "主选"},
+                    {"code": "600001", "name": "主选"},
+                ],
+                "secondary_active": [
+                    {"code": "603648", "name": "畅联股份"},
+                    {"code": "600002", "name": "ST示例"},
+                ],
+            }
+        }
+        self.assertEqual(
+            collect_tracking_codes(payload),
+            {"main": ["600001"], "secondary": ["603648"]},
         )
 
     def test_snapshot_and_live_targets_share_visible_top_30(self):
@@ -477,6 +496,8 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertIn("time.textContent =", LIVE_SCRIPT)
         self.assertIn("formatQuoteTime", LIVE_SCRIPT)
         self.assertIn("paintLivePools", LIVE_SCRIPT)
+        self.assertIn("data-area-secondary-count", LIVE_SCRIPT)
+        self.assertIn("tracking_codes", LIVE_SCRIPT)
         self.assertNotIn('row.querySelector("[data-live-return]")', LIVE_SCRIPT)
 
 
