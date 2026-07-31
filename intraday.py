@@ -12,6 +12,7 @@ from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
 from observation import OBSERVATION_LIMIT, visible_observations
+from screener import cross_yellow_pair
 
 
 ROOT = Path(__file__).resolve().parent
@@ -28,7 +29,7 @@ def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
     """Decode the compact close-generated seed used by the intraday workflow."""
     if isinstance(item, dict):
         return item
-    if seed_format != 1 or not isinstance(item, list) or len(item) < 19:
+    if seed_format not in {1, 2} or not isinstance(item, list) or len(item) < 19:
         return {}
 
     def triples(values: object) -> list[list[float]]:
@@ -77,6 +78,19 @@ def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
         "selected": bool(flags & 32),
         "eligible": True,
         "matched_count": sum(bool(flags & bit) for bit in (1, 2, 4, 8)),
+        "body_low_tail": (
+            [float(value) for value in item[19]]
+            if seed_format >= 2 and len(item) > 19
+            else []
+        ),
+        "yellow_date": (
+            str(item[20]) if seed_format >= 2 and len(item) > 20 else ""
+        ),
+        "body_low_tail_dates": (
+            [str(value) for value in item[21]]
+            if seed_format >= 2 and len(item) > 21
+            else []
+        ),
     }
 
 
@@ -412,6 +426,7 @@ def _baseline_live_row(seed: dict, quote: dict) -> dict:
         "bottom_date": str(seed.get("bottom_date", "")),
         "cross_date": str(seed.get("cross_date", "")),
         "limit_up_date": str(seed.get("limit_up_date", "")),
+        "yellow_date": str(seed.get("yellow_date", "")),
         "yellow_count": int(seed.get("yellow_count", 0)),
         "matched_count": int(seed.get("matched_count", 0)),
         "dragon_above_tiger": bool(seed.get("dragon_above_tiger")),
@@ -488,25 +503,66 @@ def evaluate_live_seed(
         else ""
     )
 
+    yellow = dragon > min(open_price, price)
+    yellow_count = 1 if yellow else 0
+    yellow_ok = False
+    yellow_date = live_date if yellow else ""
     if len(dragon_tail) >= 6:
-        cross_flags = [
+        cross_flags = [False] + [
             dragon_tail[index] > tiger_tail[index]
             and dragon_tail[index - 1] <= tiger_tail[index - 1]
             for index in range(1, len(dragon_tail))
         ]
-        cross_dates = [
-            *list(seed.get("cross_tail_dates", []))[-4:],
+        body_dates = [
+            *list(seed.get("body_low_tail_dates", []))[-5:],
             live_date,
         ]
         cross_date = next(
             (
-                date
-                for date, flag in reversed(list(zip(cross_dates, cross_flags)))
-                if flag
+                body_dates[index]
+                for index in range(len(cross_flags) - 1, 0, -1)
+                if cross_flags[index] and index < len(body_dates)
             ),
             "",
         )
         cross_ok = bool(cross_date and dragon_above_tiger)
+        body_lows = [
+            *[float(value) for value in seed.get("body_low_tail", [])][-5:],
+            min(open_price, price),
+        ]
+        if len(body_lows) == len(dragon_tail) and len(body_dates) == len(dragon_tail):
+            yellow_flags = [
+                dragon_value > body_low
+                for dragon_value, body_low in zip(dragon_tail, body_lows)
+            ]
+            paired_cross, paired_yellow, yellow_count = cross_yellow_pair(
+                cross_flags,
+                yellow_flags,
+                end_index=len(cross_flags) - 1,
+                cross_lookback_days=int(cfg["cross_lookback_days"]),
+                yellow_consecutive_days=int(cfg["yellow_consecutive_days"]),
+            )
+            yellow_ok = paired_cross >= 0
+            yellow_date = (
+                body_dates[paired_yellow] if paired_yellow >= 0 else ""
+            )
+            if paired_cross >= 0:
+                cross_date = body_dates[paired_cross]
+        else:
+            yellow_ok = bool(
+                cross_ok
+                and (
+                    yellow
+                    or (
+                        seed.get("yellow_ok")
+                        and int(seed.get("cross_age", -1)) + 1
+                        < int(cfg["cross_lookback_days"])
+                    )
+                )
+            )
+            if not yellow and yellow_ok:
+                yellow_count = int(seed.get("yellow_count", 0))
+                yellow_date = str(seed.get("yellow_date", ""))
     else:
         new_cross = bool(
             dragon_above_tiger
@@ -525,6 +581,20 @@ def evaluate_live_seed(
             if prior_cross and dragon_above_tiger
             else ""
         )
+        yellow_ok = bool(
+            cross_ok
+            and (
+                yellow
+                or (
+                    seed.get("yellow_ok")
+                    and int(seed.get("cross_age", -1)) + 1
+                    < int(cfg["cross_lookback_days"])
+                )
+            )
+        )
+        if not yellow and yellow_ok:
+            yellow_count = int(seed.get("yellow_count", 0))
+            yellow_date = str(seed.get("yellow_date", ""))
 
     new_limit_up = price + 1e-8 >= float(seed["next_limit_price"])
     limit_age = int(seed.get("limit_up_age", -1))
@@ -541,9 +611,6 @@ def evaluate_live_seed(
         else ""
     )
 
-    yellow = dragon > min(open_price, price)
-    yellow_count = 1 if yellow else 0
-    yellow_ok = yellow_count >= int(cfg["yellow_consecutive_days"])
     matched_count = sum((bottom_ok, cross_ok, limit_up_ok, yellow_ok))
     selected = bool(seed.get("eligible") and matched_count == 4)
     return {
@@ -560,6 +627,7 @@ def evaluate_live_seed(
         "bottom_date": bottom_date,
         "cross_date": cross_date,
         "limit_up_date": limit_up_date,
+        "yellow_date": yellow_date,
         "yellow_count": yellow_count,
         "matched_count": matched_count,
         "dragon_above_tiger": dragon_above_tiger,

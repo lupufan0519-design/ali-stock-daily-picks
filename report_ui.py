@@ -1400,7 +1400,7 @@ LIVE_SCRIPT = r"""
         signalCell(Boolean(item.bottom_ok), item.bottom_date || "未命中", "可能见底"),
         signalCell(Boolean(item.cross_ok), item.cross_date || "未命中", "龙腾跃虎"),
         signalCell(Boolean(item.limit_up_ok), item.limit_up_date || "未命中", "42日涨停"),
-        signalCell(Boolean(item.yellow_ok), `连续 ${Number(item.yellow_count || 0)} 根`, "黄柱"),
+        signalCell(Boolean(item.yellow_ok), `${item.yellow_date || "交叉前后2日"} · ${Number(item.yellow_count || 0)} 根`, "邻近黄柱"),
         statusCell,
       );
       body.append(row);
@@ -1605,6 +1605,11 @@ def _closed_row(position: dict) -> str:
     </tr>"""
 
 
+def _yellow_note(item) -> str:
+    yellow_date = str(getattr(item, "yellow_date", ""))
+    return f"{yellow_date or '交叉前后2日'} · {int(item.yellow_count)} 根"
+
+
 def _evaluation_row(item, observation: bool = False) -> str:
     entry_price = float(item.close)
     chart = str(item.chart).replace(
@@ -1624,7 +1629,7 @@ def _evaluation_row(item, observation: bool = False) -> str:
         return base + f"""
       <td>{_signal(item.cross_ok, item.cross_date or '未出现')}</td>
       <td>{_signal(item.bottom_ok, item.bottom_date or '未出现')}</td>
-      <td>{_signal(item.yellow_ok, f'连续 {item.yellow_count} 根')}</td>
+      <td>{_signal(item.yellow_ok, _yellow_note(item))}</td>
       <td>{_signal(item.limit_up_ok, item.limit_up_date or '未出现')}</td>
       <td><span class="state neutral">{priority}</span></td>
     </tr>"""
@@ -1632,7 +1637,7 @@ def _evaluation_row(item, observation: bool = False) -> str:
       <td>{_signal(item.bottom_ok, item.bottom_date or '未命中')}</td>
       <td>{_signal(item.cross_ok, item.cross_date or '未命中')}</td>
       <td>{_signal(item.limit_up_ok, item.limit_up_date or '未命中')}</td>
-      <td>{_signal(item.yellow_ok, f'连续 {item.yellow_count} 根')}</td>
+      <td>{_signal(item.yellow_ok, _yellow_note(item))}</td>
     </tr>"""
 
 
@@ -1647,7 +1652,7 @@ def _live_pool_row(item, area: str) -> str:
       <td data-label="可能见底">{_signal(item.bottom_ok, item.bottom_date or '未命中')}</td>
       <td data-label="龙腾跃虎">{_signal(item.cross_ok, item.cross_date or '未命中')}</td>
       <td data-label="42日涨停">{_signal(item.limit_up_ok, item.limit_up_date or '未命中')}</td>
-      <td data-label="黄柱">{_signal(item.yellow_ok, f'连续 {item.yellow_count} 根')}</td>
+      <td data-label="邻近黄柱">{_signal(item.yellow_ok, _yellow_note(item))}</td>
       <td data-label="状态" class="live-pool-status"><span class="state good">{label}</span>
           <span class="subline">正式跟踪与统计以收盘状态为准</span></td>
     </tr>"""
@@ -1663,7 +1668,7 @@ def _observation_compact_row(item) -> str:
           · <span data-live-time>{_esc(item.date)} 收盘</span></span></td>
       <td>{_signal(item.cross_ok, item.cross_date or '未出现')}</td>
       <td>{_signal(item.bottom_ok, item.bottom_date or '未出现')}</td>
-      <td>{_signal(item.yellow_ok, f'连续 {item.yellow_count} 根')}</td>
+      <td>{_signal(item.yellow_ok, _yellow_note(item))}</td>
       <td>{_signal(item.limit_up_ok, item.limit_up_date or '未出现')}</td>
       <td><span class="state neutral">{priority}</span></td>
     </tr>"""
@@ -1678,6 +1683,7 @@ def _events(events: Sequence[dict]) -> str:
         "ineligible_removed": "股票名称含 ST，已移出",
         "secondary_added": "加入次选区",
         "secondary_removed": "趋势结束，已移出次选区",
+        "trend_warning": "趋势转弱预警，继续跟踪止盈线",
         "secondary_promoted": "条件补齐，升级主选区；持有期不断开",
     }
     items = []
@@ -1712,37 +1718,44 @@ def _validation_section() -> str:
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
         coverage = payload["coverage"]
-        forward = payload["cross_forward_returns"]["overall"]
-        exits = payload["exit_rules"]
-        one_day = exits["death_cross_1"]["summary"]
-        two_day = exits["death_cross_2"]["summary"]
-        weakening = exits["weakening_or_cross"]["summary"]
+        forward_60 = payload["base_signal_forward_returns"]["overall"]["60"]
+        take_profit = payload["take_profit_analysis"]["rules"]
+        weakening = take_profit["weakening_or_cross"]["summary"]
+        trailing_10 = take_profit["trailing_10"]["summary"]
+        trailing_15 = take_profit["trailing_15"]["summary"]
+        trailing_20 = take_profit["trailing_20"]["summary"]
+        chart_60 = payload["retrospective_chart_analysis"]["forward_returns"]["overall"]["60"]
     except (OSError, ValueError, KeyError, TypeError):
         return ""
 
-    five_day = forward["5"]
-    supports_every_time = int(five_day["negative_count"]) == 0
-    verdict = (
-        "样本支持每次上涨"
-        if supports_every_time
-        else "历史样本不支持“交叉后每次都会涨”"
-    )
+    if "rally_occurrence_rate_pct" not in forward_60:
+        return ""
+    rally_5_rate = float(forward_60["rally_5pct_rate_pct"])
+    any_rally_rate = float(forward_60["rally_occurrence_rate_pct"])
+    if rally_5_rate >= 70.0:
+        verdict = "多数实时可确认信号在60日内达到过5%收盘浮盈"
+    elif rally_5_rate >= 50.0:
+        verdict = "过半实时可确认信号在60日内达到过5%收盘浮盈"
+    elif any_rally_rate >= 50.0:
+        verdict = "信号后出现过上涨，但达到5%的比例不足一半"
+    else:
+        verdict = "历史样本未验证信号后多数能形成5%涨势"
     quality = (
         "完整"
         if int(coverage.get("error_count", 0)) == 0
         else f"缺失 {int(coverage.get('error_count', 0))} 只"
     )
 
-    def exit_row(name: str, stats: dict, note: str) -> str:
+    def take_profit_row(name: str, stats: dict, note: str) -> str:
         return f"""
         <tr>
           <td><strong>{_esc(name)}</strong><span class="subline">{_esc(note)}</span></td>
-          <td class="numeric">{int(stats['closed_count'])}</td>
+          <td class="numeric">{int(stats['successful_trend_count'])}</td>
           <td>{_pct(float(stats['median_pct']))}</td>
           <td>{_pct(float(stats['positive_rate_pct']))}</td>
-          <td class="numeric">{float(stats['average_holding_bars']):.1f} 日</td>
-          <td>{_pct(float(stats['average_worst_return_pct']))}</td>
-          <td>{_pct(float(stats['average_peak_giveback_pct']))}</td>
+          <td>{_pct(float(stats['premature_exit_rate_pct']))}</td>
+          <td>{_pct(float(stats['median_retained_peak_pct']))}</td>
+          <td class="numeric">第 {float(stats['median_exit_day']):.1f} 日</td>
         </tr>"""
 
     return f"""
@@ -1751,20 +1764,24 @@ def _validation_section() -> str:
       <p class="section-copy">逐日重放，每一天只使用当时已经存在的行情；XMA 尾部按当日可见数据重新计算，避免偷看未来。</p></div></div>
       <div class="validation-lead">
         <article class="validation-verdict"><strong>{_esc(verdict)}</strong>
-          <p>龙腾跃虎后第 5 个该股交易日：中位收益 {_pct(float(five_day['median_pct']))}，上涨占比 {_pct(float(five_day['positive_rate_pct']))}，{int(five_day['negative_count'])}/{int(five_day['sample_count'])} 个样本没有上涨。交叉更适合作为候选触发器，不能单独视为收益保证。</p>
+          <p>基础启动只认“近 5 日龙腾跃虎、龙线仍在虎线上方，且上穿日前 2 日、当天或后 2 个交易日内出现黄柱”，不要求见底或 42 日涨停，同一轮多头周期只记一次。未来 60 个交易日内，{_pct(float(forward_60['rally_3pct_rate_pct']))} 达到过 3%，{_pct(rally_5_rate)} 达到过 5%，{_pct(float(forward_60['rally_10pct_rate_pct']))} 达到过 10%；最高收盘涨幅中位数为 {_pct(float(forward_60['max_close_return']['median_pct']))}。</p>
         </article>
         <div class="validation-facts">
+          <div class="validation-fact"><span>完整60日样本</span><strong>{int(forward_60['sample_count'])}</strong></div>
+          <div class="validation-fact"><span>60日内达到5%</span><strong>{_pct(rally_5_rate)}</strong></div>
+          <div class="validation-fact"><span>60日内达到10%</span><strong>{_pct(float(forward_60['rally_10pct_rate_pct']))}</strong></div>
+          <div class="validation-fact"><span>首次达到5%中位数</span><strong>第 {float(forward_60['median_first_5pct_day']):.1f} 日</strong></div>
+          <div class="validation-fact"><span>达到5%后的到顶中位数</span><strong>第 {float(forward_60['median_peak_day_for_5pct']):.1f} 日</strong></div>
+          <div class="validation-fact"><span>成功趋势峰值区间</span><strong>第 {float(trailing_20['p25_peak_day']):.0f}–{float(trailing_20['p75_peak_day']):.0f} 日</strong></div>
           <div class="validation-fact"><span>覆盖股票</span><strong>{int(coverage['analyzed_stock_count'])}</strong></div>
           <div class="validation-fact"><span>数据质量</span><strong>{_esc(quality)}</strong></div>
-          <div class="validation-fact"><span>时间范围</span><strong>{_esc(str(coverage['start_date'])[:4])}—{_esc(str(coverage['end_date'])[:4])}</strong></div>
-          <div class="validation-fact"><span>上穿样本</span><strong>{int(five_day['sample_count'])}</strong></div>
         </div>
       </div>
       <article class="panel">
-        <div class="panel-head"><div><h3>趋势结束规则比较</h3><p>次选升级主选只算条件补齐，持有期不断开；以下比较同一套趋势结束逻辑。</p></div></div>
-        <div class="table-scroll"><table><thead><tr><th>退出规则</th><th>已结束样本</th><th>收益中位数</th><th>盈利占比</th><th>平均持有</th><th>平均最差浮动</th><th>平均高点回吐</th></tr></thead>
-        <tbody>{exit_row('首次死叉', one_day, '龙线首次不高于虎线')}{exit_row('两日确认', two_day, '连续两日不高于虎线')}{exit_row('提前转弱', weakening, '龙虎差与龙线连续收窄')}</tbody></table></div>
-        <p class="validation-method">口径：信号日收盘加入、退出信号日收盘移出，不计费用与滑点。当前上市股票样本存在幸存者偏差，历史价格未复权；平均收益容易受极端除权样本影响，因此本区优先比较中位数、盈利占比、回撤与分年度稳定性。本结果用于规则验证，不构成收益承诺。</p>
+        <div class="panel-head"><div><h3>止盈规则比较</h3><p>只在信号后曾达到 5% 收盘浮盈的样本中比较；所有方案最迟在第 60 个后续交易日结束。</p></div></div>
+        <div class="table-scroll"><table><thead><tr><th>规则</th><th>成功趋势样本</th><th>退出收益中位数</th><th>盈利占比</th><th>过早退出</th><th>保留峰值</th><th>退出日中位数</th></tr></thead>
+        <tbody>{take_profit_row('龙虎转弱（仅预警）', weakening, '连续两日龙线下行且龙虎差收窄，不触发移出')}{take_profit_row('峰值回撤 10%', trailing_10, '达到5%浮盈后启动')}{take_profit_row('峰值回撤 15%', trailing_15, '达到5%浮盈后启动')}{take_profit_row('正式采用：峰值回撤 20%', trailing_20, '达到5%浮盈后启动；第60日兜底')}</tbody></table></div>
+        <p class="validation-method">正式规则：龙虎连续两日转弱只显示风险预警；持仓曾达到 5% 收盘浮盈后，当前收盘价较跟踪期最高收盘价回撤 20% 时止盈；未触发者在第 60 个后续交易日结束。历史完整图口径的 60 日达到 5% 比例为 {_pct(float(chart_60['rally_5pct_rate_pct']))}，但双重 XMA 会随未来数据回绘，这一数值只用于解释历史图形，不能当作实时可执行成功率。时间范围 {_esc(str(coverage['start_date']))}—{_esc(str(coverage['end_date']))}；当前上市股票样本存在幸存者偏差，历史价格未复权，未计费用、滑点和涨跌停无法成交。本结果用于规则验证，不构成收益承诺。</p>
       </article>
     </section>"""
 
@@ -1915,7 +1932,7 @@ def render_report(
 
     <section class="kpi-grid reveal" aria-label="核心概览">
       <article class="kpi"><span class="kpi-label">主选实时预选</span><strong class="kpi-value" data-live-main-count>{len(selected)}</strong><span class="kpi-note">严格四项同时满足</span></article>
-      <article class="kpi"><span class="kpi-label">次选实时预选</span><strong class="kpi-value" data-live-secondary-count>{len(secondary)}</strong><span class="kpi-note">龙虎 + 黄柱 + 另一项</span></article>
+      <article class="kpi"><span class="kpi-label">次选实时预选</span><strong class="kpi-value" data-live-secondary-count>{len(secondary)}</strong><span class="kpi-note">龙虎 + 邻近黄柱 + 另一项</span></article>
       <article class="kpi"><span class="kpi-label">收盘主选跟踪</span><strong class="kpi-value">{main_stats['active_count']}</strong><span class="kpi-note">仅收盘后结算</span></article>
       <article class="kpi"><span class="kpi-label">观察标的</span><strong class="kpi-value">{len(near)}</strong><span class="kpi-note">仅观察，不计入选</span></article>
       <article class="kpi"><span class="kpi-label">市场扫描</span><strong class="kpi-value">{scanned}</strong><span class="kpi-note">失败 {len(errors)} 只 · ST 排除</span></article>
@@ -1930,7 +1947,7 @@ def render_report(
         <button class="pool-tab" id="tab-secondary" type="button" role="tab" aria-selected="false" aria-controls="pool-secondary" data-pool-tab="secondary" tabindex="-1">次选区 · <span data-area-secondary-count>{secondary_area_count}</span></button>
       </div>
       <article class="panel" id="pool-main" role="tabpanel" aria-labelledby="tab-main" data-pool-panel="main">
-        <div class="panel-head"><div><h3>主选区</h3><p>盘中预选与收盘跟踪合并去重；龙线收盘不再高于虎线时确认趋势结束</p>
+        <div class="panel-head"><div><h3>主选区</h3><p>盘中预选与收盘跟踪合并去重；龙虎转弱只预警，峰值回撤20%或满60个后续交易日结束</p>
           <div class="pool-composition"><span>盘中预选 <strong data-live-main-count>{len(selected)}</strong> 只</span><span>收盘跟踪 <strong data-tracked-main-count>{tracked_main_count}</strong> 只</span><span>重复股票只计一次</span></div>
         </div><span class="count-badge"><span data-area-main-count>{main_area_count}</span> 只</span></div>
         <div class="pool-group-head"><strong>盘中实时预选</strong><span>随最新行情重算</span></div>
@@ -1951,7 +1968,7 @@ def render_report(
       </article>
 
       <article class="panel" id="pool-secondary" role="tabpanel" aria-labelledby="tab-secondary" data-pool-panel="secondary" hidden>
-        <div class="panel-head"><div><h3>次选区</h3><p>候选需龙虎、黄柱及另一项；升级主选时保留原加入日和加入价</p>
+        <div class="panel-head"><div><h3>次选区</h3><p>候选需龙虎、交叉前后2日黄柱及另一项；升级主选时保留原加入日和加入价</p>
           <div class="pool-composition"><span>盘中预选 <strong data-live-secondary-count>{len(secondary)}</strong> 只</span><span>收盘跟踪 <strong data-tracked-secondary-count>{tracked_secondary_count}</strong> 只</span><span>重复股票只计一次</span></div>
         </div><span class="count-badge"><span data-area-secondary-count>{secondary_area_count}</span> 只</span></div>
         <div class="pool-group-head"><strong>盘中实时预选</strong><span>随最新行情重算</span></div>
@@ -1995,7 +2012,7 @@ def render_report(
         <article class="rule"><span class="rule-num">01</span><strong>可能见底</strong><p>最近 {cfg['bottom_lookback_days']} 个交易日出现信号。</p></article>
         <article class="rule"><span class="rule-num">02</span><strong>龙腾跃虎</strong><p>最近 {cfg['cross_lookback_days']} 日出现交叉，且龙线仍在虎线上方。</p></article>
         <article class="rule"><span class="rule-num">03</span><strong>近期涨停</strong><p>最近 {cfg['limit_up_lookback_days']} 个交易日至少一次收盘涨停。</p></article>
-        <article class="rule"><span class="rule-num">04</span><strong>连续黄柱</strong><p>实体在龙线下方的部分呈黄色，连续至少 {cfg['yellow_consecutive_days']} 日。</p></article>
+        <article class="rule"><span class="rule-num">04</span><strong>邻近黄柱</strong><p>龙腾跃虎日前 2 日、当天或后 2 日出现黄柱即可配对；当前至少 {cfg['yellow_consecutive_days']} 根。</p></article>
       </div>
     </section>
 

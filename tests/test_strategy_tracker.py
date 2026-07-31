@@ -22,6 +22,8 @@ def row(
     limit_up=False,
     yellow=False,
     eligible=True,
+    dragon=11.0,
+    tiger=10.0,
 ):
     return {
         "code": "600001",
@@ -31,6 +33,8 @@ def row(
         "close": close,
         "selected": selected,
         "dragon_above_tiger": dragon_above,
+        "dragon_value": dragon,
+        "tiger_value": tiger,
         "eligible": eligible,
         "cross_ok": cross,
         "bottom_ok": bottom,
@@ -40,27 +44,82 @@ def row(
 
 
 class StrategyTrackerTests(unittest.TestCase):
-    def test_add_and_remove_on_first_confirmed_missing_day(self):
+    def test_first_confirmed_weakening_becomes_warning(self):
         state, events = update_state(empty_state(), [row("2026-07-20", selected=True)], "2026-07-20")
         self.assertEqual(events[0]["type"], "added")
         self.assertEqual(len(state["active"]), 1)
 
         state, events = update_state(state, [row("2026-07-21", close=9.5, dragon_above=False)], "2026-07-21")
-        self.assertEqual(len(state["active"]), 0)
-        self.assertEqual(len(state["closed"]), 1)
-        self.assertAlmostEqual(state["closed"][0]["exit_return_pct"], -5.0)
-        self.assertEqual(
-            state["closed"][0]["exit_reason"],
-            "趋势结束：龙线收盘不再高于虎线",
-        )
-        self.assertEqual(events[0]["type"], "removed")
+        self.assertEqual(len(state["active"]), 1)
+        self.assertEqual(state["closed"], [])
+        self.assertEqual(state["active"][0]["status"], "趋势转弱预警")
+        self.assertEqual(events[0]["type"], "trend_warning")
 
-    def test_same_day_rerun_does_not_duplicate_exit(self):
+    def test_same_day_rerun_does_not_duplicate_warning(self):
         state, _ = update_state(empty_state(), [row("2026-07-20", selected=True)], "2026-07-20")
         state, _ = update_state(state, [row("2026-07-21", dragon_above=False)], "2026-07-21")
         state, _ = update_state(state, [row("2026-07-21", dragon_above=False)], "2026-07-21")
+        self.assertEqual(len(state["active"]), 1)
+        self.assertEqual(state["closed"], [])
+
+    def test_two_post_entry_weakening_days_warn_without_exit(self):
+        state, _ = update_state(
+            empty_state(),
+            [row("2026-07-20", selected=True, dragon=13.0)],
+            "2026-07-20",
+        )
+        state, _ = update_state(
+            state,
+            [row("2026-07-21", dragon=12.0)],
+            "2026-07-21",
+        )
+        self.assertEqual(len(state["active"]), 1)
+        state, events = update_state(
+            state,
+            [row("2026-07-22", dragon=11.0)],
+            "2026-07-22",
+        )
+        self.assertEqual(len(state["active"]), 1)
+        self.assertEqual(state["closed"], [])
+        self.assertEqual(state["active"][0]["status"], "趋势转弱预警")
+        self.assertEqual(events[0]["type"], "trend_warning")
+
+    def test_peak_drawdown_twenty_percent_takes_profit(self):
+        state, _ = update_state(
+            empty_state(),
+            [row("2026-07-20", selected=True, close=10.0)],
+            "2026-07-20",
+        )
+        state, _ = update_state(
+            state,
+            [row("2026-07-21", close=15.0)],
+            "2026-07-21",
+        )
+        state, events = update_state(
+            state,
+            [row("2026-07-22", close=12.0)],
+            "2026-07-22",
+        )
         self.assertEqual(state["active"], [])
-        self.assertEqual(len(state["closed"]), 1)
+        self.assertAlmostEqual(state["closed"][0]["exit_return_pct"], 20.0)
+        self.assertIn("回撤20%", state["closed"][0]["exit_reason"])
+        self.assertEqual(events[0]["type"], "removed")
+
+    def test_sixty_following_bars_end_tracking(self):
+        state, _ = update_state(
+            empty_state(),
+            [row("2026-01-01", selected=True)],
+            "2026-01-01",
+        )
+        state["active"][0]["holding_days"] = 60
+        state["last_trade_date"] = "2026-06-01"
+        state, _ = update_state(
+            state,
+            [row("2026-06-02")],
+            "2026-06-02",
+        )
+        self.assertEqual(state["active"], [])
+        self.assertIn("60个后续交易日", state["closed"][0]["exit_reason"])
 
     def test_stats_use_mark_to_market_and_closed_records(self):
         state, _ = update_state(empty_state(), [row("2026-07-20", selected=True)], "2026-07-20")
@@ -70,7 +129,7 @@ class StrategyTrackerTests(unittest.TestCase):
         self.assertEqual(stats["current_success_rate"], 100.0)
         self.assertAlmostEqual(stats["active_average_return"], 10.0)
 
-    def test_secondary_adds_on_three_conditions_and_removes_immediately(self):
+    def test_secondary_adds_on_three_conditions_and_warns_on_weakening(self):
         candidate = row(
             "2026-07-20", cross=True, limit_up=True, yellow=True
         )
@@ -83,10 +142,9 @@ class StrategyTrackerTests(unittest.TestCase):
             cross=False, limit_up=True, yellow=True,
         )
         state, events = update_state(state, [lost], "2026-07-21")
-        self.assertEqual(len(state["secondary_active"]), 0)
-        self.assertEqual(len(state["secondary_closed"]), 1)
-        self.assertEqual(events[0]["type"], "secondary_removed")
-        self.assertAlmostEqual(state["secondary_closed"][0]["exit_return_pct"], -5.0)
+        self.assertEqual(len(state["secondary_active"]), 1)
+        self.assertEqual(state["secondary_closed"], [])
+        self.assertEqual(events[0]["type"], "trend_warning")
 
     def test_secondary_accepts_bottom_instead_of_limit_up(self):
         candidate = row(

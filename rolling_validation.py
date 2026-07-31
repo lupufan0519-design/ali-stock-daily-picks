@@ -17,10 +17,12 @@ from screener import (
     Stock,
     cached_universe,
     convert_bars,
+    cross_yellow_pair,
     has_yellow_segment,
     is_cross_up,
     is_st_name,
     limit_up_price,
+    line_series,
     load_config,
     price_limit_rate,
 )
@@ -151,6 +153,7 @@ class SignalPoint:
     dragon: float
     tiger: float
     area: str
+    base_signal: bool
     endpoint_cross: bool
 
 
@@ -172,15 +175,31 @@ def replay_signals(
     stock: Stock,
     bars: Sequence[Bar],
     cfg: dict,
+    *,
+    mode: str = "causal",
 ) -> list[SignalPoint]:
+    if mode not in {"causal", "retrospective"}:
+        raise ValueError(f"未知重放模式: {mode}")
     state = CausalLineState()
+    retrospective_dragon: Sequence[float] = ()
+    retrospective_tiger: Sequence[float] = ()
+    if mode == "retrospective":
+        retrospective_dragon, retrospective_tiger = line_series(bars)
     bottom_flags: list[bool] = []
     limit_flags: list[bool] = []
     points: list[SignalPoint] = []
     rate = price_limit_rate(stock)
 
     for index, bar in enumerate(bars):
-        dragon_now, tiger_now = state.append(bar)
+        if mode == "causal":
+            dragon_now, tiger_now = state.append(bar)
+            dragon_values = state.dragon
+            tiger_values = state.tiger
+        else:
+            dragon_now = retrospective_dragon[index]
+            tiger_now = retrospective_tiger[index]
+            dragon_values = retrospective_dragon
+            tiger_values = retrospective_tiger
         close_start = max(0, index - 15)
         bottom_flags.append(
             index >= 13
@@ -196,29 +215,53 @@ def replay_signals(
             >= limit_up_price(bars[index - 1].close, rate)
         )
 
-        cross_start = max(1, len(state.dragon) - cfg["cross_lookback_days"])
+        available_length = index + 1
+        cross_start = max(
+            1,
+            available_length - cfg["cross_lookback_days"],
+        )
         cross_ok = (
             any(
-                is_cross_up(state.dragon, state.tiger, signal_index)
-                for signal_index in range(cross_start, len(state.dragon))
+                is_cross_up(dragon_values, tiger_values, signal_index)
+                for signal_index in range(cross_start, available_length)
             )
             and dragon_now > tiger_now
         )
         bottom_ok = any(bottom_flags[-cfg["bottom_lookback_days"] :])
         limit_ok = any(limit_flags[-cfg["limit_up_lookback_days"] :])
 
-        yellow_count = 0
-        for line_index in range(index, -1, -1):
-            if not has_yellow_segment(
-                bars[line_index],
-                state.dragon[line_index],
-            ):
-                break
-            yellow_count += 1
-        yellow_ok = yellow_count >= cfg["yellow_consecutive_days"]
+        pair_start = max(
+            0,
+            index
+            - cfg["cross_lookback_days"]
+            - 2
+            - cfg["yellow_consecutive_days"],
+        )
+        pair_cross_flags = [
+            is_cross_up(dragon_values, tiger_values, line_index)
+            if line_index > 0
+            else False
+            for line_index in range(pair_start, index + 1)
+        ]
+        pair_yellow_flags = [
+            has_yellow_segment(bars[line_index], dragon_values[line_index])
+            for line_index in range(pair_start, index + 1)
+        ]
+        paired_cross, _, yellow_count = cross_yellow_pair(
+            pair_cross_flags,
+            pair_yellow_flags,
+            end_index=len(pair_cross_flags) - 1,
+            cross_lookback_days=cfg["cross_lookback_days"],
+            yellow_consecutive_days=cfg["yellow_consecutive_days"],
+        )
+        yellow_ok = paired_cross >= 0
 
+        eligible_day = (
+            index + 1 >= cfg["minimum_history_bars"] and bar.volume > 0
+        )
+        base_signal = eligible_day and cross_ok and yellow_ok
         area = ""
-        if index + 1 >= cfg["minimum_history_bars"] and bar.volume > 0:
+        if eligible_day:
             if bottom_ok and cross_ok and limit_ok and yellow_ok:
                 area = "main"
             elif cross_ok and yellow_ok and (bottom_ok or limit_ok):
@@ -231,11 +274,12 @@ def replay_signals(
                 dragon=float(dragon_now),
                 tiger=float(tiger_now),
                 area=area,
+                base_signal=base_signal,
                 endpoint_cross=(
                     index + 1 >= cfg["minimum_history_bars"]
                     and is_cross_up(
-                        state.dragon,
-                        state.tiger,
+                        dragon_values,
+                        tiger_values,
                         index,
                     )
                 ),
@@ -297,27 +341,202 @@ def return_stats(values: Sequence[float]) -> dict:
     }
 
 
+def base_entry_indices(points: Sequence[SignalPoint]) -> list[int]:
+    indices: list[int] = []
+    armed = True
+    for index, point in enumerate(points):
+        if point.dragon <= point.tiger:
+            armed = True
+        if armed and point.base_signal:
+            indices.append(index)
+            armed = False
+    return indices
+
+
 def forward_returns(
     stock: Stock,
     points: Sequence[SignalPoint],
-    horizons: Sequence[int] = (1, 3, 5, 10),
+    horizons: Sequence[int] = (1, 3, 5, 10, 20, 40, 60),
 ) -> list[dict]:
     rows: list[dict] = []
-    minimum = max(horizons)
-    for index, point in enumerate(points):
-        if not point.endpoint_cross or index + minimum >= len(points):
-            continue
+    for index in base_entry_indices(points):
+        point = points[index]
         row = {
             "code": stock.code,
             "name": stock.name,
             "signal_date": point.date,
             "returns": {},
+            "max_close_returns": {},
+            "peak_days": {},
+            "first_positive_days": {},
+            "first_threshold_days": {},
         }
         for horizon in horizons:
+            if index + horizon >= len(points):
+                continue
+            future_returns = [
+                (points[index + offset].close / point.close - 1.0) * 100.0
+                for offset in range(1, horizon + 1)
+            ]
             row["returns"][str(horizon)] = (
                 points[index + horizon].close / point.close - 1.0
             ) * 100.0
-        rows.append(row)
+            maximum = max(future_returns)
+            row["max_close_returns"][str(horizon)] = maximum
+            row["peak_days"][str(horizon)] = future_returns.index(maximum) + 1
+            positive_days = [
+                offset
+                for offset, value in enumerate(future_returns, start=1)
+                if value > 0
+            ]
+            row["first_positive_days"][str(horizon)] = (
+                positive_days[0] if positive_days else None
+            )
+            row["first_threshold_days"][str(horizon)] = {
+                str(threshold): next(
+                    (
+                        offset
+                        for offset, value in enumerate(
+                            future_returns,
+                            start=1,
+                        )
+                        if value >= threshold
+                    ),
+                    None,
+                )
+                for threshold in (3, 5, 10)
+            }
+        if row["returns"]:
+            rows.append(row)
+    return rows
+
+
+TAKE_PROFIT_RULES = (
+    "weakening_or_cross",
+    "death_cross_1",
+    "ma5_break_2",
+    "trailing_5",
+    "trailing_8",
+    "trailing_10",
+    "trailing_15",
+    "trailing_20",
+)
+
+
+def _take_profit_trigger(
+    points: Sequence[SignalPoint],
+    index: int,
+    entry_index: int,
+    activation_index: int,
+    rule: str,
+    running_peak_return: float,
+    current_return: float,
+) -> bool:
+    if index <= activation_index:
+        return False
+    point = points[index]
+    if rule == "death_cross_1":
+        return point.dragon <= point.tiger
+    if rule == "weakening_or_cross":
+        if point.dragon <= point.tiger:
+            return True
+        if index - entry_index < 2:
+            return False
+        spreads = [
+            points[offset].dragon - points[offset].tiger
+            for offset in (index - 2, index - 1, index)
+        ]
+        dragons = [
+            points[offset].dragon
+            for offset in (index - 2, index - 1, index)
+        ]
+        return spreads[0] > spreads[1] > spreads[2] and dragons[0] > dragons[1] > dragons[2]
+    if rule.startswith("trailing_"):
+        drawdown = float(rule.split("_", 1)[1])
+        peak_factor = 1.0 + running_peak_return / 100.0
+        current_factor = 1.0 + current_return / 100.0
+        return current_factor / peak_factor - 1.0 <= -drawdown / 100.0
+    if rule == "ma5_break_2":
+        if index < 5 or index - 1 <= activation_index:
+            return False
+        current_ma = statistics.fmean(
+            item.close for item in points[index - 4 : index + 1]
+        )
+        previous_ma = statistics.fmean(
+            item.close for item in points[index - 5 : index]
+        )
+        return (
+            points[index - 1].close < previous_ma
+            and point.close < current_ma
+            and current_ma < previous_ma
+        )
+    raise ValueError(f"未知止盈规则: {rule}")
+
+
+def take_profit_rows(
+    stock: Stock,
+    points: Sequence[SignalPoint],
+    *,
+    horizon: int = 60,
+    activation_threshold: float = 5.0,
+) -> dict[str, list[dict]]:
+    rows = {rule: [] for rule in TAKE_PROFIT_RULES}
+    for entry_index in base_entry_indices(points):
+        if entry_index + horizon >= len(points):
+            continue
+        entry = points[entry_index]
+        future_returns = [
+            (
+                points[entry_index + offset].close / entry.close - 1.0
+            )
+            * 100.0
+            for offset in range(1, horizon + 1)
+        ]
+        peak_return = max(future_returns)
+        if peak_return < activation_threshold:
+            continue
+        peak_day = future_returns.index(peak_return) + 1
+        activation_day = next(
+            offset
+            for offset, value in enumerate(future_returns, start=1)
+            if value >= activation_threshold
+        )
+        activation_index = entry_index + activation_day
+        for rule in TAKE_PROFIT_RULES:
+            running_peak = max(future_returns[:activation_day])
+            exit_day = horizon
+            for offset in range(activation_day + 1, horizon + 1):
+                current_return = future_returns[offset - 1]
+                running_peak = max(running_peak, current_return)
+                if _take_profit_trigger(
+                    points,
+                    entry_index + offset,
+                    entry_index,
+                    activation_index,
+                    rule,
+                    running_peak,
+                    current_return,
+                ):
+                    exit_day = offset
+                    break
+            exit_return = future_returns[exit_day - 1]
+            rows[rule].append(
+                {
+                    "code": stock.code,
+                    "name": stock.name,
+                    "signal_date": entry.date,
+                    "activation_day": activation_day,
+                    "peak_day": peak_day,
+                    "peak_return_pct": peak_return,
+                    "exit_day": exit_day,
+                    "exit_return_pct": exit_return,
+                    "peak_giveback_pct": peak_return - exit_return,
+                    "exit_vs_peak_days": exit_day - peak_day,
+                    "retained_peak_pct": (
+                        max(0.0, exit_return) / peak_return * 100.0
+                    ),
+                }
+            )
     return rows
 
 
@@ -326,6 +545,7 @@ def _exit_trigger(
     index: int,
     rule: str,
     death_streak: int,
+    entry_index: int,
 ) -> bool:
     point = points[index]
     if rule == "death_cross_1":
@@ -335,7 +555,7 @@ def _exit_trigger(
     if rule == "weakening_or_cross":
         if death_streak >= 1:
             return True
-        if index < 2 or point.dragon <= point.tiger:
+        if index - entry_index < 2 or point.dragon <= point.tiger:
             return False
         spreads = [
             points[offset].dragon - points[offset].tiger
@@ -356,22 +576,28 @@ def simulate_trades(
     stock: Stock,
     points: Sequence[SignalPoint],
     rule: str,
+    entry_mode: str = "pool",
 ) -> tuple[list[dict], list[dict]]:
+    if entry_mode not in {"pool", "base"}:
+        raise ValueError(f"未知入场模式: {entry_mode}")
     closed: list[dict] = []
     open_trades: list[dict] = []
     position: dict | None = None
     death_streak = 0
     wait_for_clear = False
+    base_armed = True
 
     for index, point in enumerate(points):
+        if point.dragon <= point.tiger:
+            base_armed = True
         if position is not None:
             current_return = (
                 point.close / float(position["entry_price"]) - 1.0
             ) * 100.0
-            position["best_return_pct"] = max(
-                float(position["best_return_pct"]),
-                current_return,
-            )
+            if current_return > float(position["best_return_pct"]):
+                position["best_return_pct"] = current_return
+                position["peak_index"] = index
+                position["peak_date"] = point.date
             position["worst_return_pct"] = min(
                 float(position["worst_return_pct"]),
                 current_return,
@@ -388,6 +614,7 @@ def simulate_trades(
                 index,
                 rule,
                 death_streak,
+                int(position["entry_index"]),
             ):
                 position.update(
                     {
@@ -396,6 +623,10 @@ def simulate_trades(
                         "return_pct": round(current_return, 4),
                         "holding_bars": index
                         - int(position["entry_index"]),
+                        "days_to_peak": int(position["peak_index"])
+                        - int(position["entry_index"]),
+                        "peak_to_exit_bars": index
+                        - int(position["peak_index"]),
                         "peak_giveback_pct": round(
                             float(position["best_return_pct"])
                             - current_return,
@@ -404,29 +635,41 @@ def simulate_trades(
                     }
                 )
                 position.pop("entry_index", None)
+                position.pop("peak_index", None)
                 closed.append(position)
                 position = None
                 death_streak = 0
-                wait_for_clear = True
+                if entry_mode == "pool":
+                    wait_for_clear = True
                 continue
 
         if position is None:
-            if wait_for_clear:
+            if entry_mode == "pool" and wait_for_clear:
                 if not point.area:
                     wait_for_clear = False
                 continue
-            if point.area:
+            should_enter = (
+                bool(point.area)
+                if entry_mode == "pool"
+                else base_armed and point.base_signal
+            )
+            if should_enter:
+                entry_area = point.area if entry_mode == "pool" else "base"
                 position = {
                     "code": stock.code,
                     "name": stock.name,
-                    "entry_area": point.area,
+                    "entry_area": entry_area,
                     "entry_date": point.date,
                     "entry_price": point.close,
                     "entry_index": index,
                     "best_return_pct": 0.0,
                     "worst_return_pct": 0.0,
+                    "peak_index": index,
+                    "peak_date": point.date,
                     "promoted": False,
                 }
+                if entry_mode == "base":
+                    base_armed = False
                 death_streak = 0
 
     if position is not None:
@@ -442,6 +685,11 @@ def simulate_trades(
                 "holding_bars": len(points)
                 - 1
                 - int(position["entry_index"]),
+                "days_to_peak": int(position["peak_index"])
+                - int(position["entry_index"]),
+                "peak_to_exit_bars": len(points)
+                - 1
+                - int(position["peak_index"]),
                 "peak_giveback_pct": round(
                     float(position["best_return_pct"]) - current_return,
                     4,
@@ -449,33 +697,60 @@ def simulate_trades(
             }
         )
         position.pop("entry_index", None)
+        position.pop("peak_index", None)
         open_trades.append(position)
     return closed, open_trades
 
 
 def trade_stats(closed: Sequence[dict], open_trades: Sequence[dict]) -> dict:
     returns = [float(item["return_pct"]) for item in closed]
+    peak_returns = [float(item["best_return_pct"]) for item in closed]
+    days_to_peak = [float(item["days_to_peak"]) for item in closed]
+    peak_to_exit = [float(item["peak_to_exit_bars"]) for item in closed]
+    holding_bars = [float(item["holding_bars"]) for item in closed]
+    givebacks = [float(item["peak_giveback_pct"]) for item in closed]
+
+    def median(values: Sequence[float]) -> float:
+        return round(statistics.median(values), 2) if values else 0.0
+
+    def rate_at_least(threshold: float) -> float:
+        if not peak_returns:
+            return 0.0
+        return round(
+            sum(value >= threshold for value in peak_returns)
+            / len(peak_returns)
+            * 100.0,
+            2,
+        )
+
     stats = return_stats(returns)
     stats.update(
         {
             "closed_count": len(closed),
             "open_count": len(open_trades),
-            "average_holding_bars": round(
-                statistics.fmean(
-                    float(item["holding_bars"]) for item in closed
-                ),
-                2,
-            )
-            if closed
+            "average_holding_bars": round(statistics.fmean(holding_bars), 2)
+            if holding_bars
             else 0.0,
+            "median_holding_bars": median(holding_bars),
             "average_best_return_pct": round(
-                statistics.fmean(
-                    float(item["best_return_pct"]) for item in closed
-                ),
+                statistics.fmean(peak_returns),
                 4,
             )
-            if closed
+            if peak_returns
             else 0.0,
+            "median_best_return_pct": median(peak_returns),
+            "rally_any_rate_pct": rate_at_least(0.000001),
+            "rally_3pct_rate_pct": rate_at_least(3.0),
+            "rally_5pct_rate_pct": rate_at_least(5.0),
+            "rally_10pct_rate_pct": rate_at_least(10.0),
+            "median_days_to_peak": median(days_to_peak),
+            "p25_days_to_peak": round(_percentile(days_to_peak, 0.25), 2)
+            if days_to_peak
+            else 0.0,
+            "p75_days_to_peak": round(_percentile(days_to_peak, 0.75), 2)
+            if days_to_peak
+            else 0.0,
+            "median_peak_to_exit_bars": median(peak_to_exit),
             "average_worst_return_pct": round(
                 statistics.fmean(
                     float(item["worst_return_pct"]) for item in closed
@@ -485,13 +760,12 @@ def trade_stats(closed: Sequence[dict], open_trades: Sequence[dict]) -> dict:
             if closed
             else 0.0,
             "average_peak_giveback_pct": round(
-                statistics.fmean(
-                    float(item["peak_giveback_pct"]) for item in closed
-                ),
+                statistics.fmean(givebacks),
                 4,
             )
-            if closed
+            if givebacks
             else 0.0,
+            "median_peak_giveback_pct": median(givebacks),
             "promoted_count": sum(
                 bool(item.get("promoted")) for item in closed
             ),
@@ -500,18 +774,115 @@ def trade_stats(closed: Sequence[dict], open_trades: Sequence[dict]) -> dict:
     return stats
 
 
+def take_profit_stats(rows: Sequence[dict]) -> dict:
+    exit_returns = [float(item["exit_return_pct"]) for item in rows]
+    peak_returns = [float(item["peak_return_pct"]) for item in rows]
+    activation_days = [float(item["activation_day"]) for item in rows]
+    peak_days = [float(item["peak_day"]) for item in rows]
+    exit_days = [float(item["exit_day"]) for item in rows]
+    givebacks = [float(item["peak_giveback_pct"]) for item in rows]
+    timing = [float(item["exit_vs_peak_days"]) for item in rows]
+    retained = [float(item["retained_peak_pct"]) for item in rows]
+
+    def median(values: Sequence[float]) -> float:
+        return round(statistics.median(values), 2) if values else 0.0
+
+    stats = return_stats(exit_returns)
+    stats.update(
+        {
+            "successful_trend_count": len(rows),
+            "median_activation_day": median(activation_days),
+            "median_peak_return_pct": median(peak_returns),
+            "median_peak_day": median(peak_days),
+            "p25_peak_day": round(_percentile(peak_days, 0.25), 2)
+            if peak_days
+            else 0.0,
+            "p75_peak_day": round(_percentile(peak_days, 0.75), 2)
+            if peak_days
+            else 0.0,
+            "median_exit_day": median(exit_days),
+            "median_exit_vs_peak_days": median(timing),
+            "premature_exit_rate_pct": round(
+                sum(value < 0 for value in timing) / len(timing) * 100.0,
+                2,
+            )
+            if timing
+            else 0.0,
+            "median_peak_giveback_pct": median(givebacks),
+            "median_retained_peak_pct": median(retained),
+        }
+    )
+    return stats
+
+
 def _group_forward(rows: Sequence[dict]) -> dict:
-    horizons = ("1", "3", "5", "10")
-    return {
-        horizon: return_stats(
-            [
-                float(row["returns"][horizon])
-                for row in rows
-                if horizon in row["returns"]
-            ]
+    horizons = ("1", "3", "5", "10", "20", "40", "60")
+    grouped: dict[str, dict] = {}
+    for horizon in horizons:
+        available = [row for row in rows if horizon in row["returns"]]
+        endpoint = return_stats(
+            [float(row["returns"][horizon]) for row in available]
         )
-        for horizon in horizons
-    }
+        maximums = [
+            float(row["max_close_returns"][horizon]) for row in available
+        ]
+        positive_first_days = [
+            float(row["first_positive_days"][horizon])
+            for row in available
+            if row["first_positive_days"][horizon] is not None
+        ]
+        positive_peak_days = [
+            float(row["peak_days"][horizon])
+            for row in available
+            if float(row["max_close_returns"][horizon]) > 0
+        ]
+        endpoint["max_close_return"] = return_stats(maximums)
+        endpoint["rally_occurrence_rate_pct"] = round(
+            sum(value > 0 for value in maximums) / len(maximums) * 100.0,
+            2,
+        ) if maximums else 0.0
+        endpoint["median_first_positive_day"] = round(
+            statistics.median(positive_first_days),
+            2,
+        ) if positive_first_days else 0.0
+        endpoint["median_positive_peak_day"] = round(
+            statistics.median(positive_peak_days),
+            2,
+        ) if positive_peak_days else 0.0
+        endpoint["p25_positive_peak_day"] = round(
+            _percentile(positive_peak_days, 0.25),
+            2,
+        ) if positive_peak_days else 0.0
+        endpoint["p75_positive_peak_day"] = round(
+            _percentile(positive_peak_days, 0.75),
+            2,
+        ) if positive_peak_days else 0.0
+        for threshold in (3, 5, 10):
+            reached_days = [
+                float(row["first_threshold_days"][horizon][str(threshold)])
+                for row in available
+                if row["first_threshold_days"][horizon][str(threshold)]
+                is not None
+            ]
+            endpoint[f"rally_{threshold}pct_rate_pct"] = round(
+                len(reached_days) / len(available) * 100.0,
+                2,
+            ) if available else 0.0
+            endpoint[f"median_first_{threshold}pct_day"] = round(
+                statistics.median(reached_days),
+                2,
+            ) if reached_days else 0.0
+            threshold_peak_days = [
+                float(row["peak_days"][horizon])
+                for row in available
+                if float(row["max_close_returns"][horizon]) >= threshold
+            ]
+            endpoint[f"median_peak_day_for_{threshold}pct"] = round(
+                statistics.median(threshold_peak_days),
+                2,
+            ) if threshold_peak_days else 0.0
+        grouped[horizon] = endpoint
+    return grouped
 
 
 def aggregate_result(
@@ -523,6 +894,7 @@ def aggregate_result(
     errors: Sequence[str],
 ) -> dict:
     forward_rows: list[dict] = []
+    retrospective_forward_rows: list[dict] = []
     trades: dict[str, dict[str, list[dict]]] = {
         rule: {"closed": [], "open": []}
         for rule in (
@@ -531,6 +903,12 @@ def aggregate_result(
             "weakening_or_cross",
         )
     }
+    take_profit: dict[str, list[dict]] = {
+        rule: [] for rule in TAKE_PROFIT_RULES
+    }
+    retrospective_take_profit: dict[str, list[dict]] = {
+        rule: [] for rule in TAKE_PROFIT_RULES
+    }
     date_min = ""
     date_max = ""
     for stock, bars in histories:
@@ -538,10 +916,33 @@ def aggregate_result(
             continue
         points = replay_signals(stock, bars, cfg)
         forward_rows.extend(forward_returns(stock, points))
+        retrospective_points = replay_signals(
+            stock,
+            bars,
+            cfg,
+            mode="retrospective",
+        )
+        retrospective_forward_rows.extend(
+            forward_returns(stock, retrospective_points)
+        )
         for rule in trades:
-            closed, open_rows = simulate_trades(stock, points, rule)
+            closed, open_rows = simulate_trades(
+                stock,
+                points,
+                rule,
+                entry_mode="base",
+            )
             trades[rule]["closed"].extend(closed)
             trades[rule]["open"].extend(open_rows)
+        profit_rows = take_profit_rows(stock, points)
+        for rule, rows in profit_rows.items():
+            take_profit[rule].extend(rows)
+        retrospective_profit_rows = take_profit_rows(
+            stock,
+            retrospective_points,
+        )
+        for rule, rows in retrospective_profit_rows.items():
+            retrospective_take_profit[rule].extend(rows)
         if bars:
             date_min = min(date_min or bars[0].date, bars[0].date)
             date_max = max(date_max, bars[-1].date)
@@ -550,6 +951,17 @@ def aggregate_result(
     for year in sorted({row["signal_date"][:4] for row in forward_rows}):
         forward_by_year[year] = _group_forward(
             [row for row in forward_rows if row["signal_date"].startswith(year)]
+        )
+    retrospective_forward_by_year: dict[str, dict] = {}
+    for year in sorted(
+        {row["signal_date"][:4] for row in retrospective_forward_rows}
+    ):
+        retrospective_forward_by_year[year] = _group_forward(
+            [
+                row
+                for row in retrospective_forward_rows
+                if row["signal_date"].startswith(year)
+            ]
         )
 
     exit_rules: dict[str, dict] = {}
@@ -564,23 +976,45 @@ def aggregate_result(
                 if item["entry_date"].startswith(year)
             ]
             by_year[year] = trade_stats(year_rows, [])
-        by_origin = {}
-        for origin in ("main", "secondary"):
-            origin_closed = [
-                item for item in closed if item["entry_area"] == origin
-            ]
-            origin_open = [
-                item for item in open_rows if item["entry_area"] == origin
-            ]
-            by_origin[origin] = trade_stats(origin_closed, origin_open)
         exit_rules[rule] = {
             "summary": trade_stats(closed, open_rows),
             "by_entry_year": by_year,
-            "by_entry_area": by_origin,
+        }
+
+    take_profit_rules: dict[str, dict] = {}
+    for rule, rows in take_profit.items():
+        by_year = {}
+        for year in sorted({item["signal_date"][:4] for item in rows}):
+            by_year[year] = take_profit_stats(
+                [
+                    item
+                    for item in rows
+                    if item["signal_date"].startswith(year)
+                ]
+            )
+        take_profit_rules[rule] = {
+            "summary": take_profit_stats(rows),
+            "by_signal_year": by_year,
+        }
+
+    retrospective_take_profit_rules: dict[str, dict] = {}
+    for rule, rows in retrospective_take_profit.items():
+        by_year = {}
+        for year in sorted({item["signal_date"][:4] for item in rows}):
+            by_year[year] = take_profit_stats(
+                [
+                    item
+                    for item in rows
+                    if item["signal_date"].startswith(year)
+                ]
+            )
+        retrospective_take_profit_rules[rule] = {
+            "summary": take_profit_stats(rows),
+            "by_signal_year": by_year,
         }
 
     return {
-        "schema_version": 1,
+        "schema_version": 3,
         "generated_at": datetime.now().astimezone().isoformat(
             timespec="seconds"
         ),
@@ -594,6 +1028,11 @@ def aggregate_result(
             "price_basis": "通达信未复权日线收盘价",
             "universe_basis": "验证时仍上市的沪深A股，按当前名称排除ST与*ST",
             "execution_basis": "信号日收盘加入，退出信号日收盘移出，不计费用与滑点",
+            "entry_definition": (
+                "近5个交易日发生龙线上穿虎线、当前龙线仍高于虎线，且上穿日前2日、当天或后2日内黄柱满足配置阈值；"
+                "同一轮龙线位于虎线上方期间只记录首次同时满足日，不要求见底或42日涨停"
+            ),
+            "peak_definition": "信号启动后至首次死叉前后的最高收盘价",
             "limitations": [
                 "当前上市股票样本存在幸存者偏差，未包含历史退市股票",
                 "历史ST名称变化未完整还原",
@@ -608,18 +1047,56 @@ def aggregate_result(
             "start_date": date_min,
             "end_date": date_max,
         },
-        "cross_forward_returns": {
-            "definition": "龙线在当日收盘首次上穿虎线后的第N个该股交易日收盘收益",
+        "base_signal_forward_returns": {
+            "definition": (
+                "龙腾跃虎与前后2个交易日内黄柱完成配对后，分别统计未来N个交易日内的最高收盘涨幅、"
+                "首次上涨日和第N日收盘收益；同一轮龙虎多头周期不重复计数"
+            ),
             "overall": _group_forward(forward_rows),
             "by_signal_year": forward_by_year,
+        },
+        "wave_analysis": {
+            "definition": "从基础启动信号到龙线首次不高于虎线的一段完整行情",
+            "summary": exit_rules["death_cross_1"]["summary"],
+            "by_entry_year": exit_rules["death_cross_1"]["by_entry_year"],
+        },
+        "take_profit_analysis": {
+            "definition": (
+                "基础信号后60个交易日内最高收盘涨幅达到5%视为形成可止盈上涨趋势；"
+                "达到5%后才启用止盈规则，并与60日内阶段最高收盘价比较"
+            ),
+            "activation_threshold_pct": 5.0,
+            "forward_horizon_bars": 60,
+            "rules": take_profit_rules,
+        },
+        "retrospective_chart_analysis": {
+            "warning": (
+                "使用完整历史序列的居中XMA复现行情软件事后图形；历史信号会被后续行情重绘，"
+                "包含未来数据，只用于解释图形，不能作为可实时执行的成功率"
+            ),
+            "forward_returns": {
+                "overall": _group_forward(retrospective_forward_rows),
+                "by_signal_year": retrospective_forward_by_year,
+            },
+            "take_profit": {
+                "activation_threshold_pct": 5.0,
+                "forward_horizon_bars": 60,
+                "rules": retrospective_take_profit_rules,
+            },
         },
         "exit_rules": exit_rules,
         "rule_definitions": {
             "death_cross_1": "龙线首次不高于虎线，当日收盘确认趋势结束",
             "death_cross_2": "龙线连续两个交易日不高于虎线，第二日收盘确认趋势结束",
             "weakening_or_cross": (
-                "龙虎差与龙线均连续两日收窄/下行时提前结束；最迟在首次死叉结束"
+                "启动后龙虎差与龙线均连续两个交易日收窄/下行时提前结束；最迟在首次死叉结束"
             ),
+            "ma5_break_2": "达到5%后，连续两个交易日收盘低于5日均线且5日均线下行",
+            "trailing_5": "达到5%后，收盘价较持有期最高收盘回撤5%",
+            "trailing_8": "达到5%后，收盘价较持有期最高收盘回撤8%",
+            "trailing_10": "达到5%后，收盘价较持有期最高收盘回撤10%",
+            "trailing_15": "达到5%后，收盘价较持有期最高收盘回撤15%",
+            "trailing_20": "达到5%后，收盘价较持有期最高收盘回撤20%",
         },
     }
 

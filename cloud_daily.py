@@ -17,7 +17,7 @@ STATE_PATH = ROOT / "strategy" / "state.json"
 LATEST_PATH = ROOT / "results" / "latest.json"
 LATEST_HTML_PATH = ROOT / "results" / "latest.html"
 SNAPSHOT_PATH = ROOT / "cloud_snapshot.json"
-LIVE_SEED_FORMAT = 1
+LIVE_SEED_FORMAT = 2
 
 
 def snapshot_json(payload: dict) -> str:
@@ -71,6 +71,9 @@ def pack_live_seed(seed: dict) -> list:
         int(seed.get("limit_up_age", -1)),
         int(seed.get("yellow_count", 0)),
         flags,
+        list(seed.get("body_low_tail", [])),
+        str(seed.get("yellow_date", "")),
+        list(seed.get("body_low_tail_dates", [])),
     ]
 
 

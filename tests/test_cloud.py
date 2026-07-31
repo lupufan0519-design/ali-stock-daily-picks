@@ -50,6 +50,14 @@ class CloudWorkflowTests(unittest.TestCase):
                 "2026-07-29",
                 "2026-07-30",
             ],
+            "body_low_tail": [10.0] * 5,
+            "body_low_tail_dates": [
+                "2026-07-24",
+                "2026-07-27",
+                "2026-07-28",
+                "2026-07-29",
+                "2026-07-30",
+            ],
             "bottom_date": "2026-07-30" if bottom_age >= 0 else "",
             "cross_date": "",
             "limit_up_date": "2026-07-15" if limit_age >= 0 else "",
@@ -60,6 +68,7 @@ class CloudWorkflowTests(unittest.TestCase):
             "cross_ok": False,
             "limit_up_ok": limit_age >= 0,
             "yellow_ok": False,
+            "yellow_date": "",
             "yellow_count": 0,
             "matched_count": int(bottom_age >= 0) + int(limit_age >= 0),
             "dragon_above_tiger": False,
@@ -262,7 +271,7 @@ class CloudWorkflowTests(unittest.TestCase):
             ],
         }
         snapshot = compact_snapshot(payload)
-        self.assertEqual(snapshot["live_seed_format"], 1)
+        self.assertEqual(snapshot["live_seed_format"], 2)
         self.assertEqual(
             [item[0] for item in snapshot["live_universe"]],
             ["600001"],
@@ -416,6 +425,23 @@ class CloudWorkflowTests(unittest.TestCase):
             [row["code"] for row in pools["secondary"]],
             ["600002"],
         )
+
+    def test_live_cross_pairs_with_yellow_two_days_before(self):
+        cfg = {
+            "bottom_lookback_days": 5,
+            "cross_lookback_days": 5,
+            "limit_up_lookback_days": 42,
+            "yellow_consecutive_days": 1,
+        }
+        seed = self.live_seed("600003")
+        seed["body_low_tail"] = [10.0, 10.0, 10.0, 8.5, 10.0]
+        quote = self.live_quote("600003")
+        quote["open"] = 11.2
+        quote["price"] = 11.2
+        result = evaluate_live_seed(seed, quote, cfg, "2026-07-30")
+        self.assertTrue(result["cross_ok"])
+        self.assertTrue(result["yellow_ok"])
+        self.assertEqual(result["yellow_date"], "2026-07-29")
 
     def test_live_cross_recomputes_the_full_five_day_window(self):
         cfg = {

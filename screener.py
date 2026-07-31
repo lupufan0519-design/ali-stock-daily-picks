@@ -71,9 +71,12 @@ class Evaluation:
     bottom_date: str
     cross_date: str
     limit_up_date: str
+    yellow_date: str
     yellow_count: int
     matched_count: int
     dragon_above_tiger: bool
+    dragon_value: float
+    tiger_value: float
     eligible: bool
     selected: bool
     chart: str
@@ -154,6 +157,49 @@ def line_series(bars: Sequence[Bar]) -> tuple[list[float], list[float]]:
 def has_yellow_segment(bar: Bar, dragon_value: float) -> bool:
     """K 线实体下沿位于龙线下方时，即出现黄色部分。"""
     return dragon_value > min(bar.open, bar.close)
+
+
+def cross_yellow_pair(
+    cross_flags: Sequence[bool],
+    yellow_flags: Sequence[bool],
+    *,
+    end_index: int,
+    cross_lookback_days: int,
+    yellow_consecutive_days: int,
+    proximity_days: int = 2,
+) -> tuple[int, int, int]:
+    """Return the latest cross paired with a nearby qualifying yellow run."""
+    if end_index < 0 or len(cross_flags) != len(yellow_flags):
+        return -1, -1, 0
+    runs: list[tuple[int, int]] = []
+    start = -1
+    for index, flag in enumerate(yellow_flags[: end_index + 1]):
+        if flag and start < 0:
+            start = index
+        if start >= 0 and (not flag or index == end_index):
+            run_end = index if flag and index == end_index else index - 1
+            if run_end - start + 1 >= yellow_consecutive_days:
+                runs.append((start, run_end))
+            start = -1
+    cross_start = max(1, end_index - cross_lookback_days + 1)
+    for cross_index in range(end_index, cross_start - 1, -1):
+        if not cross_flags[cross_index]:
+            continue
+        nearby_start = max(0, cross_index - proximity_days)
+        nearby_end = min(end_index, cross_index + proximity_days)
+        for run_start, run_end in reversed(runs):
+            overlap_start = max(run_start, nearby_start)
+            overlap_end = min(run_end, nearby_end)
+            if overlap_start <= overlap_end:
+                yellow_index = (
+                    cross_index
+                    if run_start <= cross_index <= run_end
+                    else overlap_end
+                    if run_end < cross_index
+                    else overlap_start
+                )
+                return cross_index, yellow_index, run_end - run_start + 1
+    return -1, -1, 0
 
 
 def is_cross_up(a: Sequence[float], b: Sequence[float], i: int) -> bool:
@@ -335,10 +381,12 @@ def make_live_seed(
     bottom_flags: Sequence[bool],
     cross_flags: Sequence[bool],
     limit_flags: Sequence[bool],
+    yellow_flags: Sequence[bool],
     yellow_count: int,
     bottom_date: str,
     cross_date: str,
     limit_date: str,
+    yellow_date: str,
     bottom_ok: bool,
     cross_ok: bool,
     limit_ok: bool,
@@ -365,9 +413,14 @@ def make_live_seed(
         ),
         "line_coefficients": append_line_coefficients(bars),
         "cross_tail_dates": [bar.date for bar in bars[-4:]],
+        "body_low_tail": [
+            round(min(bar.open, bar.close), 4) for bar in bars[-5:]
+        ],
+        "body_low_tail_dates": [bar.date for bar in bars[-5:]],
         "bottom_date": bottom_date,
         "cross_date": cross_date,
         "limit_up_date": limit_date,
+        "yellow_date": yellow_date,
         "bottom_age": latest_true_age(
             bottom_flags,
             cfg["bottom_lookback_days"],
@@ -427,16 +480,23 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
     limit_date = latest_true_date(
         limit_flags, bars, cfg["limit_up_lookback_days"]
     )
-    yellow_count = 0
-    for flag in reversed(yellow_flags):
-        if not flag:
-            break
-        yellow_count += 1
+    paired_cross_index, paired_yellow_index, yellow_count = cross_yellow_pair(
+        cross_flags,
+        yellow_flags,
+        end_index=len(bars) - 1,
+        cross_lookback_days=cfg["cross_lookback_days"],
+        yellow_consecutive_days=cfg["yellow_consecutive_days"],
+    )
+    yellow_date = (
+        bars[paired_yellow_index].date if paired_yellow_index >= 0 else ""
+    )
+    if paired_cross_index >= 0:
+        cross_date = bars[paired_cross_index].date
 
     bottom_ok = bool(bottom_date)
     cross_ok = bool(cross_date) and dragon[-1] > tiger[-1]
     limit_ok = bool(limit_date)
-    yellow_ok = yellow_count >= cfg["yellow_consecutive_days"]
+    yellow_ok = paired_cross_index >= 0
     matched = sum((bottom_ok, cross_ok, limit_ok, yellow_ok))
     dragon_above_tiger = dragon[-1] > tiger[-1]
     previous = bars[-2].close if len(bars) > 1 else bars[-1].close
@@ -448,10 +508,12 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
         bottom_flags=bottom_flags,
         cross_flags=cross_flags,
         limit_flags=limit_flags,
+        yellow_flags=yellow_flags,
         yellow_count=yellow_count,
         bottom_date=bottom_date,
         cross_date=cross_date,
         limit_date=limit_date,
+        yellow_date=yellow_date,
         bottom_ok=bottom_ok,
         cross_ok=cross_ok,
         limit_ok=limit_ok,
@@ -473,9 +535,12 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
         bottom_date=bottom_date,
         cross_date=cross_date,
         limit_up_date=limit_date,
+        yellow_date=yellow_date,
         yellow_count=yellow_count,
         matched_count=matched,
         dragon_above_tiger=dragon_above_tiger,
+        dragon_value=float(dragon[-1]),
+        tiger_value=float(tiger[-1]),
         eligible=eligible,
         selected=eligible and matched == 4,
         chart=make_sparkline(bars, dragon, tiger),
@@ -905,6 +970,7 @@ def event_text(event: dict) -> str:
         "ineligible_removed": "股票名称含 ST，已移出",
         "secondary_added": "加入次选区",
         "secondary_removed": "趋势结束，已移出次选区",
+        "trend_warning": "趋势转弱预警，继续跟踪止盈线",
         "secondary_promoted": "条件补齐，已转入主选区；持有期不断开",
     }.get(event.get("type"), "状态更新")
     return_label = "阶段收益" if event.get("type") == "secondary_promoted" else "移出收益"
@@ -968,7 +1034,7 @@ footer{{margin-top:25px;color:#738198;font-size:13px}}@media(max-width:900px){{.
 <h2>{POOL_NAME}</h2>
 {event_block}
 <h3>主选区</h3>
-<p>入选日收盘价作为加入价。龙线收盘不再高于虎线时确认趋势结束，当日收盘后移出。</p>
+<p>入选日收盘价作为加入价。龙虎连续两日转弱只作预警；曾达到5%浮盈后，较最高收盘回撤20%时止盈，或完成60个后续交易日后结束。</p>
 <div class="stats">
   <div class="stat"><small>跟踪中</small><b>{stats['active_count']} 只</b></div>
   <div class="stat"><small>已移出</small><b>{stats['closed_count']} 只</b></div>
@@ -980,7 +1046,7 @@ footer{{margin-top:25px;color:#738198;font-size:13px}}@media(max-width:900px){{.
 <div class="table-wrap"><table><thead><tr><th>股票</th><th>加入日/加入价</th><th>最新日/收盘价</th><th>加入日至今收益</th><th>跟踪时长</th><th>龙虎信号</th></tr></thead><tbody>{active_rows}</tbody></table></div>
 
 <h3>次选区</h3>
-<p>近期龙腾跃虎与连续黄柱必须同时满足，并在“可能见底”或两月内涨停中至少再满足一项。黄柱指 K 线实体有一部分位于龙线下方；龙线收盘不再高于虎线时确认趋势结束；条件补齐时转入主选区并保留原持有期。</p>
+<p>近期龙腾跃虎与邻近黄柱必须配对，并在“可能见底”或两月内涨停中至少再满足一项。龙虎转弱只作预警；曾达到5%浮盈后较最高收盘回撤20%时止盈，或完成60个后续交易日后结束；条件补齐时转入主选区并保留原持有期。</p>
 <div class="stats">
   <div class="stat"><small>次选跟踪中</small><b>{secondary_stats['active_count']} 只</b></div>
   <div class="stat"><small>当前成功率</small><b>{pct_html(secondary_stats['current_success_rate'])}</b></div>

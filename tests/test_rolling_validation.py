@@ -6,6 +6,7 @@ import unittest
 from rolling_validation import (
     CausalLineState,
     SignalPoint,
+    forward_returns,
     replay_signals,
     simulate_trades,
 )
@@ -72,6 +73,7 @@ class ExitRuleTests(unittest.TestCase):
         tiger: float,
         area: str = "",
         close: float = 10.0,
+        base_signal: bool = False,
     ) -> SignalPoint:
         return SignalPoint(
             date=f"2026-07-{day:02d}",
@@ -79,6 +81,7 @@ class ExitRuleTests(unittest.TestCase):
             dragon=dragon,
             tiger=tiger,
             area=area,
+            base_signal=base_signal,
             endpoint_cross=False,
         )
 
@@ -124,6 +127,58 @@ class ExitRuleTests(unittest.TestCase):
             "weakening_or_cross",
         )
         self.assertEqual(closed[0]["exit_date"], "2026-07-03")
+
+    def test_weakening_rule_does_not_use_pre_entry_days(self):
+        points = [
+            self.point(1, 14.0, 10.0, "", 9.8),
+            self.point(2, 13.0, 10.0, "main", 10.0),
+            self.point(3, 12.0, 10.0, "", 10.2),
+            self.point(4, 11.0, 10.0, "", 10.1),
+        ]
+        closed, _ = simulate_trades(
+            Stock(1, "600001", "示例"),
+            points,
+            "weakening_or_cross",
+        )
+        self.assertEqual(closed[0]["exit_date"], "2026-07-04")
+
+    def test_base_signal_enters_without_pool_conditions(self):
+        points = [
+            self.point(1, 11, 10, close=10.0, base_signal=True),
+            self.point(2, 12, 10, close=11.0, base_signal=True),
+            self.point(3, 9, 10, close=10.5),
+        ]
+        closed, _ = simulate_trades(
+            Stock(1, "600001", "示例"),
+            points,
+            "death_cross_1",
+            entry_mode="base",
+        )
+        self.assertEqual(len(closed), 1)
+        self.assertEqual(closed[0]["entry_area"], "base")
+        self.assertEqual(closed[0]["entry_date"], "2026-07-01")
+        self.assertEqual(closed[0]["peak_date"], "2026-07-02")
+        self.assertEqual(closed[0]["days_to_peak"], 1)
+        self.assertEqual(closed[0]["peak_to_exit_bars"], 1)
+
+    def test_forward_returns_count_one_start_per_bull_cycle(self):
+        points = [
+            self.point(1, 11, 10, close=10.0, base_signal=True),
+            self.point(2, 12, 10, close=10.2, base_signal=True),
+            self.point(3, 13, 10, close=10.4, base_signal=True),
+            self.point(4, 9, 10, close=10.1),
+            self.point(5, 11, 10, close=10.3, base_signal=True),
+            self.point(6, 12, 10, close=10.5),
+        ]
+        rows = forward_returns(
+            Stock(1, "600001", "示例"),
+            points,
+            horizons=(1,),
+        )
+        self.assertEqual([row["signal_date"] for row in rows], [
+            "2026-07-01",
+            "2026-07-05",
+        ])
 
 
 if __name__ == "__main__":

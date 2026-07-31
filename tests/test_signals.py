@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from screener import Bar, Stock, append_line_coefficients, ema, has_yellow_segment, is_intraday_snapshot, is_st_name, limit_up_price, line_series, load_config, make_sparkline, price_limit_rate, rolling_cci, xma
+from screener import Bar, Stock, append_line_coefficients, cross_yellow_pair, ema, has_yellow_segment, is_intraday_snapshot, is_st_name, limit_up_price, line_series, load_config, make_sparkline, price_limit_rate, rolling_cci, xma
 
 
 class SignalMathTests(unittest.TestCase):
@@ -81,6 +81,30 @@ class SignalMathTests(unittest.TestCase):
         bar = Bar("2026-07-22", 10.60, 10.72, 10.21, 10.25, 1, 1)
         self.assertFalse(has_yellow_segment(bar, 10.25))
         self.assertTrue(has_yellow_segment(bar, 10.26))
+
+    def test_cross_pairs_with_yellow_in_two_day_neighborhood(self):
+        cross = [False, False, False, True, False, False]
+        for yellow_index in (1, 2, 3, 4, 5):
+            yellow = [False] * 6
+            yellow[yellow_index] = True
+            pair = cross_yellow_pair(
+                cross,
+                yellow,
+                end_index=5,
+                cross_lookback_days=5,
+                yellow_consecutive_days=1,
+            )
+            self.assertEqual(pair[0], 3)
+
+    def test_cross_does_not_pair_with_yellow_three_days_away(self):
+        pair = cross_yellow_pair(
+            [False, False, False, True, False, False, False],
+            [True, False, False, False, False, False, False],
+            end_index=6,
+            cross_lookback_days=5,
+            yellow_consecutive_days=1,
+        )
+        self.assertEqual(pair, (-1, -1, 0))
 
     def test_intraday_snapshot_guard(self):
         self.assertTrue(is_intraday_snapshot("2026-07-21", datetime(2026, 7, 21, 10, 0)))

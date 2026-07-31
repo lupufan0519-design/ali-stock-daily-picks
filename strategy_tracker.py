@@ -88,6 +88,67 @@ def _secondary_selected(row: dict) -> bool:
     )
 
 
+def _record_line_point(position: dict, row: dict, trade_date: str) -> None:
+    try:
+        dragon = float(row["dragon_value"])
+        tiger = float(row["tiger_value"])
+    except (KeyError, TypeError, ValueError):
+        return
+    if not (math.isfinite(dragon) and math.isfinite(tiger)):
+        return
+    history = position.setdefault("line_history", [])
+    point = {"date": trade_date, "dragon": dragon, "tiger": tiger}
+    if history and history[-1].get("date") == trade_date:
+        history[-1] = point
+    else:
+        history.append(point)
+    del history[:-3]
+
+
+def _trend_is_weakening(position: dict, row: dict) -> bool:
+    if not _dragon_above_tiger(row):
+        return True
+    history = position.get("line_history", [])
+    if len(history) < 3:
+        return False
+    latest = history[-3:]
+    if any(
+        str(item.get("date", "")) < str(position["entry_date"])
+        for item in latest
+    ):
+        return False
+    dragons = [float(item["dragon"]) for item in latest]
+    spreads = [
+        float(item["dragon"]) - float(item["tiger"])
+        for item in latest
+    ]
+    if (
+        dragons[0] > dragons[1] > dragons[2]
+        and spreads[0] > spreads[1] > spreads[2]
+    ):
+        return True
+    return False
+
+
+def _take_profit_exit_reason(position: dict) -> str:
+    elapsed_bars = max(0, int(position.get("holding_days", 1)) - 1)
+    if elapsed_bars >= 60:
+        return "趋势结束：已完成60个后续交易日跟踪"
+    best_return = float(position.get("best_return_pct", 0.0))
+    if best_return < 5.0:
+        return ""
+    entry_price = float(position.get("entry_price", 0.0))
+    peak_price = entry_price * (1.0 + best_return / 100.0)
+    last_close = float(position.get("last_close", 0.0))
+    if peak_price <= 0 or last_close <= 0:
+        return ""
+    peak_drawdown = (last_close / peak_price - 1.0) * 100.0
+    position["peak_drawdown_pct"] = peak_drawdown
+    if peak_drawdown <= -20.0 + 1e-8:
+        return "趋势结束：达到5%浮盈后较最高收盘回撤20%"
+    return ""
+
+
 def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[dict, list[dict]]:
     """处理一个交易日；同一日期重复运行不会重复累计消失天数。"""
     state = deepcopy(state)
@@ -116,6 +177,7 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             float(position.get("worst_return_pct", position["return_pct"])),
             position["return_pct"],
         )
+        _record_line_point(position, row, trade_date)
 
         is_later_day = is_new_day and trade_date > position["entry_date"]
         if is_later_day:
@@ -132,23 +194,28 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             continue
 
         if is_later_day:
-            if _dragon_above_tiger(row):
+            exit_reason = _take_profit_exit_reason(position)
+            if exit_reason:
+                position["status"] = "已移出"
+                position["exit_date"] = trade_date
+                position["exit_price"] = position["last_close"]
+                position["exit_return_pct"] = position["return_pct"]
+                position["exit_reason"] = exit_reason
+                state["closed"].append(position)
+                events.append({"type": "removed", "code": position["code"], "name": position["name"], "return_pct": position["return_pct"]})
+                continue
+            if _trend_is_weakening(position, row):
+                if not position.get("missing_streak", 0):
+                    events.append({"type": "trend_warning", "code": position["code"], "name": position["name"]})
+                position["missing_streak"] = 1
+                position["signal_lost_date"] = trade_date
+                position["status"] = "趋势转弱预警"
+            else:
                 if position.get("missing_streak", 0):
                     events.append({"type": "signal_restored", "code": position["code"], "name": position["name"]})
                 position["missing_streak"] = 0
                 position["signal_lost_date"] = ""
                 position["status"] = "龙线在虎线上方"
-            else:
-                position["missing_streak"] = 1
-                position["signal_lost_date"] = trade_date
-                position["status"] = "已移出"
-                position["exit_date"] = trade_date
-                position["exit_price"] = position["last_close"]
-                position["exit_return_pct"] = position["return_pct"]
-                position["exit_reason"] = "趋势结束：龙线收盘不再高于虎线"
-                state["closed"].append(position)
-                events.append({"type": "removed", "code": position["code"], "name": position["name"], "return_pct": position["return_pct"]})
-                continue
         elif not position.get("status"):
             position["status"] = "龙线在虎线上方"
         still_active.append(position)
@@ -187,8 +254,10 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             "missing_streak": 0,
             "signal_lost_date": "",
             "status": "龙线在虎线上方",
+            "line_history": [],
             "selected_dates": [trade_date],
         }
+        _record_line_point(position, row, trade_date)
         state["active"].append(position)
         active_by_code[code] = position
         events.append({"type": "added", "code": code, "name": position["name"]})
@@ -214,6 +283,7 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             float(position.get("worst_return_pct", position["return_pct"])),
             position["return_pct"],
         )
+        _record_line_point(position, row, trade_date)
 
         is_later_day = is_new_day and trade_date > position["entry_date"]
         if is_later_day:
@@ -230,9 +300,11 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             continue
 
         if is_later_day:
-            exit_reason = ""
+            exit_reason = _take_profit_exit_reason(position)
             event_type = ""
-            if row.get("selected"):
+            if exit_reason:
+                event_type = "secondary_removed"
+            elif row.get("selected"):
                 event_type = "secondary_promoted"
                 position["status"] = "龙线在虎线上方"
                 position["origin_area"] = position.get(
@@ -251,9 +323,6 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
                     "return_pct": position["return_pct"],
                 })
                 continue
-            elif not _dragon_above_tiger(row):
-                exit_reason = "趋势结束：龙线收盘不再高于虎线"
-                event_type = "secondary_removed"
             if exit_reason:
                 position["status"] = "已移出"
                 position["exit_date"] = trade_date
@@ -268,7 +337,18 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
                     "return_pct": position["return_pct"],
                 })
                 continue
-            position["status"] = "龙线在虎线上方"
+            if _trend_is_weakening(position, row):
+                if not position.get("missing_streak", 0):
+                    events.append({"type": "trend_warning", "code": position["code"], "name": position["name"]})
+                position["missing_streak"] = 1
+                position["signal_lost_date"] = trade_date
+                position["status"] = "趋势转弱预警"
+            else:
+                if position.get("missing_streak", 0):
+                    events.append({"type": "signal_restored", "code": position["code"], "name": position["name"]})
+                position["missing_streak"] = 0
+                position["signal_lost_date"] = ""
+                position["status"] = "龙线在虎线上方"
         elif not position.get("status"):
             position["status"] = "龙线在虎线上方"
         secondary_still_active.append(position)
@@ -304,8 +384,10 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             "worst_return_pct": 0.0,
             "holding_days": 1,
             "status": "龙线在虎线上方",
+            "line_history": [],
             "selected_dates": [trade_date],
         }
+        _record_line_point(position, row, trade_date)
         state["secondary_active"].append(position)
         secondary_by_code[code] = position
         events.append({"type": "secondary_added", "code": code, "name": position["name"]})
