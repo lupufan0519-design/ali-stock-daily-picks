@@ -1,8 +1,10 @@
 {
   "bottom_lookback_days": 5,
-  "cross_lookback_days": 5,
+  "cross_lookback_days": 11,
   "limit_up_lookback_days": 42,
   "yellow_consecutive_days": 1,
+  "yellow_before_cross_days": 2,
+  "yellow_after_cross_days": 10,
   "history_bars": 180,
   "minimum_history_bars": 100,
   "workers": 5,

@@ -422,12 +422,15 @@ tbody tr:last-child td { border-bottom: 0; }
 .case-candle.up .case-body { fill: var(--case-up); }
 .case-candle.down .case-wick { stroke: var(--case-down); }
 .case-candle.down .case-body { fill: var(--case-down); }
+.case-yellow-body { fill: #f4d35e; stroke: #d8ad12; stroke-width: .45; }
 .case-candle:hover .case-body { filter: drop-shadow(0 0 5px currentColor); }
 .case-wave-fill { fill: url(#case-wave-fill); opacity: .44; }
 .case-wave-line { fill: none; stroke: color-mix(in srgb, var(--case-start) 52%, transparent); stroke-width: 1.4; }
 .case-dragon-line, .case-tiger-line { fill: none; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
 .case-dragon-line { stroke: #ff5c70; }
 .case-tiger-line { stroke: #55c6e8; }
+.case-cross-guide { stroke: var(--case-start); stroke-width: 1; stroke-dasharray: 3 4; opacity: .62; }
+.case-cross-ring { fill: var(--surface); stroke: var(--case-start); stroke-width: 2.2; }
 .case-stop-line { stroke: var(--case-end); stroke-width: 1.25; stroke-dasharray: 5 4; }
 .case-stop-label { fill: var(--case-end); font: 750 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace; }
 .case-arrow-start, .case-arrow-end { fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
@@ -1530,7 +1533,7 @@ LIVE_SCRIPT = r"""
         signalCell(Boolean(item.bottom_ok), item.bottom_date || "未命中", "可能见底"),
         signalCell(Boolean(item.cross_ok), item.cross_date || "未命中", "龙腾跃虎"),
         signalCell(Boolean(item.limit_up_ok), item.limit_up_date || "未命中", "42日涨停"),
-        signalCell(Boolean(item.yellow_ok), `${item.yellow_date || "交叉前后2日"} · ${Number(item.yellow_count || 0)} 根`, "邻近黄柱"),
+        signalCell(Boolean(item.yellow_ok), `${item.yellow_date || "有效窗口内"} · ${Number(item.yellow_count || 0)} 根`, "窗口黄柱"),
         statusCell,
       );
       body.append(row);
@@ -1743,7 +1746,7 @@ def _closed_row(position: dict) -> str:
 
 def _yellow_note(item) -> str:
     yellow_date = str(getattr(item, "yellow_date", ""))
-    return f"{yellow_date or '交叉前后2日'} · {int(item.yellow_count)} 根"
+    return f"{yellow_date or '有效窗口内'} · {int(item.yellow_count)} 根"
 
 
 def _observation_yellow(item) -> tuple[bool, str]:
@@ -1800,7 +1803,7 @@ def _live_pool_row(item, area: str) -> str:
       <td data-label="可能见底">{_signal(item.bottom_ok, item.bottom_date or '未命中')}</td>
       <td data-label="龙腾跃虎">{_signal(item.cross_ok, item.cross_date or '未命中')}</td>
       <td data-label="42日涨停">{_signal(item.limit_up_ok, item.limit_up_date or '未命中')}</td>
-      <td data-label="邻近黄柱">{_signal(item.yellow_ok, _yellow_note(item))}</td>
+      <td data-label="窗口黄柱">{_signal(item.yellow_ok, _yellow_note(item))}</td>
       <td data-label="状态" class="live-pool-status"><span class="state good">{label}</span>
           <span class="subline">正式跟踪与统计以收盘状态为准</span></td>
     </tr>"""
@@ -1867,6 +1870,7 @@ def _trend_case_chart() -> str:
         bars = payload["bars"]
         dragon = [float(value) for value in payload["dragon"]]
         tiger = [float(value) for value in payload["tiger"]]
+        yellow_dates = {str(value) for value in payload["yellow_dates"]}
         signal_index = next(
             index
             for index, bar in enumerate(bars)
@@ -1882,17 +1886,31 @@ def _trend_case_chart() -> str:
             for index, bar in enumerate(bars)
             if bar["date"] == payload["exit_date"]
         )
+        cross_index = next(
+            index
+            for index, bar in enumerate(bars)
+            if bar["date"] == payload["cross_date"]
+        )
     except (OSError, ValueError, KeyError, TypeError, StopIteration):
         return ""
-    if len(bars) < 3 or len(dragon) != len(bars) or len(tiger) != len(bars):
+    if (
+        len(bars) < 3
+        or len(dragon) != len(tiger)
+        or not dragon
+        or len(dragon) > signal_index + 1
+    ):
         return ""
 
     width, height = 900.0, 320.0
     left, right, top, bottom = 45.0, 20.0, 39.0, 33.0
     plot_width = width - left - right
     plot_height = height - top - bottom
-    lowest = min(float(bar["low"]) for bar in bars)
-    highest = max(float(bar["high"]) for bar in bars)
+    lowest = min(
+        [float(bar["low"]) for bar in bars] + dragon + tiger
+    )
+    highest = max(
+        [float(bar["high"]) for bar in bars] + dragon + tiger
+    )
     padding = max((highest - lowest) * 0.07, 0.5)
     price_min = lowest - padding
     price_max = highest + padding
@@ -1939,6 +1957,19 @@ def _trend_case_chart() -> str:
             f"{bar['date']} 开{open_price:.2f} 高{float(bar['high']):.2f} "
             f"低{float(bar['low']):.2f} 收{close_price:.2f}"
         )
+        yellow_part = ""
+        if bar["date"] in yellow_dates and index < len(dragon):
+            body_low = min(open_price, close_price)
+            body_high = max(open_price, close_price)
+            yellow_top_price = min(body_high, dragon[index])
+            if yellow_top_price > body_low:
+                yellow_y = y_at(yellow_top_price)
+                yellow_height = max(1.5, y_at(body_low) - yellow_y)
+                yellow_part = (
+                    f'<rect class="case-yellow-body" '
+                    f'x="{x-candle_width/2:.1f}" y="{yellow_y:.1f}" '
+                    f'width="{candle_width:.1f}" height="{yellow_height:.1f}" rx="1"/>'
+                )
         candles.append(
             f'<g class="case-candle {tone}" style="--i:{index}">'
             f'<title>{_esc(title)}</title>'
@@ -1946,6 +1977,7 @@ def _trend_case_chart() -> str:
             f'x2="{x:.1f}" y2="{y_low:.1f}"/>'
             f'<rect class="case-body" x="{x-candle_width/2:.1f}" y="{body_y:.1f}" '
             f'width="{candle_width:.1f}" height="{body_height:.1f}" rx="1"/>'
+            f'{yellow_part}'
             "</g>"
         )
 
@@ -1962,12 +1994,22 @@ def _trend_case_chart() -> str:
 
     signal_x = x_at(signal_index)
     signal_y = y_at(float(bars[signal_index]["high"]))
+    cross_x = x_at(cross_index)
+    cross_y = y_at(dragon[cross_index])
     peak_x = x_at(peak_index)
     peak_y = y_at(float(payload["peak_close"]))
     exit_x = x_at(exit_index)
     exit_y = y_at(float(payload["exit_close"]))
     stop_price = float(payload["peak_close"]) * 0.8
     stop_y = y_at(stop_price)
+    stop_markup = ""
+    if "回撤20%" in str(payload["exit_reason"]):
+        stop_markup = (
+            f'<line class="case-stop-line" x1="{peak_x:.1f}" y1="{stop_y:.1f}" '
+            f'x2="{exit_x:.1f}" y2="{stop_y:.1f}"/>'
+            f'<text class="case-stop-label" x="{peak_x+7:.1f}" '
+            f'y="{stop_y-6:.1f}">高点回撤20%</text>'
+        )
     end_path_start_x = min(width - right - 28, exit_x + 42)
     date_ticks = []
     for index in (0, signal_index, peak_index, exit_index, len(bars) - 1):
@@ -1978,18 +2020,18 @@ def _trend_case_chart() -> str:
         )
 
     return f"""
-    <div class="trend-case" aria-label="历史真实案例：隆盛科技趋势开始与建议结束点">
+    <div class="trend-case" aria-label="历史真实案例：{_esc(payload['name'])}信号确认与建议结束点">
       <div class="trend-case-head">
-        <div><strong>真实案例 · {_esc(payload['name'])} {_esc(payload['code'])}</strong><span>同一套实时可确认规则重放</span></div>
-        <div class="trend-case-legend" aria-label="趋势线图例"><span><i class="dragon"></i>龙线</span><span><i class="tiger"></i>虎线</span></div>
+        <div><strong>真实案例 · {_esc(payload['name'])} {_esc(payload['code'])}</strong><span>前复权 · 截至信号日的数据截面</span></div>
+        <div class="trend-case-legend" aria-label="趋势线图例"><span><i class="dragon"></i>龙线</span><span><i class="tiger"></i>虎线</span><span><i style="background:#f4d35e"></i>黄柱</span></div>
       </div>
       <div class="trend-case-canvas">
-        <div class="case-pin start"><b>趋势开始</b><small>{_esc(payload['signal_date'])}</small></div>
+        <div class="case-pin start"><b>信号确认</b><small>{_esc(payload['signal_date'])}</small></div>
         <div class="case-pin peak"><b>波段高点</b><small>+{float(payload['peak_return_pct']):.2f}%</small></div>
         <div class="case-pin end"><b>建议结束</b><small>{_esc(payload['exit_date'])}</small></div>
         <svg class="trend-case-svg" viewBox="0 0 900 320" preserveAspectRatio="none" role="img" aria-labelledby="trend-case-title trend-case-desc">
-          <title id="trend-case-title">隆盛科技历史案例K线图</title>
-          <desc id="trend-case-desc">2025年8月7日确认趋势开始，9月17日到达波段高点，10月14日按最高收盘回撤20%建议结束。</desc>
+          <title id="trend-case-title">{_esc(payload['name'])}历史案例K线图</title>
+          <desc id="trend-case-desc">{_esc(payload['signal_date'])}确认信号，上穿日为{_esc(payload['cross_date'])}，窗口黄柱为{_esc('、'.join(sorted(yellow_dates)))}，{_esc(payload['exit_date'])}按规则结束。</desc>
           <defs>
             <linearGradient id="case-wave-fill" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stop-color="#2457d6" stop-opacity=".22"/>
@@ -2004,8 +2046,9 @@ def _trend_case_chart() -> str:
           {''.join(candles)}
           <polyline class="case-tiger-line" points="{tiger_line}"/>
           <polyline class="case-dragon-line" points="{dragon_line}"/>
-          <line class="case-stop-line" x1="{peak_x:.1f}" y1="{stop_y:.1f}" x2="{exit_x:.1f}" y2="{stop_y:.1f}"/>
-          <text class="case-stop-label" x="{peak_x+7:.1f}" y="{stop_y-6:.1f}">高点回撤20%</text>
+          {stop_markup}
+          <line class="case-cross-guide" x1="{cross_x:.1f}" y1="{top+22:.1f}" x2="{cross_x:.1f}" y2="{cross_y-6:.1f}"/>
+          <circle class="case-cross-ring" cx="{cross_x:.1f}" cy="{cross_y:.1f}" r="4.5"/>
           <line class="case-peak-guide" x1="{peak_x:.1f}" y1="{top+22:.1f}" x2="{peak_x:.1f}" y2="{peak_y-7:.1f}"/>
           <circle class="case-peak-ring" cx="{peak_x:.1f}" cy="{peak_y:.1f}" r="5"/>
           <path class="case-arrow-start" d="M {max(left+8,signal_x-63):.1f} {top+24:.1f} C {signal_x-51:.1f} {top+54:.1f}, {signal_x-17:.1f} {signal_y-24:.1f}, {signal_x:.1f} {signal_y-6:.1f}"/>
@@ -2014,11 +2057,11 @@ def _trend_case_chart() -> str:
         </svg>
       </div>
       <div class="trend-case-notes">
-        <div class="trend-case-note start"><span>信号确认</span><strong>{_esc(payload['signal_date'])} · {float(payload['signal_close']):.2f}元</strong></div>
+        <div class="trend-case-note start"><span>上穿 / 黄柱 / 确认</span><strong>{_esc(payload['cross_date'])} / {_esc('、'.join(sorted(yellow_dates)))} / {_esc(payload['signal_date'])}</strong></div>
         <div class="trend-case-note peak"><span>最高收盘</span><strong>{_esc(payload['peak_date'])} · +{float(payload['peak_return_pct']):.2f}%</strong></div>
         <div class="trend-case-note end"><span>建议结束</span><strong>{_esc(payload['exit_date'])} · +{float(payload['exit_return_pct']):.2f}%</strong></div>
       </div>
-      <div class="trend-case-foot">建议结束点按“达到 5% 浮盈后，较最高收盘价回撤 20%”计算；未计费用、滑点和涨跌停无法成交。</div>
+      <div class="trend-case-foot">{_esc(payload['source'])}。龙线、虎线只绘制到信号确认日，保证图上的上穿和黄柱与回测当日使用的是同一份数据；本例按“{_esc(payload['exit_reason'])}”。未计费用、滑点和涨跌停无法成交。</div>
     </div>"""
 
 
@@ -2036,6 +2079,14 @@ def _validation_section() -> str:
         trailing_15 = take_profit["trailing_15"]["summary"]
         trailing_20 = take_profit["trailing_20"]["summary"]
         chart_60 = payload["retrospective_chart_analysis"]["forward_returns"]["overall"]["60"]
+        yellow_analysis = payload["yellow_window_analysis"]
+        yellow_variants = {
+            str(item["id"]): item
+            for item in yellow_analysis.get("variants", [])
+        }
+        recommended_window = yellow_variants[
+            str(yellow_analysis["recommended_id"])
+        ]
     except (OSError, ValueError, KeyError, TypeError):
         return ""
 
@@ -2066,10 +2117,10 @@ def _validation_section() -> str:
     return f"""
     <section class="section reveal" id="validation">
       <div class="section-head"><div><span class="section-kicker">Walk-forward evidence</span><h2>历史滚动验证</h2>
-      <p class="section-copy">逐日重放，每一天只使用当时已经存在的行情；XMA 尾部按当日可见数据重新计算，避免偷看未来。</p></div></div>
+      <p class="section-copy">逐日重放，每一天只使用当时已经存在的行情；XMA 尾部按当日可见数据重新计算，避免偷看未来。十套黄柱窗口中，稳定性最高的是“{_esc(str(recommended_window['label']))}”。</p></div></div>
       <div class="validation-lead">
         <article class="validation-verdict"><strong>{_esc(verdict)}</strong>
-          <p>这里的“涨到过”是指信号出现后的 60 个交易日里，至少有一天收盘达到这个涨幅，并不代表第 60 天仍有同样收益。同一只股票在不同的龙腾跃虎周期可以重复计入；同一次上穿后的连续满足日只记一次。在 {int(forward_60['sample_count'])} 次完整信号中，每 100 次约有 {float(forward_60['rally_3pct_rate_pct']):.0f} 次涨到过 3%、{rally_5_rate:.0f} 次涨到过 5%、{float(forward_60['rally_10pct_rate_pct']):.0f} 次涨到过 10%。</p>
+          <p>这里的“涨到过”是指信号确认后的 60 个交易日里，至少有一天收盘达到这个涨幅，并不代表第 60 天仍有同样收益。同一只股票在不同的龙腾跃虎周期可以重复计入；同一次上穿后的连续满足日只记一次。在 {int(forward_60['sample_count'])} 次完整信号中，每 100 次约有 {float(forward_60['rally_3pct_rate_pct']):.0f} 次涨到过 3%、{rally_5_rate:.0f} 次涨到过 5%、{float(forward_60['rally_10pct_rate_pct']):.0f} 次涨到过 10%。开发样本的 5% 到达率为 {_rate(float(recommended_window['development_before_2025']['rally_5pct_rate_pct']))}，2025 年起独立样本为 {_rate(float(recommended_window['holdout_from_2025']['rally_5pct_rate_pct']))}。</p>
           {_trend_case_chart()}
         </article>
         <div class="validation-facts">
@@ -2087,7 +2138,7 @@ def _validation_section() -> str:
         <div class="panel-head"><div><h3>止盈规则比较</h3><p>只在信号后曾达到 5% 收盘浮盈的样本中比较；所有方案最迟在第 60 个后续交易日结束。</p></div></div>
         <div class="table-scroll"><table><thead><tr><th>规则</th><th>涨到过 5% 的案例</th><th>结束时通常收益</th><th>最终仍盈利</th><th>在最高点前结束</th><th>保住最高涨幅</th><th>通常何时结束</th></tr></thead>
         <tbody>{take_profit_row('龙虎转弱（仅预警）', weakening, '连续两日龙线下行且龙虎差收窄，不触发移出')}{take_profit_row('峰值回撤 10%', trailing_10, '达到5%浮盈后启动')}{take_profit_row('峰值回撤 15%', trailing_15, '达到5%浮盈后启动')}{take_profit_row('正式采用：峰值回撤 20%', trailing_20, '达到5%浮盈后启动；第60日兜底')}</tbody></table></div>
-        <p class="validation-method">正式规则：龙虎连续两日转弱只显示风险预警；持仓曾达到 5% 收盘浮盈后，当前收盘价较跟踪期最高收盘价回撤 20% 时止盈；未触发者在第 60 个后续交易日结束。历史完整图口径的 60 日达到 5% 比例为 {_rate(float(chart_60['rally_5pct_rate_pct']))}，但双重 XMA 会随未来数据回绘，这一数值只用于解释历史图形，不能当作实时可执行成功率。时间范围 {_esc(str(coverage['start_date']))}—{_esc(str(coverage['end_date']))}；当前上市股票样本存在幸存者偏差，历史价格未复权，未计费用、滑点和涨跌停无法成交。本结果用于规则验证，不构成收益承诺。</p>
+        <p class="validation-method">正式规则：龙虎连续两日转弱只显示风险预警；持仓曾达到 5% 收盘浮盈后，当前收盘价较跟踪期最高收盘价回撤 20% 时止盈；未触发者在第 60 个后续交易日结束。历史完整图口径的 60 日达到 5% 比例为 {_rate(float(chart_60['rally_5pct_rate_pct']))}，但双重 XMA 会随未来数据回绘，这一数值只用于解释历史图形，不能当作实时可执行成功率。时间范围 {_esc(str(coverage['start_date']))}—{_esc(str(coverage['end_date']))}；历史行情按最新除权除息记录前复权，当前上市股票样本仍存在幸存者偏差，未计费用、滑点和涨跌停无法成交。本结果用于规则验证，不构成收益承诺。</p>
       </article>
     </section>"""
 
@@ -2101,19 +2152,37 @@ def render_report(
     events: Sequence[dict],
 ) -> str:
     selected = [item for item in evaluations if item.selected and item.eligible]
+    tracked_main_codes = {
+        str(item["code"]) for item in strategy_state["active"]
+    }
+    tracked_secondary_codes = {
+        str(item["code"])
+        for item in strategy_state.get("secondary_active", [])
+    }
+    main_area_codes = {str(item.code) for item in selected} | tracked_main_codes
     secondary = [
         item
         for item in evaluations
         if item.eligible
         and not item.selected
+        and str(item.code) not in main_area_codes
         and item.cross_ok
         and item.yellow_ok
         and (item.bottom_ok or item.limit_up_ok)
     ]
-    near = visible_observations(
-        evaluations,
-        cfg["near_match_minimum"],
+    occupied_codes = (
+        main_area_codes
+        | {str(item.code) for item in secondary}
+        | tracked_secondary_codes
     )
+    near = [
+        item
+        for item in visible_observations(
+            evaluations,
+            cfg["near_match_minimum"],
+        )
+        if str(item.code) not in occupied_codes
+    ]
     trade_date = max((item.date for item in evaluations), default="无数据")
     generated = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M")
     cover_desktop = "assets/hero-aigc-v2-poster.webp"
@@ -2126,10 +2195,7 @@ def render_report(
     secondary_active_rows = "".join(
         _position_row(item) for item in strategy_state.get("secondary_active", [])
     )
-    main_area_count = len(
-        {item.code for item in selected}
-        | {str(item["code"]) for item in strategy_state["active"]}
-    )
+    main_area_count = len(main_area_codes)
     secondary_area_count = len(
         {item.code for item in secondary}
         | {
@@ -2241,7 +2307,7 @@ def render_report(
 
     <section class="kpi-grid reveal" aria-label="核心概览">
       <article class="kpi"><span class="kpi-label">主选实时预选</span><strong class="kpi-value" data-live-main-count>{len(selected)}</strong><span class="kpi-note">严格四项同时满足</span></article>
-      <article class="kpi"><span class="kpi-label">次选实时预选</span><strong class="kpi-value" data-live-secondary-count>{len(secondary)}</strong><span class="kpi-note">龙虎 + 邻近黄柱 + 另一项</span></article>
+        <article class="kpi"><span class="kpi-label">次选实时预选</span><strong class="kpi-value" data-live-secondary-count>{len(secondary)}</strong><span class="kpi-note">龙虎 + 窗口黄柱 + 另一项</span></article>
       <article class="kpi"><span class="kpi-label">收盘主选跟踪</span><strong class="kpi-value">{main_stats['active_count']}</strong><span class="kpi-note">仅收盘后结算</span></article>
       <article class="kpi"><span class="kpi-label">观察标的</span><strong class="kpi-value">{len(near)}</strong><span class="kpi-note">仅观察，不计入选</span></article>
       <article class="kpi"><span class="kpi-label">市场扫描</span><strong class="kpi-value">{scanned}</strong><span class="kpi-note">失败 {len(errors)} 只 · ST 排除</span></article>
@@ -2277,7 +2343,7 @@ def render_report(
       </article>
 
       <article class="panel" id="pool-secondary" role="tabpanel" aria-labelledby="tab-secondary" data-pool-panel="secondary" hidden>
-        <div class="panel-head"><div><h3>次选区</h3><p>候选需龙虎、交叉前后2日黄柱及另一项；升级主选时保留原加入日和加入价</p>
+        <div class="panel-head"><div><h3>次选区</h3><p>候选需龙虎、上穿前 {cfg.get('yellow_before_cross_days', 2)} 日至后 {cfg.get('yellow_after_cross_days', 2)} 日内黄柱及另一项；升级主选时保留原加入日和加入价</p>
           <div class="pool-composition"><span>盘中预选 <strong data-live-secondary-count>{len(secondary)}</strong> 只</span><span>收盘跟踪 <strong data-tracked-secondary-count>{tracked_secondary_count}</strong> 只</span><span>重复股票只计一次</span></div>
         </div><span class="count-badge"><span data-area-secondary-count>{secondary_area_count}</span> 只</span></div>
         <div class="pool-group-head"><strong>盘中实时预选</strong><span>随最新行情重算</span></div>
@@ -2319,9 +2385,9 @@ def render_report(
       <div class="section-head"><div><span class="section-kicker">Methodology</span><h2>筛选规则</h2></div></div>
       <div class="rules">
         <article class="rule"><span class="rule-num">01</span><strong>可能见底</strong><p>最近 {cfg['bottom_lookback_days']} 个交易日出现信号。</p></article>
-        <article class="rule"><span class="rule-num">02</span><strong>龙腾跃虎</strong><p>最近 {cfg['cross_lookback_days']} 日出现交叉，且龙线仍在虎线上方。</p></article>
+        <article class="rule"><span class="rule-num">02</span><strong>龙腾跃虎</strong><p>最近 {cfg['cross_lookback_days']} 日出现交叉，且龙线仍在虎线上方；窗口延长用于等待交叉后的低位黄柱确认。</p></article>
         <article class="rule"><span class="rule-num">03</span><strong>近期涨停</strong><p>最近 {cfg['limit_up_lookback_days']} 个交易日至少一次收盘涨停。</p></article>
-        <article class="rule"><span class="rule-num">04</span><strong>邻近黄柱</strong><p>龙腾跃虎日前 2 日、当天或后 2 日出现黄柱即可配对；当前至少 {cfg['yellow_consecutive_days']} 根。</p></article>
+        <article class="rule"><span class="rule-num">04</span><strong>窗口黄柱</strong><p>龙腾跃虎日前 {cfg.get('yellow_before_cross_days', 2)} 日至后 {cfg.get('yellow_after_cross_days', 2)} 个交易日内出现黄柱即可配对；当前至少 {cfg['yellow_consecutive_days']} 根。</p></article>
       </div>
     </section>
 

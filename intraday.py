@@ -541,14 +541,15 @@ def evaluate_live_seed(
     observation_yellow_count = yellow_count
     observation_yellow_ok = yellow
     observation_yellow_date = live_date if yellow else ""
-    if len(dragon_tail) >= 6:
+    if len(dragon_tail) >= 2:
         cross_flags = [False] + [
             dragon_tail[index] > tiger_tail[index]
             and dragon_tail[index - 1] <= tiger_tail[index - 1]
             for index in range(1, len(dragon_tail))
         ]
+        history_tail_size = len(dragon_tail) - 1
         body_dates = [
-            *list(seed.get("body_low_tail_dates", []))[-5:],
+            *list(seed.get("body_low_tail_dates", []))[-history_tail_size:],
             live_date,
         ]
         cross_date = next(
@@ -561,7 +562,10 @@ def evaluate_live_seed(
         )
         cross_ok = bool(cross_date and dragon_above_tiger)
         body_lows = [
-            *[float(value) for value in seed.get("body_low_tail", [])][-5:],
+            *[
+                float(value)
+                for value in seed.get("body_low_tail", [])
+            ][-history_tail_size:],
             min(open_price, price),
         ]
         if len(body_lows) == len(dragon_tail) and len(body_dates) == len(dragon_tail):
@@ -587,6 +591,8 @@ def evaluate_live_seed(
                 end_index=len(cross_flags) - 1,
                 cross_lookback_days=int(cfg["cross_lookback_days"]),
                 yellow_consecutive_days=int(cfg["yellow_consecutive_days"]),
+                before_days=int(cfg.get("yellow_before_cross_days", 2)),
+                after_days=int(cfg.get("yellow_after_cross_days", 2)),
             )
             yellow_ok = paired_cross >= 0
             yellow_date = (

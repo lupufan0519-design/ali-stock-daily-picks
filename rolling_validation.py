@@ -18,6 +18,7 @@ from screener import (
     cached_universe,
     convert_bars,
     cross_yellow_pair,
+    forward_adjust_bars,
     has_yellow_segment,
     is_cross_up,
     is_st_name,
@@ -32,6 +33,19 @@ ROOT = Path(__file__).resolve().parent
 DEFAULT_OUTPUT = ROOT / "results" / "rolling_validation.json"
 MAX_PAGE_BARS = 640
 MAX_VALIDATION_ERRORS = 10
+BASE_CROSS_LOOKBACK_DAYS = 5
+YELLOW_WINDOW_VARIANTS = (
+    ("nearby_2", "上穿前2日至后2日", 2, 2),
+    ("post_2", "上穿当天至后2日", 0, 2),
+    ("post_3", "上穿当天至后3日", 0, 3),
+    ("pre2_post3", "上穿前2日至后3日", 2, 3),
+    ("post_5", "上穿当天至后5日", 0, 5),
+    ("pre2_post5", "上穿前2日至后5日", 2, 5),
+    ("post_8", "上穿当天至后8日", 0, 8),
+    ("pre2_post8", "上穿前2日至后8日", 2, 8),
+    ("post_10", "上穿当天至后10日", 0, 10),
+    ("pre2_post10", "上穿前2日至后10日", 2, 10),
+)
 
 
 class CausalLineState:
@@ -171,15 +185,28 @@ def _cci_at(bars: Sequence[Bar], index: int, period: int = 14) -> float:
     return (window[-1] - mean) / (0.015 * deviation)
 
 
-def replay_signals(
+def replay_signal_variants(
     stock: Stock,
     bars: Sequence[Bar],
     cfg: dict,
     *,
+    variants: Sequence[tuple[str, int, int, int | None]],
     mode: str = "causal",
-) -> list[SignalPoint]:
+) -> dict[str, list[SignalPoint]]:
     if mode not in {"causal", "retrospective"}:
         raise ValueError(f"未知重放模式: {mode}")
+    if not variants:
+        return {}
+    normalized = {
+        variant_id: (
+            int(before_days),
+            int(after_days),
+            int(cross_lookback_days)
+            if cross_lookback_days is not None
+            else int(cfg["cross_lookback_days"]),
+        )
+        for variant_id, before_days, after_days, cross_lookback_days in variants
+    }
     state = CausalLineState()
     retrospective_dragon: Sequence[float] = ()
     retrospective_tiger: Sequence[float] = ()
@@ -187,7 +214,9 @@ def replay_signals(
         retrospective_dragon, retrospective_tiger = line_series(bars)
     bottom_flags: list[bool] = []
     limit_flags: list[bool] = []
-    points: list[SignalPoint] = []
+    points_by_variant: dict[str, list[SignalPoint]] = {
+        variant_id: [] for variant_id in normalized
+    }
     rate = price_limit_rate(stock)
 
     for index, bar in enumerate(bars):
@@ -216,76 +245,124 @@ def replay_signals(
         )
 
         available_length = index + 1
-        cross_start = max(
-            1,
-            available_length - cfg["cross_lookback_days"],
-        )
-        cross_ok = (
-            any(
-                is_cross_up(dragon_values, tiger_values, signal_index)
-                for signal_index in range(cross_start, available_length)
-            )
-            and dragon_now > tiger_now
-        )
         bottom_ok = any(bottom_flags[-cfg["bottom_lookback_days"] :])
         limit_ok = any(limit_flags[-cfg["limit_up_lookback_days"] :])
-
-        pair_start = max(
-            0,
-            index
-            - cfg["cross_lookback_days"]
-            - 2
-            - cfg["yellow_consecutive_days"],
+        shared_pair_start = min(
+            max(
+                0,
+                index
+                - effective_cross_lookback
+                - before_days
+                - cfg["yellow_consecutive_days"],
+            )
+            for before_days, _, effective_cross_lookback in normalized.values()
         )
-        pair_cross_flags = [
+        shared_cross_flags = [
             is_cross_up(dragon_values, tiger_values, line_index)
             if line_index > 0
             else False
-            for line_index in range(pair_start, index + 1)
+            for line_index in range(shared_pair_start, index + 1)
         ]
-        pair_yellow_flags = [
+        shared_yellow_flags = [
             has_yellow_segment(bars[line_index], dragon_values[line_index])
-            for line_index in range(pair_start, index + 1)
+            for line_index in range(shared_pair_start, index + 1)
         ]
-        paired_cross, _, yellow_count = cross_yellow_pair(
-            pair_cross_flags,
-            pair_yellow_flags,
-            end_index=len(pair_cross_flags) - 1,
-            cross_lookback_days=cfg["cross_lookback_days"],
-            yellow_consecutive_days=cfg["yellow_consecutive_days"],
-        )
-        yellow_ok = paired_cross >= 0
-
         eligible_day = (
             index + 1 >= cfg["minimum_history_bars"] and bar.volume > 0
         )
-        base_signal = eligible_day and cross_ok and yellow_ok
-        area = ""
-        if eligible_day:
-            if bottom_ok and cross_ok and limit_ok and yellow_ok:
-                area = "main"
-            elif cross_ok and yellow_ok and (bottom_ok or limit_ok):
-                area = "secondary"
-
-        points.append(
-            SignalPoint(
-                date=bar.date,
-                close=float(bar.close),
-                dragon=float(dragon_now),
-                tiger=float(tiger_now),
-                area=area,
-                base_signal=base_signal,
-                endpoint_cross=(
-                    index + 1 >= cfg["minimum_history_bars"]
-                    and is_cross_up(
-                        dragon_values,
-                        tiger_values,
-                        index,
-                    )
-                ),
-            )
+        endpoint_cross = (
+            index + 1 >= cfg["minimum_history_bars"]
+            and is_cross_up(dragon_values, tiger_values, index)
         )
-    return points
+        for variant_id, (
+            before_days,
+            after_days,
+            effective_cross_lookback,
+        ) in normalized.items():
+            cross_start = max(
+                1,
+                available_length - effective_cross_lookback,
+            )
+            cross_ok = (
+                any(
+                    is_cross_up(dragon_values, tiger_values, signal_index)
+                    for signal_index in range(cross_start, available_length)
+                )
+                and dragon_now > tiger_now
+            )
+            pair_start = max(
+                0,
+                index
+                - effective_cross_lookback
+                - before_days
+                - cfg["yellow_consecutive_days"],
+            )
+            offset = pair_start - shared_pair_start
+            pair_cross_flags = shared_cross_flags[offset:]
+            pair_yellow_flags = shared_yellow_flags[offset:]
+            paired_cross, _, _ = cross_yellow_pair(
+                pair_cross_flags,
+                pair_yellow_flags,
+                end_index=len(pair_cross_flags) - 1,
+                cross_lookback_days=effective_cross_lookback,
+                yellow_consecutive_days=cfg["yellow_consecutive_days"],
+                before_days=before_days,
+                after_days=after_days,
+            )
+            yellow_ok = paired_cross >= 0
+            base_signal = eligible_day and cross_ok and yellow_ok
+            area = ""
+            if eligible_day:
+                if bottom_ok and cross_ok and limit_ok and yellow_ok:
+                    area = "main"
+                elif cross_ok and yellow_ok and (bottom_ok or limit_ok):
+                    area = "secondary"
+            points_by_variant[variant_id].append(
+                SignalPoint(
+                    date=bar.date,
+                    close=float(bar.close),
+                    dragon=float(dragon_now),
+                    tiger=float(tiger_now),
+                    area=area,
+                    base_signal=base_signal,
+                    endpoint_cross=endpoint_cross,
+                )
+            )
+    return points_by_variant
+
+
+def replay_signals(
+    stock: Stock,
+    bars: Sequence[Bar],
+    cfg: dict,
+    *,
+    mode: str = "causal",
+    yellow_before_days: int | None = None,
+    yellow_after_days: int | None = None,
+    cross_lookback_days: int | None = None,
+) -> list[SignalPoint]:
+    return replay_signal_variants(
+        stock,
+        bars,
+        cfg,
+        variants=(
+            (
+                "single",
+                int(
+                    cfg.get("yellow_before_cross_days", 2)
+                    if yellow_before_days is None
+                    else yellow_before_days
+                ),
+                int(
+                    cfg.get("yellow_after_cross_days", 2)
+                    if yellow_after_days is None
+                    else yellow_after_days
+                ),
+                cross_lookback_days,
+            ),
+        ),
+        mode=mode,
+    )["single"]
 
 
 def _percentile(values: Sequence[float], fraction: float) -> float:
@@ -885,6 +962,40 @@ def _group_forward(rows: Sequence[dict]) -> dict:
     return grouped
 
 
+def _yellow_window_summary(rows: Sequence[dict]) -> dict:
+    development = [row for row in rows if row["signal_date"] < "2025-01-01"]
+    holdout = [row for row in rows if row["signal_date"] >= "2025-01-01"]
+
+    def sixty(items: Sequence[dict]) -> dict:
+        stats = _group_forward(items)["60"]
+        return {
+            "sample_count": int(stats["sample_count"]),
+            "rally_3pct_rate_pct": float(stats["rally_3pct_rate_pct"]),
+            "rally_5pct_rate_pct": float(stats["rally_5pct_rate_pct"]),
+            "rally_10pct_rate_pct": float(stats["rally_10pct_rate_pct"]),
+            "median_first_5pct_day": float(stats["median_first_5pct_day"]),
+            "median_peak_day_for_5pct": float(
+                stats["median_peak_day_for_5pct"]
+            ),
+            "median_max_close_return_pct": float(
+                stats["max_close_return"]["median_pct"]
+            ),
+        }
+
+    overall = sixty(rows)
+    development_stats = sixty(development)
+    holdout_stats = sixty(holdout)
+    return {
+        "overall": overall,
+        "development_before_2025": development_stats,
+        "holdout_from_2025": holdout_stats,
+        "stability_5pct_rate_pct": min(
+            development_stats["rally_5pct_rate_pct"],
+            holdout_stats["rally_5pct_rate_pct"],
+        ),
+    }
+
+
 def aggregate_result(
     *,
     cfg: dict,
@@ -894,6 +1005,27 @@ def aggregate_result(
     errors: Sequence[str],
 ) -> dict:
     forward_rows: list[dict] = []
+    yellow_window_rows: dict[str, list[dict]] = {
+        variant_id: [] for variant_id, _, _, _ in YELLOW_WINDOW_VARIANTS
+    }
+    variant_specs = tuple(
+        (
+            variant_id,
+            before_days,
+            after_days,
+            max(BASE_CROSS_LOOKBACK_DAYS, after_days + 1),
+        )
+        for variant_id, _, before_days, after_days in YELLOW_WINDOW_VARIANTS
+    )
+    base_variant_id = next(
+        (
+            variant_id
+            for variant_id, _, before_days, after_days in YELLOW_WINDOW_VARIANTS
+            if before_days == int(cfg.get("yellow_before_cross_days", 2))
+            and after_days == int(cfg.get("yellow_after_cross_days", 2))
+        ),
+        "nearby_2",
+    )
     retrospective_forward_rows: list[dict] = []
     trades: dict[str, dict[str, list[dict]]] = {
         rule: {"closed": [], "open": []}
@@ -911,11 +1043,23 @@ def aggregate_result(
     }
     date_min = ""
     date_max = ""
-    for stock, bars in histories:
+    for history_index, (stock, bars) in enumerate(histories, start=1):
         if len(bars) < cfg["minimum_history_bars"]:
             continue
-        points = replay_signals(stock, bars, cfg)
-        forward_rows.extend(forward_returns(stock, points))
+        variant_points = replay_signal_variants(
+            stock,
+            bars,
+            cfg,
+            variants=variant_specs,
+        )
+        points = variant_points[base_variant_id]
+        configured_rows: list[dict] = []
+        for variant_id, rows in variant_points.items():
+            variant_forward_rows = forward_returns(stock, rows)
+            yellow_window_rows[variant_id].extend(variant_forward_rows)
+            if variant_id == base_variant_id:
+                configured_rows = variant_forward_rows
+        forward_rows.extend(configured_rows)
         retrospective_points = replay_signals(
             stock,
             bars,
@@ -946,6 +1090,36 @@ def aggregate_result(
         if bars:
             date_min = min(date_min or bars[0].date, bars[0].date)
             date_max = max(date_max, bars[-1].date)
+        if history_index % 500 == 0:
+            print(
+                f"黄柱窗口比较：{history_index}/{len(histories)}",
+                flush=True,
+            )
+
+    yellow_window_analysis = []
+    for variant_id, label, before_days, after_days in YELLOW_WINDOW_VARIANTS:
+        summary = _yellow_window_summary(yellow_window_rows[variant_id])
+        yellow_window_analysis.append(
+            {
+                "id": variant_id,
+                "label": label,
+                "yellow_before_days": before_days,
+                "yellow_after_days": after_days,
+                "cross_lookback_days": max(
+                    BASE_CROSS_LOOKBACK_DAYS,
+                    after_days + 1,
+                ),
+                **summary,
+            }
+        )
+    recommended_window = max(
+        yellow_window_analysis,
+        key=lambda item: (
+            item["stability_5pct_rate_pct"],
+            item["holdout_from_2025"]["sample_count"],
+            item["overall"]["sample_count"],
+        ),
+    )
 
     forward_by_year: dict[str, dict] = {}
     for year in sorted({row["signal_date"][:4] for row in forward_rows}):
@@ -1014,7 +1188,7 @@ def aggregate_result(
         }
 
     return {
-        "schema_version": 3,
+        "schema_version": 4,
         "generated_at": datetime.now().astimezone().isoformat(
             timespec="seconds"
         ),
@@ -1025,18 +1199,19 @@ def aggregate_result(
             "signal_calculation": (
                 "每个交易日只用当日及此前数据重算双重XMA与虎线EMA"
             ),
-            "price_basis": "通达信未复权日线收盘价",
+            "price_basis": "通达信日线按最新除权除息记录前复权",
             "universe_basis": "验证时仍上市的沪深A股，按当前名称排除ST与*ST",
             "execution_basis": "信号日收盘加入，退出信号日收盘移出，不计费用与滑点",
             "entry_definition": (
-                "近5个交易日发生龙线上穿虎线、当前龙线仍高于虎线，且上穿日前2日、当天或后2日内黄柱满足配置阈值；"
+                f"近{cfg['cross_lookback_days']}个交易日发生龙线上穿虎线、当前龙线仍高于虎线，且上穿日前"
+                f"{cfg.get('yellow_before_cross_days', 2)}日至后{cfg.get('yellow_after_cross_days', 2)}日内黄柱满足配置阈值；"
                 "同一轮龙线位于虎线上方期间只记录首次同时满足日，不要求见底或42日涨停"
             ),
             "peak_definition": "信号启动后至首次死叉前后的最高收盘价",
             "limitations": [
                 "当前上市股票样本存在幸存者偏差，未包含历史退市股票",
                 "历史ST名称变化未完整还原",
-                "未复权价格未计入现金分红，除权事件可能影响个别样本",
+                "除权除息记录按验证日可取得的最新记录统一前复权",
                 "涨跌停无法成交、停牌、滑点和手续费未纳入",
             ],
         },
@@ -1047,9 +1222,18 @@ def aggregate_result(
             "start_date": date_min,
             "end_date": date_max,
         },
+        "yellow_window_analysis": {
+            "selection_rule": (
+                "优先比较2025年前开发样本与2025年起留出样本的60日达到5%比例，"
+                "以两段中较低者衡量稳定性；同分时优先样本更多的方案"
+            ),
+            "recommended_id": recommended_window["id"],
+            "variants": yellow_window_analysis,
+        },
         "base_signal_forward_returns": {
             "definition": (
-                "龙腾跃虎与前后2个交易日内黄柱完成配对后，分别统计未来N个交易日内的最高收盘涨幅、"
+                f"龙腾跃虎与上穿前{cfg.get('yellow_before_cross_days', 2)}日至后{cfg.get('yellow_after_cross_days', 2)}日内黄柱完成配对后，"
+                "分别统计未来N个交易日内的最高收盘涨幅、"
                 "首次上涨日和第N日收盘收益；同一轮龙虎多头周期不重复计数"
             ),
             "overall": _group_forward(forward_rows),
@@ -1105,14 +1289,15 @@ def fetch_history(
     host: str,
     stock: Stock,
     bars: int,
+    client=None,
 ) -> list[Bar]:
     from xmtdx import KlineCategory, Market, TdxClient
 
-    pages = []
-    with TdxClient(host, timeout=12, auto_reconnect=True) as client:
+    def load(active_client) -> list[Bar]:
+        pages = []
         for start in range(0, bars, MAX_PAGE_BARS):
             count = min(MAX_PAGE_BARS, bars - start)
-            page = client.get_security_bars(
+            page = active_client.get_security_bars(
                 Market(stock.market),
                 stock.code,
                 KlineCategory.DAY,
@@ -1124,14 +1309,23 @@ def fetch_history(
             pages.append(convert_bars(page))
             if len(page) < count:
                 break
-    combined: list[Bar] = []
-    seen: set[str] = set()
-    for page in reversed(pages):
-        for bar in page:
-            if bar.date not in seen:
-                combined.append(bar)
-                seen.add(bar.date)
-    return combined[-bars:]
+        xdxr = active_client.get_xdxr_info(
+            Market(stock.market),
+            stock.code,
+        )
+        combined: list[Bar] = []
+        seen: set[str] = set()
+        for page in reversed(pages):
+            for bar in page:
+                if bar.date not in seen:
+                    combined.append(bar)
+                    seen.add(bar.date)
+        return forward_adjust_bars(combined[-bars:], xdxr)
+
+    if client is not None:
+        return load(client)
+    with TdxClient(host, timeout=12, auto_reconnect=True) as active_client:
+        return load(active_client)
 
 
 def fetch_histories(
@@ -1151,34 +1345,43 @@ def fetch_histories(
     def run_group(host: str, group: Sequence[Stock], group_index: int):
         rows: list[tuple[Stock, list[Bar]]] = []
         failed: list[str] = []
-        for item_index, stock in enumerate(group, start=1):
-            try:
-                history = fetch_history(host, stock, bars)
-                if history:
-                    rows.append((stock, history))
-                else:
-                    failed.append(f"{stock.code} EmptyHistory")
-            except Exception as exc:
-                failed.append(
-                    f"{stock.code} {type(exc).__name__}: {exc}"
-                )
-            if item_index % 100 == 0:
-                print(
-                    f"历史行情分组 {group_index}/{worker_count}："
-                    f"{item_index}/{len(group)}",
-                    flush=True,
-                )
-        return rows, failed
+        with TdxClient(host, timeout=12, auto_reconnect=True) as client:
+            for item_index, stock in enumerate(group, start=1):
+                try:
+                    history = fetch_history(
+                        host,
+                        stock,
+                        bars,
+                        client=client,
+                    )
+                    if history:
+                        rows.append((stock, history))
+                    else:
+                        failed.append(f"{stock.code} EmptyHistory")
+                except Exception as exc:
+                    failed.append(
+                        f"{stock.code} {type(exc).__name__}: {exc}"
+                    )
+                if item_index % 100 == 0:
+                    print(
+                        f"历史行情分组 {group_index}/{worker_count}："
+                        f"{item_index}/{len(group)}",
+                        flush=True,
+                    )
+        return host, rows, failed
 
     histories: list[tuple[Stock, list[Bar]]] = []
     errors: list[str] = []
+    failed_hosts: set[str] = set()
     with ThreadPoolExecutor(max_workers=worker_count) as pool:
         futures = [
             pool.submit(run_group, hosts[index], group, index + 1)
             for index, group in enumerate(groups)
         ]
         for completed, future in enumerate(as_completed(futures), start=1):
-            rows, failed = future.result()
+            host, rows, failed = future.result()
+            if groups and failed and not rows:
+                failed_hosts.add(host)
             histories.extend(rows)
             errors.extend(failed)
             print(
@@ -1193,34 +1396,39 @@ def fetch_histories(
             stock for stock in stocks if stock.code in failed_codes
         ]
         errors = []
-        def retry_one(stock: Stock, start_index: int):
-            last_error = ""
-            for offset in range(len(hosts)):
-                host = hosts[(start_index + offset) % len(hosts)]
-                try:
-                    history = fetch_history(host, stock, bars)
-                    if history:
-                        return stock, history, ""
-                    last_error = f"{stock.code} EmptyHistory"
-                except Exception as exc:
-                    last_error = (
-                        f"{stock.code} {type(exc).__name__}: {exc}"
-                    )
-            return stock, [], last_error
+        retry_hosts = [host for host in hosts if host not in failed_hosts] or hosts
+        retry_worker_count = min(len(retry_hosts), len(retry_stocks))
+        retry_groups = [
+            retry_stocks[index::retry_worker_count]
+            for index in range(retry_worker_count)
+        ]
 
-        with ThreadPoolExecutor(
-            max_workers=min(worker_count, len(retry_stocks))
-        ) as pool:
+        def retry_group(host: str, group: Sequence[Stock]):
+            rows: list[tuple[Stock, list[Bar]]] = []
+            failed: list[str] = []
+            with TdxClient(host, timeout=12, auto_reconnect=True) as client:
+                for stock in group:
+                    try:
+                        history = fetch_history(host, stock, bars, client=client)
+                        if history:
+                            rows.append((stock, history))
+                        else:
+                            failed.append(f"{stock.code} EmptyHistory")
+                    except Exception as exc:
+                        failed.append(
+                            f"{stock.code} {type(exc).__name__}: {exc}"
+                        )
+            return rows, failed
+
+        with ThreadPoolExecutor(max_workers=retry_worker_count) as pool:
             futures = [
-                pool.submit(retry_one, stock, index)
-                for index, stock in enumerate(retry_stocks)
+                pool.submit(retry_group, retry_hosts[index], group)
+                for index, group in enumerate(retry_groups)
             ]
             for future in as_completed(futures):
-                stock, history, error = future.result()
-                if history:
-                    histories.append((stock, history))
-                else:
-                    errors.append(error)
+                rows, failed = future.result()
+                histories.extend(rows)
+                errors.extend(failed)
     unique = {(stock.market, stock.code): (stock, bars_) for stock, bars_ in histories}
     return list(unique.values()), errors
 

@@ -29,6 +29,9 @@ class SignalMathTests(unittest.TestCase):
         self.assertFalse(config["include_st"])
         self.assertEqual(config["limit_up_lookback_days"], 42)
         self.assertEqual(config["yellow_consecutive_days"], 1)
+        self.assertEqual(config["cross_lookback_days"], 11)
+        self.assertEqual(config["yellow_before_cross_days"], 2)
+        self.assertEqual(config["yellow_after_cross_days"], 10)
         self.assertEqual(config["near_match_minimum"], 3)
 
     def test_cci_has_warmup(self):
@@ -77,6 +80,23 @@ class SignalMathTests(unittest.TestCase):
             self.assertAlmostEqual(value(parts), expected, places=8)
         for parts, expected in zip(coefficients["tiger_tail"], tiger[-6:]):
             self.assertAlmostEqual(value(parts), expected, places=8)
+
+    def test_extended_line_tail_supports_the_live_yellow_window(self):
+        bars = [
+            Bar(
+                f"2026-01-{(i % 28) + 1:02d}",
+                10 + i * 0.02,
+                10.6 + i * 0.02,
+                9.5 + i * 0.02,
+                10.1 + i * 0.02,
+                1,
+                1,
+            )
+            for i in range(100)
+        ]
+        coefficients = append_line_coefficients(bars, 13)
+        self.assertEqual(len(coefficients["dragon_tail"]), 13)
+        self.assertEqual(len(coefficients["tiger_tail"]), 13)
 
     def test_partial_body_below_dragon_is_yellow(self):
         bar = Bar("2026-07-22", 10.60, 10.72, 10.21, 10.25, 1, 1)

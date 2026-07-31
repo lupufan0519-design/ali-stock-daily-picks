@@ -8,7 +8,7 @@ import math
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
@@ -95,6 +95,8 @@ def load_config(path: Path) -> dict:
         "cross_lookback_days",
         "limit_up_lookback_days",
         "yellow_consecutive_days",
+        "yellow_before_cross_days",
+        "yellow_after_cross_days",
         "history_bars",
         "minimum_history_bars",
         "workers",
@@ -104,9 +106,13 @@ def load_config(path: Path) -> dict:
     missing = required.difference(cfg)
     if missing:
         raise ValueError(f"配置缺少字段: {', '.join(sorted(missing))}")
-    for key in required - {"include_st"}:
+    nonnegative = {"yellow_before_cross_days", "yellow_after_cross_days"}
+    for key in required - {"include_st"} - nonnegative:
         if not isinstance(cfg[key], int) or cfg[key] <= 0:
             raise ValueError(f"配置 {key} 必须是正整数")
+    for key in nonnegative:
+        if not isinstance(cfg[key], int) or cfg[key] < 0:
+            raise ValueError(f"配置 {key} 不能是负数")
     if cfg["minimum_history_bars"] > cfg["history_bars"]:
         raise ValueError("minimum_history_bars 不能大于 history_bars")
     return cfg
@@ -171,6 +177,8 @@ def cross_yellow_pair(
     cross_lookback_days: int,
     yellow_consecutive_days: int,
     proximity_days: int = 2,
+    before_days: int | None = None,
+    after_days: int | None = None,
 ) -> tuple[int, int, int]:
     """Return the latest cross paired with a nearby qualifying yellow run."""
     if end_index < 0 or len(cross_flags) != len(yellow_flags):
@@ -185,12 +193,14 @@ def cross_yellow_pair(
             if run_end - start + 1 >= yellow_consecutive_days:
                 runs.append((start, run_end))
             start = -1
+    before = proximity_days if before_days is None else max(0, before_days)
+    after = proximity_days if after_days is None else max(0, after_days)
     cross_start = max(1, end_index - cross_lookback_days + 1)
     for cross_index in range(end_index, cross_start - 1, -1):
         if not cross_flags[cross_index]:
             continue
-        nearby_start = max(0, cross_index - proximity_days)
-        nearby_end = min(end_index, cross_index + proximity_days)
+        nearby_start = max(0, cross_index - before)
+        nearby_end = min(end_index, cross_index + after)
         for run_start, run_end in reversed(runs):
             overlap_start = max(run_start, nearby_start)
             overlap_end = min(run_end, nearby_end)
@@ -332,7 +342,10 @@ def make_sparkline(bars: Sequence[Bar], dragon: Sequence[float], tiger: Sequence
     )
 
 
-def append_line_coefficients(bars: Sequence[Bar]) -> dict[str, list]:
+def append_line_coefficients(
+    bars: Sequence[Bar],
+    tail_size: int = 6,
+) -> dict[str, list]:
     """Encode exact next-bar dragon/tiger values as linear high/low functions."""
 
     def values(low: float, high: float) -> tuple[list[float], list[float]]:
@@ -346,7 +359,7 @@ def append_line_coefficients(bars: Sequence[Bar]) -> dict[str, list]:
             amount=0.0,
         )
         dragon, tiger = line_series([*bars, probe])
-        return dragon[-6:], tiger[-6:]
+        return dragon[-tail_size:], tiger[-tail_size:]
 
     base = values(0.0, 0.0)
     low_unit = values(1.0, 0.0)
@@ -365,8 +378,8 @@ def append_line_coefficients(bars: Sequence[Bar]) -> dict[str, list]:
             ),
         ]
 
-    dragon_tail = [coeff(0, index) for index in range(-6, 0)]
-    tiger_tail = [coeff(1, index) for index in range(-6, 0)]
+    dragon_tail = [coeff(0, index) for index in range(-tail_size, 0)]
+    tiger_tail = [coeff(1, index) for index in range(-tail_size, 0)]
     return {
         "dragon": dragon_tail[-1],
         "tiger": tiger_tail[-1],
@@ -403,6 +416,14 @@ def make_live_seed(
     ]
     matched = sum((bottom_ok, cross_ok, limit_ok, yellow_ok))
     eligible = bool(cfg["include_st"] or not is_st_name(stock.name))
+    tail_size = max(
+        6,
+        int(cfg["cross_lookback_days"])
+        + int(cfg.get("yellow_before_cross_days", 2))
+        + int(cfg["yellow_consecutive_days"])
+        - 1,
+    )
+    history_tail_size = tail_size - 1
     return {
         "code": stock.code,
         "name": stock.name,
@@ -415,12 +436,15 @@ def make_live_seed(
             limit_up_price(bars[-1].close, price_limit_rate(stock)),
             4,
         ),
-        "line_coefficients": append_line_coefficients(bars),
+        "line_coefficients": append_line_coefficients(bars, tail_size),
         "cross_tail_dates": [bar.date for bar in bars[-4:]],
         "body_low_tail": [
-            round(min(bar.open, bar.close), 4) for bar in bars[-5:]
+            round(min(bar.open, bar.close), 4)
+            for bar in bars[-history_tail_size:]
         ],
-        "body_low_tail_dates": [bar.date for bar in bars[-5:]],
+        "body_low_tail_dates": [
+            bar.date for bar in bars[-history_tail_size:]
+        ],
         "bottom_date": bottom_date,
         "cross_date": cross_date,
         "limit_up_date": limit_date,
@@ -499,6 +523,8 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
         end_index=len(bars) - 1,
         cross_lookback_days=cfg["cross_lookback_days"],
         yellow_consecutive_days=cfg["yellow_consecutive_days"],
+        before_days=cfg.get("yellow_before_cross_days", 2),
+        after_days=cfg.get("yellow_after_cross_days", 2),
     )
     yellow_date = (
         bars[paired_yellow_index].date if paired_yellow_index >= 0 else ""
@@ -662,6 +688,51 @@ def convert_bars(items) -> list[Bar]:
     ]
 
 
+def forward_adjust_bars(bars: Sequence[Bar], xdxr_records: Sequence) -> list[Bar]:
+    """Convert raw TDX daily bars to the latest forward-adjusted price basis."""
+    adjusted = list(bars)
+    if not adjusted:
+        return adjusted
+    events = sorted(
+        (record for record in xdxr_records if int(record.category) == 1),
+        key=lambda record: (record.year, record.month, record.day),
+    )
+    latest_date = adjusted[-1].date
+    for record in events:
+        event_date = f"{record.year:04d}-{record.month:02d}-{record.day:02d}"
+        if event_date > latest_date:
+            continue
+        cash = float(record.fenhong or 0.0)
+        rights_ratio = float(record.peigu or 0.0)
+        rights_price = float(record.peigujia or 0.0)
+        bonus_ratio = float(record.songzhuangu or 0.0)
+        denominator = 1.0 + rights_ratio + bonus_ratio
+        if denominator <= 0:
+            continue
+
+        def adjusted_price(value: float) -> float:
+            price = Decimal(str(
+                (value - cash + rights_price * rights_ratio) / denominator
+            ))
+            return float(
+                price.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            )
+
+        adjusted = [
+            replace(
+                bar,
+                open=adjusted_price(bar.open),
+                high=adjusted_price(bar.high),
+                low=adjusted_price(bar.low),
+                close=adjusted_price(bar.close),
+            )
+            if bar.date < event_date
+            else bar
+            for bar in adjusted
+        ]
+    return adjusted
+
+
 def fetch_chunk(host: str, stocks: Sequence[Stock], cfg: dict) -> tuple[list[Evaluation], list[str]]:
     from xmtdx import KlineCategory, Market, TdxClient
 
@@ -679,7 +750,15 @@ def fetch_chunk(host: str, stocks: Sequence[Stock], cfg: dict) -> tuple[list[Eva
                         0,
                         cfg["history_bars"],
                     )
-                    item = evaluate(stock, convert_bars(raw), cfg)
+                    xdxr = client.get_xdxr_info(
+                        Market(stock.market),
+                        stock.code,
+                    )
+                    item = evaluate(
+                        stock,
+                        forward_adjust_bars(convert_bars(raw), xdxr),
+                        cfg,
+                    )
                     if item is not None:
                         results.append(item)
                 except Exception as exc:  # 单只股票失败不影响全市场
@@ -1077,7 +1156,7 @@ footer{{margin-top:25px;color:#738198;font-size:13px}}@media(max-width:900px){{.
 <div class="table-wrap"><table><thead><tr><th>股票</th><th>加入日/加入价</th><th>最新日/收盘价</th><th>加入日至今收益</th><th>跟踪时长</th><th>龙虎信号</th></tr></thead><tbody>{active_rows}</tbody></table></div>
 
 <h3>次选区</h3>
-<p>近期龙腾跃虎与邻近黄柱必须配对，并在“可能见底”或两月内涨停中至少再满足一项。龙虎转弱只作预警；曾达到5%浮盈后较最高收盘回撤20%时止盈，或完成60个后续交易日后结束；条件补齐时转入主选区并保留原持有期。</p>
+<p>近期龙腾跃虎与窗口黄柱必须配对，并在“可能见底”或两月内涨停中至少再满足一项。窗口按上穿前 {cfg.get('yellow_before_cross_days', 2)} 日至后 {cfg.get('yellow_after_cross_days', 2)} 日计算。龙虎转弱只作预警；曾达到5%浮盈后较最高收盘回撤20%时止盈，或完成60个后续交易日后结束；条件补齐时转入主选区并保留原持有期。</p>
 <div class="stats">
   <div class="stat"><small>次选跟踪中</small><b>{secondary_stats['active_count']} 只</b></div>
   <div class="stat"><small>当前成功率</small><b>{pct_html(secondary_stats['current_success_rate'])}</b></div>

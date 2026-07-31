@@ -1,6 +1,7 @@
 import json
 import unittest
 from datetime import datetime
+from pathlib import Path
 from types import SimpleNamespace
 
 from cloud_gate import parse_tencent_trade_date, should_screen
@@ -16,6 +17,7 @@ from intraday import (
     unpack_live_seed,
 )
 from report_ui import LIVE_SCRIPT, _evaluation_row, _position_row, render_report
+from screener import Bar, cross_yellow_pair, forward_adjust_bars
 
 
 class CloudWorkflowTests(unittest.TestCase):
@@ -478,6 +480,75 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertTrue(result["observation_yellow_ok"])
         self.assertEqual(result["observation_matched_count"], 3)
 
+    def test_forward_adjustment_matches_the_user_chart(self):
+        bars = [
+            Bar("2025-08-07", 43.0, 43.42, 41.64, 42.35, 1, 1),
+            Bar("2026-07-31", 20.5, 21.52, 20.29, 21.01, 1, 1),
+        ]
+        event = SimpleNamespace(
+            category=1,
+            year=2026,
+            month=6,
+            day=17,
+            fenhong=0.2,
+            peigu=0.0,
+            peigujia=0.0,
+            songzhuangu=0.3,
+        )
+        adjusted = forward_adjust_bars(bars, [event])
+        self.assertEqual(
+            (
+                adjusted[0].open,
+                adjusted[0].high,
+                adjusted[0].low,
+                adjusted[0].close,
+            ),
+            (32.92, 33.25, 31.88, 32.42),
+        )
+        self.assertEqual(adjusted[1], bars[1])
+
+    def test_trend_case_contains_a_visible_cross_and_real_yellow_bars(self):
+        payload = json.loads(
+            (Path(__file__).resolve().parents[1] / "results" / "trend_case.json")
+            .read_text(encoding="utf-8")
+        )
+        bars = payload["bars"]
+        dragon = payload["dragon"]
+        tiger = payload["tiger"]
+        cross_index = next(
+            index
+            for index, bar in enumerate(bars)
+            if bar["date"] == payload["cross_date"]
+        )
+        self.assertLessEqual(dragon[cross_index - 1], tiger[cross_index - 1])
+        self.assertGreater(dragon[cross_index], tiger[cross_index])
+        for yellow_date in payload["yellow_dates"]:
+            index = next(
+                index
+                for index, bar in enumerate(bars)
+                if bar["date"] == yellow_date
+            )
+            self.assertGreater(
+                dragon[index],
+                min(bars[index]["open"], bars[index]["close"]),
+            )
+
+    def test_yellow_window_can_extend_after_the_cross_without_looking_before(self):
+        cross = [False, True, False, False, False, False, False]
+        yellow = [True, False, False, False, False, False, True]
+        self.assertEqual(
+            cross_yellow_pair(
+                cross,
+                yellow,
+                end_index=6,
+                cross_lookback_days=6,
+                yellow_consecutive_days=1,
+                before_days=0,
+                after_days=5,
+            )[:2],
+            (1, 6),
+        )
+
     def test_live_cross_recomputes_the_full_five_day_window(self):
         cfg = {
             "bottom_lookback_days": 5,
@@ -666,8 +737,23 @@ class CloudWorkflowTests(unittest.TestCase):
                 eligible=True,
                 selected=False,
             )
-            for index in range(7)
+            for index in range(8)
         ]
+        observations[1].yellow_ok = True
+        observations[1].yellow_count = 1
+        tracked = {
+            "code": "600100",
+            "name": "主选跟踪",
+            "market": 1,
+            "entry_price": 10.0,
+            "entry_date": "2026-07-20",
+            "last_close": 10.5,
+            "last_date": "2026-07-30",
+            "return_pct": 5.0,
+            "holding_days": 8,
+            "missing_streak": 0,
+            "status": "跟踪中",
+        }
         html = render_report(
             [item, *observations],
             {
@@ -680,7 +766,7 @@ class CloudWorkflowTests(unittest.TestCase):
             5209,
             [],
             {
-                "active": [],
+                "active": [tracked],
                 "closed": [],
                 "secondary_active": [],
                 "secondary_closed": [],
@@ -692,15 +778,20 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertIn('preload="none"', html)
         self.assertIn('class="pool-table"', html)
         self.assertIn("中远通 最近42日K线", html)
-        self.assertIn("真实案例 · 隆盛科技", html)
-        self.assertIn("趋势开始", html)
+        self.assertIn("真实案例 · 海南华铁", html)
+        self.assertIn("信号确认", html)
         self.assertIn("建议结束", html)
         self.assertIn('class="case-dragon-line"', html)
         self.assertIn('class="case-tiger-line"', html)
+        self.assertIn('class="case-yellow-body"', html)
+        self.assertIn("通达信前复权日线", html)
+        self.assertIn("2025-02-05 / 2025-01-24、2025-01-27 / 2025-02-11", html)
         self.assertIn("默认展示优先级最高的 5 只", html)
-        self.assertIn("展开更多：其余 2 只观察标的", html)
+        self.assertIn("展开更多：其余 1 只观察标的", html)
+        self.assertNotIn("观察示例0", html)
+        self.assertEqual(html.count("观察示例1"), 1)
         self.assertIn("100 次信号中，曾至少涨到 5%", html)
-        self.assertIn("信号后第 13 个交易日", html)
+        self.assertIn("信号后第", html)
         self.assertNotIn("首次达到5%中位数", html)
         self.assertNotIn("hero-aigc-v2-poster.webp;base64", html)
 
