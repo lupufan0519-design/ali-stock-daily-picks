@@ -1,7 +1,7 @@
 {
   "version": 1,
   "pool_name": "卢氏龙虎趋势池",
-  "last_trade_date": "2026-07-24",
+  "last_trade_date": "2026-07-30",
   "active": [],
   "closed": [
     {
@@ -31,43 +31,48 @@
   ],
   "secondary_active": [
     {
-      "position_id": "secondary_600793_2026-07-22",
-      "code": "600793",
-      "name": "宜宾纸业",
-      "market": 1,
-      "entry_date": "2026-07-22",
-      "entry_price": 12.6,
-      "last_date": "2026-07-24",
-      "last_close": 12.38,
-      "return_pct": -1.7460317460317398,
-      "best_return_pct": 1.5873015873016039,
-      "worst_return_pct": -1.7460317460317398,
-      "holding_days": 3,
-      "status": "龙线在虎线上方",
-      "selected_dates": [
-        "2026-07-22",
-        "2026-07-23",
-        "2026-07-24"
-      ]
-    },
-    {
       "position_id": "secondary_603648_2026-07-24",
       "code": "603648",
       "name": "畅联股份",
       "market": 1,
       "entry_date": "2026-07-24",
       "entry_price": 8.49,
-      "last_date": "2026-07-24",
-      "last_close": 8.49,
-      "return_pct": 0.0,
-      "best_return_pct": 0.0,
+      "last_date": "2026-07-30",
+      "last_close": 8.8,
+      "return_pct": 3.6513545347467646,
+      "best_return_pct": 3.6513545347467646,
       "worst_return_pct": 0.0,
-      "holding_days": 1,
+      "holding_days": 2,
       "status": "龙线在虎线上方",
       "selected_dates": [
         "2026-07-24"
       ]
     }
   ],
-  "secondary_closed": []
+  "secondary_closed": [
+    {
+      "position_id": "secondary_600793_2026-07-22",
+      "code": "600793",
+      "name": "宜宾纸业",
+      "market": 1,
+      "entry_date": "2026-07-22",
+      "entry_price": 12.6,
+      "last_date": "2026-07-30",
+      "last_close": 12.6,
+      "return_pct": 0.0,
+      "best_return_pct": 1.5873015873016039,
+      "worst_return_pct": -1.7460317460317398,
+      "holding_days": 4,
+      "status": "已移出",
+      "selected_dates": [
+        "2026-07-22",
+        "2026-07-23",
+        "2026-07-24"
+      ],
+      "exit_date": "2026-07-30",
+      "exit_price": 12.6,
+      "exit_return_pct": 0.0,
+      "exit_reason": "龙线不再高于虎线"
+    }
+  ]
 }
