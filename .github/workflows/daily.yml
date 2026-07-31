@@ -2,8 +2,15 @@ name: Daily close screening
 
 on:
   schedule:
-    - cron: "22,37 7 * * 1-5"
+    # 17:40 China Standard Time fallback. External triggers run at 15:40/16:40.
+    - cron: "40 9 * * 1-5"
   workflow_dispatch:
+    inputs:
+      force:
+        description: "Run even when the close/trading-day gate would skip"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -27,12 +34,25 @@ jobs:
       PYTHONUNBUFFERED: "1"
     steps:
       - uses: actions/checkout@v6
+      - name: Check completed trading day
+        id: gate
+        env:
+          FORCE_RUN: ${{ inputs.force || false }}
+        run: |
+          if [ "$FORCE_RUN" = "true" ]; then
+            python cloud_gate.py --force
+          else
+            python cloud_gate.py
+          fi
       - uses: actions/setup-python@v6
+        if: steps.gate.outputs.run == 'true'
         with:
           python-version: "3.12"
           cache: pip
-      - run: python -m pip install -r requirements.txt
+      - if: steps.gate.outputs.run == 'true'
+        run: python -m pip install -r requirements.txt
       - name: Run full-market close screening
+        if: steps.gate.outputs.run == 'true'
         id: screening
         run: python cloud_daily.py
       - name: Refresh closing quotes

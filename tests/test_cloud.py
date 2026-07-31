@@ -2,6 +2,7 @@ import unittest
 from datetime import datetime
 from types import SimpleNamespace
 
+from cloud_gate import parse_tencent_trade_date, should_screen
 from cloud_daily import compact_snapshot
 from intraday import (
     collect_targets,
@@ -175,7 +176,7 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertEqual(quotes["002038"]["amount"], 142691351.0)
 
     def test_quote_time_normalizes_iso_and_time_only_formats(self):
-        now = datetime(2026, 7, 31, 10, 30)
+        now = datetime(2026, 7, 31, 16, 30)
         self.assertEqual(
             normalize_quote_time("2026-07-31T10:15:20+08:00", now),
             "2026-07-31T10:15:20+08:00",
@@ -184,6 +185,31 @@ class CloudWorkflowTests(unittest.TestCase):
             normalize_quote_time("15:17:58.099", now),
             "2026-07-31T15:17:58+08:00",
         )
+        self.assertEqual(
+            normalize_quote_time("15:00:00", datetime(2026, 7, 27, 9, 15)),
+            "2026-07-24T15:00:00+08:00",
+        )
+
+    def test_close_gate_skips_weekends_duplicates_and_holidays(self):
+        friday = datetime(2026, 7, 31, 15, 40)
+        self.assertEqual(
+            should_screen(friday, "2026-07-30", "2026-07-31"),
+            (True, "new completed trading day"),
+        )
+        self.assertFalse(should_screen(friday, "2026-07-31", "2026-07-31")[0])
+        self.assertFalse(should_screen(friday, "2026-07-30", "2026-07-30")[0])
+        self.assertFalse(
+            should_screen(datetime(2026, 8, 1, 15, 40), "2026-07-31", "")[0]
+        )
+        self.assertTrue(
+            should_screen(datetime(2026, 8, 1, 9, 0), "", "", force=True)[0]
+        )
+
+    def test_parse_tencent_index_trade_date(self):
+        fields = [""] * 31
+        fields[30] = "20260731150000"
+        raw = f'v_sh000001="{"~".join(fields)}";'
+        self.assertEqual(parse_tencent_trade_date(raw), "2026-07-31")
 
     def test_live_rows_expose_and_update_quote_time(self):
         position = {

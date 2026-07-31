@@ -3,7 +3,12 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from screener import Stock, fetch_chunk
+from screener import (
+    MAX_UNRESOLVED_ERRORS,
+    Stock,
+    fetch_chunk,
+    scan_quality_error,
+)
 
 
 class FailingClient:
@@ -39,6 +44,12 @@ class ScreenerResilienceTests(unittest.TestCase):
         self.assertEqual(len(errors), 2)
         self.assertTrue(errors[0].startswith("600001 ConnectionError:"))
         self.assertTrue(errors[1].startswith("000001 ConnectionError:"))
+
+    def test_scan_quality_blocks_large_partial_publication(self):
+        allowed = ["600001 timeout"] * MAX_UNRESOLVED_ERRORS
+        blocked = allowed + ["600002 timeout"]
+        self.assertEqual(scan_quality_error(5208, allowed), "")
+        self.assertIn("本轮不更新策略状态", scan_quality_error(5208, blocked))
 
 
 if __name__ == "__main__":

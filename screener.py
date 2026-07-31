@@ -6,6 +6,7 @@ import html
 import json
 import math
 import sys
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
 from datetime import datetime
@@ -32,6 +33,9 @@ CACHE_DIR = ROOT / "cache"
 UNIVERSE_CACHE = CACHE_DIR / "universe.json"
 STRATEGY_DIR = ROOT / "strategy"
 STRATEGY_STATE_PATH = STRATEGY_DIR / "state.json"
+FINAL_INDIVIDUAL_RETRY_LIMIT = 200
+FINAL_RETRY_TIME_BUDGET_SECONDS = 600
+MAX_UNRESOLVED_ERRORS = 10
 
 
 @dataclass(frozen=True)
@@ -521,24 +525,54 @@ def scan_market(cfg: dict, codes: set[str] | None = None) -> tuple[list[Evaluati
     if errors:
         failed_codes = {line.split(" ", 1)[0] for line in errors}
         retry_stocks = [s for s in universe if s.code in failed_codes]
-        print(f"逐只换服务器补扫 {len(retry_stocks)} 只", flush=True)
-        final_errors: list[str] = []
-        for stock in retry_stocks:
-            last_errors: list[str] = []
-            for host in hosts:
-                part_results, part_errors = fetch_chunk(host, [stock], cfg)
-                if not part_errors:
-                    evaluations.extend(part_results)
-                    last_errors = []
+        if len(retry_stocks) <= FINAL_INDIVIDUAL_RETRY_LIMIT:
+            print(f"逐只换服务器补扫 {len(retry_stocks)} 只", flush=True)
+            final_errors: list[str] = []
+            retry_deadline = time.monotonic() + FINAL_RETRY_TIME_BUDGET_SECONDS
+            for index, stock in enumerate(retry_stocks):
+                if time.monotonic() >= retry_deadline:
+                    final_errors.extend(
+                        f"{remaining.code} FinalRetryBudgetExceeded: "
+                        f"{FINAL_RETRY_TIME_BUDGET_SECONDS}s budget exhausted"
+                        for remaining in retry_stocks[index:]
+                    )
                     break
-                last_errors = part_errors
-            final_errors.extend(last_errors)
-        errors = final_errors
+                last_errors: list[str] = []
+                for host in hosts:
+                    if time.monotonic() >= retry_deadline:
+                        last_errors = [
+                            f"{stock.code} FinalRetryBudgetExceeded: "
+                            f"{FINAL_RETRY_TIME_BUDGET_SECONDS}s budget exhausted"
+                        ]
+                        break
+                    part_results, part_errors = fetch_chunk(host, [stock], cfg)
+                    if not part_errors:
+                        evaluations.extend(part_results)
+                        last_errors = []
+                        break
+                    last_errors = part_errors
+                final_errors.extend(last_errors)
+            errors = final_errors
+        else:
+            print(
+                f"仍有 {len(retry_stocks)} 只失败，超过逐只补扫上限 "
+                f"{FINAL_INDIVIDUAL_RETRY_LIMIT}；保留错误并结束本轮，避免工作流超时",
+                flush=True,
+            )
     evaluations.sort(
         key=lambda x: (x.selected, x.matched_count, x.yellow_count, x.change_pct),
         reverse=True,
     )
     return evaluations, errors, len(universe)
+
+
+def scan_quality_error(scanned: int, errors: Sequence[str]) -> str:
+    if len(errors) <= MAX_UNRESOLVED_ERRORS:
+        return ""
+    return (
+        f"全市场扫描仍有 {len(errors)}/{scanned} 只行情失败，"
+        f"超过发布上限 {MAX_UNRESOLVED_ERRORS}；本轮不更新策略状态"
+    )
 
 
 def market_prefix(item: Evaluation) -> str:
@@ -860,6 +894,10 @@ def main(argv: Iterable[str] | None = None) -> int:
             datetime.strptime(args.as_of, "%Y-%m-%d")
             cfg["_as_of_date"] = args.as_of
         evaluations, errors, scanned = scan_market(cfg, parse_codes(args.codes))
+        quality_error = scan_quality_error(scanned, errors)
+        if quality_error:
+            print(quality_error, file=sys.stderr)
+            return 4
         trade_date = max(x.date for x in evaluations)
         if is_intraday_snapshot(trade_date):
             print(f"{trade_date} 尚未收盘：本次为盘中数据，未更新日报和策略跟踪池")

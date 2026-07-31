@@ -4,7 +4,7 @@ import argparse
 import json
 import re
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Iterable, Sequence
 from urllib.request import Request, urlopen
@@ -152,6 +152,10 @@ def normalize_quote_time(value: object, now: datetime | None = None) -> str:
                 parsed_time,
                 tzinfo=SHANGHAI,
             )
+            if parsed > reference + timedelta(minutes=10):
+                parsed -= timedelta(days=1)
+                while parsed.weekday() >= 5:
+                    parsed -= timedelta(days=1)
             return parsed.isoformat(timespec="seconds")
         except ValueError:
             continue
