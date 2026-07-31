@@ -22,6 +22,13 @@
       "selected_dates": [
         "2026-07-30",
         "2026-07-31"
+      ],
+      "line_history": [
+        {
+          "date": "2026-07-31",
+          "dragon": 15.320033955696822,
+          "tiger": 15.227721986496169
+        }
       ]
     }
   ],
@@ -68,6 +75,13 @@
       "status": "龙线在虎线上方",
       "selected_dates": [
         "2026-07-24"
+      ],
+      "line_history": [
+        {
+          "date": "2026-07-31",
+          "dragon": 8.517772508535211,
+          "tiger": 8.505648066712174
+        }
       ]
     },
     {
@@ -84,6 +98,38 @@
       "worst_return_pct": 0.0,
       "holding_days": 1,
       "status": "龙线在虎线上方",
+      "selected_dates": [
+        "2026-07-31"
+      ],
+      "line_history": [
+        {
+          "date": "2026-07-31",
+          "dragon": 15.796142007039457,
+          "tiger": 15.735604417024875
+        }
+      ]
+    },
+    {
+      "position_id": "secondary_688443_2026-07-31",
+      "code": "688443",
+      "name": "智翔金泰",
+      "market": 1,
+      "entry_date": "2026-07-31",
+      "entry_price": 22.22,
+      "last_date": "2026-07-31",
+      "last_close": 22.22,
+      "return_pct": 0.0,
+      "best_return_pct": 0.0,
+      "worst_return_pct": 0.0,
+      "holding_days": 1,
+      "status": "龙线在虎线上方",
+      "line_history": [
+        {
+          "date": "2026-07-31",
+          "dragon": 22.12626467711918,
+          "tiger": 21.99213434617141
+        }
+      ],
       "selected_dates": [
         "2026-07-31"
       ]
