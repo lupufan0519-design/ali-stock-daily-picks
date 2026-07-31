@@ -4,6 +4,8 @@ import argparse
 import json
 import os
 import sys
+from dataclasses import asdict, is_dataclass
+from datetime import datetime
 from pathlib import Path
 
 import screener
@@ -13,6 +15,7 @@ from observation import visible_observations
 ROOT = Path(__file__).resolve().parent
 STATE_PATH = ROOT / "strategy" / "state.json"
 LATEST_PATH = ROOT / "results" / "latest.json"
+LATEST_HTML_PATH = ROOT / "results" / "latest.html"
 SNAPSHOT_PATH = ROOT / "cloud_snapshot.json"
 LIVE_SEED_FORMAT = 1
 
@@ -103,6 +106,81 @@ def compact_snapshot(payload: dict) -> dict:
     }
 
 
+def bootstrap_payload(
+    evaluations: list,
+    cfg: dict,
+    scanned: int,
+    errors: list[str],
+    strategy: dict,
+) -> dict:
+    trade_date = max((item.date for item in evaluations), default="")
+    return {
+        "trade_date": trade_date,
+        "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "scanned": scanned,
+        "errors": list(errors),
+        "config": {
+            key: value
+            for key, value in cfg.items()
+            if not key.startswith("_")
+        },
+        "results": [
+            {
+                key: value
+                for key, value in (
+                    asdict(item) if is_dataclass(item) else vars(item)
+                ).items()
+                if key != "chart"
+            }
+            for item in evaluations
+        ],
+        "strategy": strategy,
+    }
+
+
+def bootstrap_live_snapshot() -> int:
+    """Build live seeds from the last settled date without changing strategy state."""
+    strategy = json.loads(STATE_PATH.read_text(encoding="utf-8"))
+    base_date = str(strategy.get("last_trade_date", ""))
+    if not base_date:
+        raise RuntimeError("策略状态没有可用于初始化的收盘交易日")
+
+    cfg = screener.load_config(screener.DEFAULT_CONFIG)
+    cfg["_as_of_date"] = base_date
+    evaluations, errors, scanned = screener.scan_market(cfg)
+    quality_error = screener.scan_quality_error(scanned, errors)
+    if quality_error:
+        raise RuntimeError(quality_error)
+    payload = bootstrap_payload(evaluations, cfg, scanned, errors, strategy)
+    if payload["trade_date"] != base_date:
+        raise RuntimeError(
+            f"初始化交易日不一致：策略状态 {base_date}，行情 {payload['trade_date']}"
+        )
+
+    SNAPSHOT_PATH.write_text(
+        json.dumps(compact_snapshot(payload), ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    LATEST_HTML_PATH.write_text(
+        screener.render_html(
+            evaluations,
+            cfg,
+            scanned,
+            errors,
+            strategy,
+            [],
+        ),
+        encoding="utf-8",
+    )
+    write_github_output("changed", "true")
+    write_github_output("trade_date", base_date)
+    print(
+        f"盘中数值种子初始化完成：基准 {base_date}，"
+        f"扫描 {scanned} 只，失败 {len(errors)} 只；策略状态未修改"
+    )
+    return 0
+
+
 def write_github_output(name: str, value: str) -> None:
     output = os.environ.get("GITHUB_OUTPUT")
     if output:
@@ -112,12 +190,20 @@ def write_github_output(name: str, value: str) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="云端收盘筛选与状态持久化")
-    parser.add_argument(
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
         "--snapshot-only",
         action="store_true",
         help="从现有 latest.json 生成轻量云端快照，不重新扫描",
     )
+    mode.add_argument(
+        "--bootstrap-live",
+        action="store_true",
+        help="按最近结算日生成盘中数值种子，不修改策略状态",
+    )
     args = parser.parse_args(argv)
+    if args.bootstrap_live:
+        return bootstrap_live_snapshot()
     if args.snapshot_only:
         payload = json.loads(LATEST_PATH.read_text(encoding="utf-8"))
         SNAPSHOT_PATH.write_text(

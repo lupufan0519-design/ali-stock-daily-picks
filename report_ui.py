@@ -1431,7 +1431,7 @@ def _evaluation_row(item, observation: bool = False) -> str:
 
 
 def _live_pool_row(item, area: str) -> str:
-    label = "收盘主选" if area == "main" else "收盘次选"
+    label = "最近收盘主选信号" if area == "main" else "最近收盘次选信号"
     return f"""
     <tr data-live-code="{_esc(item.code)}">
       <td>{_stock_cell(item.code, item.name, int(item.market))}</td>
@@ -1443,7 +1443,7 @@ def _live_pool_row(item, area: str) -> str:
       <td>{_signal(item.limit_up_ok, item.limit_up_date or '未命中')}</td>
       <td>{_signal(item.yellow_ok, f'连续 {item.yellow_count} 根')}</td>
       <td class="live-pool-status"><span class="state good">{label}</span>
-          <span class="subline">跟踪与统计已按收盘结算</span></td>
+          <span class="subline">正式跟踪与统计以收盘状态为准</span></td>
     </tr>"""
 
 
@@ -1653,7 +1653,7 @@ def render_report(
     </section>
 
     <section class="section reveal" id="signals">
-      <div class="section-head"><div><span class="section-kicker">Daily selection</span><h2>最近收盘确认主选</h2>
+      <div class="section-head"><div><span class="section-kicker">Daily selection</span><h2>最近收盘主选信号</h2>
       </div><span class="count-badge">{len(selected)} 只</span></div>
 {legend}
       <div class="panel table-scroll"><table><thead><tr><th>股票</th><th>收盘 / 涨跌</th><th>近42日 K 线与龙虎线</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>连续黄柱</th></tr></thead>

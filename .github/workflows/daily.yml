@@ -11,6 +11,11 @@ on:
         required: false
         type: boolean
         default: false
+      bootstrap_live:
+        description: "Build intraday seeds from the last settled close without changing tracking"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -38,8 +43,9 @@ jobs:
         id: gate
         env:
           FORCE_RUN: ${{ inputs.force || false }}
+          BOOTSTRAP_LIVE: ${{ inputs.bootstrap_live || false }}
         run: |
-          if [ "$FORCE_RUN" = "true" ]; then
+          if [ "$FORCE_RUN" = "true" ] || [ "$BOOTSTRAP_LIVE" = "true" ]; then
             python cloud_gate.py --force
           else
             python cloud_gate.py
@@ -54,14 +60,21 @@ jobs:
       - name: Run full-market close screening
         if: steps.gate.outputs.run == 'true'
         id: screening
-        run: python cloud_daily.py
+        env:
+          BOOTSTRAP_LIVE: ${{ inputs.bootstrap_live || false }}
+        run: |
+          if [ "$BOOTSTRAP_LIVE" = "true" ]; then
+            python cloud_daily.py --bootstrap-live
+          else
+            python cloud_daily.py
+          fi
       - name: Refresh closing quotes
         if: steps.screening.outputs.changed == 'true'
         run: python intraday.py --result cloud_snapshot.json
       - name: Build static site
         if: steps.screening.outputs.changed == 'true'
         run: python prepare_site.py
-      - name: Persist strategy state
+      - name: Persist close state or live bootstrap
         if: steps.screening.outputs.changed == 'true'
         shell: bash
         run: |

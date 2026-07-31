@@ -3,7 +3,7 @@ from datetime import datetime
 from types import SimpleNamespace
 
 from cloud_gate import parse_tencent_trade_date, should_screen
-from cloud_daily import compact_snapshot
+from cloud_daily import bootstrap_payload, compact_snapshot
 from intraday import (
     build_live_pools,
     collect_targets,
@@ -253,6 +253,49 @@ class CloudWorkflowTests(unittest.TestCase):
         )
         self.assertEqual(seed["code"], "600001")
         self.assertTrue(seed["eligible"])
+
+    def test_bootstrap_payload_does_not_change_strategy_state(self):
+        strategy = {
+            "last_trade_date": "2026-07-30",
+            "active": [],
+            "closed": [],
+            "secondary_active": [],
+            "secondary_closed": [],
+        }
+        original = dict(strategy)
+        item = SimpleNamespace(
+            code="301516",
+            name="中远通",
+            market=0,
+            date="2026-07-30",
+            close=14.43,
+            change_pct=-8.44,
+            bottom_ok=True,
+            bottom_date="2026-07-30",
+            cross_ok=True,
+            cross_date="2026-07-24",
+            limit_up_ok=True,
+            limit_up_date="2026-07-07",
+            yellow_ok=True,
+            yellow_count=1,
+            matched_count=4,
+            dragon_above_tiger=True,
+            eligible=True,
+            selected=True,
+            chart="<svg></svg>",
+            live_seed=self.live_seed("301516"),
+        )
+        payload = bootstrap_payload(
+            [item],
+            {"yellow_consecutive_days": 1, "_as_of_date": "2026-07-30"},
+            5208,
+            [],
+            strategy,
+        )
+        self.assertEqual(strategy, original)
+        self.assertIs(payload["strategy"], strategy)
+        self.assertTrue(payload["results"][0]["selected"])
+        self.assertNotIn("chart", payload["results"][0])
 
     def test_live_seed_recomputes_primary_and_secondary_without_settlement(self):
         cfg = {
