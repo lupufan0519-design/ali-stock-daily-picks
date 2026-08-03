@@ -552,17 +552,24 @@ class CloudWorkflowTests(unittest.TestCase):
                 min(bars[index]["open"], bars[index]["close"]),
             )
 
-    def test_trend_case_separates_cross_from_confirmation_in_a_signal_zoom(self):
+    def test_trend_case_overlays_signal_evidence_on_one_full_wave_chart(self):
         html = _trend_case_chart()
-        self.assertIn("信号形成放大图", html)
-        self.assertIn("2月5日为回看上穿日；2月11日为当天首次确认日", html)
+        self.assertNotIn("信号形成放大图", html)
+        self.assertNotIn('class="trend-case-signal"', html)
+        self.assertIn("完整波段 · 龙虎线与黄柱", html)
+        self.assertIn("2/5 回看上穿", html)
         self.assertIn("当天首次确认", html)
+        self.assertEqual(html.count('class="trend-case-canvas"'), 1)
         self.assertEqual(html.count('class="case-arrow-start"'), 1)
+        self.assertEqual(html.count('class="case-arrow-end"'), 1)
+        self.assertEqual(html.count('class="case-exit-target"'), 1)
         self.assertEqual(html.count('class="case-cross-guide"'), 1)
         self.assertEqual(html.count('class="case-dragon-line"'), 1)
         self.assertEqual(html.count('class="case-tiger-line"'), 1)
+        self.assertEqual(html.count('class="case-line-label dragon"'), 1)
+        self.assertEqual(html.count('class="case-line-label tiger"'), 1)
         self.assertEqual(html.count('class="case-yellow-body qualified"'), 2)
-        self.assertEqual(html.count('class="case-yellow-body contextual"'), 4)
+        self.assertEqual(html.count('class="case-yellow-body contextual"'), 6)
 
     def test_yellow_window_can_extend_after_the_cross_without_looking_before(self):
         cross = [False, True, False, False, False, False, False]
