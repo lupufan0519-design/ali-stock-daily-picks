@@ -7,7 +7,9 @@ from rolling_validation import (
     CausalLineState,
     SignalPoint,
     forward_returns,
+    lifecycle_trade_stats,
     replay_signals,
+    simulate_lifecycle_trades,
     simulate_trades,
 )
 from screener import Bar, Stock, line_series
@@ -74,6 +76,9 @@ class ExitRuleTests(unittest.TestCase):
         area: str = "",
         close: float = 10.0,
         base_signal: bool = False,
+        cross_ok: bool = True,
+        cross_age: int = -1,
+        cross_lookback_days: int = 0,
     ) -> SignalPoint:
         return SignalPoint(
             date=f"2026-07-{day:02d}",
@@ -83,6 +88,10 @@ class ExitRuleTests(unittest.TestCase):
             area=area,
             base_signal=base_signal,
             endpoint_cross=False,
+            cross_ok=cross_ok,
+            yellow_ok=base_signal or bool(area),
+            cross_age=cross_age,
+            cross_lookback_days=cross_lookback_days,
         )
 
     def test_secondary_promotion_is_not_an_exit(self):
@@ -179,6 +188,225 @@ class ExitRuleTests(unittest.TestCase):
             "2026-07-01",
             "2026-07-05",
         ])
+
+    def test_signal_label_expiry_and_true_trend_end_are_separate(self):
+        points = [
+            self.point(1, 11, 10, "secondary", 10.0, cross_ok=True),
+            self.point(2, 11.2, 10, "", 10.2, cross_ok=False),
+            self.point(3, 9.8, 10, "", 10.4, cross_ok=False),
+            *[
+                self.point(day, 9.8, 10, "", 10.4, cross_ok=False)
+                for day in range(4, 62)
+            ],
+        ]
+        literal = simulate_lifecycle_trades(
+            Stock(1, "600001", "示例"),
+            points,
+            {"id": "signal_window_end", "signal_expiry_exit": True},
+        )
+        relationship = simulate_lifecycle_trades(
+            Stock(1, "600001", "示例"),
+            points,
+            {"id": "death_cross"},
+        )
+        self.assertEqual(literal[0]["exit_date"], "2026-07-02")
+        self.assertEqual(relationship[0]["exit_date"], "2026-07-03")
+        self.assertEqual(relationship[0]["exit_reason"], "龙线不再高于虎线")
+
+    def test_recalculated_signal_erasure_exits_before_natural_expiry(self):
+        points = [
+            self.point(
+                1,
+                11,
+                10,
+                "secondary",
+                10.0,
+                cross_age=2,
+                cross_lookback_days=5,
+            ),
+            self.point(2, 11.2, 10, "", 9.8, cross_ok=False),
+            *[
+                self.point(day, 11.2, 10, "", 9.8, cross_ok=False)
+                for day in range(3, 63)
+            ],
+        ]
+        rows = simulate_lifecycle_trades(
+            Stock(1, "600001", "示例"),
+            points,
+            {"id": "death_cross"},
+        )
+        self.assertEqual(rows[0]["exit_date"], "2026-07-02")
+        self.assertEqual(
+            rows[0]["exit_reason"],
+            "龙腾跃虎信号被K线重算消失",
+        )
+
+    def test_natural_cross_label_expiry_does_not_end_a_persistent_trend(self):
+        points = [
+            self.point(
+                1,
+                11,
+                10,
+                "secondary",
+                10.0,
+                cross_age=4,
+                cross_lookback_days=5,
+            ),
+            self.point(2, 11.2, 10, "", 10.2, cross_ok=False),
+            self.point(3, 9.8, 10, "", 10.1, cross_ok=False),
+            *[
+                self.point(day, 9.8, 10, "", 10.1, cross_ok=False)
+                for day in range(4, 63)
+            ],
+        ]
+        rows = simulate_lifecycle_trades(
+            Stock(1, "600001", "示例"),
+            points,
+            {"id": "death_cross"},
+        )
+        self.assertEqual(rows[0]["exit_date"], "2026-07-03")
+        self.assertEqual(rows[0]["exit_reason"], "龙线不再高于虎线")
+
+    def test_entry_can_wait_for_signal_to_remain_selected(self):
+        points = [
+            self.point(1, 11, 10, "secondary", 10.0),
+            self.point(2, 11.2, 10, "secondary", 10.2),
+            self.point(3, 9.8, 10, "", 10.1),
+            *[
+                self.point(day, 9.8, 10, "", 10.1)
+                for day in range(4, 63)
+            ],
+        ]
+        rows = simulate_lifecycle_trades(
+            Stock(1, "600001", "示例"),
+            points,
+            {"id": "confirmed_entry", "entry_confirmation_days": 1},
+        )
+        self.assertEqual(rows[0]["entry_date"], "2026-07-02")
+        self.assertEqual(rows[0]["entry_confirmation_days"], 1)
+
+    def test_entry_can_wait_for_price_to_confirm_trend_start(self):
+        points = [
+            self.point(1, 11, 10, "secondary", 10.0),
+            self.point(2, 11.2, 10, "", 10.2),
+            self.point(3, 11.4, 10, "", 10.4),
+            self.point(4, 9.8, 10, "", 10.3),
+            *[
+                self.point(day, 9.8, 10, "", 10.3)
+                for day in range(5, 64)
+            ],
+        ]
+        rows = simulate_lifecycle_trades(
+            Stock(1, "600001", "示例"),
+            points,
+            {
+                "id": "breakout_entry",
+                "entry_breakout_pct": 3.0,
+                "entry_max_wait_bars": 10,
+            },
+        )
+        self.assertEqual(rows[0]["signal_setup_date"], "2026-07-01")
+        self.assertEqual(rows[0]["entry_date"], "2026-07-03")
+        self.assertEqual(rows[0]["entry_price"], 10.4)
+
+    def test_lifecycle_trailing_rule_still_ends_on_relationship_loss(self):
+        points = [
+            self.point(1, 11, 10, "main", 10.0),
+            self.point(2, 12, 10, "", 10.6),
+            self.point(3, 9, 10, "", 10.4),
+            *[
+                self.point(day, 9, 10, "", 10.4)
+                for day in range(4, 62)
+            ],
+        ]
+        rows = simulate_lifecycle_trades(
+            Stock(1, "600001", "示例"),
+            points,
+            {
+                "id": "trail",
+                "activation_threshold_pct": 5.0,
+                "trailing_drawdown_pct": 5.0,
+            },
+        )
+        self.assertEqual(rows[0]["exit_date"], "2026-07-03")
+        self.assertEqual(rows[0]["exit_reason"], "龙线不再高于虎线")
+
+    def test_lifecycle_trailing_rule_can_require_two_closes(self):
+        closes = [10.0, 11.0, 10.4, 10.3] + [10.3] * 58
+        points = [
+            self.point(
+                day,
+                11,
+                10,
+                "main" if day == 1 else "",
+                close,
+            )
+            for day, close in enumerate(closes, start=1)
+        ]
+        rows = simulate_lifecycle_trades(
+            Stock(1, "600001", "示例"),
+            points,
+            {
+                "id": "confirmed_trail",
+                "activation_threshold_pct": 5.0,
+                "trailing_drawdown_pct": 5.0,
+                "trailing_confirm_days": 2,
+            },
+        )
+        self.assertEqual(rows[0]["exit_date"], "2026-07-04")
+        self.assertIn("连续确认2日", rows[0]["exit_reason"])
+
+    def test_lifecycle_trailing_rule_can_wait_five_bars(self):
+        closes = [10.0, 11.0, 10.4, 10.3, 10.2, 10.1] + [10.1] * 56
+        points = [
+            self.point(
+                day,
+                11,
+                10,
+                "main" if day == 1 else "",
+                close,
+            )
+            for day, close in enumerate(closes, start=1)
+        ]
+        rows = simulate_lifecycle_trades(
+            Stock(1, "600001", "示例"),
+            points,
+            {
+                "id": "minimum_hold_trail",
+                "activation_threshold_pct": 5.0,
+                "trailing_drawdown_pct": 5.0,
+                "minimum_holding_bars": 5,
+            },
+        )
+        self.assertEqual(rows[0]["exit_date"], "2026-07-06")
+
+    def test_lifecycle_success_uses_only_completed_entry_to_exit_return(self):
+        stats = lifecycle_trade_stats(
+            [
+                {
+                    "return_pct": 5.0,
+                    "best_return_pct": 8.0,
+                    "worst_return_pct": -1.0,
+                    "days_to_peak": 2,
+                    "peak_to_exit_bars": 1,
+                    "holding_bars": 3,
+                    "peak_giveback_pct": 3.0,
+                    "pending_days": 1,
+                },
+                {
+                    "return_pct": -2.0,
+                    "best_return_pct": 1.0,
+                    "worst_return_pct": -3.0,
+                    "days_to_peak": 1,
+                    "peak_to_exit_bars": 2,
+                    "holding_bars": 3,
+                    "peak_giveback_pct": 3.0,
+                    "pending_days": 2,
+                },
+            ]
+        )
+        self.assertEqual(stats["success_rate_pct"], 50.0)
+        self.assertEqual(stats["sample_count"], 2)
 
 
 if __name__ == "__main__":

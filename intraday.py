@@ -13,7 +13,13 @@ from zoneinfo import ZoneInfo
 
 from observation import OBSERVATION_LIMIT, visible_observations
 from screener import cross_yellow_pair
-from strategy_tracker import trend_exit_reason
+from strategy_tracker import (
+    TREND_START_BREAKOUT_PCT,
+    TREND_START_MAX_WAIT_BARS,
+    signal_recalculated_away,
+    trend_exit_reason,
+    trend_pending_reason,
+)
 
 
 ROOT = Path(__file__).resolve().parent
@@ -157,6 +163,8 @@ def collect_display_targets(
     for position in (
         list(strategy.get("active", []))
         + list(strategy.get("secondary_active", []))
+        + list(strategy.get("pending_main", []))
+        + list(strategy.get("pending_secondary", []))
     ):
         if is_st_name(position.get("name", "")):
             continue
@@ -215,14 +223,31 @@ def collect_tracking_codes(
         )
 
     return {
-        "main": codes("active"),
-        "secondary": codes("secondary_active"),
+        "main": sorted(set(codes("active")) | set(codes("pending_main"))),
+        "secondary": sorted(
+            set(codes("secondary_active"))
+            | set(codes("pending_secondary"))
+        ),
     }
 
 
 def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, list[dict]]:
     """Project settled positions onto live prices without settling strategy state."""
     strategy = payload.get("strategy", {})
+    cfg = payload.get("config", {})
+    close_trade_date = str(payload.get("trade_date", ""))
+    evaluated_by_code: dict[str, dict] = {}
+    for seed in live_seeds(payload):
+        code = str(seed.get("code", ""))
+        quote = quotes.get(code)
+        if not code or quote is None:
+            continue
+        try:
+            evaluated = evaluate_live_seed(seed, quote, cfg, close_trade_date)
+        except (KeyError, TypeError, ValueError):
+            evaluated = None
+        if evaluated is not None:
+            evaluated_by_code[code] = evaluated
     result: dict[str, list[dict]] = {"main": [], "secondary": []}
     for area, key in (("main", "active"), ("secondary", "secondary_active")):
         for position in strategy.get(key, []):
@@ -239,17 +264,64 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                 if entry_price > 0 and live_price > 0
                 else float(position.get("return_pct", 0.0))
             )
-            exit_reason = trend_exit_reason(position, live_price) if has_quote else ""
+            live_signal = evaluated_by_code.get(code)
+            dragon_above_tiger = (
+                bool(live_signal.get("dragon_above_tiger"))
+                if live_signal is not None
+                else None
+            )
+            live_extra_bar = int(
+                bool(
+                    str(quote.get("server_time", ""))[:10]
+                    and str(quote.get("server_time", ""))[:10]
+                    > str(position.get("last_date", ""))
+                )
+            )
+            setup_elapsed = int(
+                position.get("setup_elapsed_bars_at_entry", 0)
+            ) + max(0, int(position.get("holding_days", 1)) - 1) + live_extra_bar
+            signal_erased = signal_recalculated_away(
+                position,
+                live_signal,
+                setup_elapsed,
+            )
+            exit_reason = (
+                trend_exit_reason(
+                    position,
+                    live_price,
+                    dragon_above_tiger=dragon_above_tiger,
+                    signal_erased=signal_erased,
+                )
+                if has_quote
+                else ""
+            )
             trend_ended = bool(exit_reason)
-            warning = bool(position.get("missing_streak", 0))
+            pending_reason = (
+                trend_pending_reason(position, live_signal, live_price)
+                if live_signal is not None and not trend_ended
+                else str(position.get("status_detail", ""))
+                if position.get("status") == "待观察中"
+                else ""
+            )
             if trend_ended:
                 detail = f"{exit_reason}；收盘确认后结算"
-            elif warning:
-                detail = "龙虎线转弱观察，尚未触发趋势结束条件"
+                status = "趋势结束"
+            elif pending_reason:
+                detail = f"{pending_reason}；尚未触发趋势结束"
+                status = "待观察中"
             elif has_quote:
                 detail = "趋势条件仍有效，盘中持续跟踪"
+                status = (
+                    "趋势开始"
+                    if str(position.get("entry_date", ""))
+                    == str(position.get("last_date", ""))
+                    and str(quote.get("server_time", ""))[:10]
+                    <= str(position.get("last_date", ""))
+                    else "上升趋势中"
+                )
             else:
                 detail = "最新行情待确认，暂按最近收盘展示"
+                status = str(position.get("status", "上升趋势中"))
             result[area].append(
                 {
                     "position_id": str(position.get("position_id", "")),
@@ -267,9 +339,94 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                     "server_time": str(quote.get("server_time", "")),
                     "quote_available": has_quote,
                     "trend_ended": trend_ended,
-                    "status": "趋势结束" if trend_ended else "上升趋势中",
+                    "status": status,
                     "status_detail": detail,
                     "exit_reason": exit_reason,
+                    "setup_cancelled": False,
+                }
+            )
+    for area, key in (
+        ("main", "pending_main"),
+        ("secondary", "pending_secondary"),
+    ):
+        for setup in strategy.get(key, []):
+            if not setup.get("code") or is_st_name(setup.get("name", "")):
+                continue
+            code = str(setup["code"])
+            quote = quotes.get(code, {})
+            quote_price = float(quote.get("price", 0.0) or 0.0)
+            has_quote = quote_price > 0
+            live_price = (
+                quote_price
+                if has_quote
+                else float(setup.get("last_close", setup.get("setup_price", 0.0)))
+            )
+            setup_price = float(setup.get("setup_price", 0.0))
+            setup_return = (
+                (live_price / setup_price - 1.0) * 100.0
+                if live_price > 0 and setup_price > 0
+                else 0.0
+            )
+            live_signal = evaluated_by_code.get(code)
+            live_extra_bar = int(
+                bool(
+                    str(quote.get("server_time", ""))[:10]
+                    and str(quote.get("server_time", ""))[:10]
+                    > str(setup.get("last_date", ""))
+                )
+            )
+            elapsed = int(setup.get("setup_elapsed_bars", 0)) + live_extra_bar
+            cancel_reason = ""
+            if live_signal is not None and signal_recalculated_away(
+                setup,
+                live_signal,
+                elapsed,
+            ):
+                cancel_reason = "龙腾跃虎信号被后续K线重算消失"
+            elif (
+                live_signal is not None
+                and not live_signal.get("dragon_above_tiger")
+            ):
+                cancel_reason = "龙线不再高于虎线"
+            elif elapsed > TREND_START_MAX_WAIT_BARS:
+                cancel_reason = "10个交易日内未确认上涨趋势"
+            confirmed = bool(
+                not cancel_reason
+                and elapsed > 0
+                and setup_return >= TREND_START_BREAKOUT_PCT
+            )
+            if cancel_reason:
+                status = "待观察中"
+                detail = f"{cancel_reason}；收盘确认后移出候选"
+            elif confirmed:
+                status = "趋势开始"
+                detail = "盘中已达到5%启动线；收盘确认后给出正式买点"
+            else:
+                gap = max(0.0, TREND_START_BREAKOUT_PCT - setup_return)
+                status = "待观察中"
+                detail = f"信号仍有效，距趋势开始确认约差{gap:.2f}个百分点"
+            result[area].append(
+                {
+                    "position_id": str(setup.get("setup_id", "")),
+                    "code": code,
+                    "name": str(setup.get("name", quote.get("name", ""))),
+                    "market": int(setup.get("market", quote.get("market", 0))),
+                    "entry_date": str(setup.get("setup_date", "")),
+                    "entry_price": setup_price,
+                    "holding_days": elapsed,
+                    "settled_date": str(setup.get("last_date", "")),
+                    "settled_price": float(setup.get("last_close", setup_price)),
+                    "settled_return_pct": setup_return,
+                    "live_price": live_price,
+                    "live_return_pct": setup_return,
+                    "server_time": str(quote.get("server_time", "")),
+                    "quote_available": has_quote,
+                    "trend_ended": bool(cancel_reason),
+                    "status": status,
+                    "status_detail": detail,
+                    "exit_reason": cancel_reason,
+                    "setup_cancelled": bool(cancel_reason),
+                    "pending_setup": True,
                 }
             )
     return result
@@ -500,7 +657,7 @@ def current_cci(typical_13: Sequence[float], high: float, low: float, close: flo
     return 0.0 if deviation == 0 else (window[-1] - mean) / (0.015 * deviation)
 
 
-def _baseline_live_row(seed: dict, quote: dict) -> dict:
+def _baseline_live_row(seed: dict, quote: dict, cfg: dict | None = None) -> dict:
     return {
         "code": str(seed["code"]),
         "name": str(seed.get("name", quote.get("name", ""))),
@@ -510,6 +667,10 @@ def _baseline_live_row(seed: dict, quote: dict) -> dict:
         "server_time": str(quote.get("server_time", "")),
         "bottom_ok": bool(seed.get("bottom_ok")),
         "cross_ok": bool(seed.get("cross_ok")),
+        "cross_age": int(seed.get("cross_age", -1)),
+        "cross_lookback_days": int(
+            (cfg or {}).get("cross_lookback_days", 11)
+        ),
         "limit_up_ok": bool(seed.get("limit_up_ok")),
         "yellow_ok": bool(seed.get("yellow_ok")),
         "bottom_date": str(seed.get("bottom_date", "")),
@@ -556,7 +717,7 @@ def evaluate_live_seed(
         or live_date <= close_trade_date
         or live_date <= str(seed.get("base_date", ""))
     ):
-        return _baseline_live_row(seed, quote)
+        return _baseline_live_row(seed, quote, cfg)
     if min(price, open_price, high, low) <= 0:
         return None
 
@@ -584,6 +745,8 @@ def evaluate_live_seed(
     dragon = dragon_tail[-1]
     tiger = tiger_tail[-1]
     dragon_above_tiger = dragon > tiger
+    prior_cross_age = int(seed.get("cross_age", -1))
+    cross_age = prior_cross_age + 1 if prior_cross_age >= 0 else -1
 
     new_bottom = bool(
         price <= float(seed["min_close_15"]) + 1e-8
@@ -670,6 +833,7 @@ def evaluate_live_seed(
             )
             if paired_cross >= 0:
                 cross_date = body_dates[paired_cross]
+                cross_age = len(cross_flags) - 1 - paired_cross
         else:
             yellow_ok = bool(
                 cross_ok
@@ -703,6 +867,7 @@ def evaluate_live_seed(
             if prior_cross and dragon_above_tiger
             else ""
         )
+        cross_age = 0 if new_cross else cross_age if prior_cross else -1
         yellow_ok = bool(
             cross_ok
             and (
@@ -747,6 +912,8 @@ def evaluate_live_seed(
         "server_time": server_time,
         "bottom_ok": bottom_ok,
         "cross_ok": cross_ok,
+        "cross_age": cross_age,
+        "cross_lookback_days": int(cfg["cross_lookback_days"]),
         "limit_up_ok": limit_up_ok,
         "yellow_ok": yellow_ok,
         "bottom_date": bottom_date,
@@ -760,6 +927,9 @@ def evaluate_live_seed(
         "observation_yellow_count": observation_yellow_count,
         "observation_matched_count": observation_matched_count,
         "dragon_above_tiger": dragon_above_tiger,
+        "dragon_value": dragon,
+        "tiger_value": tiger,
+        "date": live_date,
         "eligible": True,
         "selected": selected,
     }

@@ -255,7 +255,7 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertTrue(main["trend_ended"])
         self.assertEqual(main["status"], "趋势结束")
         self.assertAlmostEqual(main["live_return_pct"], 20.0)
-        self.assertIn("回撤20%", main["exit_reason"])
+        self.assertIn("回撤5%", main["exit_reason"])
         self.assertFalse(secondary["trend_ended"])
         self.assertEqual(secondary["status"], "上升趋势中")
         self.assertAlmostEqual(secondary["live_return_pct"], 8.0)
@@ -632,7 +632,7 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertNotIn('class="trend-case-signal"', html)
         self.assertIn("完整波段 · 龙虎线与黄柱", html)
         self.assertIn("2/5 回看上穿", html)
-        self.assertIn("当天首次确认", html)
+        self.assertIn("趋势开始", html)
         self.assertEqual(html.count('class="trend-case-canvas"'), 1)
         self.assertEqual(html.count('class="case-arrow-start"'), 1)
         self.assertEqual(html.count('class="case-arrow-end"'), 1)
@@ -772,7 +772,7 @@ class CloudWorkflowTests(unittest.TestCase):
             "return_pct": 5.0,
             "holding_days": 4,
             "missing_streak": 0,
-            "status": "跟踪中",
+            "status": "上升趋势中",
         }
         item = SimpleNamespace(
             code="300001",
@@ -867,7 +867,7 @@ class CloudWorkflowTests(unittest.TestCase):
             "return_pct": 5.0,
             "holding_days": 8,
             "missing_streak": 0,
-            "status": "跟踪中",
+            "status": "上升趋势中",
         }
         html = render_report(
             [item, *observations],
@@ -900,13 +900,13 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertIn('class="case-tiger-line"', html)
         self.assertIn('class="case-yellow-body qualified"', html)
         self.assertIn("通达信前复权日线", html)
-        self.assertIn("2025-02-05 / 2025-01-24、2025-01-27 / 2025-02-11", html)
+        self.assertIn("2025-02-11 / 2025-02-13 · 8.92元", html)
         self.assertIn("默认展示优先级最高的 5 只", html)
         self.assertIn("展开更多：其余 1 只观察标的", html)
         self.assertNotIn("观察示例0", html)
         self.assertEqual(html.count("观察示例1"), 1)
-        self.assertIn("100 次信号中，曾至少涨到 5%", html)
-        self.assertIn("信号后第", html)
+        self.assertIn("首次入选信号在自然显示期限内", html)
+        self.assertIn("10 个交易日内收盘较信号日上涨 5%", html)
         self.assertNotIn("首次达到5%中位数", html)
         self.assertNotIn("hero-aigc-v2-poster.webp;base64", html)
 

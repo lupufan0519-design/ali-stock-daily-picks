@@ -169,6 +169,11 @@ class SignalPoint:
     area: str
     base_signal: bool
     endpoint_cross: bool
+    cross_ok: bool = False
+    yellow_ok: bool = False
+    cross_date: str = ""
+    cross_age: int = -1
+    cross_lookback_days: int = 0
 
 
 def _cci_at(bars: Sequence[Bar], index: int, period: int = 14) -> float:
@@ -310,6 +315,26 @@ def replay_signal_variants(
                 after_days=after_days,
             )
             yellow_ok = paired_cross >= 0
+            paired_cross_index = (
+                pair_start + paired_cross if paired_cross >= 0 else -1
+            )
+            latest_cross_index = next(
+                (
+                    signal_index
+                    for signal_index in range(index, cross_start - 1, -1)
+                    if is_cross_up(
+                        dragon_values,
+                        tiger_values,
+                        signal_index,
+                    )
+                ),
+                -1,
+            )
+            tracked_cross_index = (
+                paired_cross_index
+                if paired_cross_index >= 0
+                else latest_cross_index
+            )
             base_signal = eligible_day and cross_ok and yellow_ok
             area = ""
             if eligible_day:
@@ -326,6 +351,19 @@ def replay_signal_variants(
                     area=area,
                     base_signal=base_signal,
                     endpoint_cross=endpoint_cross,
+                    cross_ok=cross_ok,
+                    yellow_ok=yellow_ok,
+                    cross_date=(
+                        bars[tracked_cross_index].date
+                        if tracked_cross_index >= 0
+                        else ""
+                    ),
+                    cross_age=(
+                        index - tracked_cross_index
+                        if tracked_cross_index >= 0
+                        else -1
+                    ),
+                    cross_lookback_days=effective_cross_lookback,
                 )
             )
     return points_by_variant
@@ -779,6 +817,398 @@ def simulate_trades(
     return closed, open_trades
 
 
+def lifecycle_rule_candidates() -> tuple[dict, ...]:
+    rules: list[dict] = [
+        {
+            "id": "signal_window_end",
+            "label": "近期龙腾跃虎标签到期即结束",
+            "signal_expiry_exit": True,
+        },
+        {
+            "id": "death_cross",
+            "label": "龙线不再高于虎线即结束",
+        },
+        {
+            "id": "weakening_1_or_cross",
+            "label": "首次转弱或龙线不再高于虎线即结束",
+            "weakening_confirm_days": 1,
+        },
+        {
+            "id": "weakening_2_or_cross",
+            "label": "转弱连续确认2日或龙线不再高于虎线即结束",
+            "weakening_confirm_days": 2,
+        },
+        {
+            "id": "ma5_2_or_cross",
+            "label": "连续2日跌破5日均线或龙线不再高于虎线即结束",
+            "ma5_confirm_days": 2,
+        },
+    ]
+    for activation in (3.0, 5.0, 8.0):
+        for drawdown in (5.0, 8.0, 10.0, 12.0, 15.0, 20.0):
+            rules.append(
+                {
+                    "id": f"trail_{drawdown:g}_after_{activation:g}_or_cross",
+                    "label": (
+                        f"收盘浮盈达到{activation:g}%后回撤{drawdown:g}%"
+                        "，或龙线不再高于虎线即结束"
+                    ),
+                    "activation_threshold_pct": activation,
+                    "trailing_drawdown_pct": drawdown,
+                }
+            )
+    for drawdown in (8.0, 10.0, 12.0, 15.0):
+        rules.append(
+            {
+                "id": f"trail_{drawdown:g}_after_5_weakening_2_or_cross",
+                "label": (
+                    f"收盘浮盈达到5%后回撤{drawdown:g}%、转弱连续确认2日"
+                    "或龙线不再高于虎线即结束"
+                ),
+                "activation_threshold_pct": 5.0,
+                "trailing_drawdown_pct": drawdown,
+                "weakening_confirm_days": 2,
+            }
+        )
+    for activation in (3.0, 5.0, 8.0):
+        for drawdown in (5.0, 8.0, 10.0):
+            rules.append(
+                {
+                    "id": (
+                        f"trail_{drawdown:g}_after_{activation:g}_"
+                        "confirm_2_or_cross"
+                    ),
+                    "label": (
+                        f"收盘浮盈达到{activation:g}%后回撤{drawdown:g}%"
+                        "连续确认2日，或龙线不再高于虎线即结束"
+                    ),
+                    "activation_threshold_pct": activation,
+                    "trailing_drawdown_pct": drawdown,
+                    "trailing_confirm_days": 2,
+                }
+            )
+            rules.append(
+                {
+                    "id": (
+                        f"trail_{drawdown:g}_after_{activation:g}_"
+                        "min_5_or_cross"
+                    ),
+                    "label": (
+                        f"至少持有5日，且收盘浮盈达到{activation:g}%后"
+                        f"回撤{drawdown:g}%，或龙线不再高于虎线即结束"
+                    ),
+                    "activation_threshold_pct": activation,
+                    "trailing_drawdown_pct": drawdown,
+                    "minimum_holding_bars": 5,
+                }
+            )
+    confirmation_base = [
+        rule for rule in rules if rule["id"] != "signal_window_end"
+    ]
+    for confirmation_days in (1, 2):
+        for rule in confirmation_base:
+            rules.append(
+                {
+                    **rule,
+                    "id": f"confirm_{confirmation_days}_{rule['id']}",
+                    "label": (
+                        f"连续{confirmation_days + 1}个收盘日保持入选后开始；"
+                        f"{rule['label']}"
+                    ),
+                    "entry_confirmation_days": confirmation_days,
+                }
+            )
+    breakout_exit_ids = {
+        "death_cross",
+        "weakening_1_or_cross",
+        "weakening_2_or_cross",
+        "trail_5_after_5_or_cross",
+        "trail_8_after_5_weakening_2_or_cross",
+        "trail_8_after_8_or_cross",
+        "trail_12_after_8_or_cross",
+        "trail_15_after_5_weakening_2_or_cross",
+    }
+    breakout_exit_base = [
+        rule
+        for rule in confirmation_base
+        if rule["id"] in breakout_exit_ids
+    ]
+    for breakout_pct in (3.0, 5.0):
+        for rule in breakout_exit_base:
+            rules.append(
+                {
+                    **rule,
+                    "id": f"breakout_{breakout_pct:g}_{rule['id']}",
+                    "label": (
+                        f"信号持续且收盘较信号日上涨{breakout_pct:g}%后开始；"
+                        f"{rule['label']}"
+                    ),
+                    "entry_breakout_pct": breakout_pct,
+                    "entry_max_wait_bars": 10,
+                }
+            )
+    return tuple(rules)
+
+
+def _lifecycle_entry_indices(
+    points: Sequence[SignalPoint],
+    entry_mode: str,
+    rule: dict,
+) -> list[tuple[int, int]]:
+    if entry_mode not in {"base", "pool", "main"}:
+        raise ValueError(f"未知生命周期入场模式: {entry_mode}")
+    indices: list[tuple[int, int]] = []
+    armed = True
+    selected_streak = 0
+    setup_index = -1
+    confirmation_days = int(rule.get("entry_confirmation_days", 0))
+    breakout_pct = rule.get("entry_breakout_pct")
+    max_wait = int(rule.get("entry_max_wait_bars", 10))
+    for index, point in enumerate(points):
+        if point.dragon <= point.tiger:
+            armed = True
+            selected_streak = 0
+            setup_index = -1
+        should_enter = (
+            point.base_signal
+            if entry_mode == "base"
+            else bool(point.area)
+            if entry_mode == "pool"
+            else point.area == "main"
+        )
+        if not armed:
+            continue
+        if setup_index < 0 and should_enter:
+            setup_index = index
+            selected_streak = 1
+        elif setup_index >= 0:
+            selected_streak = selected_streak + 1 if should_enter else 0
+
+        if setup_index < 0:
+            continue
+        setup = points[setup_index]
+        elapsed = index - setup_index
+        natural_cross_remaining = max(
+            0,
+            int(setup.cross_lookback_days)
+            - int(setup.cross_age)
+            - 1,
+        )
+        signal_erased = bool(
+            setup.cross_age >= 0
+            and setup.cross_lookback_days > 0
+            and elapsed <= natural_cross_remaining
+            and not point.cross_ok
+            and point.dragon > point.tiger
+        )
+        if signal_erased or elapsed > max_wait:
+            setup_index = index if should_enter else -1
+            selected_streak = 1 if should_enter else 0
+            continue
+
+        entry_ready = (
+            selected_streak >= confirmation_days + 1
+            if breakout_pct is None
+            else elapsed > 0
+            and point.close >= setup.close * (1.0 + float(breakout_pct) / 100.0)
+        )
+        if entry_ready:
+            indices.append((index, setup_index))
+            armed = False
+    return indices
+
+
+def _lifecycle_weakening(
+    points: Sequence[SignalPoint],
+    index: int,
+    entry_index: int,
+) -> bool:
+    if index - entry_index < 2 or points[index].dragon <= points[index].tiger:
+        return False
+    latest = points[index - 2 : index + 1]
+    dragons = [point.dragon for point in latest]
+    spreads = [point.dragon - point.tiger for point in latest]
+    return (
+        dragons[0] > dragons[1] > dragons[2]
+        and spreads[0] > spreads[1] > spreads[2]
+    )
+
+
+def _lifecycle_below_ma5(points: Sequence[SignalPoint], index: int) -> bool:
+    if index < 4:
+        return False
+    moving_average = statistics.fmean(
+        point.close for point in points[index - 4 : index + 1]
+    )
+    return points[index].close < moving_average
+
+
+def simulate_lifecycle_trades(
+    stock: Stock,
+    points: Sequence[SignalPoint],
+    rule: dict,
+    *,
+    entry_mode: str = "pool",
+    horizon: int = 60,
+) -> list[dict]:
+    """Close every eligible wave causally and record the four-stage lifecycle."""
+    trades: list[dict] = []
+    confirmation_days = int(rule.get("entry_confirmation_days", 0))
+    for entry_index, setup_index in _lifecycle_entry_indices(
+        points,
+        entry_mode,
+        rule,
+    ):
+        if entry_index + horizon >= len(points):
+            continue
+        entry = points[entry_index]
+        setup = points[setup_index]
+        running_peak_return = 0.0
+        best_return = 0.0
+        worst_return = 0.0
+        peak_index = entry_index
+        weakening_streak = 0
+        ma5_streak = 0
+        trailing_streak = 0
+        pending_days = 0
+        recovered_count = 0
+        was_pending = False
+        exit_index = entry_index + horizon
+        exit_reason = "完成60个后续交易日"
+
+        for index in range(entry_index + 1, entry_index + horizon + 1):
+            point = points[index]
+            current_return = (point.close / entry.close - 1.0) * 100.0
+            if current_return > best_return:
+                best_return = current_return
+                peak_index = index
+            worst_return = min(worst_return, current_return)
+            running_peak_return = max(running_peak_return, current_return)
+
+            weakening = _lifecycle_weakening(points, index, entry_index)
+            weakening_streak = weakening_streak + 1 if weakening else 0
+            below_ma5 = _lifecycle_below_ma5(points, index)
+            ma5_streak = ma5_streak + 1 if below_ma5 else 0
+
+            activation = rule.get("activation_threshold_pct")
+            trailing = rule.get("trailing_drawdown_pct")
+            activated = activation is not None and running_peak_return >= float(activation)
+            peak_factor = 1.0 + running_peak_return / 100.0
+            current_factor = 1.0 + current_return / 100.0
+            peak_drawdown = (
+                (current_factor / peak_factor - 1.0) * 100.0
+                if peak_factor > 0
+                else 0.0
+            )
+            drawdown_warning = bool(
+                activated
+                and trailing is not None
+                and peak_drawdown <= -float(trailing) * 0.6
+            )
+            trailing_breach = bool(
+                activated
+                and trailing is not None
+                and index - entry_index
+                >= int(rule.get("minimum_holding_bars", 0))
+                and peak_drawdown <= -float(trailing) + 1e-8
+            )
+            trailing_streak = trailing_streak + 1 if trailing_breach else 0
+            natural_cross_remaining = max(
+                0,
+                int(setup.cross_lookback_days)
+                - int(setup.cross_age)
+                - 1,
+            )
+            signal_erased = bool(
+                setup.cross_age >= 0
+                and setup.cross_lookback_days > 0
+                and index - setup_index <= natural_cross_remaining
+                and not point.cross_ok
+                and point.dragon > point.tiger
+            )
+            label_expired = bool(not point.cross_ok and not signal_erased)
+            pending = bool(
+                weakening
+                or below_ma5
+                or drawdown_warning
+            )
+            if pending:
+                pending_days += 1
+            elif was_pending:
+                recovered_count += 1
+            was_pending = pending
+
+            reason = ""
+            if signal_erased:
+                reason = "龙腾跃虎信号被K线重算消失"
+            elif rule.get("signal_expiry_exit") and label_expired:
+                reason = "近期龙腾跃虎标签超过有效窗口"
+            elif point.dragon <= point.tiger:
+                reason = "龙线不再高于虎线"
+            elif (
+                int(rule.get("weakening_confirm_days", 0)) > 0
+                and weakening_streak
+                >= int(rule["weakening_confirm_days"])
+            ):
+                reason = "龙虎差与龙线持续转弱"
+            elif (
+                int(rule.get("ma5_confirm_days", 0)) > 0
+                and ma5_streak >= int(rule["ma5_confirm_days"])
+            ):
+                reason = "连续跌破5日均线"
+            elif (
+                trailing_breach
+                and trailing_streak
+                >= int(rule.get("trailing_confirm_days", 1))
+            ):
+                reason = (
+                    f"达到浮盈阈值后较最高收盘回撤{float(trailing):g}%"
+                    + (
+                        f"连续确认{int(rule['trailing_confirm_days'])}日"
+                        if int(rule.get("trailing_confirm_days", 1)) > 1
+                        else ""
+                    )
+                )
+            elif index == entry_index + horizon:
+                reason = "完成60个后续交易日"
+
+            if reason:
+                exit_index = index
+                exit_reason = reason
+                break
+
+        exit_point = points[exit_index]
+        exit_return = (exit_point.close / entry.close - 1.0) * 100.0
+        trades.append(
+            {
+                "code": stock.code,
+                "name": stock.name,
+                "entry_area": setup.area if entry_mode != "base" else "base",
+                "entry_date": entry.date,
+                "entry_price": entry.close,
+                "entry_confirmation_days": confirmation_days,
+                "entry_breakout_pct": rule.get("entry_breakout_pct"),
+                "signal_setup_date": setup.date,
+                "entry_cross_date": setup.cross_date,
+                "exit_date": exit_point.date,
+                "exit_price": exit_point.close,
+                "return_pct": round(exit_return, 4),
+                "holding_bars": exit_index - entry_index,
+                "best_return_pct": round(best_return, 4),
+                "worst_return_pct": round(worst_return, 4),
+                "peak_date": points[peak_index].date,
+                "days_to_peak": peak_index - entry_index,
+                "peak_to_exit_bars": exit_index - peak_index,
+                "peak_giveback_pct": round(best_return - exit_return, 4),
+                "pending_days": pending_days,
+                "recovered_count": recovered_count,
+                "exit_reason": exit_reason,
+                "success": exit_return > 0,
+            }
+        )
+    return trades
+
+
 def trade_stats(closed: Sequence[dict], open_trades: Sequence[dict]) -> dict:
     returns = [float(item["return_pct"]) for item in closed]
     peak_returns = [float(item["best_return_pct"]) for item in closed]
@@ -846,6 +1276,42 @@ def trade_stats(closed: Sequence[dict], open_trades: Sequence[dict]) -> dict:
             "promoted_count": sum(
                 bool(item.get("promoted")) for item in closed
             ),
+        }
+    )
+    return stats
+
+
+def lifecycle_trade_stats(rows: Sequence[dict]) -> dict:
+    stats = trade_stats(rows, [])
+    returns = [float(item["return_pct"]) for item in rows]
+    gains = sum(value for value in returns if value > 0)
+    losses = abs(sum(value for value in returns if value <= 0))
+    log_returns = [math.log1p(value / 100.0) for value in returns if value > -100.0]
+    stats.update(
+        {
+            "success_definition": "建议结束价高于建议趋势开始价",
+            "success_rate_pct": stats["positive_rate_pct"],
+            "geometric_average_return_pct": round(
+                math.expm1(statistics.fmean(log_returns)) * 100.0,
+                4,
+            )
+            if log_returns
+            else 0.0,
+            "profit_factor": round(gains / losses, 4) if losses else None,
+            "average_pending_bars": round(
+                statistics.fmean(float(item.get("pending_days", 0)) for item in rows),
+                2,
+            )
+            if rows
+            else 0.0,
+            "recovery_rate_pct": round(
+                sum(int(item.get("recovered_count", 0)) > 0 for item in rows)
+                / len(rows)
+                * 100.0,
+                2,
+            )
+            if rows
+            else 0.0,
         }
     )
     return stats
@@ -1041,6 +1507,10 @@ def aggregate_result(
     retrospective_take_profit: dict[str, list[dict]] = {
         rule: [] for rule in TAKE_PROFIT_RULES
     }
+    lifecycle_rules = lifecycle_rule_candidates()
+    lifecycle_trades: dict[str, list[dict]] = {
+        str(rule["id"]): [] for rule in lifecycle_rules
+    }
     date_min = ""
     date_max = ""
     for history_index, (stock, bars) in enumerate(histories, start=1):
@@ -1087,6 +1557,15 @@ def aggregate_result(
         )
         for rule, rows in retrospective_profit_rows.items():
             retrospective_take_profit[rule].extend(rows)
+        for lifecycle_rule in lifecycle_rules:
+            lifecycle_trades[str(lifecycle_rule["id"])].extend(
+                simulate_lifecycle_trades(
+                    stock,
+                    points,
+                    lifecycle_rule,
+                    entry_mode="pool",
+                )
+            )
         if bars:
             date_min = min(date_min or bars[0].date, bars[0].date)
             date_max = max(date_max, bars[-1].date)
@@ -1187,8 +1666,157 @@ def aggregate_result(
             "by_signal_year": by_year,
         }
 
+    lifecycle_candidates: list[dict] = []
+    lifecycle_rule_by_id = {
+        str(rule["id"]): rule for rule in lifecycle_rules
+    }
+    for rule_id, rows in lifecycle_trades.items():
+        development = [row for row in rows if row["entry_date"] < "2025-01-01"]
+        validation_2025 = [
+            row
+            for row in rows
+            if "2025-01-01" <= row["entry_date"] < "2026-01-01"
+        ]
+        holdout_2026 = [row for row in rows if row["entry_date"] >= "2026-01-01"]
+        by_area = {
+            area: lifecycle_trade_stats(
+                [row for row in rows if row["entry_area"] == area]
+            )
+            for area in ("main", "secondary")
+        }
+        development_stats = lifecycle_trade_stats(development)
+        validation_stats = lifecycle_trade_stats(validation_2025)
+        holdout_stats = lifecycle_trade_stats(holdout_2026)
+        stable_success = min(
+            float(development_stats["success_rate_pct"]),
+            float(validation_stats["success_rate_pct"]),
+        )
+        stable_average = min(
+            float(development_stats["average_pct"]),
+            float(validation_stats["average_pct"]),
+        )
+        lifecycle_candidates.append(
+            {
+                **lifecycle_rule_by_id[rule_id],
+                "overall": lifecycle_trade_stats(rows),
+                "development_before_2025": development_stats,
+                "validation_2025": validation_stats,
+                "holdout_2026": holdout_stats,
+                "by_entry_area": by_area,
+                "selection_success_floor_pct": round(stable_success, 2),
+                "selection_average_return_floor_pct": round(stable_average, 4),
+            }
+        )
+
+    eligible_candidates = [
+        item
+        for item in lifecycle_candidates
+        if item["development_before_2025"]["sample_count"] >= 100
+        and item["validation_2025"]["sample_count"] >= 100
+        and item["selection_average_return_floor_pct"] > 0
+    ] or lifecycle_candidates
+    highest_success = max(
+        eligible_candidates,
+        key=lambda item: (
+            item["selection_success_floor_pct"],
+            item["selection_average_return_floor_pct"],
+        ),
+    )
+    success_cutoff = float(highest_success["selection_success_floor_pct"]) - 3.0
+    balanced_pool = [
+        item
+        for item in eligible_candidates
+        if float(item["selection_success_floor_pct"]) >= success_cutoff
+    ]
+    recommended_lifecycle = max(
+        balanced_pool,
+        key=lambda item: (
+            item["selection_average_return_floor_pct"],
+            item["selection_success_floor_pct"],
+        ),
+    )
+    highest_return = max(
+        eligible_candidates,
+        key=lambda item: (
+            item["selection_average_return_floor_pct"],
+            item["selection_success_floor_pct"],
+        ),
+    )
+    operational_candidates = [
+        item
+        for item in lifecycle_candidates
+        if item["development_before_2025"]["sample_count"] >= 50
+        and item["validation_2025"]["sample_count"] >= 50
+        and item["holdout_2026"]["sample_count"] >= 50
+        and min(
+            float(item["development_before_2025"]["average_pct"]),
+            float(item["validation_2025"]["average_pct"]),
+            float(item["holdout_2026"]["average_pct"]),
+        ) > 0
+    ] or lifecycle_candidates
+    for item in operational_candidates:
+        item["operational_success_floor_pct"] = round(
+            min(
+                float(item["development_before_2025"]["success_rate_pct"]),
+                float(item["validation_2025"]["success_rate_pct"]),
+                float(item["holdout_2026"]["success_rate_pct"]),
+            ),
+            2,
+        )
+        item["operational_average_return_floor_pct"] = round(
+            min(
+                float(item["development_before_2025"]["average_pct"]),
+                float(item["validation_2025"]["average_pct"]),
+                float(item["holdout_2026"]["average_pct"]),
+            ),
+            4,
+        )
+    operational_highest_success = max(
+        operational_candidates,
+        key=lambda item: (
+            item["operational_success_floor_pct"],
+            item["operational_average_return_floor_pct"],
+        ),
+    )
+    operational_success_cutoff = (
+        float(operational_highest_success["operational_success_floor_pct"])
+        - 3.0
+    )
+    operational_balanced_pool = [
+        item
+        for item in operational_candidates
+        if float(item["operational_success_floor_pct"])
+        >= operational_success_cutoff
+    ]
+    operational_recommended = max(
+        operational_balanced_pool,
+        key=lambda item: (
+            item["operational_average_return_floor_pct"],
+            item["operational_success_floor_pct"],
+        ),
+    )
+    operational_rows = lifecycle_trades[str(operational_recommended["id"])]
+    persistence_reference_rows = lifecycle_trades["death_cross"]
+    erased_operational_rows = [
+        row
+        for row in persistence_reference_rows
+        if row.get("exit_reason") == "龙腾跃虎信号被K线重算消失"
+    ]
+    persistent_operational_rows = [
+        row
+        for row in persistence_reference_rows
+        if row.get("exit_reason") != "龙腾跃虎信号被K线重算消失"
+    ]
+    lifecycle_candidates.sort(
+        key=lambda item: (
+            item["selection_success_floor_pct"],
+            item["selection_average_return_floor_pct"],
+        ),
+        reverse=True,
+    )
+
     return {
-        "schema_version": 4,
+        "schema_version": 5,
         "generated_at": datetime.now().astimezone().isoformat(
             timespec="seconds"
         ),
@@ -1252,6 +1880,71 @@ def aggregate_result(
             "activation_threshold_pct": 5.0,
             "forward_horizon_bars": 60,
             "rules": take_profit_rules,
+        },
+        "trend_lifecycle_analysis": {
+            "success_definition": (
+                "只统计已经从建议趋势开始走到建议趋势结束的完整波段；"
+                "结束价高于开始价才算成功，未结束样本不进入成功率"
+            ),
+            "entry_definition": (
+                "主选或次选首次满足日只作为待观察信号；信号未被重算消失，且10个交易日内收盘较信号日上涨5%时才确认趋势开始；同一轮龙线高于虎线期间只进入一次"
+            ),
+            "mandatory_end_definition": (
+                "龙线不再高于虎线时，龙腾跃虎的多头关系消失，当日收盘确认趋势结束"
+            ),
+            "label_expiry_comparison": (
+                "自然超过交叉显示窗口不等同趋势结束；另行识别仍在自然窗口内却因XMA尾部重算而消失的短暂信号"
+            ),
+            "status_definition": {
+                "trend_start": "主选或次选信号形成后，10个交易日内收盘较信号日上涨5%的建议买入日",
+                "rising": "尚未出现风险预警或结束条件",
+                "pending": (
+                    "龙虎同步转弱、跌破5日均线，"
+                    "或达到浮盈阈值后回撤达到止盈线的60%"
+                ),
+                "trend_end": "触发推荐结束规则的建议卖出日",
+            },
+            "selection_method": (
+                "参数只用2025年前开发样本与2025年验证样本选择；"
+                "先保留两段胜率下限距最高方案不超过3个百分点的候选，"
+                "再选两段平均收益下限最高者；2026样本不参与选择，只用于最终检验"
+            ),
+            "recommended_id": recommended_lifecycle["id"],
+            "highest_success_id": highest_success["id"],
+            "highest_return_id": highest_return["id"],
+            "operational_selection_method": (
+                "正式执行规则同时比较2025年前、2025年与2026年三个时段；"
+                "在各时段平均收益均为正的候选中，先保留最低胜率距最高方案不超过3个百分点的候选，"
+                "再选各时段最低平均收益最高者。规则自本次选择后冻结，后续行情继续样本外检验"
+            ),
+            "operational_recommended_id": operational_recommended["id"],
+            "signal_persistence_analysis": {
+                "definition": (
+                    "信号首次出现后，在按初始交叉年龄推算的自然显示期限内，"
+                    "若龙线仍高于虎线但龙腾跃虎被后续K线重算掉，记为短暂信号消失；"
+                    "自然到期不记为消失"
+                ),
+                "reference_rule": "首次入选即开始、仅以信号重算消失或龙虎关系结束作为退出",
+                "reference_entry_count": len(persistence_reference_rows),
+                "erased_before_natural_expiry_count": len(
+                    erased_operational_rows
+                ),
+                "erased_before_natural_expiry_rate_pct": round(
+                    len(erased_operational_rows)
+                    / len(persistence_reference_rows)
+                    * 100.0,
+                    2,
+                )
+                if persistence_reference_rows
+                else 0.0,
+                "erased": lifecycle_trade_stats(erased_operational_rows),
+                "persistent": lifecycle_trade_stats(
+                    persistent_operational_rows
+                ),
+            },
+            "entry_mode": "main_or_secondary_pool",
+            "forward_horizon_bars": 60,
+            "candidates": lifecycle_candidates,
         },
         "retrospective_chart_analysis": {
             "warning": (
@@ -1390,45 +2083,54 @@ def fetch_histories(
                 flush=True,
             )
 
-    if errors:
+    def retry_group(host: str, group: Sequence[Stock]):
+        rows: list[tuple[Stock, list[Bar]]] = []
+        failed: list[str] = []
+        with TdxClient(host, timeout=12, auto_reconnect=True) as client:
+            for stock in group:
+                try:
+                    history = fetch_history(host, stock, bars, client=client)
+                    if history:
+                        rows.append((stock, history))
+                    else:
+                        failed.append(f"{stock.code} EmptyHistory")
+                except Exception as exc:
+                    failed.append(
+                        f"{stock.code} {type(exc).__name__}: {exc}"
+                    )
+        return rows, failed
+
+    retry_hosts = [host for host in hosts if host not in failed_hosts] or hosts
+    for retry_attempt in range(1, 4):
+        if not errors:
+            break
         failed_codes = {line.split(" ", 1)[0] for line in errors}
         retry_stocks = [
             stock for stock in stocks if stock.code in failed_codes
         ]
         errors = []
-        retry_hosts = [host for host in hosts if host not in failed_hosts] or hosts
         retry_worker_count = min(len(retry_hosts), len(retry_stocks))
         retry_groups = [
             retry_stocks[index::retry_worker_count]
             for index in range(retry_worker_count)
         ]
-
-        def retry_group(host: str, group: Sequence[Stock]):
-            rows: list[tuple[Stock, list[Bar]]] = []
-            failed: list[str] = []
-            with TdxClient(host, timeout=12, auto_reconnect=True) as client:
-                for stock in group:
-                    try:
-                        history = fetch_history(host, stock, bars, client=client)
-                        if history:
-                            rows.append((stock, history))
-                        else:
-                            failed.append(f"{stock.code} EmptyHistory")
-                    except Exception as exc:
-                        failed.append(
-                            f"{stock.code} {type(exc).__name__}: {exc}"
-                        )
-            return rows, failed
-
         with ThreadPoolExecutor(max_workers=retry_worker_count) as pool:
             futures = [
-                pool.submit(retry_group, retry_hosts[index], group)
+                pool.submit(
+                    retry_group,
+                    retry_hosts[(index + retry_attempt - 1) % len(retry_hosts)],
+                    group,
+                )
                 for index, group in enumerate(retry_groups)
             ]
             for future in as_completed(futures):
                 rows, failed = future.result()
                 histories.extend(rows)
                 errors.extend(failed)
+        print(
+            f"历史行情重试 {retry_attempt}/3；仍失败 {len(errors)} 只",
+            flush=True,
+        )
     unique = {(stock.market, stock.code): (stock, bars_) for stock, bars_ in histories}
     return list(unique.values()), errors
 

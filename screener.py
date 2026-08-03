@@ -457,6 +457,7 @@ def make_live_seed(
             cross_flags,
             cfg["cross_lookback_days"],
         ),
+        "cross_lookback_days": int(cfg["cross_lookback_days"]),
         "limit_up_age": latest_true_age(
             limit_flags,
             cfg["limit_up_lookback_days"],
