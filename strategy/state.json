@@ -1,7 +1,7 @@
 {
   "version": 1,
   "pool_name": "卢氏龙虎趋势池",
-  "last_trade_date": "2026-07-31",
+  "last_trade_date": "2026-08-03",
   "active": [
     {
       "position_id": "301516_2026-07-30",
@@ -10,26 +10,34 @@
       "market": 0,
       "entry_date": "2026-07-30",
       "entry_price": 14.43,
-      "last_date": "2026-07-31",
-      "last_close": 14.75,
-      "return_pct": 2.2176022176022103,
-      "best_return_pct": 2.2176022176022103,
+      "last_date": "2026-08-03",
+      "last_close": 14.91,
+      "return_pct": 3.3264033264033266,
+      "best_return_pct": 3.3264033264033266,
       "worst_return_pct": 0.0,
-      "holding_days": 2,
+      "holding_days": 3,
       "missing_streak": 0,
       "signal_lost_date": "",
-      "status": "龙线在虎线上方",
+      "status": "上升趋势中",
       "selected_dates": [
         "2026-07-30",
-        "2026-07-31"
+        "2026-07-31",
+        "2026-08-03"
       ],
       "line_history": [
         {
           "date": "2026-07-31",
           "dragon": 15.320033955696822,
           "tiger": 15.227721986496169
+        },
+        {
+          "date": "2026-08-03",
+          "dragon": 15.253171430491452,
+          "tiger": 15.189380460985321
         }
-      ]
+      ],
+      "peak_drawdown_pct": 0.0,
+      "status_detail": "趋势条件仍有效"
     }
   ],
   "closed": [
@@ -66,13 +74,13 @@
       "market": 1,
       "entry_date": "2026-07-24",
       "entry_price": 8.49,
-      "last_date": "2026-07-31",
-      "last_close": 8.98,
-      "return_pct": 5.771495877502941,
-      "best_return_pct": 5.771495877502941,
+      "last_date": "2026-08-03",
+      "last_close": 9.15,
+      "return_pct": 7.773851590106018,
+      "best_return_pct": 7.773851590106018,
       "worst_return_pct": 0.0,
-      "holding_days": 3,
-      "status": "龙线在虎线上方",
+      "holding_days": 4,
+      "status": "上升趋势中",
       "selected_dates": [
         "2026-07-24"
       ],
@@ -81,8 +89,17 @@
           "date": "2026-07-31",
           "dragon": 8.517772508535211,
           "tiger": 8.505648066712174
+        },
+        {
+          "date": "2026-08-03",
+          "dragon": 8.519991683030359,
+          "tiger": 8.507837099558495
         }
-      ]
+      ],
+      "peak_drawdown_pct": 0.0,
+      "missing_streak": 0,
+      "signal_lost_date": "",
+      "status_detail": "趋势条件仍有效"
     },
     {
       "position_id": "secondary_600062_2026-07-31",
@@ -91,13 +108,13 @@
       "market": 1,
       "entry_date": "2026-07-31",
       "entry_price": 16.27,
-      "last_date": "2026-07-31",
-      "last_close": 16.27,
-      "return_pct": 0.0,
-      "best_return_pct": 0.0,
+      "last_date": "2026-08-03",
+      "last_close": 16.31,
+      "return_pct": 0.24585125998770607,
+      "best_return_pct": 0.24585125998770607,
       "worst_return_pct": 0.0,
-      "holding_days": 1,
-      "status": "龙线在虎线上方",
+      "holding_days": 2,
+      "status": "上升趋势中",
       "selected_dates": [
         "2026-07-31"
       ],
@@ -106,8 +123,17 @@
           "date": "2026-07-31",
           "dragon": 15.796142007039457,
           "tiger": 15.735604417024875
+        },
+        {
+          "date": "2026-08-03",
+          "dragon": 15.820748760609604,
+          "tiger": 15.748950015314136
         }
-      ]
+      ],
+      "peak_drawdown_pct": 0.0,
+      "missing_streak": 0,
+      "signal_lost_date": "",
+      "status_detail": "趋势条件仍有效"
     },
     {
       "position_id": "secondary_688443_2026-07-31",
@@ -116,23 +142,32 @@
       "market": 1,
       "entry_date": "2026-07-31",
       "entry_price": 22.22,
-      "last_date": "2026-07-31",
-      "last_close": 22.22,
-      "return_pct": 0.0,
-      "best_return_pct": 0.0,
+      "last_date": "2026-08-03",
+      "last_close": 22.63,
+      "return_pct": 1.8451845184518367,
+      "best_return_pct": 1.8451845184518367,
       "worst_return_pct": 0.0,
-      "holding_days": 1,
-      "status": "龙线在虎线上方",
+      "holding_days": 2,
+      "status": "上升趋势中",
       "line_history": [
         {
           "date": "2026-07-31",
           "dragon": 22.12626467711918,
           "tiger": 21.99213434617141
+        },
+        {
+          "date": "2026-08-03",
+          "dragon": 22.08164616296542,
+          "tiger": 21.97418246404674
         }
       ],
       "selected_dates": [
         "2026-07-31"
-      ]
+      ],
+      "peak_drawdown_pct": 2.220446049250313e-14,
+      "missing_streak": 0,
+      "signal_lost_date": "",
+      "status_detail": "趋势条件仍有效"
     }
   ],
   "secondary_closed": [
@@ -159,6 +194,72 @@
       "exit_price": 12.6,
       "exit_return_pct": 0.0,
       "exit_reason": "龙线不再高于虎线"
+    }
+  ],
+  "pending_main": [],
+  "pending_secondary": [
+    {
+      "setup_id": "secondary_002558_2026-08-03",
+      "code": "002558",
+      "name": "巨人网络",
+      "market": 0,
+      "area": "secondary",
+      "origin_area": "secondary",
+      "setup_date": "2026-08-03",
+      "setup_price": 29.09,
+      "last_date": "2026-08-03",
+      "last_close": 29.09,
+      "setup_cross_date": "2026-07-20",
+      "setup_cross_age": 10,
+      "setup_cross_lookback_days": 11,
+      "setup_elapsed_bars": 0,
+      "status": "待观察中",
+      "status_detail": "入选信号已形成，等待收盘较信号日上涨5%确认趋势开始",
+      "selected_dates": [
+        "2026-08-03"
+      ]
+    },
+    {
+      "setup_id": "secondary_002827_2026-08-03",
+      "code": "002827",
+      "name": "高争民爆",
+      "market": 0,
+      "area": "secondary",
+      "origin_area": "secondary",
+      "setup_date": "2026-08-03",
+      "setup_price": 38.06,
+      "last_date": "2026-08-03",
+      "last_close": 38.06,
+      "setup_cross_date": "2026-07-27",
+      "setup_cross_age": 5,
+      "setup_cross_lookback_days": 11,
+      "setup_elapsed_bars": 0,
+      "status": "待观察中",
+      "status_detail": "入选信号已形成，等待收盘较信号日上涨5%确认趋势开始",
+      "selected_dates": [
+        "2026-08-03"
+      ]
+    },
+    {
+      "setup_id": "secondary_003032_2026-08-03",
+      "code": "003032",
+      "name": "传智教育",
+      "market": 0,
+      "area": "secondary",
+      "origin_area": "secondary",
+      "setup_date": "2026-08-03",
+      "setup_price": 9.69,
+      "last_date": "2026-08-03",
+      "last_close": 9.69,
+      "setup_cross_date": "2026-07-27",
+      "setup_cross_age": 5,
+      "setup_cross_lookback_days": 11,
+      "setup_elapsed_bars": 0,
+      "status": "待观察中",
+      "status_detail": "入选信号已形成，等待收盘较信号日上涨5%确认趋势开始",
+      "selected_dates": [
+        "2026-08-03"
+      ]
     }
   ]
 }
