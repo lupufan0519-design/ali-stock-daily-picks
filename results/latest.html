@@ -535,6 +535,111 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 .validation-fact span { display: block; color: var(--muted); font-size: 12px; }
 .validation-fact strong { display: block; margin-top: 5px; font-size: 20px; }
+.repaint-panel {
+  --repaint-live: #2457d6;
+  --repaint-lost: #d4512f;
+  --repaint-kept: #11845b;
+  position: relative;
+  isolation: isolate;
+  margin-bottom: 14px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--primary) 24%, var(--line));
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 9% 6%, color-mix(in srgb, var(--repaint-live) 11%, transparent), transparent 31%),
+    radial-gradient(circle at 94% 91%, color-mix(in srgb, var(--repaint-lost) 9%, transparent), transparent 28%),
+    var(--surface);
+  box-shadow: 0 18px 45px rgba(30, 64, 175, .08);
+}
+.repaint-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 22px 22px 15px;
+}
+.repaint-head h3 { margin: 3px 0 5px; font-size: 22px; }
+.repaint-head p { max-width: 760px; margin: 0; color: var(--muted-strong); }
+.repaint-badge {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 1px solid color-mix(in srgb, var(--repaint-live) 25%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--repaint-live) 6%, var(--surface));
+  color: var(--repaint-live);
+  font-size: 11px;
+  font-weight: 800;
+}
+.repaint-lineage {
+  display: grid;
+  grid-template-columns: minmax(180px, .75fr) 42px minmax(0, 1.25fr);
+  align-items: stretch;
+  gap: 12px;
+  padding: 0 22px 18px;
+}
+.lineage-origin,
+.lineage-branch {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+.lineage-origin { display: flex; flex-direction: column; justify-content: center; }
+.lineage-origin span,
+.lineage-branch span { color: var(--muted); font-size: 11px; }
+.lineage-origin strong { margin: 4px 0 2px; color: var(--repaint-live); font-size: clamp(30px, 4vw, 48px); line-height: 1; }
+.lineage-origin small,
+.lineage-branch small { color: var(--muted); }
+.lineage-fork { position: relative; min-height: 142px; }
+.lineage-fork::before,
+.lineage-fork::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  border: solid color-mix(in srgb, var(--repaint-live) 42%, var(--line));
+}
+.lineage-fork::before { top: 50%; border-width: 1px 0 0; }
+.lineage-fork::after { top: 25%; bottom: 25%; border-width: 1px 1px 1px 0; border-radius: 0 12px 12px 0; }
+.lineage-branches { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.lineage-branch strong { display: block; margin: 4px 0; font-size: 25px; }
+.lineage-branch.lost { border-color: color-mix(in srgb, var(--repaint-lost) 27%, var(--line)); }
+.lineage-branch.lost strong { color: var(--repaint-lost); }
+.lineage-branch.kept { border-color: color-mix(in srgb, var(--repaint-kept) 27%, var(--line)); }
+.lineage-branch.kept strong { color: var(--repaint-kept); }
+.repaint-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.repaint-cohort { min-width: 0; padding: 20px 22px; }
+.repaint-cohort + .repaint-cohort { border-left: 1px solid var(--line); }
+.repaint-cohort h4 { margin: 0 0 4px; font-size: 17px; }
+.repaint-cohort > p { min-height: 42px; margin: 0 0 15px; color: var(--muted); font-size: 12px; }
+.repaint-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.repaint-stat { padding: 11px; border-radius: 11px; background: var(--surface-soft); }
+.repaint-stat span { display: block; min-height: 28px; color: var(--muted); font-size: 10px; }
+.repaint-stat strong { display: block; margin-top: 3px; font-size: 17px; }
+.repaint-cohort.hindsight {
+  background: repeating-linear-gradient(-45deg, transparent, transparent 16px, color-mix(in srgb, var(--warning-soft) 42%, transparent) 16px, color-mix(in srgb, var(--warning-soft) 42%, transparent) 32px);
+}
+.repaint-warning {
+  margin: 0 22px 18px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--repaint-lost);
+  border-radius: 0 10px 10px 0;
+  background: color-mix(in srgb, var(--repaint-lost) 7%, var(--surface));
+  color: var(--muted-strong);
+  font-size: 12px;
+}
+.repaint-strategy { display: grid; grid-template-columns: 1.05fr .95fr; gap: 12px; padding: 0 22px 20px; }
+.repaint-strategy-card { padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.repaint-strategy-card strong { display: block; margin-bottom: 7px; }
+.repaint-strategy-card p { margin: 0; color: var(--muted-strong); font-size: 12px; }
+.repaint-strategy-card em { color: var(--repaint-live); font-style: normal; font-weight: 800; }
+.repaint-failures { margin: 0 22px 20px; border: 1px solid var(--line); border-radius: 13px; }
+.repaint-failures summary { min-height: 0; padding: 12px 14px; }
+.repaint-failure-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0 14px 14px; }
+.repaint-failure { padding: 10px; border-radius: 10px; background: var(--surface-soft); font-size: 11px; }
+.repaint-failure a { color: var(--text); font-weight: 800; text-decoration: none; }
+.repaint-failure span { display: block; margin-top: 3px; color: var(--muted); }
 .validation-method {
   margin: 12px 0 0;
   color: var(--muted);
@@ -608,6 +713,18 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .trend-case-note { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 9px 12px; }
   .trend-case-note + .trend-case-note { border-top: 1px solid var(--line); border-left: 0; }
   .trend-case-note strong { max-width: 68%; text-align: right; }
+  .repaint-head { display: grid; padding: 18px 16px 13px; }
+  .repaint-badge { justify-self: start; }
+  .repaint-lineage { grid-template-columns: 1fr; padding: 0 16px 16px; }
+  .lineage-fork { display: none; }
+  .lineage-branches { grid-template-columns: 1fr 1fr; }
+  .repaint-columns, .repaint-strategy { grid-template-columns: 1fr; }
+  .repaint-cohort { padding: 17px 16px; }
+  .repaint-cohort + .repaint-cohort { border-top: 1px solid var(--line); border-left: 0; }
+  .repaint-warning { margin: 0 16px 16px; }
+  .repaint-strategy { padding: 0 16px 16px; }
+  .repaint-failures { margin: 0 16px 16px; }
+  .repaint-failure-list { grid-template-columns: 1fr 1fr; }
   th, td { padding: 12px 14px; }
   .chart-cell { min-width: 320px; }
   .pool-group-head { padding-inline: 14px; }
@@ -675,6 +792,8 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .kpi-grid { grid-template-columns: 1fr 1fr; }
   .kpi-value { font-size: 24px; }
   .metrics { grid-template-columns: 1fr 1fr; }
+  .lineage-branches, .repaint-stats, .repaint-failure-list { grid-template-columns: 1fr; }
+  .repaint-stat span { min-height: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -1423,7 +1542,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
             <span class="cover-count" id="lens-value">等待行情</span>
           </div>
           <div class="status-detail" id="market-detail">交易日 2026-08-03 · 云端行情自动刷新</div>
-          <div class="cover-time">最新行情<strong id="quote-time">2026-08-03 15:57</strong></div>
+          <div class="cover-time">最新行情<strong id="quote-time">2026-08-03 18:05</strong></div>
           <div class="date-strip">
             <span class="date-chip">盘中行情日<strong data-live-trade-date>等待行情</strong></span>
             <span class="date-chip">收盘结算日<strong data-close-trade-date>2026-08-03</strong></span>
@@ -1443,13 +1562,13 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
         <article class="kpi"><span class="kpi-label">次选实时预选</span><strong class="kpi-value" data-live-secondary-count>3</strong><span class="kpi-note">龙虎 + 窗口黄柱 + 另一项</span></article>
       <article class="kpi"><span class="kpi-label">主选信号监控</span><strong class="kpi-value" data-tracked-main-count>1</strong><span class="kpi-note">含待确认与趋势跟踪</span></article>
       <article class="kpi"><span class="kpi-label">观察标的</span><strong class="kpi-value">30</strong><span class="kpi-note">仅观察，不计入选</span></article>
-      <article class="kpi"><span class="kpi-label">市场扫描</span><strong class="kpi-value">5207</strong><span class="kpi-note">失败 0 只 · ST 排除</span></article>
+      <article class="kpi"><span class="kpi-label">市场扫描</span><strong class="kpi-value">5211</strong><span class="kpi-note">失败 0 只 · ST 排除</span></article>
     </section>
 
     <section class="section reveal" id="pool">
       <div class="section-head"><div><span class="section-kicker">Tracked portfolio</span><h2>卢氏龙虎趋势池</h2>
       <p class="section-copy">首次入选先显示“待观察中”；信号未被重算消失且收盘较信号日上涨5%，才确认“趋势开始”并给出建议买点。买点后依次显示上升趋势中、待观察中或趋势结束；只有完整买卖波段才结算成功率。</p></div></div>
-<div class="events"><strong>今日状态变动</strong><ul><li>002558 巨人网络：次选信号形成，等待上涨5%确认趋势开始</li><li>002827 高争民爆：次选信号形成，等待上涨5%确认趋势开始</li><li>003032 传智教育：次选信号形成，等待上涨5%确认趋势开始</li></ul></div>
+
       <div class="pool-switcher" role="tablist" aria-label="趋势池区域切换">
         <button class="pool-tab" id="tab-main" type="button" role="tab" aria-selected="true" aria-controls="pool-main" data-pool-tab="main">主选区 · <span data-area-main-count>1</span></button>
         <button class="pool-tab" id="tab-secondary" type="button" role="tab" aria-selected="false" aria-controls="pool-secondary" data-pool-tab="secondary" tabindex="-1">次选区 · <span data-area-secondary-count>6</span></button>
@@ -1550,7 +1669,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
           <span class="subline" data-live-time>2026-08-03 收盘</span></td>
       <td data-label="距信号涨幅"><span class="numeric positive" data-live-return>+0.00%</span><span class="subline">达到 +5% 才确认买点</span></td>
       <td data-label="等待时长" class="numeric">0 日</td>
-      <td data-label="趋势状态"><span class="state warn" data-live-status>待观察中</span><span class="subline" data-live-status-detail>入选信号已形成，等待收盘较信号日上涨5%确认趋势开始</span></td>
+      <td data-label="趋势状态"><span class="state warn" data-live-status>待观察中</span><span class="subline" data-live-status-detail>信号仍有效，距趋势开始确认约差5.00个百分点</span></td>
     </tr>
     <tr data-tracking-code="002827" data-tracking-area="secondary" data-pending-setup="true">
       <td data-label="股票"><a class="stock-link" href="https://quote.eastmoney.com/sz002827.html" target="_blank" rel="noreferrer">高争民爆</a><span class="stock-code">002827</span></td>
@@ -1559,7 +1678,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
           <span class="subline" data-live-time>2026-08-03 收盘</span></td>
       <td data-label="距信号涨幅"><span class="numeric positive" data-live-return>+0.00%</span><span class="subline">达到 +5% 才确认买点</span></td>
       <td data-label="等待时长" class="numeric">0 日</td>
-      <td data-label="趋势状态"><span class="state warn" data-live-status>待观察中</span><span class="subline" data-live-status-detail>入选信号已形成，等待收盘较信号日上涨5%确认趋势开始</span></td>
+      <td data-label="趋势状态"><span class="state warn" data-live-status>待观察中</span><span class="subline" data-live-status-detail>信号仍有效，距趋势开始确认约差5.00个百分点</span></td>
     </tr>
     <tr data-tracking-code="003032" data-tracking-area="secondary" data-pending-setup="true">
       <td data-label="股票"><a class="stock-link" href="https://quote.eastmoney.com/sz003032.html" target="_blank" rel="noreferrer">传智教育</a><span class="stock-code">003032</span></td>
@@ -1568,7 +1687,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
           <span class="subline" data-live-time>2026-08-03 收盘</span></td>
       <td data-label="距信号涨幅"><span class="numeric positive" data-live-return>+0.00%</span><span class="subline">达到 +5% 才确认买点</span></td>
       <td data-label="等待时长" class="numeric">0 日</td>
-      <td data-label="趋势状态"><span class="state warn" data-live-status>待观察中</span><span class="subline" data-live-status-detail>入选信号已形成，等待收盘较信号日上涨5%确认趋势开始</span></td>
+      <td data-label="趋势状态"><span class="state warn" data-live-status>待观察中</span><span class="subline" data-live-status-detail>信号仍有效，距趋势开始确认约差5.00个百分点</span></td>
     </tr>
     <tr data-tracking-code="603648" data-tracking-area="secondary">
       <td data-label="股票"><a class="stock-link" href="https://quote.eastmoney.com/sh603648.html" target="_blank" rel="noreferrer">畅联股份</a><span class="stock-code">603648</span></td>
@@ -2059,6 +2178,75 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
           <div class="validation-fact"><span>未取得完整历史行情</span><strong>8 只</strong></div>
         </div>
       </div>
+      <article class="repaint-panel" aria-label="龙腾跃虎信号重绘对照">
+        <div class="repaint-head">
+          <div><span class="section-kicker">Signal lineage</span><h3>信号重绘对照 · 独立统计</h3>
+          <p>同一套“交叉前2日至后7日出现至少1根黄柱”规则，分别统计当时实盘可见的信号、后来被重绘的信号，以及今天完整历史图留下的信号。</p></div>
+          <span class="repaint-badge">全 A 股 · 4997 只</span>
+        </div>
+        <div class="repaint-lineage">
+          <div class="lineage-origin"><span>当时逐日计算曾确认</span><strong>6,846</strong><small>次独立信号事件</small></div>
+          <div class="lineage-fork" aria-hidden="true"></div>
+          <div class="lineage-branches">
+            <div class="lineage-branch lost"><span>原交叉日期后来消失或迁移</span><strong>6,775 · 98.96%</strong><small>长时间加入未来K线后的最终重绘结果</small></div>
+            <div class="lineage-branch kept"><span>原交叉日期最终仍保留</span><strong>71 · 1.04%</strong><small>同一天交叉在当前完整历史图仍可见</small></div>
+          </div>
+        </div>
+        <div class="repaint-warning"><strong>两个“消失率”不是一回事：</strong>同口径的 6,846 个实盘信号中，有 1,772 个（25.88%）在原信号显示期内被重算掉，这是实盘短期可观察风险；98.96% 指把所有后续行情加入后，原交叉日期最终被 XMA 重绘或迁移。附近日期若出现新交叉，原日期仍计为消失。</div>
+        <div class="repaint-columns">
+          <section class="repaint-cohort">
+            <h4>当时出现，后来消失或迁移</h4>
+            <p>这是实盘会真正遇到的主体样本。收益从当时信号日收盘起算，到龙虎关系结束或最长60日内的本轮高点。</p>
+            <div class="repaint-stats">
+              <div class="repaint-stat"><span>可计算样本</span><strong>6,773</strong></div>
+              <div class="repaint-stat"><span>后续曾高于信号价</span><strong>93.67%</strong></div>
+              <div class="repaint-stat"><span>本轮曾达到5%</span><strong>43.23%</strong></div>
+              <div class="repaint-stat"><span>本轮高点平均涨幅</span><strong>+13.20%</strong></div>
+              <div class="repaint-stat"><span>消失即卖实际胜率</span><strong>43.88%</strong></div>
+              <div class="repaint-stat"><span>消失即卖平均收益</span><strong>+0.81%</strong></div>
+            </div>
+          </section>
+          <section class="repaint-cohort">
+            <h4>当时出现，同一交叉日期最终保留</h4>
+            <p>精确匹配到同一天的样本只有 71 次，分类要等未来走完才知道，样本小，不能在当时提前识别。</p>
+            <div class="repaint-stats">
+              <div class="repaint-stat"><span>精确保留样本</span><strong>71</strong></div>
+              <div class="repaint-stat"><span>后续曾高于信号价</span><strong>92.96%</strong></div>
+              <div class="repaint-stat"><span>本轮曾达到5%</span><strong>36.62%</strong></div>
+              <div class="repaint-stat"><span>本轮高点平均涨幅</span><strong>+7.71%</strong></div>
+              <div class="repaint-stat"><span>龙虎关系结束卖出胜率</span><strong>50.70%</strong></div>
+              <div class="repaint-stat"><span>龙虎关系结束平均收益</span><strong>+1.48%</strong></div>
+            </div>
+          </section>
+          <section class="repaint-cohort hindsight">
+            <h4>只看今天完整历史图的全部交叉</h4>
+            <p>这是事后倒推的形态上限，交叉本身已经使用未来K线重绘，不是当时可执行的买入信号。</p>
+            <div class="repaint-stats">
+              <div class="repaint-stat"><span>可计算样本</span><strong>24,281</strong></div>
+              <div class="repaint-stat"><span>后续曾高于信号价</span><strong>99.98%</strong></div>
+              <div class="repaint-stat"><span>本轮曾达到5%</span><strong>99.20%</strong></div>
+              <div class="repaint-stat"><span>本轮高点平均涨幅</span><strong>+50.52%</strong></div>
+              <div class="repaint-stat"><span>事后规则卖出胜率</span><strong>97.41%</strong></div>
+              <div class="repaint-stat"><span>事后规则平均收益</span><strong>+29.96%</strong></div>
+            </div>
+          </section>
+          <section class="repaint-cohort hindsight">
+            <h4>为什么最终图数字会异常漂亮</h4>
+            <p>只有未来上涨后最终被保留下来的交叉，更容易在今天的历史图中被看见，形成严重的未来函数偏差。</p>
+            <div class="repaint-stats">
+              <div class="repaint-stat"><span>严格未上涨案例</span><strong>6</strong></div>
+              <div class="repaint-stat"><span>严格未上涨占比</span><strong>0.025%</strong></div>
+              <div class="repaint-stat"><span>结论属性</span><strong>形态验证</strong></div>
+            </div>
+          </section>
+        </div>
+        <div class="repaint-warning"><strong>最终历史图不是实盘买点：</strong>99.98% 和平均 +50.52% 不能作为实时成功率。鞍钢股份 2026-03-11 属于“当时短暂出现、后来消失”，不再列入最终历史图失败案例。</div>
+        <div class="repaint-strategy">
+          <div class="repaint-strategy-card"><strong>买入：不要靠“多等几天看交叉还在不在”</strong><p>强制等1日后只剩 <em>36.91%</em> 的信号，20日退出平均收益仅 <em>+0.49%</em>，没有提高胜率。更合理的是：信号形成先记“待观察”，用价格真正启动确认买点；确认前若信号消失就取消。</p></div>
+          <div class="repaint-strategy-card"><strong>卖出：已买入后，消失只降级为风险提示</strong><p>短暂信号“消失即卖”平均 <em>+0.81%</em>、胜率 <em>43.88%</em>；改为最长20日且龙虎关系结束才卖为 <em>+1.85% / 48.07%</em>，8%启动后回撤3%为 <em>+1.38% / 50.86%</em>。因此交叉消失不宜单独触发卖出，应与龙线不再高于虎线或价格回撤联合判断。</p></div>
+        </div>
+        <details class="repaint-failures"><summary>展开查看当前完整历史图中严格未上涨的 6 个案例</summary><div class="repaint-failure-list"><div class="repaint-failure"><a href="https://quote.eastmoney.com/sz002666.html" target="_blank" rel="noreferrer">德联集团 002666</a><span>2025-12-22 · 后续波段高点 +0.00%</span></div><div class="repaint-failure"><a href="https://quote.eastmoney.com/sh600125.html" target="_blank" rel="noreferrer">铁龙物流 600125</a><span>2025-04-10 · 后续波段高点 -0.84%</span></div><div class="repaint-failure"><a href="https://quote.eastmoney.com/sz300904.html" target="_blank" rel="noreferrer">威力传动 300904</a><span>2024-03-07 · 后续波段高点 -0.47%</span></div><div class="repaint-failure"><a href="https://quote.eastmoney.com/sz300885.html" target="_blank" rel="noreferrer">海昌新材 300885</a><span>2023-08-30 · 后续波段高点 -9.04%</span></div><div class="repaint-failure"><a href="https://quote.eastmoney.com/sz300674.html" target="_blank" rel="noreferrer">宇信科技 300674</a><span>2023-08-30 · 后续波段高点 -0.22%</span></div><div class="repaint-failure"><a href="https://quote.eastmoney.com/sz300726.html" target="_blank" rel="noreferrer">宏达电子 300726</a><span>2023-06-21 · 后续波段高点 -1.26%</span></div></div></details>
+      </article>
       <article class="panel">
         <div class="panel-head"><div><h3>买点与卖点联合比较</h3><p>所有统计都从实际建议买点算到建议卖点；未确认买点和未结束持仓不混入成功率。</p></div></div>
         <div class="table-scroll"><table><thead><tr><th>规则</th><th>完整波段</th><th>成功率</th><th>平均收益</th><th>收益中位数</th><th>通常持有</th><th>2026 年</th></tr></thead>
@@ -2123,7 +2311,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
 
     <p class="disclaimer">本页面按技术条件机械筛选，不构成投资建议。收益按每只股票等权计算，未计手续费、滑点和实际仓位；免费公开行情仅适合个人研究与小范围分享。</p>
   </main>
-  <footer>收盘交易日 2026-08-03 · 报告生成 2026-08-03 15:57 · 沪深 A 股 5207 只 · 数据失败 0 只</footer>
+  <footer>收盘交易日 2026-08-03 · 报告生成 2026-08-03 18:05 · 沪深 A 股 5211 只 · 数据失败 0 只</footer>
 </div>
 <nav class="mobile-dock" aria-label="手机快捷导航">
   <a href="#content"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19V10l8-6 8 6v9H4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 19v-5h5v5" stroke="currentColor" stroke-width="1.8"/></svg><span>概览</span></a>

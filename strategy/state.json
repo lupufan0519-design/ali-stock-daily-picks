@@ -214,7 +214,7 @@
       "setup_cross_lookback_days": 11,
       "setup_elapsed_bars": 0,
       "status": "待观察中",
-      "status_detail": "入选信号已形成，等待收盘较信号日上涨5%确认趋势开始",
+      "status_detail": "信号仍有效，距趋势开始确认约差5.00个百分点",
       "selected_dates": [
         "2026-08-03"
       ]
@@ -235,7 +235,7 @@
       "setup_cross_lookback_days": 11,
       "setup_elapsed_bars": 0,
       "status": "待观察中",
-      "status_detail": "入选信号已形成，等待收盘较信号日上涨5%确认趋势开始",
+      "status_detail": "信号仍有效，距趋势开始确认约差5.00个百分点",
       "selected_dates": [
         "2026-08-03"
       ]
@@ -256,7 +256,7 @@
       "setup_cross_lookback_days": 11,
       "setup_elapsed_bars": 0,
       "status": "待观察中",
-      "status_detail": "入选信号已形成，等待收盘较信号日上涨5%确认趋势开始",
+      "status_detail": "信号仍有效，距趋势开始确认约差5.00个百分点",
       "selected_dates": [
         "2026-08-03"
       ]
