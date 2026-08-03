@@ -907,6 +907,11 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertEqual(html.count("观察示例1"), 1)
         self.assertIn("首次入选信号在自然显示期限内", html)
         self.assertIn("10 个交易日内收盘较信号日上涨 5%", html)
+        self.assertIn("信号重绘对照 · 独立统计", html)
+        self.assertIn("98.96%", html)
+        self.assertIn("最终历史图不是实盘买点", html)
+        self.assertIn("德联集团", html)
+        self.assertNotIn("鞍钢股份 000898", html)
         self.assertNotIn("首次达到5%中位数", html)
         self.assertNotIn("hero-aigc-v2-poster.webp;base64", html)
 

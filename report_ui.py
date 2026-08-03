@@ -537,6 +537,111 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 .validation-fact span { display: block; color: var(--muted); font-size: 12px; }
 .validation-fact strong { display: block; margin-top: 5px; font-size: 20px; }
+.repaint-panel {
+  --repaint-live: #2457d6;
+  --repaint-lost: #d4512f;
+  --repaint-kept: #11845b;
+  position: relative;
+  isolation: isolate;
+  margin-bottom: 14px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--primary) 24%, var(--line));
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 9% 6%, color-mix(in srgb, var(--repaint-live) 11%, transparent), transparent 31%),
+    radial-gradient(circle at 94% 91%, color-mix(in srgb, var(--repaint-lost) 9%, transparent), transparent 28%),
+    var(--surface);
+  box-shadow: 0 18px 45px rgba(30, 64, 175, .08);
+}
+.repaint-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 22px 22px 15px;
+}
+.repaint-head h3 { margin: 3px 0 5px; font-size: 22px; }
+.repaint-head p { max-width: 760px; margin: 0; color: var(--muted-strong); }
+.repaint-badge {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 1px solid color-mix(in srgb, var(--repaint-live) 25%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--repaint-live) 6%, var(--surface));
+  color: var(--repaint-live);
+  font-size: 11px;
+  font-weight: 800;
+}
+.repaint-lineage {
+  display: grid;
+  grid-template-columns: minmax(180px, .75fr) 42px minmax(0, 1.25fr);
+  align-items: stretch;
+  gap: 12px;
+  padding: 0 22px 18px;
+}
+.lineage-origin,
+.lineage-branch {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+.lineage-origin { display: flex; flex-direction: column; justify-content: center; }
+.lineage-origin span,
+.lineage-branch span { color: var(--muted); font-size: 11px; }
+.lineage-origin strong { margin: 4px 0 2px; color: var(--repaint-live); font-size: clamp(30px, 4vw, 48px); line-height: 1; }
+.lineage-origin small,
+.lineage-branch small { color: var(--muted); }
+.lineage-fork { position: relative; min-height: 142px; }
+.lineage-fork::before,
+.lineage-fork::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  border: solid color-mix(in srgb, var(--repaint-live) 42%, var(--line));
+}
+.lineage-fork::before { top: 50%; border-width: 1px 0 0; }
+.lineage-fork::after { top: 25%; bottom: 25%; border-width: 1px 1px 1px 0; border-radius: 0 12px 12px 0; }
+.lineage-branches { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.lineage-branch strong { display: block; margin: 4px 0; font-size: 25px; }
+.lineage-branch.lost { border-color: color-mix(in srgb, var(--repaint-lost) 27%, var(--line)); }
+.lineage-branch.lost strong { color: var(--repaint-lost); }
+.lineage-branch.kept { border-color: color-mix(in srgb, var(--repaint-kept) 27%, var(--line)); }
+.lineage-branch.kept strong { color: var(--repaint-kept); }
+.repaint-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.repaint-cohort { min-width: 0; padding: 20px 22px; }
+.repaint-cohort + .repaint-cohort { border-left: 1px solid var(--line); }
+.repaint-cohort h4 { margin: 0 0 4px; font-size: 17px; }
+.repaint-cohort > p { min-height: 42px; margin: 0 0 15px; color: var(--muted); font-size: 12px; }
+.repaint-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.repaint-stat { padding: 11px; border-radius: 11px; background: var(--surface-soft); }
+.repaint-stat span { display: block; min-height: 28px; color: var(--muted); font-size: 10px; }
+.repaint-stat strong { display: block; margin-top: 3px; font-size: 17px; }
+.repaint-cohort.hindsight {
+  background: repeating-linear-gradient(-45deg, transparent, transparent 16px, color-mix(in srgb, var(--warning-soft) 42%, transparent) 16px, color-mix(in srgb, var(--warning-soft) 42%, transparent) 32px);
+}
+.repaint-warning {
+  margin: 0 22px 18px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--repaint-lost);
+  border-radius: 0 10px 10px 0;
+  background: color-mix(in srgb, var(--repaint-lost) 7%, var(--surface));
+  color: var(--muted-strong);
+  font-size: 12px;
+}
+.repaint-strategy { display: grid; grid-template-columns: 1.05fr .95fr; gap: 12px; padding: 0 22px 20px; }
+.repaint-strategy-card { padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.repaint-strategy-card strong { display: block; margin-bottom: 7px; }
+.repaint-strategy-card p { margin: 0; color: var(--muted-strong); font-size: 12px; }
+.repaint-strategy-card em { color: var(--repaint-live); font-style: normal; font-weight: 800; }
+.repaint-failures { margin: 0 22px 20px; border: 1px solid var(--line); border-radius: 13px; }
+.repaint-failures summary { min-height: 0; padding: 12px 14px; }
+.repaint-failure-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0 14px 14px; }
+.repaint-failure { padding: 10px; border-radius: 10px; background: var(--surface-soft); font-size: 11px; }
+.repaint-failure a { color: var(--text); font-weight: 800; text-decoration: none; }
+.repaint-failure span { display: block; margin-top: 3px; color: var(--muted); }
 .validation-method {
   margin: 12px 0 0;
   color: var(--muted);
@@ -610,6 +715,18 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .trend-case-note { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 9px 12px; }
   .trend-case-note + .trend-case-note { border-top: 1px solid var(--line); border-left: 0; }
   .trend-case-note strong { max-width: 68%; text-align: right; }
+  .repaint-head { display: grid; padding: 18px 16px 13px; }
+  .repaint-badge { justify-self: start; }
+  .repaint-lineage { grid-template-columns: 1fr; padding: 0 16px 16px; }
+  .lineage-fork { display: none; }
+  .lineage-branches { grid-template-columns: 1fr 1fr; }
+  .repaint-columns, .repaint-strategy { grid-template-columns: 1fr; }
+  .repaint-cohort { padding: 17px 16px; }
+  .repaint-cohort + .repaint-cohort { border-top: 1px solid var(--line); border-left: 0; }
+  .repaint-warning { margin: 0 16px 16px; }
+  .repaint-strategy { padding: 0 16px 16px; }
+  .repaint-failures { margin: 0 16px 16px; }
+  .repaint-failure-list { grid-template-columns: 1fr 1fr; }
   th, td { padding: 12px 14px; }
   .chart-cell { min-width: 320px; }
   .pool-group-head { padding-inline: 14px; }
@@ -677,6 +794,8 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .kpi-grid { grid-template-columns: 1fr 1fr; }
   .kpi-value { font-size: 24px; }
   .metrics { grid-template-columns: 1fr 1fr; }
+  .lineage-branches, .repaint-stats, .repaint-failure-list { grid-template-columns: 1fr; }
+  .repaint-stat span { min-height: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -2227,6 +2346,132 @@ def _trend_case_chart() -> str:
     </div>"""
 
 
+def _repaint_comparison_panel() -> str:
+    """Render live-repainted signals separately from hindsight-only final charts."""
+    path = Path(__file__).resolve().parent / "results" / "signal_repaint_comparison.json"
+    window_path = Path(__file__).resolve().parent / "results" / "signal_window_optimization.json"
+    if not path.exists():
+        return ""
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        window_payload = json.loads(window_path.read_text(encoding="utf-8"))
+        coverage = payload["coverage"]
+        live = payload["causal_live_signals"]
+        final = payload["final_chart_signals"]
+        disappeared_wave = live["disappeared_wave"]
+        retained_wave = live["cross_retained_wave"]
+        final_wave = final["wave"]
+        disappeared_rows = {
+            str(item["id"]): item
+            for item in live["disappeared_strategy_rows"]
+        }
+        retained_rows = {
+            str(item["id"]): item
+            for item in live["cross_retained_strategy_rows"]
+        }
+        erased_exit = disappeared_rows[
+            "confirm_0_close__erasure_or_relationship"
+        ]["overall"]
+        hold_20 = disappeared_rows["confirm_0_close__hold_20"]["overall"]
+        trail_8_3 = disappeared_rows["confirm_0_close__trail_8_3"]["overall"]
+        wait_1 = disappeared_rows["confirm_1_close__hold_20"]
+        retained_relationship = retained_rows[
+            "confirm_0_close__relationship"
+        ]["overall"]
+        final_hindsight_exit = final[
+            "hindsight_strategy_comparison"
+        ]["highest_average"]["overall"]
+        failures = list(final.get("strict_failure_examples", []))
+        short_term_count = int(window_payload["signals"]["recalculated_away_count"])
+        short_term_total = int(window_payload["signals"]["common_trade_cohort_count"])
+        short_term_rate = float(window_payload["signals"]["recalculated_away_rate_pct"])
+    except (OSError, ValueError, KeyError, TypeError):
+        return ""
+
+    failure_cards = []
+    for item in failures:
+        code = str(item["code"])
+        market = 1 if code.startswith("6") else 0
+        failure_cards.append(
+            '<div class="repaint-failure">'
+            f'<a href="{_link(code, market)}" target="_blank" rel="noreferrer">'
+            f'{_esc(item["name"])} {_esc(code)}</a>'
+            f'<span>{_esc(item["signal_date"])} · 后续波段高点 '
+            f'{float(item["peak_high_return_pct"]):+.2f}%</span></div>'
+        )
+
+    return f"""
+      <article class="repaint-panel" aria-label="龙腾跃虎信号重绘对照">
+        <div class="repaint-head">
+          <div><span class="section-kicker">Signal lineage</span><h3>信号重绘对照 · 独立统计</h3>
+          <p>同一套“交叉前2日至后7日出现至少1根黄柱”规则，分别统计当时实盘可见的信号、后来被重绘的信号，以及今天完整历史图留下的信号。</p></div>
+          <span class="repaint-badge">全 A 股 · {int(coverage['analyzed_stock_count'])} 只</span>
+        </div>
+        <div class="repaint-lineage">
+          <div class="lineage-origin"><span>当时逐日计算曾确认</span><strong>{int(live['total']):,}</strong><small>次独立信号事件</small></div>
+          <div class="lineage-fork" aria-hidden="true"></div>
+          <div class="lineage-branches">
+            <div class="lineage-branch lost"><span>原交叉日期后来消失或迁移</span><strong>{int(live['disappeared_count']):,} · {float(live['disappeared_rate_pct']):.2f}%</strong><small>长时间加入未来K线后的最终重绘结果</small></div>
+            <div class="lineage-branch kept"><span>原交叉日期最终仍保留</span><strong>{int(live['cross_retained_count']):,} · {float(live['cross_retained_rate_pct']):.2f}%</strong><small>同一天交叉在当前完整历史图仍可见</small></div>
+          </div>
+        </div>
+        <div class="repaint-warning"><strong>两个“消失率”不是一回事：</strong>同口径的 {short_term_total:,} 个实盘信号中，有 {short_term_count:,} 个（{short_term_rate:.2f}%）在原信号显示期内被重算掉，这是实盘短期可观察风险；98.96% 指把所有后续行情加入后，原交叉日期最终被 XMA 重绘或迁移。附近日期若出现新交叉，原日期仍计为消失。</div>
+        <div class="repaint-columns">
+          <section class="repaint-cohort">
+            <h4>当时出现，后来消失或迁移</h4>
+            <p>这是实盘会真正遇到的主体样本。收益从当时信号日收盘起算，到龙虎关系结束或最长60日内的本轮高点。</p>
+            <div class="repaint-stats">
+              <div class="repaint-stat"><span>可计算样本</span><strong>{int(disappeared_wave['sample_count']):,}</strong></div>
+              <div class="repaint-stat"><span>后续曾高于信号价</span><strong>{float(disappeared_wave['ever_rise_rate_pct']):.2f}%</strong></div>
+              <div class="repaint-stat"><span>本轮曾达到5%</span><strong>{float(disappeared_wave['ever_reach_5pct_rate_pct']):.2f}%</strong></div>
+              <div class="repaint-stat"><span>本轮高点平均涨幅</span><strong>{float(disappeared_wave['average_peak_high_return_pct']):+.2f}%</strong></div>
+              <div class="repaint-stat"><span>消失即卖实际胜率</span><strong>{float(erased_exit['positive_rate_pct']):.2f}%</strong></div>
+              <div class="repaint-stat"><span>消失即卖平均收益</span><strong>{float(erased_exit['average_pct']):+.2f}%</strong></div>
+            </div>
+          </section>
+          <section class="repaint-cohort">
+            <h4>当时出现，同一交叉日期最终保留</h4>
+            <p>精确匹配到同一天的样本只有 {int(retained_wave['sample_count'])} 次，分类要等未来走完才知道，样本小，不能在当时提前识别。</p>
+            <div class="repaint-stats">
+              <div class="repaint-stat"><span>精确保留样本</span><strong>{int(retained_wave['sample_count'])}</strong></div>
+              <div class="repaint-stat"><span>后续曾高于信号价</span><strong>{float(retained_wave['ever_rise_rate_pct']):.2f}%</strong></div>
+              <div class="repaint-stat"><span>本轮曾达到5%</span><strong>{float(retained_wave['ever_reach_5pct_rate_pct']):.2f}%</strong></div>
+              <div class="repaint-stat"><span>本轮高点平均涨幅</span><strong>{float(retained_wave['average_peak_high_return_pct']):+.2f}%</strong></div>
+              <div class="repaint-stat"><span>龙虎关系结束卖出胜率</span><strong>{float(retained_relationship['positive_rate_pct']):.2f}%</strong></div>
+              <div class="repaint-stat"><span>龙虎关系结束平均收益</span><strong>{float(retained_relationship['average_pct']):+.2f}%</strong></div>
+            </div>
+          </section>
+          <section class="repaint-cohort hindsight">
+            <h4>只看今天完整历史图的全部交叉</h4>
+            <p>这是事后倒推的形态上限，交叉本身已经使用未来K线重绘，不是当时可执行的买入信号。</p>
+            <div class="repaint-stats">
+              <div class="repaint-stat"><span>可计算样本</span><strong>{int(final_wave['sample_count']):,}</strong></div>
+              <div class="repaint-stat"><span>后续曾高于信号价</span><strong>{float(final_wave['ever_rise_rate_pct']):.2f}%</strong></div>
+              <div class="repaint-stat"><span>本轮曾达到5%</span><strong>{float(final_wave['ever_reach_5pct_rate_pct']):.2f}%</strong></div>
+              <div class="repaint-stat"><span>本轮高点平均涨幅</span><strong>{float(final_wave['average_peak_high_return_pct']):+.2f}%</strong></div>
+              <div class="repaint-stat"><span>事后规则卖出胜率</span><strong>{float(final_hindsight_exit['positive_rate_pct']):.2f}%</strong></div>
+              <div class="repaint-stat"><span>事后规则平均收益</span><strong>{float(final_hindsight_exit['average_pct']):+.2f}%</strong></div>
+            </div>
+          </section>
+          <section class="repaint-cohort hindsight">
+            <h4>为什么最终图数字会异常漂亮</h4>
+            <p>只有未来上涨后最终被保留下来的交叉，更容易在今天的历史图中被看见，形成严重的未来函数偏差。</p>
+            <div class="repaint-stats">
+              <div class="repaint-stat"><span>严格未上涨案例</span><strong>{int(final['strict_failure_count'])}</strong></div>
+              <div class="repaint-stat"><span>严格未上涨占比</span><strong>{100 * int(final['strict_failure_count']) / int(final_wave['sample_count']):.3f}%</strong></div>
+              <div class="repaint-stat"><span>结论属性</span><strong>形态验证</strong></div>
+            </div>
+          </section>
+        </div>
+        <div class="repaint-warning"><strong>最终历史图不是实盘买点：</strong>99.98% 和平均 +50.52% 不能作为实时成功率。鞍钢股份 2026-03-11 属于“当时短暂出现、后来消失”，不再列入最终历史图失败案例。</div>
+        <div class="repaint-strategy">
+          <div class="repaint-strategy-card"><strong>买入：不要靠“多等几天看交叉还在不在”</strong><p>强制等1日后只剩 <em>{float(wait_1['entry_rate_pct']):.2f}%</em> 的信号，20日退出平均收益仅 <em>{float(wait_1['overall']['average_pct']):+.2f}%</em>，没有提高胜率。更合理的是：信号形成先记“待观察”，用价格真正启动确认买点；确认前若信号消失就取消。</p></div>
+          <div class="repaint-strategy-card"><strong>卖出：已买入后，消失只降级为风险提示</strong><p>短暂信号“消失即卖”平均 <em>{float(erased_exit['average_pct']):+.2f}%</em>、胜率 <em>{float(erased_exit['positive_rate_pct']):.2f}%</em>；改为最长20日且龙虎关系结束才卖为 <em>{float(hold_20['average_pct']):+.2f}% / {float(hold_20['positive_rate_pct']):.2f}%</em>，8%启动后回撤3%为 <em>{float(trail_8_3['average_pct']):+.2f}% / {float(trail_8_3['positive_rate_pct']):.2f}%</em>。因此交叉消失不宜单独触发卖出，应与龙线不再高于虎线或价格回撤联合判断。</p></div>
+        </div>
+        <details class="repaint-failures"><summary>展开查看当前完整历史图中严格未上涨的 {int(final['strict_failure_count'])} 个案例</summary><div class="repaint-failure-list">{''.join(failure_cards)}</div></details>
+      </article>"""
+
+
 def _validation_section() -> str:
     path = Path(__file__).resolve().parent / "results" / "rolling_validation.json"
     if not path.exists():
@@ -2326,6 +2571,7 @@ def _validation_section() -> str:
           <div class="validation-fact"><span>未取得完整历史行情</span><strong>{int(coverage.get('error_count', 0))} 只</strong></div>
         </div>
       </div>
+      {_repaint_comparison_panel().lstrip()}
       <article class="panel">
         <div class="panel-head"><div><h3>买点与卖点联合比较</h3><p>所有统计都从实际建议买点算到建议卖点；未确认买点和未结束持仓不混入成功率。</p></div></div>
         <div class="table-scroll"><table><thead><tr><th>规则</th><th>完整波段</th><th>成功率</th><th>平均收益</th><th>收益中位数</th><th>通常持有</th><th>2026 年</th></tr></thead>
