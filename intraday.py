@@ -13,6 +13,7 @@ from zoneinfo import ZoneInfo
 
 from observation import OBSERVATION_LIMIT, visible_observations
 from screener import cross_yellow_pair
+from strategy_tracker import trend_exit_reason
 
 
 ROOT = Path(__file__).resolve().parent
@@ -187,7 +188,21 @@ def collect_display_targets(
     return sorted(targets.values(), key=lambda item: (item["market"], item["code"]))
 
 
-def collect_tracking_codes(payload: dict) -> dict[str, list[str]]:
+def collect_tracking_codes(
+    payload: dict,
+    live_tracking: dict[str, list[dict]] | None = None,
+) -> dict[str, list[str]]:
+    if live_tracking is not None:
+        return {
+            area: sorted(
+                {
+                    str(item["code"])
+                    for item in live_tracking.get(area, [])
+                    if item.get("code") and not item.get("trend_ended")
+                }
+            )
+            for area in ("main", "secondary")
+        }
     strategy = payload.get("strategy", {})
 
     def codes(key: str) -> list[str]:
@@ -205,14 +220,69 @@ def collect_tracking_codes(payload: dict) -> dict[str, list[str]]:
     }
 
 
+def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, list[dict]]:
+    """Project settled positions onto live prices without settling strategy state."""
+    strategy = payload.get("strategy", {})
+    result: dict[str, list[dict]] = {"main": [], "secondary": []}
+    for area, key in (("main", "active"), ("secondary", "secondary_active")):
+        for position in strategy.get(key, []):
+            if not position.get("code") or is_st_name(position.get("name", "")):
+                continue
+            code = str(position["code"])
+            quote = quotes.get(code, {})
+            quote_price = float(quote.get("price", 0.0) or 0.0)
+            has_quote = quote_price > 0
+            live_price = quote_price if has_quote else float(position.get("last_close", 0.0))
+            entry_price = float(position.get("entry_price", 0.0))
+            live_return = (
+                (live_price / entry_price - 1.0) * 100.0
+                if entry_price > 0 and live_price > 0
+                else float(position.get("return_pct", 0.0))
+            )
+            exit_reason = trend_exit_reason(position, live_price) if has_quote else ""
+            trend_ended = bool(exit_reason)
+            warning = bool(position.get("missing_streak", 0))
+            if trend_ended:
+                detail = f"{exit_reason}；收盘确认后结算"
+            elif warning:
+                detail = "龙虎线转弱观察，尚未触发趋势结束条件"
+            elif has_quote:
+                detail = "趋势条件仍有效，盘中持续跟踪"
+            else:
+                detail = "最新行情待确认，暂按最近收盘展示"
+            result[area].append(
+                {
+                    "position_id": str(position.get("position_id", "")),
+                    "code": code,
+                    "name": str(position.get("name", quote.get("name", ""))),
+                    "market": int(position.get("market", quote.get("market", 0))),
+                    "entry_date": str(position.get("entry_date", "")),
+                    "entry_price": entry_price,
+                    "holding_days": int(position.get("holding_days", 0)),
+                    "settled_date": str(position.get("last_date", "")),
+                    "settled_price": float(position.get("last_close", 0.0)),
+                    "settled_return_pct": float(position.get("return_pct", 0.0)),
+                    "live_price": live_price,
+                    "live_return_pct": live_return,
+                    "server_time": str(quote.get("server_time", "")),
+                    "quote_available": has_quote,
+                    "trend_ended": trend_ended,
+                    "status": "趋势结束" if trend_ended else "上升趋势中",
+                    "status_detail": detail,
+                    "exit_reason": exit_reason,
+                }
+            )
+    return result
+
+
 def market_state(now: datetime) -> tuple[str, str]:
     if now.weekday() >= 5:
         return "休市", "周末休市，页面保留最近一次已验证行情"
     hhmm = now.strftime("%H:%M")
     if "09:15" <= hhmm < "09:30":
-        return "集合竞价", "主选与次选按最新行情预选；跟踪统计收盘后结算"
+        return "集合竞价", "主选与次选按最新行情预选；趋势状态实时判断，统计收盘结算"
     if "09:30" <= hhmm <= "11:30" or "13:00" <= hhmm <= "15:00":
-        return "盘中行情", "主选与次选约每 5 分钟重算；跟踪统计收盘后结算"
+        return "盘中行情", "主选与次选约每 5 分钟重算；趋势状态实时判断，统计收盘结算"
     if "11:30" < hhmm < "13:00":
         return "午间休市", "显示上午收盘行情，13:00 后继续刷新"
     if hhmm > "15:00":
@@ -695,7 +765,11 @@ def evaluate_live_seed(
     }
 
 
-def build_live_pools(payload: dict, quotes: dict[str, dict]) -> dict:
+def build_live_pools(
+    payload: dict,
+    quotes: dict[str, dict],
+    excluded_codes: set[str] | None = None,
+) -> dict:
     seeds = live_seeds(payload)
     if not seeds:
         return {"main": [], "secondary": [], "available": False}
@@ -709,6 +783,8 @@ def build_live_pools(payload: dict, quotes: dict[str, dict]) -> dict:
         row = evaluate_live_seed(seed, quote, cfg, close_trade_date)
         if row is not None:
             rows.append(row)
+    excluded = excluded_codes or set()
+    rows = [row for row in rows if row["code"] not in excluded]
     main = [row for row in rows if row["selected"]]
     secondary = [
         row
@@ -736,7 +812,14 @@ def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
     targets = collect_targets(payload)
     label, note = market_state(local_now)
     quotes, source, host = fetch_quotes(targets)
-    live_pools = build_live_pools(payload, quotes)
+    live_tracking = build_live_tracking(payload, quotes)
+    ended_codes = {
+        str(item["code"])
+        for area in ("main", "secondary")
+        for item in live_tracking.get(area, [])
+        if item.get("trend_ended")
+    }
+    live_pools = build_live_pools(payload, quotes, ended_codes)
     quote_times = [
         datetime.fromisoformat(str(item["server_time"]))
         for item in quotes.values()
@@ -800,7 +883,8 @@ def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
         "live_trade_date": live_trade_date,
         "selection_mode": selection_mode,
         "live_pools": live_pools,
-        "tracking_codes": collect_tracking_codes(payload),
+        "live_tracking": live_tracking,
+        "tracking_codes": collect_tracking_codes(payload, live_tracking),
         "target_count": len(targets),
         "quote_count": len(quotes),
         "quotes": display_quotes,

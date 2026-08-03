@@ -12,6 +12,7 @@ from cloud_daily import (
     snapshot_json,
 )
 from intraday import (
+    build_live_tracking,
     build_live_pools,
     collect_tracking_codes,
     collect_targets,
@@ -210,6 +211,79 @@ class CloudWorkflowTests(unittest.TestCase):
             collect_tracking_codes(payload),
             {"main": ["600001"], "secondary": ["603648"]},
         )
+
+    def test_live_tracking_updates_return_and_marks_trend_end(self):
+        payload = {
+            "strategy": {
+                "active": [
+                    {
+                        "code": "600001",
+                        "name": "主选",
+                        "market": 1,
+                        "entry_price": 10.0,
+                        "entry_date": "2026-07-20",
+                        "last_close": 15.0,
+                        "last_date": "2026-07-30",
+                        "return_pct": 50.0,
+                        "best_return_pct": 50.0,
+                        "holding_days": 8,
+                    }
+                ],
+                "secondary_active": [
+                    {
+                        "code": "603648",
+                        "name": "次选",
+                        "market": 1,
+                        "entry_price": 10.0,
+                        "entry_date": "2026-07-20",
+                        "last_close": 10.5,
+                        "last_date": "2026-07-30",
+                        "return_pct": 5.0,
+                        "best_return_pct": 5.0,
+                        "holding_days": 8,
+                    }
+                ],
+            }
+        }
+        quotes = {
+            "600001": {**self.live_quote("600001"), "price": 12.0},
+            "603648": {**self.live_quote("603648"), "price": 10.8},
+        }
+        tracking = build_live_tracking(payload, quotes)
+        main = tracking["main"][0]
+        secondary = tracking["secondary"][0]
+        self.assertTrue(main["trend_ended"])
+        self.assertEqual(main["status"], "趋势结束")
+        self.assertAlmostEqual(main["live_return_pct"], 20.0)
+        self.assertIn("回撤20%", main["exit_reason"])
+        self.assertFalse(secondary["trend_ended"])
+        self.assertEqual(secondary["status"], "上升趋势中")
+        self.assertAlmostEqual(secondary["live_return_pct"], 8.0)
+        self.assertEqual(
+            collect_tracking_codes(payload, tracking),
+            {"main": [], "secondary": ["603648"]},
+        )
+
+    def test_live_pool_does_not_readd_a_position_ending_intraday(self):
+        payload = {
+            "trade_date": "2026-07-30",
+            "config": {
+                "bottom_lookback_days": 5,
+                "cross_lookback_days": 5,
+                "limit_up_lookback_days": 42,
+                "yellow_consecutive_days": 1,
+                "yellow_before_cross_days": 2,
+                "yellow_after_cross_days": 8,
+            },
+            "live_universe": [self.live_seed("600001")],
+        }
+        pools = build_live_pools(
+            payload,
+            {"600001": self.live_quote("600001")},
+            {"600001"},
+        )
+        self.assertEqual(pools["main"], [])
+        self.assertEqual(pools["secondary"], [])
 
     def test_snapshot_and_live_targets_share_visible_top_30(self):
         rows = [
@@ -717,17 +791,20 @@ class CloudWorkflowTests(unittest.TestCase):
             limit_up_ok=True,
             limit_up_date="2026-07-01",
         )
-        self.assertNotIn("data-live-time", _position_row(position))
-        self.assertNotIn("data-live-return", _position_row(position))
+        self.assertIn("data-tracking-code", _position_row(position))
+        self.assertIn("data-live-time", _position_row(position))
+        self.assertIn("data-live-return", _position_row(position))
+        self.assertIn("上升趋势中", _position_row(position))
         self.assertIn("data-live-time", _evaluation_row(item, observation=True))
         self.assertIn("quote.server_time", LIVE_SCRIPT)
         self.assertIn('row.querySelector("[data-live-time]")', LIVE_SCRIPT)
         self.assertIn("time.textContent =", LIVE_SCRIPT)
         self.assertIn("formatQuoteTime", LIVE_SCRIPT)
         self.assertIn("paintLivePools", LIVE_SCRIPT)
+        self.assertIn("paintLiveTracking", LIVE_SCRIPT)
         self.assertIn("data-area-secondary-count", LIVE_SCRIPT)
         self.assertIn("tracking_codes", LIVE_SCRIPT)
-        self.assertNotIn('row.querySelector("[data-live-return]")', LIVE_SCRIPT)
+        self.assertIn('row.querySelector("[data-live-return]")', LIVE_SCRIPT)
 
     def test_report_separates_live_and_settled_dates_and_defers_video(self):
         item = SimpleNamespace(

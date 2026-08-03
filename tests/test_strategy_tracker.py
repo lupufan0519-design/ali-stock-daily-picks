@@ -8,7 +8,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from strategy_tracker import empty_state, replay_state, strategy_stats, update_state
+from strategy_tracker import (
+    empty_state,
+    replay_state,
+    secondary_strategy_stats,
+    strategy_stats,
+    update_state,
+)
 
 
 def row(
@@ -52,7 +58,8 @@ class StrategyTrackerTests(unittest.TestCase):
         state, events = update_state(state, [row("2026-07-21", close=9.5, dragon_above=False)], "2026-07-21")
         self.assertEqual(len(state["active"]), 1)
         self.assertEqual(state["closed"], [])
-        self.assertEqual(state["active"][0]["status"], "趋势转弱预警")
+        self.assertEqual(state["active"][0]["status"], "上升趋势中")
+        self.assertEqual(state["active"][0]["missing_streak"], 1)
         self.assertEqual(events[0]["type"], "trend_warning")
 
     def test_same_day_rerun_does_not_duplicate_warning(self):
@@ -81,7 +88,7 @@ class StrategyTrackerTests(unittest.TestCase):
         )
         self.assertEqual(len(state["active"]), 1)
         self.assertEqual(state["closed"], [])
-        self.assertEqual(state["active"][0]["status"], "趋势转弱预警")
+        self.assertEqual(state["active"][0]["status"], "上升趋势中")
         self.assertEqual(events[0]["type"], "trend_warning")
 
     def test_peak_drawdown_twenty_percent_takes_profit(self):
@@ -103,7 +110,36 @@ class StrategyTrackerTests(unittest.TestCase):
         self.assertEqual(state["active"], [])
         self.assertAlmostEqual(state["closed"][0]["exit_return_pct"], 20.0)
         self.assertIn("回撤20%", state["closed"][0]["exit_reason"])
+        self.assertEqual(state["closed"][0]["status"], "趋势结束")
         self.assertEqual(events[0]["type"], "removed")
+
+    def test_closed_position_waits_for_a_fresh_later_signal_before_reentry(self):
+        state, _ = update_state(
+            empty_state(),
+            [row("2026-07-20", selected=True, close=10.0)],
+            "2026-07-20",
+        )
+        state, _ = update_state(
+            state,
+            [row("2026-07-21", selected=True, close=15.0)],
+            "2026-07-21",
+        )
+        state, events = update_state(
+            state,
+            [row("2026-07-22", selected=True, close=12.0)],
+            "2026-07-22",
+        )
+        self.assertEqual(state["active"], [])
+        self.assertEqual([event["type"] for event in events], ["removed"])
+
+        state, events = update_state(
+            state,
+            [row("2026-07-23", selected=True, close=12.5)],
+            "2026-07-23",
+        )
+        self.assertEqual(events[0]["type"], "added")
+        self.assertEqual(state["active"][0]["entry_date"], "2026-07-23")
+        self.assertEqual(state["active"][0]["position_id"], "600001_2026-07-23")
 
     def test_sixty_following_bars_end_tracking(self):
         state, _ = update_state(
@@ -128,6 +164,16 @@ class StrategyTrackerTests(unittest.TestCase):
         self.assertEqual(stats["sample_count"], 1)
         self.assertEqual(stats["current_success_rate"], 100.0)
         self.assertAlmostEqual(stats["active_average_return"], 10.0)
+
+    def test_secondary_stats_include_closed_success_and_realized_return(self):
+        state = empty_state()
+        state["secondary_closed"] = [
+            {"exit_return_pct": 10.0},
+            {"exit_return_pct": -5.0},
+        ]
+        stats = secondary_strategy_stats(state)
+        self.assertEqual(stats["closed_success_rate"], 50.0)
+        self.assertAlmostEqual(stats["realized_compound_return"], 4.5)
 
     def test_secondary_adds_on_three_conditions_and_warns_on_weakening(self):
         candidate = row(

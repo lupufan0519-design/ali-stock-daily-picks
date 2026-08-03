@@ -44,6 +44,8 @@ def load_state(path: Path) -> dict:
                         .replace("红蓝", "龙虎")
                         .replace("红线", "龙线")
                         .replace("蓝线", "虎线")
+                        .replace("龙线在虎线上方", "上升趋势中")
+                        .replace("趋势转弱预警", "上升趋势中")
                         .replace("\u4e00\u8fb0", "卢氏")
                     )
     return data
@@ -130,7 +132,8 @@ def _trend_is_weakening(position: dict, row: dict) -> bool:
     return False
 
 
-def _take_profit_exit_reason(position: dict) -> str:
+def trend_exit_reason(position: dict, price: float | None = None) -> str:
+    """Return the shared close/intraday trend-ending reason without mutating state."""
     elapsed_bars = max(0, int(position.get("holding_days", 1)) - 1)
     if elapsed_bars >= 60:
         return "趋势结束：已完成60个后续交易日跟踪"
@@ -139,14 +142,28 @@ def _take_profit_exit_reason(position: dict) -> str:
         return ""
     entry_price = float(position.get("entry_price", 0.0))
     peak_price = entry_price * (1.0 + best_return / 100.0)
-    last_close = float(position.get("last_close", 0.0))
-    if peak_price <= 0 or last_close <= 0:
+    current_price = float(
+        position.get("last_close", 0.0) if price is None else price
+    )
+    if peak_price <= 0 or current_price <= 0:
         return ""
-    peak_drawdown = (last_close / peak_price - 1.0) * 100.0
-    position["peak_drawdown_pct"] = peak_drawdown
+    peak_drawdown = (current_price / peak_price - 1.0) * 100.0
     if peak_drawdown <= -20.0 + 1e-8:
         return "趋势结束：达到5%浮盈后较最高收盘回撤20%"
     return ""
+
+
+def _take_profit_exit_reason(position: dict) -> str:
+    reason = trend_exit_reason(position)
+    best_return = float(position.get("best_return_pct", 0.0))
+    entry_price = float(position.get("entry_price", 0.0))
+    last_close = float(position.get("last_close", 0.0))
+    peak_price = entry_price * (1.0 + best_return / 100.0)
+    if best_return >= 5.0 and peak_price > 0 and last_close > 0:
+        position["peak_drawdown_pct"] = (
+            last_close / peak_price - 1.0
+        ) * 100.0
+    return reason
 
 
 def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[dict, list[dict]]:
@@ -155,6 +172,7 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
     row_by_code = {str(row["code"]): row for row in rows}
     is_new_day = not state["last_trade_date"] or trade_date > state["last_trade_date"]
     events: list[dict] = []
+    exited_codes: set[str] = set()
     still_active: list[dict] = []
 
     for position in state["active"]:
@@ -190,18 +208,20 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             position["exit_return_pct"] = position["return_pct"]
             position["exit_reason"] = "股票名称含 ST，不符合入选范围"
             state["closed"].append(position)
+            exited_codes.add(str(position["code"]))
             events.append({"type": "ineligible_removed", "code": position["code"], "name": str(row.get("name", position["name"])), "return_pct": position["return_pct"]})
             continue
 
         if is_later_day:
             exit_reason = _take_profit_exit_reason(position)
             if exit_reason:
-                position["status"] = "已移出"
+                position["status"] = "趋势结束"
                 position["exit_date"] = trade_date
                 position["exit_price"] = position["last_close"]
                 position["exit_return_pct"] = position["return_pct"]
                 position["exit_reason"] = exit_reason
                 state["closed"].append(position)
+                exited_codes.add(str(position["code"]))
                 events.append({"type": "removed", "code": position["code"], "name": position["name"], "return_pct": position["return_pct"]})
                 continue
             if _trend_is_weakening(position, row):
@@ -209,15 +229,15 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
                     events.append({"type": "trend_warning", "code": position["code"], "name": position["name"]})
                 position["missing_streak"] = 1
                 position["signal_lost_date"] = trade_date
-                position["status"] = "趋势转弱预警"
+                position["status"] = "上升趋势中"
             else:
                 if position.get("missing_streak", 0):
                     events.append({"type": "signal_restored", "code": position["code"], "name": position["name"]})
                 position["missing_streak"] = 0
                 position["signal_lost_date"] = ""
-                position["status"] = "龙线在虎线上方"
+                position["status"] = "上升趋势中"
         elif not position.get("status"):
-            position["status"] = "龙线在虎线上方"
+            position["status"] = "上升趋势中"
         still_active.append(position)
 
     state["active"] = still_active
@@ -229,6 +249,8 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
         if not _eligible(row) or not row.get("selected"):
             continue
         code = str(row["code"])
+        if code in exited_codes:
+            continue
         if code in active_by_code:
             dates = active_by_code[code].setdefault("selected_dates", [])
             if trade_date not in dates:
@@ -253,7 +275,7 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             "holding_days": 1,
             "missing_streak": 0,
             "signal_lost_date": "",
-            "status": "龙线在虎线上方",
+            "status": "上升趋势中",
             "line_history": [],
             "selected_dates": [trade_date],
         }
@@ -296,6 +318,7 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             position["exit_return_pct"] = position["return_pct"]
             position["exit_reason"] = "股票名称含 ST，不符合入选范围"
             state["secondary_closed"].append(position)
+            exited_codes.add(str(position["code"]))
             events.append({"type": "ineligible_removed", "code": position["code"], "name": str(row.get("name", position["name"])), "return_pct": position["return_pct"]})
             continue
 
@@ -306,7 +329,7 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
                 event_type = "secondary_removed"
             elif row.get("selected"):
                 event_type = "secondary_promoted"
-                position["status"] = "龙线在虎线上方"
+                position["status"] = "上升趋势中"
                 position["origin_area"] = position.get(
                     "origin_area",
                     "secondary",
@@ -324,12 +347,13 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
                 })
                 continue
             if exit_reason:
-                position["status"] = "已移出"
+                position["status"] = "趋势结束"
                 position["exit_date"] = trade_date
                 position["exit_price"] = position["last_close"]
                 position["exit_return_pct"] = position["return_pct"]
                 position["exit_reason"] = exit_reason
                 state["secondary_closed"].append(position)
+                exited_codes.add(str(position["code"]))
                 events.append({
                     "type": event_type,
                     "code": position["code"],
@@ -342,15 +366,15 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
                     events.append({"type": "trend_warning", "code": position["code"], "name": position["name"]})
                 position["missing_streak"] = 1
                 position["signal_lost_date"] = trade_date
-                position["status"] = "趋势转弱预警"
+                position["status"] = "上升趋势中"
             else:
                 if position.get("missing_streak", 0):
                     events.append({"type": "signal_restored", "code": position["code"], "name": position["name"]})
                 position["missing_streak"] = 0
                 position["signal_lost_date"] = ""
-                position["status"] = "龙线在虎线上方"
+                position["status"] = "上升趋势中"
         elif not position.get("status"):
-            position["status"] = "龙线在虎线上方"
+            position["status"] = "上升趋势中"
         secondary_still_active.append(position)
 
     state["secondary_active"] = secondary_still_active
@@ -362,6 +386,8 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
         if not _secondary_selected(row):
             continue
         code = str(row["code"])
+        if code in exited_codes:
+            continue
         if code in primary_codes:
             continue
         if code in secondary_by_code:
@@ -383,7 +409,7 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             "best_return_pct": 0.0,
             "worst_return_pct": 0.0,
             "holding_days": 1,
-            "status": "龙线在虎线上方",
+            "status": "上升趋势中",
             "line_history": [],
             "selected_dates": [trade_date],
         }
@@ -452,17 +478,24 @@ def secondary_strategy_stats(state: dict) -> dict:
         for x in state.get("secondary_closed", [])
     ]
     all_returns = active_returns + closed_returns
+    realized_factor = math.prod(1.0 + value / 100.0 for value in closed_returns)
     return {
         "active_count": len(active_returns),
         "closed_count": len(closed_returns),
         "current_success_rate": (
             sum(value > 0 for value in all_returns) / len(all_returns) * 100.0
         ) if all_returns else None,
+        "closed_success_rate": (
+            sum(value > 0 for value in closed_returns) / len(closed_returns) * 100.0
+        ) if closed_returns else None,
         "active_average_return": (
             sum(active_returns) / len(active_returns) if active_returns else None
         ),
         "all_average_return": (
             sum(all_returns) / len(all_returns) if all_returns else None
+        ),
+        "realized_compound_return": (
+            (realized_factor - 1.0) * 100.0 if closed_returns else None
         ),
         "sample_count": len(all_returns),
     }
