@@ -6,6 +6,7 @@ import re
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
+from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 from typing import Iterable, Sequence
 from urllib.request import Request, urlopen
@@ -29,6 +30,43 @@ SHANGHAI = ZoneInfo("Asia/Shanghai")
 
 def is_st_name(name: object) -> bool:
     return "ST" in str(name).upper()
+
+
+def _live_limit_rate(code: object, market: object, name: object) -> Decimal:
+    if is_st_name(name):
+        return Decimal("0.05")
+    if int(market or 0) == 2:
+        return Decimal("0.30")
+    if str(code).startswith(("30", "68")):
+        return Decimal("0.20")
+    return Decimal("0.10")
+
+
+def _quote_is_locked_limit(
+    quote: dict,
+    code: object,
+    market: object,
+    name: object,
+    direction: str,
+) -> bool:
+    previous_close = float(quote.get("pre_close", 0.0) or 0.0)
+    if previous_close <= 0:
+        return False
+    rate = _live_limit_rate(code, market, name)
+    factor = Decimal("1") + rate if direction == "up" else Decimal("1") - rate
+    limit_price = float(
+        (Decimal(str(previous_close)) * factor).quantize(
+            Decimal("0.01"),
+            rounding=ROUND_HALF_UP,
+        )
+    )
+    prices = [
+        float(quote.get(key, 0.0) or 0.0)
+        for key in ("open", "high", "low", "price")
+    ]
+    return min(prices) > 0 and all(
+        abs(value - limit_price) <= 0.0051 for value in prices
+    )
 
 
 def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
@@ -140,18 +178,36 @@ def collect_targets(
     """Return the full lightweight universe when live signal seeds are present."""
     universe = live_seeds(payload)
     if universe:
+        targets = {
+            str(item["code"]): {
+                "code": str(item["code"]),
+                "name": str(item.get("name", "")),
+                "market": int(item["market"]),
+                "scope": "universe",
+            }
+            for item in universe
+            if item.get("eligible")
+            and not is_st_name(item.get("name", ""))
+        }
+        strategy = payload.get("strategy", {})
+        for key, scope in (
+            ("pending_entry_execution", "pending_entry"),
+            ("pending_exit_execution", "pending_exit"),
+        ):
+            for position in strategy.get(key, []):
+                code = str(position.get("code", ""))
+                if code:
+                    targets.setdefault(
+                        code,
+                        {
+                            "code": code,
+                            "name": str(position.get("name", "")),
+                            "market": int(position.get("market", 0)),
+                            "scope": scope,
+                        },
+                    )
         return sorted(
-            [
-                {
-                    "code": str(item["code"]),
-                    "name": str(item.get("name", "")),
-                    "market": int(item["market"]),
-                    "scope": "universe",
-                }
-                for item in universe
-                if item.get("eligible")
-                and not is_st_name(item.get("name", ""))
-            ],
+            targets.values(),
             key=lambda item: (item["market"], item["code"]),
         )
     return collect_display_targets(payload, observation_limit)
@@ -169,6 +225,7 @@ def collect_display_targets(
         + list(strategy.get("secondary_active", []))
         + list(strategy.get("pending_main", []))
         + list(strategy.get("pending_secondary", []))
+        + list(strategy.get("pending_entry_execution", []))
     ):
         if is_st_name(position.get("name", "")):
             continue
@@ -178,6 +235,16 @@ def collect_display_targets(
             "name": str(position.get("name", "")),
             "market": int(position["market"]),
             "scope": "pool",
+        }
+    for position in strategy.get("pending_exit_execution", []):
+        code = str(position.get("code", ""))
+        if not code:
+            continue
+        targets[code] = {
+            "code": code,
+            "name": str(position.get("name", "")),
+            "market": int(position.get("market", 0)),
+            "scope": "pending_exit",
         }
 
     minimum = int(payload.get("config", {}).get("near_match_minimum", 3))
@@ -227,10 +294,25 @@ def collect_tracking_codes(
         )
 
     return {
-        "main": sorted(set(codes("active")) | set(codes("pending_main"))),
+        "main": sorted(
+            set(codes("active"))
+            | set(codes("pending_main"))
+            | {
+                str(item["code"])
+                for key in ("pending_entry_execution", "pending_exit_execution")
+                for item in strategy.get(key, [])
+                if str(item.get("area", "main")) == "main" and item.get("code")
+            }
+        ),
         "secondary": sorted(
             set(codes("secondary_active"))
             | set(codes("pending_secondary"))
+            | {
+                str(item["code"])
+                for key in ("pending_entry_execution", "pending_exit_execution")
+                for item in strategy.get(key, [])
+                if str(item.get("area", "main")) == "secondary" and item.get("code")
+            }
         ),
     }
 
@@ -255,10 +337,14 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
     result: dict[str, list[dict]] = {"main": [], "secondary": []}
     for area, key in (("main", "active"), ("secondary", "secondary_active")):
         for position in strategy.get(key, []):
-            if not position.get("code") or is_st_name(position.get("name", "")):
+            if not position.get("code"):
                 continue
             code = str(position["code"])
             quote = quotes.get(code, {})
+            live_name = str(
+                quote.get("name") or position.get("name", "")
+            )
+            ineligible_live = is_st_name(live_name)
             quote_price = float(quote.get("price", 0.0) or 0.0)
             has_quote = quote_price > 0
             live_price = quote_price if has_quote else float(position.get("last_close", 0.0))
@@ -293,15 +379,18 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                 live_signal,
                 setup_elapsed,
             )
-            exit_reason = (
-                trend_exit_reason(
-                    live_position,
-                    live_price,
-                    dragon_above_tiger=dragon_above_tiger,
+            if has_quote and ineligible_live:
+                exit_reason = "趋势结束：股票名称含 ST，不符合入选范围"
+            else:
+                exit_reason = (
+                    trend_exit_reason(
+                        live_position,
+                        live_price,
+                        dragon_above_tiger=dragon_above_tiger,
+                    )
+                    if has_quote
+                    else ""
                 )
-                if has_quote
-                else ""
-            )
             provisional_exit = bool(exit_reason)
             pending_reasons: list[str] = []
             if signal_erased:
@@ -326,7 +415,7 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
             if provisional_exit:
                 detail = (
                     f"{exit_reason.removeprefix('趋势结束：')}；"
-                    "若收盘仍满足则建议卖出并结算"
+                    "若收盘仍满足则确认卖点，下一交易日开盘执行"
                 )
                 status = "待观察中"
                 operation = "卖出触发 · 等待收盘"
@@ -358,7 +447,7 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                 {
                     "position_id": str(position.get("position_id", "")),
                     "code": code,
-                    "name": str(position.get("name", quote.get("name", ""))),
+                    "name": live_name,
                     "market": int(position.get("market", quote.get("market", 0))),
                     "entry_date": str(position.get("entry_date", "")),
                     "entry_price": entry_price,
@@ -384,10 +473,11 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
         ("secondary", "pending_secondary"),
     ):
         for setup in strategy.get(key, []):
-            if not setup.get("code") or is_st_name(setup.get("name", "")):
+            if not setup.get("code"):
                 continue
             code = str(setup["code"])
             quote = quotes.get(code, {})
+            live_name = str(quote.get("name") or setup.get("name", ""))
             quote_price = float(quote.get("price", 0.0) or 0.0)
             has_quote = quote_price > 0
             live_price = (
@@ -411,7 +501,9 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
             )
             elapsed = int(setup.get("setup_elapsed_bars", 0)) + live_extra_bar
             cancel_reason = ""
-            if live_signal is not None and signal_recalculated_away(
+            if is_st_name(live_name):
+                cancel_reason = "股票名称含 ST，不符合入选范围"
+            elif live_signal is not None and signal_recalculated_away(
                 setup,
                 live_signal,
                 elapsed,
@@ -442,10 +534,10 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                 detail = f"{cancel_reason}；若收盘仍成立则停止等待买点"
             elif confirmed:
                 status = "待观察中"
-                operation = "买入触发 · 等待收盘"
+                operation = "买点触发 · 等待收盘"
                 detail = (
                     f"盘中已突破前5日高点 {breakout_high:.2f} 元；"
-                    "若收盘保持则确认趋势开始并建议买入"
+                    "若收盘保持则确认买点，下一交易日开盘执行"
                 )
             else:
                 status = "待观察中"
@@ -462,7 +554,7 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                 {
                     "position_id": str(setup.get("setup_id", "")),
                     "code": code,
-                    "name": str(setup.get("name", quote.get("name", ""))),
+                    "name": live_name,
                     "market": int(setup.get("market", quote.get("market", 0))),
                     "entry_date": str(setup.get("setup_date", "")),
                     "entry_price": setup_price,
@@ -486,6 +578,171 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                     "breakout_high_5": breakout_high,
                 }
             )
+    for order in strategy.get("pending_entry_execution", []):
+        area = str(order.get("area", "main"))
+        if area not in result or not order.get("code"):
+            continue
+        code = str(order["code"])
+        quote = quotes.get(code, {})
+        quote_price = float(quote.get("price", 0.0) or 0.0)
+        open_price = float(quote.get("open", 0.0) or 0.0)
+        quote_date = str(quote.get("server_time", ""))[:10]
+        trigger_date = str(order.get("entry_trigger_date", ""))
+        execution_day = bool(quote_date and trigger_date and quote_date > trigger_date)
+        ineligible = bool(
+            is_st_name(order.get("name", ""))
+            or is_st_name(quote.get("name", ""))
+        )
+        locked = bool(
+            execution_day
+            and not ineligible
+            and open_price > 0
+            and _quote_is_locked_limit(
+                quote,
+                code,
+                order.get("market", quote.get("market", 0)),
+                quote.get("name") or order.get("name", ""),
+                "up",
+            )
+        )
+        provisional_execution = bool(
+            execution_day and not ineligible and open_price > 0 and not locked
+        )
+        if ineligible:
+            operation = "取消买入待收盘"
+            detail = "股票名称含 ST；盘中不执行买入，收盘任务确认取消候选"
+        elif locked:
+            operation = "等待可成交开盘"
+            detail = "当前仍封在一字涨停，盘中不假定可以买入；收盘后确认是否继续等待"
+        elif provisional_execution:
+            operation = "开盘买入待结算"
+            detail = (
+                f"今日开盘价 {open_price:.2f} 元可模拟执行；"
+                "盘中仅预告，收盘任务写入正式持仓"
+            )
+        elif execution_day:
+            operation = "暂停执行买入"
+            detail = "今日开盘价尚未取得，不使用最新价或收盘价代替成交"
+        else:
+            operation = "下一交易日开盘买入"
+            detail = "买点已由收盘确认，等待下一交易日开盘模拟执行"
+        live_return = (
+            (quote_price / open_price - 1.0) * 100.0
+            if provisional_execution and quote_price > 0
+            else 0.0
+        )
+        result[area].append(
+            {
+                "position_id": str(order.get("execution_id", "")),
+                "code": code,
+                "name": str(quote.get("name") or order.get("name", "")),
+                "market": int(order.get("market", quote.get("market", 0))),
+                "entry_trigger_date": trigger_date,
+                "entry_trigger_close": float(order.get("entry_trigger_close", 0.0)),
+                "entry_date": "",
+                "entry_price": open_price if provisional_execution else 0.0,
+                "holding_days": 0,
+                "settled_date": trigger_date,
+                "settled_price": float(order.get("entry_trigger_close", 0.0)),
+                "settled_return_pct": 0.0,
+                "live_price": quote_price,
+                "live_return_pct": live_return,
+                "server_time": str(quote.get("server_time", "")),
+                "quote_available": quote_price > 0,
+                "trend_ended": False,
+                "pending_execution": True,
+                "pending_entry_execution": True,
+                "provisional_entry_execution": provisional_execution,
+                "execution_blocked": bool(locked or ineligible),
+                "provisional_cancel": ineligible,
+                "status": "待观察中" if ineligible else "买点已确认",
+                "operation": operation,
+                "status_detail": detail,
+                "exit_reason": "股票名称含 ST" if ineligible else "",
+                "setup_cancelled": False,
+            }
+        )
+    for order in strategy.get("pending_exit_execution", []):
+        area = str(order.get("area", "main"))
+        if area not in result or not order.get("code"):
+            continue
+        code = str(order["code"])
+        quote = quotes.get(code, {})
+        quote_price = float(quote.get("price", 0.0) or 0.0)
+        open_price = float(quote.get("open", 0.0) or 0.0)
+        quote_date = str(quote.get("server_time", ""))[:10]
+        trigger_date = str(order.get("exit_trigger_date", ""))
+        execution_day = bool(quote_date and trigger_date and quote_date > trigger_date)
+        locked = bool(
+            execution_day
+            and open_price > 0
+            and _quote_is_locked_limit(
+                quote,
+                code,
+                order.get("market", quote.get("market", 0)),
+                quote.get("name") or order.get("name", ""),
+                "down",
+            )
+        )
+        provisional_execution = bool(execution_day and open_price > 0 and not locked)
+        if locked:
+            operation = "等待可成交开盘"
+            detail = "当前仍封在一字跌停，盘中不假定可以卖出；继续等待首次可成交开盘"
+        elif provisional_execution:
+            operation = "开盘卖出待结算"
+            detail = (
+                f"今日开盘价 {open_price:.2f} 元可模拟执行；"
+                "盘中仅预告，收盘任务再结算收益与成功率"
+            )
+        elif execution_day:
+            operation = "暂停执行卖出"
+            detail = "今日开盘价尚未取得，不使用最新价或收盘价代替成交"
+        else:
+            operation = "下一交易日开盘卖出"
+            detail = "卖点已由收盘确认，等待下一交易日开盘模拟执行"
+        entry_price = float(order.get("entry_price", 0.0))
+        live_return = (
+            (quote_price / entry_price - 1.0) * 100.0
+            if quote_price > 0 and entry_price > 0
+            else float(order.get("return_pct", 0.0))
+        )
+        preview_exit_return = (
+            (open_price / entry_price - 1.0) * 100.0
+            if provisional_execution and entry_price > 0
+            else None
+        )
+        result[area].append(
+            {
+                "position_id": str(order.get("position_id", "")),
+                "code": code,
+                "name": str(quote.get("name") or order.get("name", "")),
+                "market": int(order.get("market", quote.get("market", 0))),
+                "entry_date": str(order.get("entry_date", "")),
+                "entry_price": entry_price,
+                "holding_days": int(order.get("holding_days", 0)),
+                "exit_trigger_date": trigger_date,
+                "exit_trigger_close": float(order.get("exit_trigger_close", 0.0)),
+                "settled_date": str(order.get("last_date", "")),
+                "settled_price": float(order.get("last_close", 0.0)),
+                "settled_return_pct": float(order.get("return_pct", 0.0)),
+                "live_price": quote_price,
+                "live_return_pct": live_return,
+                "preview_exit_price": open_price if provisional_execution else None,
+                "preview_exit_return_pct": preview_exit_return,
+                "server_time": str(quote.get("server_time", "")),
+                "quote_available": quote_price > 0,
+                "trend_ended": False,
+                "pending_execution": True,
+                "pending_exit_execution": True,
+                "provisional_exit_execution": provisional_execution,
+                "execution_blocked": locked,
+                "status": "卖点已确认",
+                "operation": operation,
+                "status_detail": detail,
+                "exit_reason": str(order.get("exit_reason", "")),
+                "setup_cancelled": False,
+            }
+        )
     return result
 
 
@@ -764,7 +1021,11 @@ def evaluate_live_seed(
     close_trade_date: str,
 ) -> dict | None:
     """Re-evaluate one stock from today's OHLC without mutating settled state."""
-    if not seed.get("eligible") or is_st_name(seed.get("name", "")):
+    if (
+        not seed.get("eligible")
+        or is_st_name(seed.get("name", ""))
+        or is_st_name(quote.get("name", ""))
+    ):
         return None
     price = float(quote.get("price", 0.0))
     open_price = float(quote.get("open", 0.0))

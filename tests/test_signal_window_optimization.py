@@ -3,15 +3,17 @@ from __future__ import annotations
 import unittest
 from unittest.mock import patch
 
-from rolling_validation import SignalPoint
+from rolling_validation import ExecutionAssumptions, SignalPoint
 from screener import Bar, Stock
 from signal_failure_examples import failure_rows
 from signal_repaint_comparison import measurement
 from signal_window_optimization import (
     WaveSamples,
     append_wave_sample,
+    balanced_candidate,
     entry_for_method,
     exit_for_rule,
+    joint_trade_for_setup,
     risk_exit_index,
     signal_indices,
 )
@@ -27,19 +29,22 @@ def point(
     cross_ok: bool = True,
     cross_age: int = 0,
     cross_lookback_days: int = 8,
+    area: str = "",
+    cross_date: str = "",
 ) -> SignalPoint:
     return SignalPoint(
         date=f"2026-07-{day:02d}",
         close=close,
         dragon=dragon,
         tiger=tiger,
-        area="",
+        area=area,
         base_signal=base_signal,
         endpoint_cross=False,
         cross_ok=cross_ok,
         yellow_ok=base_signal,
         cross_age=cross_age,
         cross_lookback_days=cross_lookback_days,
+        cross_date=cross_date,
     )
 
 
@@ -77,13 +82,13 @@ class SignalWindowOptimizationTests(unittest.TestCase):
         self.assertEqual(replay.call_args.kwargs["mode"], "retrospective")
 
     def test_repaint_comparison_excludes_nonpositive_adjusted_prices(self):
-        points = [point(day, close=10.0) for day in range(1, 72)]
+        points = [point(day, close=10.0) for day in range(1, 75)]
         points[0] = point(1, close=-1.0, base_signal=True)
         measured = measurement(points, bars(points), 0)
         self.assertEqual(measured, {"excluded_nonpositive_price": True})
 
     def test_failure_examples_exclude_nonpositive_adjusted_prices(self):
-        points = [point(day, close=10.0) for day in range(1, 72)]
+        points = [point(day, close=10.0) for day in range(1, 75)]
         points[0] = point(1, close=-1.0, base_signal=True)
         points[1] = point(2, close=10.0, dragon=9.0, tiger=10.0)
         with patch(
@@ -109,6 +114,127 @@ class SignalWindowOptimizationTests(unittest.TestCase):
             point(5, base_signal=True),
         ]
         self.assertEqual(signal_indices(points), [1, 4])
+
+    def test_pool_promotion_does_not_create_a_second_event(self):
+        points = [
+            point(1),
+            point(2, area="secondary", cross_date="2026-07-01"),
+            point(3, area="main", cross_date="2026-07-01"),
+            point(4),
+        ]
+        self.assertEqual(signal_indices(points, "pool"), [1])
+
+    def test_same_cross_reappearance_is_consumed_but_new_cross_is_counted(self):
+        points = [
+            point(1, area="secondary", cross_date="2026-06-30"),
+            point(2),
+            point(3, area="secondary", cross_date="2026-06-30"),
+            point(4),
+            point(5, area="main", cross_date="2026-07-04"),
+        ]
+        self.assertEqual(signal_indices(points, "pool"), [0, 4])
+
+    def test_holdout_changes_do_not_change_frozen_balanced_choice(self):
+        def candidate(identifier: str, dev_geo: float, valid_geo: float, holdout: float) -> dict:
+            period = lambda geo: {
+                "sample_count": 250,
+                "geometric_average_pct": geo,
+                "positive_rate_pct": 60.0,
+                "average_excluding_abs_50pct_outliers_pct": geo,
+            }
+            return {
+                "id": identifier,
+                "development_before_2024": period(dev_geo),
+                "validation_2024_2025": period(valid_geo),
+                "holdout_2026": {"sample_count": 999, "average_pct": holdout},
+            }
+
+        first = [candidate("a", 2.0, 2.0, -99.0), candidate("b", 1.0, 1.0, 99.0)]
+        second = [candidate("a", 2.0, 2.0, 99.0), candidate("b", 1.0, 1.0, -99.0)]
+        self.assertEqual(balanced_candidate(first)["id"], "a")
+        self.assertEqual(balanced_candidate(second)["id"], "a")
+
+    def test_breakout_is_cancelled_when_signal_erases_on_confirmation_close(self):
+        points = [
+            point(1, close=10.0, base_signal=True, cross_ok=True, cross_age=1),
+            point(2, close=10.8, cross_ok=False, dragon=11.0, tiger=10.0),
+            point(3, close=11.0),
+        ]
+        result = entry_for_method(
+            points,
+            bars(points, [10.2, 10.5, 11.1]),
+            0,
+            {"kind": "recent_high", "lookback": 1},
+        )
+        self.assertIsNone(result)
+
+    def test_exit_threshold_uses_raw_entry_but_return_uses_cost_adjusted_fills(self):
+        points = [
+            point(1, close=10.0, base_signal=True, cross_ok=True),
+            point(2, close=10.1),
+            point(3, close=10.31),
+            point(4, close=10.25),
+            point(5, close=10.2),
+        ]
+        history = [
+            Bar(
+                date=item.date,
+                open=open_price,
+                high=max(open_price, item.close) + 0.1,
+                low=min(open_price, item.close) - 0.1,
+                close=item.close,
+                volume=1000.0,
+                amount=10000.0,
+            )
+            for item, open_price in zip(points, [10.0, 10.0, 10.2, 10.25, 10.2])
+        ]
+        assumptions = ExecutionAssumptions(
+            commission_bps_per_side=200.0,
+            exchange_fee_bps_per_side=0.0,
+            regulatory_fee_bps_per_side=0.0,
+            stamp_duty_bps_sell=0.0,
+            slippage_bps_per_side=0.0,
+        )
+        trade = joint_trade_for_setup(
+            Stock(1, "600001", "示例"),
+            history,
+            points,
+            0,
+            {"id": "signal_close", "label": "确认", "kind": "close", "delay": 0},
+            {"id": "target_3", "label": "达到3%", "kind": "target", "target": 3.0},
+            assumptions,
+        )
+        self.assertEqual(trade["entry_raw_price"], 10.0)
+        self.assertEqual(trade["exit_trigger_index"], 2)
+        self.assertLess(trade["return_pct"], 0.0)
+
+    def test_blocked_buy_is_cancelled_when_a_different_cross_replaces_setup(self):
+        points = [
+            point(1, close=10.0, base_signal=True, cross_date="2026-06-30"),
+            point(2, close=11.0, cross_date="2026-07-02"),
+            point(3, close=10.8, cross_date="2026-07-02"),
+        ]
+        history = [
+            Bar("2026-07-01", 10.0, 10.1, 9.9, 10.0, 1000.0, 10000.0),
+            Bar("2026-07-02", 11.0, 11.0, 11.0, 11.0, 1000.0, 10000.0),
+            Bar("2026-07-03", 10.8, 10.9, 10.7, 10.8, 1000.0, 10000.0),
+        ]
+        assumptions = ExecutionAssumptions(
+            commission_bps_per_side=0.0,
+            exchange_fee_bps_per_side=0.0,
+            regulatory_fee_bps_per_side=0.0,
+            stamp_duty_bps_sell=0.0,
+            slippage_bps_per_side=0.0,
+        )
+        result = entry_for_method(
+            points,
+            history,
+            0,
+            {"kind": "close", "delay": 0},
+            stock=Stock(1, "600001", "示例"),
+            execution=assumptions,
+        )
+        self.assertIsNone(result)
 
     def test_wave_peak_excludes_signal_day_and_stops_at_relationship_end(self):
         points = [point(day, close=10.0) for day in range(1, 63)]

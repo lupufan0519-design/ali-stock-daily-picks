@@ -9,5 +9,11 @@
   "minimum_history_bars": 100,
   "workers": 5,
   "include_st": false,
-  "near_match_minimum": 3
+  "near_match_minimum": 3,
+  "backtest_commission_bps_per_side": 3.0,
+  "backtest_exchange_fee_bps_per_side": 0.341,
+  "backtest_regulatory_fee_bps_per_side": 0.2,
+  "backtest_stamp_duty_bps_sell": 5.0,
+  "backtest_slippage_bps_per_side": 5.0,
+  "entry_execution_max_wait_bars": 5
 }

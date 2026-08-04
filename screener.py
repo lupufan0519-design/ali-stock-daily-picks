@@ -62,7 +62,15 @@ class Evaluation:
     name: str
     market: int
     date: str
+    open: float
+    high: float
+    low: float
     close: float
+    previous_close: float
+    limit_up_price: float
+    limit_down_price: float
+    one_word_limit_up: bool
+    one_word_limit_down: bool
     entry_breakout_high_5: float
     change_pct: float
     bottom_ok: bool
@@ -256,6 +264,22 @@ def price_limit_rate(stock: Stock) -> Decimal:
 def limit_up_price(previous_close: float, rate: Decimal) -> float:
     price = Decimal(str(previous_close)) * (Decimal("1") + rate)
     return float(price.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+
+
+def limit_down_price(previous_close: float, rate: Decimal) -> float:
+    price = Decimal(str(previous_close)) * (Decimal("1") - rate)
+    return float(price.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+
+
+def is_one_word_limit(
+    bar: Bar,
+    limit_price: float,
+) -> bool:
+    tolerance = 0.0051
+    return all(
+        abs(float(value) - float(limit_price)) <= tolerance
+        for value in (bar.open, bar.high, bar.low, bar.close)
+    )
 
 
 def make_sparkline(bars: Sequence[Bar], dragon: Sequence[float], tiger: Sequence[float]) -> str:
@@ -553,6 +577,9 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
     dragon_above_tiger = dragon[-1] > tiger[-1]
     previous = bars[-2].close if len(bars) > 1 else bars[-1].close
     change_pct = (bars[-1].close / previous - 1.0) * 100.0 if previous else 0.0
+    rate = price_limit_rate(stock)
+    daily_limit_up = limit_up_price(previous, rate)
+    daily_limit_down = limit_down_price(previous, rate)
     live_seed = make_live_seed(
         stock,
         bars,
@@ -586,7 +613,15 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
         name=stock.name,
         market=stock.market,
         date=bars[-1].date,
+        open=bars[-1].open,
+        high=bars[-1].high,
+        low=bars[-1].low,
         close=bars[-1].close,
+        previous_close=previous,
+        limit_up_price=daily_limit_up,
+        limit_down_price=daily_limit_down,
+        one_word_limit_up=is_one_word_limit(bars[-1], daily_limit_up),
+        one_word_limit_down=is_one_word_limit(bars[-1], daily_limit_down),
         entry_breakout_high_5=float(
             max(bar.high for bar in bars[-6:-1])
         ),
