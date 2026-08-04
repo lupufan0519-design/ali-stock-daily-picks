@@ -17,7 +17,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: stock-pages-daily
+  group: stock-pages-publish
   cancel-in-progress: false
 
 jobs:
@@ -87,6 +87,25 @@ jobs:
           --run-id "${{ steps.research.outputs.run_id }}"
           --output results/strategy_grid_optimization.json
           --case-output results/trend_case.json
+      - name: Validate the frozen strategy as a capacity-constrained portfolio
+        if: steps.research.outputs.run == 'true'
+        env:
+          INPUT_BARS: ${{ inputs.bars || '1600' }}
+        run: >-
+          python strategy_portfolio_validation.py
+          --candidates "low_risk_2__wave_erasure_hybrid_or_10_10_weakening,low_risk_2__wave_erasure_trail_10_10,low_risk_2__wave_erasure_hybrid_or_8_3_weakening,break_5day_high__trail_3_2"
+          --bars "$INPUT_BARS"
+          --completed-trade-date "${{ steps.research.outputs.cutoff }}"
+          --output results/strategy_portfolio_validation.json
+          --omit-trades
+      - name: Verify frozen strategy identity before publishing
+        if: steps.research.outputs.run == 'true'
+        run: >-
+          python validate_strategy_artifacts.py
+          --grid results/strategy_grid_optimization.json
+          --case results/trend_case.json
+          --portfolio results/strategy_portfolio_validation.json
+          --require-portfolio
       - name: Refresh the complete research section
         if: steps.research.outputs.run == 'true'
         run: python refresh_report_research.py
@@ -102,7 +121,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- results/strategy_grid_optimization.json results/trend_case.json results/latest.html
+          git add -- results/strategy_grid_optimization.json results/trend_case.json results/strategy_portfolio_validation.json results/latest.html index.html
           if git diff --cached --quiet; then
             echo "Validation result unchanged"
           else

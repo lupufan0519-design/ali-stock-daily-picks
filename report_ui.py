@@ -7,7 +7,12 @@ from pathlib import Path
 from typing import Sequence
 
 from observation import visible_observations
-from strategy_tracker import POOL_NAME, secondary_strategy_stats, strategy_stats
+from strategy_contract import strategy_contract
+from strategy_tracker import POOL_NAME, secondary_strategy_stats
+
+
+PRODUCTION_STRATEGY = strategy_contract()
+RETURN_PRIORITY_CANDIDATE_ID = "low_risk_2__wave_erasure_trail_10_10"
 
 
 STYLES = r"""
@@ -411,7 +416,7 @@ tbody tr:last-child td { border-bottom: 0; }
   background: linear-gradient(145deg, var(--surface), var(--surface-blue));
 }
 .validation-verdict strong { display: block; margin-bottom: 7px; font-size: 19px; }
-.validation-verdict p { margin: 0; color: var(--muted-strong); }
+.validation-verdict p { margin: 0; overflow-wrap: anywhere; word-break: break-word; color: var(--muted-strong); }
 .trend-case {
   --case-up: #e43b36;
   --case-down: #139b68;
@@ -868,8 +873,11 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .strategy-lab-stamp { justify-self: start; text-align: left; }
   .strategy-tickets { grid-template-columns: 1fr; padding: 16px; }
   .strategy-ticket.recommended { transform: none; }
-  .strategy-lab-baseline { grid-template-columns: 1fr; margin: 0 16px 16px; }
-  .strategy-baseline-numbers { flex-wrap: wrap; }
+  .strategy-lab-baseline { grid-template-columns: minmax(0, 1fr); margin: 0 16px 16px; }
+  .strategy-lab-baseline > * { min-width: 0; }
+  .strategy-lab-baseline p,
+  .strategy-baseline-numbers { overflow-wrap: anywhere; word-break: break-word; }
+  .strategy-baseline-numbers { flex-wrap: wrap; white-space: normal; }
   .strategy-lab-note { margin: 0 16px 18px; }
   th, td { padding: 12px 14px; }
   .chart-cell { min-width: 320px; }
@@ -1939,17 +1947,18 @@ LIVE_SCRIPT = r"""
       const state = document.createElement("span");
       state.className = "state warn";
       const areaLabel = area === "main" ? "主选" : "次选";
-      state.textContent = "待观察中";
+      state.textContent = area === "main" ? "仅观察" : "待观察中";
       const operation = document.createElement("span");
-      setOperation(
-        operation,
-        mode === "intraday" ? "等待收盘确认" : "等待买入",
-      );
+      setOperation(operation, area === "main"
+        ? "不执行买卖"
+        : mode === "intraday" ? "等待收盘确认" : "等待买入");
       const settlement = document.createElement("span");
       settlement.className = "subline status-detail-line";
-      settlement.textContent = mode === "intraday"
-        ? `新${areaLabel}信号，收盘后保存并进入买点观察`
-        : `已形成${areaLabel}信号；收盘确认买点后，下一交易日开盘执行`;
+      settlement.textContent = area === "main"
+        ? "满足主选条件，仅作观察，不生成自动买卖操作，也不纳入生产绩效"
+        : mode === "intraday"
+          ? `新${areaLabel}信号，收盘后保存并进入D+2买点观察`
+          : "首次进入次选后的第2个完整交易日收盘检查；满足生产合同后，下一可交易日开盘买入";
       statusOperation.append(state, operation);
       statusCell.append(statusOperation, settlement);
 
@@ -1973,9 +1982,11 @@ LIVE_SCRIPT = r"""
     const trackedSecondary = Array.isArray(trackingCodes?.secondary) ? trackingCodes.secondary : [];
     const trackedMainSet = new Set(trackedMain.map(String));
     const trackedSecondarySet = new Set(trackedSecondary.map(String));
-    const main = mainRows.filter((item) => !trackedMainSet.has(String(item.code)));
+    const main = mainRows.filter((item) =>
+      !trackedMainSet.has(String(item.code)) && !trackedSecondarySet.has(String(item.code))
+    );
     const secondary = secondaryRows.filter((item) => !trackedSecondarySet.has(String(item.code)));
-    const mainAreaCount = new Set([...main.map((item) => item.code), ...trackedMain]).size;
+    const mainAreaCount = new Set(main.map((item) => item.code)).size;
     const secondaryAreaCount = new Set([
       ...secondary.map((item) => item.code),
       ...trackedSecondary,
@@ -2109,7 +2120,7 @@ LIVE_SCRIPT = r"""
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       status.textContent = data.market_label || "行情已更新";
-      detail.textContent = data.note || "主选与次选盘中重算；趋势状态实时判断，统计收盘结算";
+      detail.textContent = data.note || "主选盘中重算并仅观察；次选实时判断生产状态，绩效收盘结算";
       quoteTime.textContent = data.latest_quote_time_display || data.latest_quote_time || data.generated_at_display || data.generated_at;
       if (liveTradeDate) {
         liveTradeDate.textContent = data.live_trade_date || data.close_trade_date || "等待行情";
@@ -2255,8 +2266,8 @@ def _operation_for_status(status: str, explicit: object = "", *, pending: bool =
         "上升趋势中": "继续持有",
         "待观察中": "谨慎持有",
         "谨慎持有中": "风险观察",
-        "买点已确认": "下一交易日开盘买入",
-        "卖点已确认": "下一交易日开盘卖出",
+        "买点已确认": "下一可交易日开盘买入",
+        "卖点已确认": "下一可交易日开盘卖出",
         "趋势结束": "已完成卖出",
         "数据待确认": "暂停操作",
     }.get(status, "继续观察")
@@ -2335,26 +2346,27 @@ def _pending_row(setup: dict, area: str = "main") -> str:
         (last_close / setup_price - 1.0) * 100.0 if setup_price else 0.0
     )
     return_class = "positive" if setup_return >= 0 else "negative"
-    operation = _operation_for_status(
-        "待观察中",
-        setup.get("operation", ""),
-        pending=True,
-    )
-    breakout_high = float(setup.get("breakout_high_5", 0.0) or 0.0)
-    breakout_note = (
-        f"收盘突破 {breakout_high:.2f} 元确认买点"
-        if breakout_high > 0
-        else "前5日高点数据等待更新"
-    )
+    if area == "main":
+        operation = "不执行买卖"
+        status = "仅观察"
+        rule_note = "满足主选条件，仅作观察，不生成自动买卖操作，也不纳入生产绩效"
+    else:
+        operation = "等待买入"
+        status = "待观察中"
+        wait_bars = int(PRODUCTION_STRATEGY["entry_delay_bars"])
+        rule_note = (
+            f"首次进入次选后的第{wait_bars}个完整交易日收盘检查；"
+            "满足生产合同后，下一可交易日开盘买入"
+        )
     return f"""
     <tr data-tracking-code="{_esc(setup['code'])}" data-tracking-area="{_esc(area)}" data-pending-setup="true">
       <td data-label="股票">{_stock_cell(setup['code'], setup['name'], int(setup['market']))}</td>
       <td data-label="信号日 / 价格" class="numeric">{_esc(setup['setup_date'])}<span class="subline">{setup_price:.2f} 元</span></td>
       <td data-label="最新价 / 时间"><span class="numeric" data-live-price>{last_close:.2f}</span>
           <span class="subline" data-live-time>{_esc(setup.get('last_date', setup['setup_date']))} 收盘</span></td>
-      <td data-label="距信号涨幅"><span class="numeric {return_class}" data-live-return>{setup_return:+.2f}%</span><span class="subline">{_esc(breakout_note)}</span></td>
+      <td data-label="距信号涨幅"><span class="numeric {return_class}" data-live-return>{setup_return:+.2f}%</span><span class="subline">{_esc(rule_note)}</span></td>
       <td data-label="等待时长" class="numeric">{int(setup.get('setup_elapsed_bars', 0))} 日</td>
-      <td data-label="状态 / 操作"><div class="status-operation"><span class="state warn" data-live-status>待观察中</span>{_operation_badge(operation, live=True)}</div><span class="subline status-detail-line" data-live-status-detail>{_esc(setup.get('status_detail', '等待收盘突破前5日高点'))}</span></td>
+      <td data-label="状态 / 操作"><div class="status-operation"><span class="state warn" data-live-status>{_esc(status)}</span>{_operation_badge(operation, live=True)}</div><span class="subline status-detail-line" data-live-status-detail>{_esc(rule_note)}</span></td>
     </tr>"""
 
 
@@ -2363,7 +2375,7 @@ def _pending_entry_execution_row(item: dict, area: str = "main") -> str:
     setup_price = float(item.get("setup_price", trigger_price) or trigger_price)
     move = (trigger_price / setup_price - 1.0) * 100.0 if setup_price else 0.0
     return_class = "positive" if move >= 0 else "negative"
-    operation = str(item.get("operation") or "下一交易日开盘买入")
+    operation = str(item.get("operation") or "下一可交易日开盘买入")
     detail = str(item.get("status_detail") or "买点已由收盘确认，尚未建立持仓")
     blocked = str(item.get("execution_blocked_reason") or "")
     if blocked:
@@ -2382,7 +2394,7 @@ def _pending_entry_execution_row(item: dict, area: str = "main") -> str:
 def _pending_exit_execution_row(item: dict, area: str = "main") -> str:
     position = dict(item)
     position["status"] = "卖点已确认"
-    position["operation"] = item.get("operation") or "下一交易日开盘卖出"
+    position["operation"] = item.get("operation") or "下一可交易日开盘卖出"
     position["status_detail"] = item.get("status_detail") or "卖点已由收盘确认，实际卖出前仍计入跟踪池"
     position.setdefault("last_close", item.get("exit_trigger_close", item.get("entry_price", 0.0)))
     position.setdefault("last_date", item.get("exit_trigger_date", item.get("entry_date", "")))
@@ -2461,6 +2473,17 @@ def _evaluation_row(item, observation: bool = False) -> str:
 
 def _live_pool_row(item, area: str) -> str:
     label = "最近收盘主选信号" if area == "main" else "最近收盘次选信号"
+    if area == "main":
+        status = "仅观察"
+        operation = "不执行买卖"
+        detail = f"{label}已形成；仅作观察，不生成自动买卖操作，也不纳入生产绩效"
+    else:
+        status = "待观察中"
+        operation = "等待买入"
+        detail = (
+            f"{label}已形成；首次进入次选后的第{int(PRODUCTION_STRATEGY['entry_delay_bars'])}个"
+            "完整交易日收盘检查，满足生产合同后下一可交易日开盘买入"
+        )
     return f"""
     <tr data-live-code="{_esc(item.code)}">
       <td data-label="股票">{_stock_cell(item.code, item.name, int(item.market))}</td>
@@ -2471,8 +2494,8 @@ def _live_pool_row(item, area: str) -> str:
       <td data-label="龙腾跃虎">{_signal(item.cross_ok, item.cross_date or '未命中')}</td>
       <td data-label="42日涨停">{_signal(item.limit_up_ok, item.limit_up_date or '未命中')}</td>
       <td data-label="窗口黄柱">{_signal(item.yellow_ok, _yellow_note(item))}</td>
-      <td data-label="状态 / 操作" class="live-pool-status"><div class="status-operation"><span class="state warn">待观察中</span>{_operation_badge('等待买入')}</div>
-          <span class="subline status-detail-line">{label}已形成；收盘确认买点后，下一交易日开盘执行</span></td>
+      <td data-label="状态 / 操作" class="live-pool-status"><div class="status-operation"><span class="state warn">{_esc(status)}</span>{_operation_badge(operation)}</div>
+          <span class="subline status-detail-line">{_esc(detail)}</span></td>
     </tr>"""
 
 
@@ -2495,29 +2518,29 @@ def _observation_compact_row(item) -> str:
 
 def _events(events: Sequence[dict]) -> str:
     labels = {
-        "added": "主选买入已执行，开始趋势跟踪",
-        "signal_lost": "龙虎信号转弱",
+        "added": "主选信号进入仅观察区",
+        "signal_lost": "龙腾跃虎重算消失，已持有则优先退出",
         "signal_restored": "龙虎信号恢复",
-        "removed": "主选卖出已执行，趋势结束并移出",
+        "removed": "主选观察结束并移出",
         "ineligible_removed": "股票名称含 ST，已移出",
         "secondary_added": "次选买入已执行，开始趋势跟踪",
         "secondary_removed": "次选卖出已执行，趋势结束并移出",
         "trend_warning": "趋势转弱预警，继续跟踪止盈线",
-        "secondary_promoted": "条件补齐，升级主选区；持有期不断开",
-        "setup_added": "主选信号形成，等待收盘突破前5日高点",
-        "secondary_setup_added": "次选信号形成，等待收盘突破前5日高点",
-        "setup_promoted": "候选条件补齐，升级为主选等待确认",
+        "secondary_promoted": "条件补齐，进入主选仅观察区",
+        "setup_added": "主选信号形成，仅作观察",
+        "secondary_setup_added": "次选信号形成，进入D+2买点观察",
+        "setup_promoted": "条件补齐，进入主选仅观察区",
         "setup_cancelled": "候选信号失效，未产生建议买点",
-        "trend_started": "买点已由收盘确认，等待下一交易日开盘执行",
-        "entry_triggered": "买点已由收盘确认，等待下一交易日开盘执行",
-        "entry_execution_pending": "买点已确认，等待下一交易日开盘执行",
-        "entry_executed": "买入已按下一交易日开盘执行",
+        "trend_started": "买点已由收盘确认，等待下一可交易日开盘执行",
+        "entry_triggered": "买点已由收盘确认，等待下一可交易日开盘执行",
+        "entry_execution_pending": "买点已确认，等待下一可交易日开盘执行",
+        "entry_executed": "买入已按下一可交易日开盘执行",
         "entry_execution_blocked": "买入暂未成交，等待下一可交易开盘",
         "entry_cancelled": "待执行买单已取消，未计入收益统计",
-        "exit_triggered": "卖点已由收盘确认，等待下一交易日开盘执行",
-        "exit_execution_pending": "卖点已确认，等待下一交易日开盘执行",
+        "exit_triggered": "卖点已由收盘确认，等待下一可交易日开盘执行",
+        "exit_execution_pending": "卖点已确认，等待下一可交易日开盘执行",
         "exit_execution_blocked": "卖出暂未成交，等待下一可交易开盘",
-        "exit_executed": "卖出已按下一交易日开盘执行并完成结算",
+        "exit_executed": "卖出已按下一可交易日开盘执行并完成结算",
     }
     items = []
     for event in events:
@@ -2697,7 +2720,13 @@ def _single_trend_case_chart(initial_payload: dict | None = None) -> str:
             payload.setdefault("exit_date", payload.get("exit_date") or payload.get("exit_trigger_date"))
             payload.setdefault("exit_close", payload.get("exit_price"))
             payload.setdefault("exit_return_pct", payload.get("return_pct"))
-            payload.setdefault("exit_reason", payload.get("exit_rule_label") or payload.get("exit_rule_id") or payload.get("method") or "按正式卖点规则")
+            if not payload.get("exit_reason"):
+                payload["exit_reason"] = (
+                    payload.get("exit_rule_label")
+                    or payload.get("exit_rule_id")
+                    or payload.get("method")
+                    or "按正式卖点规则"
+                )
         bars = payload["bars"]
         wave_dragon = [float(value) for value in payload["wave_dragon"]]
         wave_tiger = [float(value) for value in payload["wave_tiger"]]
@@ -2845,16 +2874,50 @@ def _single_trend_case_chart(initial_payload: dict | None = None) -> str:
     line_label_x = x_at(len(bars) - 1) + 8
     dragon_label_y = y_at(wave_dragon[-1]) + 3
     tiger_label_y = y_at(wave_tiger[-1]) + 3
-    stop_drawdown = 2.0 if "回撤2%" in str(payload["exit_reason"]) else 5.0
-    stop_price = float(payload["peak_close"]) * (1.0 - stop_drawdown / 100.0)
-    stop_y = y_at(stop_price)
+    exit_rule = payload.get("exit_rule") if isinstance(payload.get("exit_rule"), dict) else {}
+
+    def structured_number(*keys: str) -> float | None:
+        for source in (exit_rule, payload):
+            for key in keys:
+                value = source.get(key)
+                if value is None:
+                    continue
+                try:
+                    return float(value)
+                except (TypeError, ValueError):
+                    continue
+        return None
+
+    activation_pct = structured_number(
+        "profit_activation_pct",
+        "activation_pct",
+        "exit_profit_activation_pct",
+    )
+    stop_drawdown = structured_number(
+        "trailing_drawdown_pct",
+        "drawdown_pct",
+        "exit_trailing_drawdown_pct",
+    )
+    case_candidate_id = str(
+        payload.get("frozen_candidate_id")
+        or payload.get("candidate_id")
+        or exit_rule.get("candidate_id")
+        or ""
+    )
+    if case_candidate_id == str(PRODUCTION_STRATEGY["candidate_id"]):
+        if activation_pct is None:
+            activation_pct = float(PRODUCTION_STRATEGY["profit_activation_pct"])
+        if stop_drawdown is None:
+            stop_drawdown = float(PRODUCTION_STRATEGY["trailing_drawdown_pct"])
     stop_markup = ""
-    if "回撤" in str(payload["exit_reason"]):
+    if activation_pct is not None and stop_drawdown is not None:
+        stop_price = float(payload["peak_close"]) * (1.0 - stop_drawdown / 100.0)
+        stop_y = y_at(stop_price)
         stop_markup = (
             f'<line class="case-stop-line" x1="{peak_x:.1f}" y1="{stop_y:.1f}" '
             f'x2="{exit_x:.1f}" y2="{stop_y:.1f}"/>'
             f'<text class="case-stop-label" x="{peak_x+7:.1f}" '
-            f'y="{stop_y-6:.1f}">高点回撤{stop_drawdown:.0f}%</text>'
+            f'y="{stop_y-6:.1f}">浮盈达到{activation_pct:g}%后 · 高点回撤{stop_drawdown:g}%</text>'
         )
     start_anchor_x = width * 0.28
     peak_anchor_x = width * 0.50
@@ -2935,19 +2998,38 @@ def _single_trend_case_chart(initial_payload: dict | None = None) -> str:
     </div>"""
 
 
-def _trend_case_chart() -> str:
+def _trend_case_chart(validation_payload: dict | None = None) -> str:
     payload = _read_result_json("trend_case.json")
+    if validation_payload is None:
+        validation_payload = _read_result_json("strategy_grid_optimization.json")
+    if not validation_payload or not _artifact_matches_grid(payload, validation_payload):
+        return ""
+    inherited = {
+        key: payload.get(key)
+        for key in ("run_id", "config_hash", "completed_trade_date", "frozen_candidate_id")
+        if payload.get(key) is not None
+    }
+    payload_meta = payload.get("meta") if isinstance(payload.get("meta"), dict) else {}
+    for key in ("run_id", "config_hash", "completed_trade_date", "frozen_candidate_id"):
+        if key not in inherited and payload_meta.get(key) is not None:
+            inherited[key] = payload_meta.get(key)
+
+    def inherit_case(item: dict) -> dict:
+        merged = dict(inherited)
+        merged.update(item)
+        return merged
+
     raw_cases = payload.get("cases")
     if isinstance(raw_cases, list):
-        cases = [item for item in raw_cases if isinstance(item, dict)]
+        cases = [inherit_case(item) for item in raw_cases if isinstance(item, dict)]
     else:
         cases = []
         primary = payload.get("primary_case")
         if isinstance(primary, dict):
-            cases.append(primary)
+            cases.append(inherit_case(primary))
         cancelled = payload.get("cancelled_cases")
         if isinstance(cancelled, list):
-            cases.extend(item for item in cancelled if isinstance(item, dict))
+            cases.extend(inherit_case(item) for item in cancelled if isinstance(item, dict))
     if not cases:
         return _single_trend_case_chart(payload)
 
@@ -2999,9 +3081,6 @@ def _repaint_comparison_panel() -> str:
         erased_exit = disappeared_rows[
             "confirm_0_close__erasure_or_relationship"
         ]["overall"]
-        hold_20 = disappeared_rows["confirm_0_close__hold_20"]["overall"]
-        trail_8_3 = disappeared_rows["confirm_0_close__trail_8_3"]["overall"]
-        wait_1 = disappeared_rows["confirm_1_close__hold_20"]
         retained_relationship = retained_rows[
             "confirm_0_close__relationship"
         ]["overall"]
@@ -3092,8 +3171,8 @@ def _repaint_comparison_panel() -> str:
         </div>
         <div class="repaint-warning"><strong>最终历史图不是实盘买点：</strong>99.98% 和平均 +50.52% 不能作为实时成功率。鞍钢股份 2026-03-11 属于“当时短暂出现、后来消失”，不再列入最终历史图失败案例。</div>
         <div class="repaint-strategy">
-          <div class="repaint-strategy-card"><strong>买入：不要靠“多等几天看交叉还在不在”</strong><p>强制等1日后只剩 <em>{float(wait_1['entry_rate_pct']):.2f}%</em> 的信号，20日退出平均收益仅 <em>{float(wait_1['overall']['average_pct']):+.2f}%</em>，没有提高胜率。更合理的是：信号形成先记“待观察”，用价格真正启动确认买点；确认前若信号消失就取消。</p></div>
-          <div class="repaint-strategy-card"><strong>卖出：已买入后，消失只降级为风险提示</strong><p>短暂信号“消失即卖”平均 <em>{float(erased_exit['average_pct']):+.2f}%</em>、胜率 <em>{float(erased_exit['positive_rate_pct']):.2f}%</em>；改为最长20日且龙虎关系结束才卖为 <em>{float(hold_20['average_pct']):+.2f}% / {float(hold_20['positive_rate_pct']):.2f}%</em>，8%启动后回撤3%为 <em>{float(trail_8_3['average_pct']):+.2f}% / {float(trail_8_3['positive_rate_pct']):.2f}%</em>。因此交叉消失不宜单独触发卖出，应与龙线不再高于虎线或价格回撤联合判断。</p></div>
+          <div class="repaint-strategy-card"><strong>买入：信号先进入待观察，D+2确认启动</strong><p>页面不把交叉标签本身直接当成交指令。次选信号形成后，到第2个完整交易日收盘共同检查：信号仍有效、龙线仍在虎线上、收盘站上龙线、龙线不下行且回撤不超过3%；全部满足才在下一可交易日开盘买入，确认前消失就取消。</p></div>
+          <div class="repaint-strategy-card"><strong>卖出：重算消失及时退出，标签自然到期不退出</strong><p>历史上“消失即卖”样本的平均收益为 <em>{float(erased_exit['average_pct']):+.2f}%</em>、胜率为 <em>{float(erased_exit['positive_rate_pct']):.2f}%</em>，它的作用是及时终止已经失效的前提，并不追求单独成为高收益卖法。若信号未被重算消失，则继续跟随长波段，直到龙虎关系结束、10%启动后回撤10%，或龙虎线连续三点同步转弱。</p></div>
         </div>
         <details class="repaint-failures"><summary>展开查看当前完整历史图中严格未上涨的 {int(final['strict_failure_count'])} 个案例</summary><div class="repaint-failure-list">{''.join(failure_cards)}</div></details>
       </article>"""
@@ -3102,50 +3181,51 @@ def _repaint_comparison_panel() -> str:
 def _layered_strategy_grid_panel(payload: dict, cohorts: dict[str, dict]) -> str:
     coverage = payload.get("coverage") if isinstance(payload.get("coverage"), dict) else {}
     meta = _run_meta(payload)
-    buy_execution, sell_execution, cost_note = _execution_copy(payload)
-    execution_summary = _execution_summary(buy_execution, sell_execution)
-    labels = {
-        "main": ("主选区", "四项条件同时满足"),
-        "secondary": ("次选区", "龙虎、有效黄柱及另一项"),
-        "combined": ("主次选合计", "正式趋势池总体口径"),
-    }
-    combined_optimization = cohorts.get("combined", {}).get("optimization", {})
-    if not isinstance(combined_optimization, dict):
-        combined_optimization = {}
-    formal_strategy_id = _frozen_strategy_id(payload, cohorts)
-    cards = []
-    for key in ("main", "secondary", "combined"):
-        cohort = cohorts.get(key, {})
-        candidate = _cohort_candidate_for_id(cohort, formal_strategy_id)
-        stats = _candidate_stats(candidate)
-        label, note = labels[key]
-        sample_count = int(_stats_number(stats, "sample_count", "trade_count"))
-        success = _stats_number(stats, "positive_rate_pct", "success_rate_pct")
-        average = _stats_number(stats, "average_pct", "average_return_pct")
-        median = _stats_number(stats, "median_pct", "median_return_pct")
-        setup_count = int(
-            _stats_number(
-                cohort,
-                "setup_count",
-                "signal_count",
-                default=_stats_number(cohort, "common_trade_cohort_count"),
-            )
+    _, _, cost_note = _execution_copy(payload)
+    execution_summary = str(PRODUCTION_STRATEGY["execution_timing"])
+    live_strategy_id = _live_strategy_id(payload, cohorts)
+    frozen_candidate_id = _frozen_candidate_id(payload, cohorts)
+    main = cohorts.get("main", {})
+    secondary = cohorts.get("secondary", {})
+    main_setup_count = int(
+        _stats_number(main, "setup_count", "signal_count", default=_stats_number(main, "common_trade_cohort_count"))
+    )
+    secondary_setup_count = int(
+        _stats_number(secondary, "setup_count", "signal_count", default=_stats_number(secondary, "common_trade_cohort_count"))
+    )
+    secondary_candidate = _cohort_candidate_for_id(secondary, frozen_candidate_id)
+    secondary_stats = _candidate_stats(secondary_candidate)
+    secondary_sample = int(_stats_number(secondary_stats, "sample_count", "trade_count"))
+    secondary_success = _stats_number(secondary_stats, "positive_rate_pct", "success_rate_pct")
+    secondary_average = _stats_number(secondary_stats, "average_pct", "average_return_pct")
+    secondary_median = _stats_number(secondary_stats, "median_pct", "median_return_pct")
+
+    main_card = f"""
+      <article class="strategy-ticket">
+        <div class="strategy-ticket-head"><span class="strategy-ticket-kicker">四项条件同时满足</span><h4>主选区 · 仅观察</h4><small>{main_setup_count:,} 次入选信号 · 不生成自动买卖</small></div>
+        <div class="strategy-orders"><div class="strategy-order"><b>WATCH</b><span>用于观察高完整度信号，不纳入生产交易与生产绩效。</span></div></div>
+      </article>"""
+    if secondary_candidate:
+        secondary_numbers = f"""
+          <div class="strategy-numbers">
+            <div class="strategy-number"><span>历史回测成功率</span><strong>{secondary_success:.2f}%</strong></div>
+            <div class="strategy-number"><span>每笔平均收益</span><strong>{secondary_average:+.2f}%</strong></div>
+            <div class="strategy-number"><span>收益中位数</span><strong>{secondary_median:+.2f}%</strong></div>
+            <div class="strategy-number"><span>完整交易样本</span><strong>{secondary_sample:,}</strong></div>
+          </div>"""
+        candidate_state = f"{secondary_setup_count:,} 次入选信号 · {secondary_sample:,} 笔已完成交易"
+    else:
+        secondary_numbers = (
+            '<p class="validation-method">冻结候选数据缺失；页面不会改用其他候选填充，'
+            '本轮次选绩效暂不展示。</p>'
         )
-        entry_label = str(candidate.get("entry_label") or candidate.get("buy_label") or "按正式买点规则")
-        exit_label = str(candidate.get("exit_label") or candidate.get("sell_label") or "按正式卖点规则")
-        cards.append(
-            f"""
-            <article class="strategy-ticket {'recommended' if key == 'combined' else ''}">
-              <div class="strategy-ticket-head"><span class="strategy-ticket-kicker">{_esc(note)}</span><h4>{_esc(label)}</h4><small>{setup_count:,} 次入选信号 · {sample_count:,} 笔已完成交易</small></div>
-              <div class="strategy-orders"><div class="strategy-order"><b>BUY</b><span>{_esc(entry_label)}</span></div><div class="strategy-order"><b>SELL</b><span>{_esc(exit_label)}</span></div></div>
-              <div class="strategy-numbers">
-                <div class="strategy-number"><span>历史回测成功率</span><strong>{success:.2f}%</strong></div>
-                <div class="strategy-number"><span>每笔平均收益</span><strong>{average:+.2f}%</strong></div>
-                <div class="strategy-number"><span>收益中位数</span><strong>{median:+.2f}%</strong></div>
-                <div class="strategy-number"><span>完整交易样本</span><strong>{sample_count:,}</strong></div>
-              </div>
-            </article>"""
-        )
+        candidate_state = f"{secondary_setup_count:,} 次入选信号 · 正式候选数据缺失"
+    secondary_card = f"""
+      <article class="strategy-ticket recommended">
+        <div class="strategy-ticket-head"><span class="strategy-ticket-kicker">龙虎、有效黄柱及另一项</span><h4>次选区 · 生产执行</h4><small>{_esc(candidate_state)}</small></div>
+        <div class="strategy-orders"><div class="strategy-order"><b>BUY</b><span>{_esc(PRODUCTION_STRATEGY['entry_label'])}</span></div><div class="strategy-order"><b>SELL</b><span>{_esc(PRODUCTION_STRATEGY['exit_label'])}</span></div></div>
+        {secondary_numbers}
+      </article>"""
 
     base = cohorts.get("base_research", {})
     base_candidate = _cohort_candidate(base)
@@ -3160,25 +3240,24 @@ def _layered_strategy_grid_panel(payload: dict, cohorts: dict[str, dict]) -> str
             f'平均收益 {_stats_number(base_stats, "average_pct", "average_return_pct"):+.2f}%。该组不并入趋势池正式结论。</p></details>'
         )
 
-    automatic = (
-        combined_optimization.get("automatic_recommended")
-        or cohorts.get("combined", {}).get("automatic_recommended")
-        or payload.get("automatic_recommended")
-    )
+    secondary_optimization = secondary.get("optimization", {})
+    if not isinstance(secondary_optimization, dict):
+        secondary_optimization = {}
+    automatic = secondary_optimization.get("automatic_recommended") or secondary.get("automatic_recommended") or payload.get("automatic_recommended")
     automatic_id = str(
-        combined_optimization.get("automatic_recommended_id")
-        or cohorts.get("combined", {}).get("automatic_recommended_id")
+        secondary_optimization.get("automatic_recommended_id")
+        or secondary.get("automatic_recommended_id")
         or payload.get("automatic_recommended_id")
         or (automatic.get("id") if isinstance(automatic, dict) else "")
     )
     if not isinstance(automatic, dict) and automatic_id:
-        automatic = _cohort_candidate_for_id(cohorts.get("combined", {}), automatic_id)
+        automatic = _cohort_candidate_for_id(secondary, automatic_id)
     automatic_note = ""
-    if isinstance(automatic, dict) and automatic and automatic_id != formal_strategy_id:
+    if isinstance(automatic, dict) and automatic and automatic_id != frozen_candidate_id:
         automatic_stats = _candidate_stats(automatic)
         automatic_note = f"""
         <details class="legacy-study"><summary>查看未启用的自动推荐研究对照</summary>
-          <p class="validation-method">自动推荐 {_esc(automatic_id)} 由严格的2024年前开发、2024—2025验证阶段选出，2026可作为留出验收；它当前没有驱动实时操作。历史回测成功率 {_stats_number(automatic_stats, 'positive_rate_pct', 'success_rate_pct'):.2f}%，平均收益 {_stats_number(automatic_stats, 'average_pct', 'average_return_pct'):+.2f}%。实时状态、正式案例和主次选绩效仍只绑定冻结策略 {_esc(formal_strategy_id)}。</p>
+          <p class="validation-method">自动推荐 {_esc(automatic_id)} 仅作研究对照，没有驱动实时操作。历史回测成功率 {_stats_number(automatic_stats, 'positive_rate_pct', 'success_rate_pct'):.2f}%，平均收益 {_stats_number(automatic_stats, 'average_pct', 'average_return_pct'):+.2f}%。次选生产绩效只绑定冻结候选 {_esc(frozen_candidate_id)}。</p>
         </details>"""
 
     run_parts = []
@@ -3192,13 +3271,13 @@ def _layered_strategy_grid_panel(payload: dict, cohorts: dict[str, dict]) -> str
     requested = int(coverage.get("requested_stock_count", analyzed) or analyzed)
     errors = int(coverage.get("error_count", max(0, requested - analyzed)) or 0)
     return f"""
-      <article class="strategy-lab" aria-label="主选次选分层联合滚动验证">
+      <article class="strategy-lab" aria-label="主选观察与次选生产策略联合滚动验证">
         <div class="strategy-lab-head">
-          <div><span class="section-kicker">Execution lab</span><h3>主选、次选与合计 · 买卖点联合滚动验证</h3><p>每天只使用当时可见数据；买点与卖点在同一状态机内逐日推进。{_esc(execution_summary)}。</p></div>
+          <div><span class="section-kicker">Execution lab</span><h3>主选观察 + 次选生产策略</h3><p>主选只观察；次选的买点与卖点在同一状态机内逐日推进。{_esc(execution_summary)}。</p></div>
           <div class="strategy-lab-stamp"><strong>{analyzed:,}/{requested:,}</strong><small>只非ST历史回测 · 失败 {errors}</small><strong>{_esc(meta['completed_trade_date'] or '已完成交易日')}</strong><small>不含盘中未完成日K</small></div>
         </div>
-        <div class="strategy-tickets">{''.join(cards)}</div>
-        <div class="strategy-lab-baseline"><p><strong>统一正式策略：</strong>{_esc(formal_strategy_id or '同一strategy_id')} 同时应用于主选、次选和合计样本，不为各区事后挑选不同规则。{_esc(execution_summary)}。{_esc(cost_note)}。</p><div class="strategy-baseline-numbers"><span>{' · '.join(run_parts) or '同一批次联合验证'}</span></div></div>
+        <div class="strategy-tickets">{main_card}{secondary_card}</div>
+        <div class="strategy-lab-baseline"><p><strong>生产合同：</strong>实时策略 {_esc(live_strategy_id or PRODUCTION_STRATEGY['live_strategy_id'])}；冻结候选 {_esc(frozen_candidate_id or '缺失')}。只对次选执行，{_esc(execution_summary)}。{_esc(cost_note)}。</p><div class="strategy-baseline-numbers"><span>{' · '.join(run_parts) or '同一批次联合验证'}</span></div></div>
         {automatic_note}
         {base_note}
       </article>"""
@@ -3214,117 +3293,174 @@ def _strategy_grid_panel(payload: dict | None = None) -> str:
     if cohorts:
         return _layered_strategy_grid_panel(payload, cohorts)
     return ""
-    try:
-        coverage = payload["coverage"]
-        optimization = payload["optimization"]
-        candidates = {
-            str(item["id"]): item
-            for item in optimization["all_candidates"]
-        }
-        profiles = (
-            (
-                "success",
-                "高成功率",
-                "更常兑现小目标",
-                candidates["reclaim_dragon__target_3"],
-            ),
-            (
-                "balanced recommended",
-                "旧基础样本对照",
-                "仅作历史研究，不作为趋势池绩效",
-                candidates["break_5day_high__trail_3_2"],
-            ),
-            (
-                "return",
-                "高收益率",
-                "接受更低胜率换取更大波段",
-                candidates["break_5day_high__trail_8_2"],
-            ),
-        )
-        baseline = candidates["confirm_5__trail_5_5"]
-        rejected = candidates["confirm_8__target_3"]
-        common_signals = int(payload["signals"]["common_trade_cohort_count"])
-    except (OSError, ValueError, KeyError, TypeError):
+
+
+def _portfolio_validation_panel(grid_payload: dict) -> str:
+    """Render capacity-aware portfolio evidence without conflating it with trade hit rate."""
+    payload = _read_result_json("strategy_portfolio_validation.json")
+    grid_date = _run_meta(grid_payload).get("completed_trade_date")
+    portfolio_date = _run_meta(payload).get("completed_trade_date")
+    frozen_candidate_id = _frozen_candidate_id(grid_payload)
+    meta = payload.get("meta") if isinstance(payload.get("meta"), dict) else {}
+    if (
+        not payload
+        or not grid_date
+        or str(portfolio_date) != str(grid_date)
+        or not frozen_candidate_id
+        or _frozen_candidate_id(payload) != frozen_candidate_id
+        or str(meta.get("execution_scope") or "") != "secondary"
+    ):
+        return ""
+    candidates = payload.get("candidates")
+    if not isinstance(candidates, dict):
+        return ""
+    formal_candidate = candidates.get(frozen_candidate_id)
+    return_candidate = candidates.get(RETURN_PRIORITY_CANDIDATE_ID)
+    if (
+        not isinstance(formal_candidate, dict)
+        or not isinstance(return_candidate, dict)
+        or str(formal_candidate.get("execution_scope") or "") != "secondary"
+        or str(return_candidate.get("execution_scope") or "") != "secondary"
+    ):
+        return ""
+    return_exit = return_candidate.get("exit_rule")
+    if (
+        not isinstance(return_exit, dict)
+        or str(return_exit.get("id") or "") != "wave_erasure_trail_10_10"
+    ):
         return ""
 
-    cards = []
-    for css, name, note, row in profiles:
-        overall = row["overall"]
-        development = row["development_before_2024"]
-        validation = row["validation_2024_2025"]
-        holdout = row["holdout_2026"]
-        phases = (
-            ("2024年前", development),
-            ("2024—25", validation),
-            ("2026滚动段", holdout),
+    def required_number(source: dict, key: str) -> float | None:
+        if key not in source or source.get(key) is None:
+            return None
+        try:
+            return float(source[key])
+        except (TypeError, ValueError):
+            return None
+
+    def worst_metrics(candidate: dict, scenario_id: str, slot_count: int) -> dict | None:
+        scenarios = candidate.get("scenarios")
+        scenario = scenarios.get(scenario_id) if isinstance(scenarios, dict) else None
+        by_area = scenario.get("portfolios_by_area") if isinstance(scenario, dict) else None
+        secondary = by_area.get("secondary") if isinstance(by_area, dict) else None
+        slots = secondary.get(str(slot_count)) if isinstance(secondary, dict) else None
+        seed_summary = slots.get("seed_summary") if isinstance(slots, dict) else None
+        worst = seed_summary.get("worst") if isinstance(seed_summary, dict) else None
+        periods = worst.get("periods") if isinstance(worst, dict) else None
+        overall = periods.get("overall") if isinstance(periods, dict) else None
+        if not isinstance(worst, dict) or not isinstance(overall, dict):
+            return None
+        values = {
+            "cagr": required_number(overall, "cagr_pct"),
+            "drawdown": required_number(overall, "max_drawdown_pct"),
+            "exposure": required_number(worst, "average_exposure_pct"),
+            "rejections": required_number(worst, "capacity_rejections"),
+            "open_positions": required_number(worst, "open_positions_at_cutoff"),
+            "seed_count": float(len(slots.get("runs", []))),
+            "start_date": str(overall.get("start_date") or ""),
+            "end_date": str(overall.get("end_date") or ""),
+        }
+        required = (
+            "cagr",
+            "drawdown",
+            "exposure",
+            "rejections",
+            "open_positions",
         )
-        phase_markup = "".join(
-            f'<div class="strategy-phase"><span>{_esc(label)}</span>'
-            f'<div class="strategy-phase-track"><i style="--phase:{float(stats["positive_rate_pct"]):.2f}%"></i></div>'
-            f'<b>{float(stats["positive_rate_pct"]):.2f}%</b></div>'
-            for label, stats in phases
+        return values if all(values[key] is not None for key in required) else None
+
+    formal_1x = {
+        slots: worst_metrics(formal_candidate, "cost_1x", slots)
+        for slots in (5, 10, 20)
+    }
+    formal_2x = {
+        slots: worst_metrics(formal_candidate, "cost_2x", slots)
+        for slots in (5, 10, 20)
+    }
+    return_20 = worst_metrics(return_candidate, "cost_1x", 20)
+    if any(value is None for value in (*formal_1x.values(), *formal_2x.values(), return_20)):
+        return ""
+
+    formal_rows = []
+    stress_rows = []
+    for slots in (5, 10, 20):
+        base = formal_1x[slots]
+        stress = formal_2x[slots]
+        formal_rows.append(
+            f'<tr><td data-label="持仓槽位"><strong>{slots} 槽位</strong><span class="subline">等槽位建仓 · {int(base["seed_count"])}组中最差</span></td>'
+            f'<td data-label="整体账户CAGR"><strong>{base["cagr"]:+.2f}%</strong></td>'
+            f'<td data-label="最大回撤"><strong>{base["drawdown"]:.2f}%</strong></td>'
+            f'<td data-label="平均敞口"><strong>{base["exposure"]:.2f}%</strong></td>'
+            f'<td data-label="容量拒绝"><strong>{int(base["rejections"]):,} 次</strong></td>'
+            f'<td data-label="截止持仓"><strong>{int(base["open_positions"]):,} 只</strong></td></tr>'
         )
-        cards.append(
-            f"""
-            <article class="strategy-ticket {css}">
-              <div class="strategy-ticket-head"><span class="strategy-ticket-kicker">{_esc(note)}</span><h4>{_esc(name)}</h4><small>仅 {float(row['entry_rate_pct']):.2f}% 的原始信号会确认买点</small></div>
-              <div class="strategy-orders"><div class="strategy-order"><b>BUY</b><span>{_esc(row['entry_label'])}</span></div><div class="strategy-order"><b>SELL</b><span>{_esc(row['exit_label'])}</span></div></div>
-              <div class="strategy-numbers">
-                <div class="strategy-number"><span>基础双信号历史回测成功率</span><strong>{float(overall['positive_rate_pct']):.2f}%</strong></div>
-                <div class="strategy-number"><span>每笔平均收益</span><strong>{float(overall['average_pct']):+.2f}%</strong></div>
-                <div class="strategy-number"><span>收益中位数</span><strong>{float(overall['median_pct']):+.2f}%</strong></div>
-                <div class="strategy-number"><span>完整交易样本</span><strong>{int(overall['sample_count']):,}</strong></div>
-                <div class="strategy-number"><span>2026成功率</span><strong>{float(holdout['positive_rate_pct']):.2f}%</strong></div>
-                <div class="strategy-number"><span>2026平均收益</span><strong>{float(holdout['average_pct']):+.2f}%</strong></div>
-              </div>
-              <div class="strategy-phases">{phase_markup}</div>
-            </article>"""
+        stress_rows.append(
+            f'<tr><td data-label="持仓槽位"><strong>{slots} 槽位</strong></td>'
+            f'<td data-label="整体账户CAGR"><strong>{stress["cagr"]:+.2f}%</strong></td>'
+            f'<td data-label="最大回撤"><strong>{stress["drawdown"]:.2f}%</strong></td></tr>'
         )
 
+    formal_20 = formal_1x[20]
+    cagr_delta = return_20["cagr"] - formal_20["cagr"]
+    drawdown_delta = abs(return_20["drawdown"]) - abs(formal_20["drawdown"])
+    if cagr_delta > 0 and drawdown_delta > 0:
+        comparison = (
+            f"纯10/10的整体账户CAGR只高 {cagr_delta:.2f} 个百分点，"
+            f"最大回撤却加深 {drawdown_delta:.2f} 个百分点，因此仍只作收益优先研究对照。"
+        )
+    else:
+        comparison = "纯10/10没有同时改善整体账户CAGR与最大回撤，因此仍只作收益优先研究对照。"
     return f"""
-      <article class="strategy-lab" aria-label="扩展买卖点全市场回测">
-        <div class="strategy-lab-head">
-          <div><span class="section-kicker">Execution lab</span><h3>基础双信号研究 · 非主次选绩效</h3><p>12种买点与88种卖点交叉形成1,056种组合。该旧数据只验证“龙虎交叉 + 有效黄柱”，不等同于满足第三项条件的主选或次选，不能作为趋势池正式成功率。</p></div>
-          <div class="strategy-lab-stamp"><strong>{int(coverage['analyzed_stock_count']):,}</strong><small>只非ST沪深A股</small><strong>{common_signals:,}</strong><small>次共同信号样本</small></div>
-        </div>
-        <div class="strategy-tickets">{''.join(cards)}</div>
-        <div class="strategy-lab-baseline"><p><strong>上一版同口径基准：</strong>信号后上涨5%确认买入，买后再达到5%浮盈并回撤5%卖出，历史成功率 {float(baseline['overall']['positive_rate_pct']):.2f}%、平均 {float(baseline['overall']['average_pct']):+.2f}%；2026为 {float(baseline['holdout_2026']['positive_rate_pct']):.2f}% / {float(baseline['holdout_2026']['average_pct']):+.2f}%。正式策略与对照方案均改善了至少一个核心目标。</p><div class="strategy-baseline-numbers"><span>组合数 <b>{int(optimization['candidate_count']):,}</b></span><span>行情失败 <b>{int(coverage['error_count'])}</b></span></div></div>
-        <p class="strategy-lab-note"><strong>旧口径说明：</strong>这些数字仅保留为基础双信号研究。待同一批次的主选、次选和合计分层结果生成后，页面才展示趋势池正式历史回测成功率。收益未计手续费、滑点及涨跌停无法成交。</p>
+      <article class="panel portfolio-scenario" aria-label="次选正式策略仓位验证与收益优先对照">
+        <div class="panel-head"><div><h3>次选 · 正式策略仓位验证</h3><p>1×基准费用；展示{int(formal_20['seed_count'])}组固定排序中整体收益最差的一组。比较5、10、20个等槽位建仓、不再平衡的因果账户容量压力。</p></div><span class="count-badge">账户情景</span></div>
+        <div class="table-scroll"><table><thead><tr><th>槽位</th><th>整体账户CAGR</th><th>最大回撤</th><th>平均敞口</th><th>容量拒绝</th><th>截止持仓</th></tr></thead><tbody>{''.join(formal_rows)}</tbody></table></div>
+        <div class="panel-head"><div><h3>收益优先纯10/10 · 20槽位研究对照</h3><p>{_esc(comparison)}</p></div></div>
+        <div class="table-scroll"><table><thead><tr><th>候选</th><th>整体账户CAGR</th><th>最大回撤</th></tr></thead><tbody>
+          <tr><td data-label="候选"><strong>正式混合10/10</strong><span class="subline">冻结生产候选</span></td><td data-label="整体账户CAGR"><strong>{formal_20['cagr']:+.2f}%</strong></td><td data-label="最大回撤"><strong>{formal_20['drawdown']:.2f}%</strong></td></tr>
+          <tr><td data-label="候选"><strong>收益优先纯10/10</strong><span class="subline">研究对照，不驱动操作</span></td><td data-label="整体账户CAGR"><strong>{return_20['cagr']:+.2f}%</strong></td><td data-label="最大回撤"><strong>{return_20['drawdown']:.2f}%</strong></td></tr>
+        </tbody></table></div>
+        <details class="legacy-study"><summary>查看佣金与滑点2×压力行</summary><div class="table-scroll"><table><thead><tr><th>槽位</th><th>整体账户CAGR</th><th>最大回撤</th></tr></thead><tbody>{''.join(stress_rows)}</tbody></table></div></details>
+        <p class="validation-method"><strong>口径：</strong>组合曲线覆盖 {formal_20['start_date']} 至 {formal_20['end_date']}，来自次选范围的{int(formal_20['seed_count'])}组固定排序，表中取整体收益最差的一组。排序只使用买入时已经知道的股票、信号日、买入日和固定种子；不同卖法共用同一入场优先级。建仓金额按当时现金与持仓最近收盘估值合计后除以槽位数，持有后不再平衡。组合不会预先筛掉未来卖不出的股票：所有截止日前实际买入的机会都会占仓；没有触发卖点或卖出受阻的持仓一直保留到截止日，并按最近收盘价估值。单笔成功率仍只统计后续至少72根K线且已完整卖出的共同样本。账户CAGR综合了空仓、同时持仓、未结束持仓、容量拒绝和资金利用率；它不是单笔成功率，也不能与单只股票平均收益直接互换。2026仅是已查看过的历史时间段，不称为盲测；真正的forward验证从本次冻结截止日之后开始。</p>
       </article>"""
 
 
 def _layered_validation_section(grid_payload: dict) -> str:
     cohorts = _validation_cohorts(grid_payload)
-    combined = cohorts.get("combined", {})
-    formal_strategy_id = _frozen_strategy_id(grid_payload, cohorts)
-    combined_candidate = _cohort_candidate_for_id(combined, formal_strategy_id)
-    combined_stats = _candidate_stats(combined_candidate)
-    sample_count = int(_stats_number(combined_stats, "sample_count", "trade_count"))
-    success_rate = _stats_number(combined_stats, "positive_rate_pct", "success_rate_pct")
-    average = _stats_number(combined_stats, "average_pct", "average_return_pct")
-    median = _stats_number(combined_stats, "median_pct", "median_return_pct")
-    holding = _stats_number(combined_stats, "median_holding_bars", "median_holding_days")
+    main = cohorts.get("main", {})
+    secondary = cohorts.get("secondary", {})
+    frozen_candidate_id = _frozen_candidate_id(grid_payload, cohorts)
+    live_strategy_id = _live_strategy_id(grid_payload, cohorts)
+    secondary_candidate = _cohort_candidate_for_id(secondary, frozen_candidate_id)
+    secondary_stats = _candidate_stats(secondary_candidate)
+    sample_count = int(_stats_number(secondary_stats, "sample_count", "trade_count"))
+    success_rate = _stats_number(secondary_stats, "positive_rate_pct", "success_rate_pct")
+    average = _stats_number(secondary_stats, "average_pct", "average_return_pct")
+    median = _stats_number(secondary_stats, "median_pct", "median_return_pct")
+    holding = _stats_number(secondary_stats, "median_holding_bars", "median_holding_days")
+    main_setup_count = int(
+        _stats_number(main, "setup_count", "signal_count", default=_stats_number(main, "common_trade_cohort_count"))
+    )
     coverage = grid_payload.get("coverage") if isinstance(grid_payload.get("coverage"), dict) else {}
     meta = _run_meta(grid_payload)
-    buy_execution, sell_execution, cost_note = _execution_copy(grid_payload)
-    execution_summary = _execution_summary(buy_execution, sell_execution)
+    _, _, cost_note = _execution_copy(grid_payload)
+    execution_summary = str(PRODUCTION_STRATEGY["execution_timing"])
 
-    facts = []
-    for key, label in (("main", "主选区"), ("secondary", "次选区"), ("combined", "主次选合计")):
-        cohort = cohorts.get(key, {})
-        candidate = _cohort_candidate_for_id(cohort, formal_strategy_id)
-        stats = _candidate_stats(candidate)
-        count = int(_stats_number(stats, "sample_count", "trade_count"))
-        rate = _stats_number(stats, "positive_rate_pct", "success_rate_pct")
-        avg = _stats_number(stats, "average_pct", "average_return_pct")
+    facts = [
+        f'<div class="validation-fact"><span>主选区 · 入选信号 {main_setup_count:,} 次</span><strong>仅观察 · 不计绩效</strong></div>'
+    ]
+    if secondary_candidate:
         facts.append(
-            f'<div class="validation-fact"><span>{label} · 完整交易 {count:,} 笔</span>'
-            f'<strong>{rate:.2f}% / {avg:+.2f}%</strong></div>'
+            f'<div class="validation-fact"><span>次选区 · 完整交易 {sample_count:,} 笔</span>'
+            f'<strong>{success_rate:.2f}% / {average:+.2f}%</strong></div>'
+        )
+    else:
+        facts.append(
+            '<div class="validation-fact"><span>次选区 · 冻结候选</span><strong>数据缺失，绩效隐藏</strong></div>'
         )
     facts.extend(
         [
-            f'<div class="validation-fact"><span>合计收益中位数</span><strong>{median:+.2f}%</strong></div>',
-            f'<div class="validation-fact"><span>合计通常持有</span><strong>{holding:.1f} 个交易日</strong></div>',
+            f'<div class="validation-fact"><span>次选收益中位数</span><strong>{median:+.2f}%</strong></div>' if secondary_candidate else '',
+            f'<div class="validation-fact"><span>次选通常持有</span><strong>{holding:.1f} 个交易日</strong></div>' if secondary_candidate else '',
             f'<div class="validation-fact"><span>非ST历史回测</span><strong>{int(coverage.get("analyzed_stock_count", 0) or 0):,}/{int(coverage.get("requested_stock_count", 0) or 0):,} 只</strong></div>',
             f'<div class="validation-fact"><span>数据截止</span><strong>{_esc(meta["completed_trade_date"] or "已完成交易日")}</strong></div>',
         ]
@@ -3340,9 +3476,9 @@ def _layered_validation_section(grid_payload: dict) -> str:
         if part
     )
     verdict = (
-        f"主次选合计完成 {sample_count:,} 笔真实链路交易，历史回测成功率 {success_rate:.2f}%"
-        if sample_count
-        else "主选、次选与合计正在按同一状态机生成联合验证"
+        f"次选生产策略完成 {sample_count:,} 笔真实链路交易，历史回测成功率 {success_rate:.2f}%"
+        if secondary_candidate and sample_count
+        else "次选冻结候选数据尚未形成可展示的联合验证"
     )
     return f"""
     <section class="section reveal" id="validation">
@@ -3350,12 +3486,13 @@ def _layered_validation_section(grid_payload: dict) -> str:
       <p class="section-copy">买点与卖点在同一条逐日状态链中共同验证；每一天只使用当时已经存在的数据，数据截止到已完成交易日，不让盘中未完成日K进入回测。</p></div></div>
       <div class="validation-lead">
         <article class="validation-verdict"><strong>{_esc(verdict)}</strong>
-          <p>主选、次选和合计分别统计；基础“龙虎交叉 + 有效黄柱”只保留为研究层，不冒充趋势池绩效。{_esc(execution_summary)}。成功只统计已经完成买卖的交易，卖出净结果高于买入结果才记为成功。</p>
-          {_trend_case_chart().lstrip()}
+          <p>主选只展示信号观察，不生成自动买卖，也不进入生产绩效。次选严格绑定实时策略 {_esc(live_strategy_id or PRODUCTION_STRATEGY['live_strategy_id'])} 与冻结候选 {_esc(frozen_candidate_id or '缺失')}；{_esc(execution_summary)}。成功只统计已经完成买卖且卖出净结果高于买入净结果的交易。</p>
+          {_trend_case_chart(grid_payload).lstrip()}
         </article>
-        <div class="validation-facts">{''.join(facts)}</div>
+        <div class="validation-facts">{''.join(fact for fact in facts if fact)}</div>
       </div>
       {_strategy_grid_panel(grid_payload).lstrip()}
+      {_portfolio_validation_panel(grid_payload).lstrip()}
       {lineage_panel}
       <article class="panel validation-run-note"><div class="panel-head"><div><h3>本轮验证边界</h3><p>{_esc(run_identity or '同一批次、同一规则配置')}</p></div></div>
         <p class="validation-method">数据截止 {_esc(meta['completed_trade_date'] or '已完成交易日')}；分析 {int(coverage.get('analyzed_stock_count', 0) or 0):,}/{int(coverage.get('requested_stock_count', 0) or 0):,} 只，失败 {int(coverage.get('error_count', 0) or 0):,} 只。{_esc(execution_summary)}。{_esc(cost_note)}。本结果用于规则验证，不构成收益承诺。</p></article>
@@ -3407,9 +3544,14 @@ def _legacy_validation_section_archived() -> str:
         persistence = lifecycle["signal_persistence_analysis"]
         if not grid_payload:
             raise KeyError("strategy_grid_optimization.json")
+        comparison_rows = (
+            grid_payload["optimization"].get("research_comparators")
+            or grid_payload["optimization"].get("all_candidates")
+            or []
+        )
         balanced_rule = next(
             item
-            for item in grid_payload["optimization"]["all_candidates"]
+            for item in comparison_rows
             if item["id"] == "break_5day_high__trail_3_2"
         )
     except (OSError, ValueError, KeyError, TypeError):
@@ -3494,8 +3636,8 @@ def _legacy_validation_section_archived() -> str:
       <article class="panel">
         <div class="panel-head"><div><h3>买点与卖点联合比较</h3><p>所有统计都从实际建议买点算到建议卖点；未确认买点和未结束持仓不混入成功率。</p></div></div>
         <div class="table-scroll"><table><thead><tr><th>规则</th><th>完整波段</th><th>成功率</th><th>平均收益</th><th>收益中位数</th><th>通常持有</th><th>2026 年</th></tr></thead>
-        <tbody>{grid_lifecycle_row('正式采用：突破5日高点 + 3%/2%移动止盈', balanced_rule, '信号持续；10日内收盘突破此前5日最高价才买入；买入后达到3%浮盈，再从最高收盘回撤2%卖出；龙线不再高于虎线或60日结束')}{lifecycle_row('上一版：5%确认启动 + 5%移动止盈', operational_rule, '仅作历史对照，已停止新增样本')}{lifecycle_row('首次入选即买，等龙虎关系结束', relationship_rule, '用于比较延后确认买点的价值')}</tbody></table></div>
-        <p class="validation-method">状态区分：买前为“待观察中 / 等待买入”；收盘确认买点后，下一交易日开盘执行；买后正常为“上升趋势中 / 继续持有”，转弱为“谨慎持有中 / 风险观察”；收盘确认卖点后，下一交易日开盘执行。该旧研究覆盖 {_esc(str(coverage['start_date']))}—{_esc(str(coverage['end_date']))}，分析 {int(coverage['analyzed_stock_count'])}/{int(coverage['requested_stock_count'])} 只，失败 {int(coverage.get('error_count', 0))} 只，仅代表基础双信号样本，不代表主选或次选绩效。</p>
+        <tbody>{grid_lifecycle_row('冻结候选仅作归档对照', balanced_rule, '归档渲染器不会进入正式网页')}{lifecycle_row('上一版研究规则', operational_rule, '仅作历史对照，已停止新增样本')}{lifecycle_row('龙虎关系研究', relationship_rule, '仅用于归档比较')}</tbody></table></div>
+        <p class="validation-method">归档状态链仅保留供旧文件读取，不进入当前生产网页。该旧研究覆盖 {_esc(str(coverage['start_date']))}—{_esc(str(coverage['end_date']))}，分析 {int(coverage['analyzed_stock_count'])}/{int(coverage['requested_stock_count'])} 只，失败 {int(coverage.get('error_count', 0))} 只，仅代表基础双信号样本。</p>
       </article>
     </section>"""
 
@@ -3507,7 +3649,7 @@ def _validation_section() -> str:
     return """
     <section class="section reveal" id="validation">
       <div class="section-head"><div><span class="section-kicker">Walk-forward evidence</span><h2>历史滚动验证</h2>
-      <p class="section-copy">新的主选、次选与合计联合验证尚未生成。为避免混用不同规则、日期或样本分母，旧口径数字暂不展示。</p></div></div>
+      <p class="section-copy">新的次选买卖点联合验证尚未生成。主选只作信号观察；为避免混用不同规则、日期或样本分母，次选生产绩效暂不展示。</p></div></div>
       <article class="panel validation-empty"><div class="panel-head"><div><h3>联合验证数据待生成</h3><p>页面只接受带 run_id、config_hash、completed_trade_date 和分层 cohorts 的同一批次结果。</p></div></div>
         <p class="validation-method">买点与卖点必须在同一条逐日状态链中共同验证；数据只截止到已完成交易日，盘中未完成日K不参与回测。</p></article>
     </section>"""
@@ -3549,19 +3691,22 @@ def _render_report_prefix_archived(
         str(item["code"])
         for item in strategy_state.get("pending_secondary", [])
     } | {str(item["code"]) for item in pending_entry_secondary}
-    lifecycle_codes = tracked_main_codes | pending_main_codes | tracked_secondary_codes | pending_secondary_codes
-    selected = [item for item in selected if str(item.code) not in lifecycle_codes]
-    main_area_codes = (
-        {str(item.code) for item in selected}
-        | tracked_main_codes
-        | pending_main_codes
-    )
+    secondary_lifecycle_codes = tracked_secondary_codes | pending_secondary_codes
+    selected = [
+        item
+        for item in selected
+        if str(item.code) not in secondary_lifecycle_codes
+        and str(item.code) not in tracked_main_codes
+        and str(item.code) not in pending_main_codes
+    ]
+    main_area_codes = {str(item.code) for item in selected}
     secondary = [
         item
         for item in evaluations
         if item.eligible
         and not item.selected
         and str(item.code) not in main_area_codes
+        and str(item.code) not in secondary_lifecycle_codes
         and item.cross_ok
         and item.yellow_ok
         and (item.bottom_ok or item.limit_up_ok)
@@ -3571,6 +3716,8 @@ def _render_report_prefix_archived(
         | {str(item.code) for item in secondary}
         | tracked_secondary_codes
         | pending_secondary_codes
+        | tracked_main_codes
+        | pending_main_codes
     )
     near = [
         item
@@ -3592,12 +3739,10 @@ def _render_report_prefix_archived(
     historical_analyzed = int(validation_coverage.get("analyzed_stock_count", 0) or 0)
     historical_requested = int(validation_coverage.get("requested_stock_count", historical_analyzed) or historical_analyzed)
     historical_errors = int(validation_coverage.get("error_count", max(0, historical_requested - historical_analyzed)) or 0)
-    buy_execution_copy, sell_execution_copy, _ = _execution_copy(validation_payload)
-    main_stats = strategy_stats(strategy_state)
+    buy_execution_copy = str(PRODUCTION_STRATEGY["entry_label"])
+    sell_execution_copy = str(PRODUCTION_STRATEGY["exit_label"])
     secondary_stats = secondary_strategy_stats(strategy_state)
-    legacy_active_total = int(main_stats.get("legacy_active_count", 0)) + int(
-        secondary_stats.get("legacy_active_count", 0)
-    )
+    legacy_active_total = int(secondary_stats.get("legacy_active_count", 0))
 
 
 def _read_result_json(filename: str) -> dict:
@@ -3664,16 +3809,23 @@ def _cohort_candidate(cohort: dict) -> dict:
 
 
 def _cohort_candidate_for_id(cohort: dict, candidate_id: str) -> dict:
+    if not candidate_id:
+        return {}
     optimization = cohort.get("optimization") if isinstance(cohort.get("optimization"), dict) else cohort
-    selected = optimization.get("selected_strategy")
-    if isinstance(selected, dict) and (not candidate_id or str(selected.get("id")) == candidate_id):
-        return selected
+    for key in ("selected_strategy", "frozen_live_strategy", "frozen_candidate"):
+        selected = optimization.get(key)
+        if isinstance(selected, dict) and str(selected.get("id")) == candidate_id:
+            return selected
+    for key in ("selected_strategy", "frozen_live_strategy", "frozen_candidate"):
+        selected = cohort.get(key)
+        if isinstance(selected, dict) and str(selected.get("id")) == candidate_id:
+            return selected
     rows = optimization.get("candidates") or optimization.get("all_candidates") or []
     if isinstance(rows, list):
         for row in rows:
             if isinstance(row, dict) and str(row.get("id")) == candidate_id:
                 return row
-    return _cohort_candidate(cohort)
+    return {}
 
 
 def _candidate_stats(candidate: dict) -> dict:
@@ -3715,34 +3867,75 @@ def _validation_cohorts(payload: dict) -> dict[str, dict]:
     return accepted
 
 
-def _frozen_strategy_id(payload: dict, cohorts: dict[str, dict]) -> str:
-    combined = cohorts.get("combined", {})
-    optimization = combined.get("optimization") if isinstance(combined.get("optimization"), dict) else {}
+def _live_strategy_id(payload: dict, cohorts: dict[str, dict] | None = None) -> str:
+    cohorts = cohorts or _validation_cohorts(payload)
+    secondary = cohorts.get("secondary", {})
+    optimization = secondary.get("optimization") if isinstance(secondary.get("optimization"), dict) else {}
     meta = payload.get("meta") if isinstance(payload.get("meta"), dict) else {}
-    frozen_object = (
+    live_object = (
         optimization.get("frozen_live_strategy")
-        or combined.get("frozen_live_strategy")
+        or secondary.get("frozen_live_strategy")
         or payload.get("frozen_live_strategy")
     )
-    object_id = frozen_object.get("id") if isinstance(frozen_object, dict) else ""
+    object_id = live_object.get("live_strategy_id") if isinstance(live_object, dict) else ""
     return str(
-        optimization.get("frozen_live_strategy_id")
-        or combined.get("frozen_live_strategy_id")
+        optimization.get("live_strategy_id")
+        or secondary.get("live_strategy_id")
+        or payload.get("live_strategy_id")
+        or meta.get("live_strategy_id")
+        or optimization.get("frozen_live_strategy_id")
+        or secondary.get("frozen_live_strategy_id")
         or payload.get("frozen_live_strategy_id")
         or meta.get("frozen_live_strategy_id")
-        or optimization.get("live_strategy_id")
-        or payload.get("live_strategy_id")
         or object_id
-        or optimization.get("selected_strategy_id")
-        or combined.get("selected_strategy_id")
         or ""
     )
 
 
+def _frozen_candidate_id(payload: dict, cohorts: dict[str, dict] | None = None) -> str:
+    cohorts = cohorts or _validation_cohorts(payload)
+    meta = payload.get("meta") if isinstance(payload.get("meta"), dict) else {}
+    for source in (
+        payload,
+        meta,
+        cohorts.get("secondary", {}),
+        (cohorts.get("secondary", {}).get("optimization", {})
+         if isinstance(cohorts.get("secondary", {}).get("optimization"), dict) else {}),
+        cohorts.get("combined", {}),
+        (cohorts.get("combined", {}).get("optimization", {})
+         if isinstance(cohorts.get("combined", {}).get("optimization"), dict) else {}),
+    ):
+        if not isinstance(source, dict):
+            continue
+        value = source.get("frozen_candidate_id") or source.get("candidate_id")
+        if value:
+            return str(value)
+        frozen = source.get("frozen_candidate")
+        if isinstance(frozen, dict) and frozen.get("id"):
+            return str(frozen["id"])
+    return ""
+
+
+def _artifact_matches_grid(artifact: dict, grid_payload: dict) -> bool:
+    """Require exact run lineage before joining independently generated artifacts."""
+    artifact_meta = _run_meta(artifact)
+    grid_meta = _run_meta(grid_payload)
+    identity_pairs = [
+        (artifact_meta.get("run_id"), grid_meta.get("run_id")),
+        (artifact_meta.get("config_hash"), grid_meta.get("config_hash")),
+        (
+            artifact_meta.get("completed_trade_date"),
+            grid_meta.get("completed_trade_date"),
+        ),
+        (_frozen_candidate_id(artifact), _frozen_candidate_id(grid_payload)),
+    ]
+    return all(str(left or "").strip() and str(left) == str(right) for left, right in identity_pairs)
+
+
 def _execution_copy(payload: dict) -> tuple[str, str, str]:
     assumptions = _run_meta(payload).get("execution_assumptions")
-    default_buy = "收盘确认买点，下一交易日开盘执行"
-    default_sell = "收盘确认卖点，下一交易日开盘执行"
+    default_buy = "收盘确认买点，下一可交易日开盘执行"
+    default_sell = "收盘确认卖点，下一可交易日开盘执行"
     default_cost = "联合验证费用参数缺失，当前页面不展示净收益成本口径"
     if isinstance(assumptions, dict):
         timing = str(assumptions.get("execution_timing") or "").strip()
@@ -3888,19 +4081,22 @@ def render_report(
         str(item["code"])
         for item in strategy_state.get("pending_secondary", [])
     } | {str(item["code"]) for item in pending_entry_secondary}
-    lifecycle_codes = tracked_main_codes | pending_main_codes | tracked_secondary_codes | pending_secondary_codes
-    selected = [item for item in selected if str(item.code) not in lifecycle_codes]
-    main_area_codes = (
-        {str(item.code) for item in selected}
-        | tracked_main_codes
-        | pending_main_codes
-    )
+    secondary_lifecycle_codes = tracked_secondary_codes | pending_secondary_codes
+    selected = [
+        item
+        for item in selected
+        if str(item.code) not in secondary_lifecycle_codes
+        and str(item.code) not in tracked_main_codes
+        and str(item.code) not in pending_main_codes
+    ]
+    main_area_codes = {str(item.code) for item in selected}
     secondary = [
         item
         for item in evaluations
         if item.eligible
         and not item.selected
         and str(item.code) not in main_area_codes
+        and str(item.code) not in secondary_lifecycle_codes
         and item.cross_ok
         and item.yellow_ok
         and (item.bottom_ok or item.limit_up_ok)
@@ -3910,6 +4106,8 @@ def render_report(
         | {str(item.code) for item in secondary}
         | tracked_secondary_codes
         | pending_secondary_codes
+        | tracked_main_codes
+        | pending_main_codes
     )
     near = [
         item
@@ -3931,42 +4129,58 @@ def render_report(
     historical_analyzed = int(validation_coverage.get("analyzed_stock_count", 0) or 0)
     historical_requested = int(validation_coverage.get("requested_stock_count", historical_analyzed) or historical_analyzed)
     historical_errors = int(validation_coverage.get("error_count", max(0, historical_requested - historical_analyzed)) or 0)
-    buy_execution_copy, sell_execution_copy, _ = _execution_copy(validation_payload)
-    main_stats = strategy_stats(strategy_state)
+    buy_execution_copy = str(PRODUCTION_STRATEGY["entry_label"])
+    sell_execution_copy = str(PRODUCTION_STRATEGY["exit_label"])
     secondary_stats = secondary_strategy_stats(strategy_state)
-    legacy_active_total = int(main_stats.get("legacy_active_count", 0)) + int(
-        secondary_stats.get("legacy_active_count", 0)
-    )
+    legacy_main_by_code = {
+        str(item["code"]): item
+        for item in strategy_state.get("active", [])
+        if isinstance(item, dict) and item.get("code")
+    }
+    pending_exit_main_codes = {str(item["code"]) for item in pending_exit_main}
+    legacy_main_count = len(set(legacy_main_by_code) | pending_exit_main_codes)
+    legacy_secondary_count = int(secondary_stats.get("legacy_active_count", 0))
+    migration_items = []
+    if legacy_main_count:
+        migration_items.append(
+            f"主选区有 {legacy_main_count} 只策略切换前持仓，仅作存量卖出管理，不计入主选当前信号或新策略绩效"
+        )
+    if legacy_secondary_count:
+        migration_items.append(
+            f"次选区有 {legacy_secondary_count} 只旧规则持仓继续管理，不混入新策略成功率"
+        )
     migration_note = (
-        f'<div class="events"><strong>策略切换说明</strong><ul><li>现有 {legacy_active_total} 只旧规则持仓继续按新的卖点实时管理，但不混入新策略成功率；新成功率只统计本次切换后完成的完整买卖波段。</li></ul></div>'
-        if legacy_active_total
+        '<div class="events"><strong>策略切换说明</strong><ul>'
+        + "".join(f"<li>{_esc(item)}</li>" for item in migration_items)
+        + "</ul></div>"
+        if migration_items
         else ""
     )
-    active_main_by_code = {str(item["code"]): item for item in strategy_state["active"]}
-    active_secondary_by_code = {str(item["code"]): item for item in strategy_state.get("secondary_active", [])}
-    pending_exit_main_codes = {str(item["code"]) for item in pending_exit_main}
-    pending_exit_secondary_codes = {str(item["code"]) for item in pending_exit_secondary}
-    confirmed_main_count = len(set(active_main_by_code) | pending_exit_main_codes)
-    confirmed_secondary_count = len(set(active_secondary_by_code) | pending_exit_secondary_codes)
-    pending_main_count = len(strategy_state.get("pending_main", []))
-    pending_secondary_count = len(strategy_state.get("pending_secondary", []))
-    tracked_main_count = len(tracked_main_codes | pending_main_codes)
-    tracked_secondary_count = len(tracked_secondary_codes | pending_secondary_codes)
-    active_rows = "".join(
+    legacy_main_rows = "".join(
         [
             *(
-                _pending_row(item, "main")
-                for item in strategy_state.get("pending_main", [])
-            ),
-            *(_pending_entry_execution_row(item, "main") for item in pending_entry_main),
-            *(
                 _position_row(item, "main")
-                for code, item in active_main_by_code.items()
+                for code, item in legacy_main_by_code.items()
                 if code not in pending_exit_main_codes
             ),
             *(_pending_exit_execution_row(item, "main") for item in pending_exit_main),
         ]
     )
+    legacy_main_section = (
+        f"""
+        <div class="pool-group-head settled"><strong>策略切换前持仓</strong><span>仅存量管理，不计新策略绩效</span></div>
+        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>加入日 / 价格</th><th>最新价 / 时间</th><th>实时收益</th><th>时长</th><th>状态 / 操作</th></tr></thead>
+        <tbody id="tracking-main-body">{legacy_main_rows or '<tr><td class="empty" colspan="6">当前没有策略切换前持仓</td></tr>'}</tbody></table></div>
+        <div class="live-exit-list" id="live-main-exits" hidden aria-live="polite"></div>
+        <p class="settlement-note">这些持仓沿用切换前的卖点完成退出，只用于保护存量头寸；不计入主选当前信号数量，也不进入次选新策略成功率或收益率。</p>"""
+        if legacy_main_count
+        else ""
+    )
+    active_secondary_by_code = {str(item["code"]): item for item in strategy_state.get("secondary_active", [])}
+    pending_exit_secondary_codes = {str(item["code"]) for item in pending_exit_secondary}
+    confirmed_secondary_count = len(set(active_secondary_by_code) | pending_exit_secondary_codes)
+    pending_secondary_count = len(strategy_state.get("pending_secondary", []))
+    tracked_secondary_count = len(tracked_secondary_codes | pending_secondary_codes)
     secondary_active_rows = "".join(
         [
             *(
@@ -3982,7 +4196,7 @@ def render_report(
             *(_pending_exit_execution_row(item, "secondary") for item in pending_exit_secondary),
         ]
     )
-    main_area_count = len(main_area_codes)
+    main_area_count = len(selected)
     secondary_area_count = len(
         {item.code for item in secondary}
         | {
@@ -4009,7 +4223,6 @@ def render_report(
         if near_compact
         else ""
     )
-    closed_rows = "".join(_closed_row(item) for item in strategy_state["closed"][:50])
     secondary_closed_rows = "".join(
         _closed_row(item) for item in strategy_state.get("secondary_closed", [])[:50]
     )
@@ -4102,7 +4315,7 @@ def render_report(
     </section>
 
     <section class="kpi-grid reveal" aria-label="口径清晰的核心概览">
-      <article class="kpi"><span class="kpi-label">主选总计</span><strong class="kpi-value" data-area-main-count>{main_area_count}</strong><span class="kpi-note">新信号 + 跟踪，去重计算</span></article>
+      <article class="kpi"><span class="kpi-label">主选总计</span><strong class="kpi-value" data-area-main-count>{main_area_count}</strong><span class="kpi-note">当前主选信号 · 仅观察</span></article>
       <article class="kpi"><span class="kpi-label">次选总计</span><strong class="kpi-value" data-area-secondary-count>{secondary_area_count}</strong><span class="kpi-note">新信号 + 跟踪，去重计算</span></article>
       <article class="kpi"><span class="kpi-label">观察标的</span><strong class="kpi-value">{len(near)}</strong><span class="kpi-note">仅观察，不计入选</span></article>
       <article class="kpi"><span class="kpi-label">全市场收盘扫描</span><strong class="kpi-value">{scanned}</strong><span class="kpi-note">失败 {len(errors)} 只 · 含ST后再排除</span></article>
@@ -4112,7 +4325,7 @@ def render_report(
 
     <section class="section reveal" id="pool">
       <div class="section-head"><div><span class="section-kicker">Tracked portfolio</span><h2>{POOL_NAME}</h2>
-      <p class="section-copy">买前只显示“待观察中 / 等待买入”；收盘确认买点后，下一交易日开盘执行。买后状态分为“上升趋势中 / 继续持有”和“谨慎持有中 / 风险观察”；收盘确认卖点后，下一交易日开盘执行并结算。</p></div></div>
+      <p class="section-copy">主选区只观察，不生成自动买卖或生产绩效；次选区按冻结生产合同执行D+2买点与混合10%/10%卖点，收盘确认后在下一可交易日开盘执行。</p></div></div>
 {_events(events)}
 {migration_note}
       <div class="pool-switcher" role="tablist" aria-label="趋势池区域切换">
@@ -4120,35 +4333,23 @@ def render_report(
         <button class="pool-tab" id="tab-secondary" type="button" role="tab" aria-selected="false" aria-controls="pool-secondary" data-pool-tab="secondary" tabindex="-1">次选区 · <span data-area-secondary-count>{secondary_area_count}</span></button>
       </div>
       <article class="panel" id="pool-main" role="tabpanel" aria-labelledby="tab-main" data-pool-panel="main">
-        <div class="panel-head"><div><h3>主选区</h3><p>候选信号仍有效且达到正式买点条件后，{_esc(buy_execution_copy)}；达到正式卖点条件后，{_esc(sell_execution_copy)}</p>
-          <div class="pool-composition"><span class="pool-equation">总计 <strong data-area-main-count>{main_area_count}</strong> = 新信号 <strong data-live-main-count>{len(selected)}</strong> + 跟踪 <strong data-tracked-main-count>{tracked_main_count}</strong></span><span>其中已执行买入 {confirmed_main_count} 只</span></div>
+        <div class="panel-head"><div><h3>主选区 · 仅观察</h3><p>满足四项主选条件的当前信号，仅用于观察；不生成自动买入、卖出或收益统计。</p>
+          <div class="pool-composition"><span class="pool-equation">当前信号 <strong data-area-main-count>{main_area_count}</strong> 只</span><span>新策略自动交易 0 只</span></div>
         </div><span class="count-badge"><span data-area-main-count>{main_area_count}</span> 只</span></div>
-        <div class="pool-group-head"><strong>盘中新信号</strong><span>随最新行情重算，收盘确认后加入跟踪</span></div>
+        <div class="pool-group-head"><strong>当前观察信号</strong><span>盘中随最新行情重算，收盘后保存正式名单</span></div>
         <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>有效黄柱</th><th>状态 / 操作</th></tr></thead>
         <tbody id="live-main-body">{main_pool_rows or '<tr><td class="empty" colspan="7">当前没有符合条件的主选预选</td></tr>'}</tbody></table></div>
-        <div class="pool-group-head settled"><strong>实时信号与趋势跟踪</strong><span>买点收盘确认后等待下一交易日开盘执行；执行后才计算价格收益</span></div>
-        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>加入日 / 价格</th><th>最新价 / 时间</th><th>实时收益</th><th>时长</th><th>状态 / 操作</th></tr></thead>
-        <tbody id="tracking-main-body">{active_rows or empty6}</tbody></table></div>
-        <div class="live-exit-list" id="live-main-exits" hidden aria-live="polite"></div>
-        <p class="settlement-note">实时跟踪按原始开盘价计算价格毛收益；趋势结束后的成功率、实现毛收益和正式移出记录，以实际开盘执行结果为准，不与含回测费用的历史净收益直接比较。</p>
-        <div class="metrics">
-          {_metric('已结束毛收益成功率', _pct(main_stats['closed_success_rate']))}
-          {_metric('实时已结束平均收益', _pct(main_stats['all_average_return']))}
-          {_metric('等待买点确认', f"{pending_main_count} 只")}
-          {_metric('买点待开盘执行', f"{len(pending_entry_main)} 只")}
-          {_metric('卖点待开盘执行', f"{len(pending_exit_main)} 只")}
-          {_metric('当前策略已结束', f"{main_stats['closed_count']} 只")}
-        </div>
+        {legacy_main_section}
       </article>
 
       <article class="panel" id="pool-secondary" role="tabpanel" aria-labelledby="tab-secondary" data-pool-panel="secondary" hidden>
-        <div class="panel-head"><div><h3>次选区</h3><p>候选需龙虎、有效黄柱及另一项；买卖执行规则与主选一致：{_esc(buy_execution_copy)}，{_esc(sell_execution_copy)}</p>
+        <div class="panel-head"><div><h3>次选区 · 生产执行</h3><p>候选需龙虎、有效黄柱及另一项。买点：{_esc(buy_execution_copy)}；卖点：{_esc(sell_execution_copy)}</p>
           <div class="pool-composition"><span class="pool-equation">总计 <strong data-area-secondary-count>{secondary_area_count}</strong> = 新信号 <strong data-live-secondary-count>{len(secondary)}</strong> + 跟踪 <strong data-tracked-secondary-count>{tracked_secondary_count}</strong></span><span>其中已执行买入 {confirmed_secondary_count} 只</span></div>
         </div><span class="count-badge"><span data-area-secondary-count>{secondary_area_count}</span> 只</span></div>
-        <div class="pool-group-head"><strong>盘中新信号</strong><span>随最新行情重算，收盘确认后加入跟踪</span></div>
+        <div class="pool-group-head"><strong>盘中新信号</strong><span>随最新行情重算，收盘后进入D+2买点观察</span></div>
         <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>有效黄柱</th><th>状态 / 操作</th></tr></thead>
         <tbody id="live-secondary-body">{secondary_pool_rows or '<tr><td class="empty" colspan="7">当前没有符合条件的次选预选</td></tr>'}</tbody></table></div>
-        <div class="pool-group-head settled"><strong>实时信号与趋势跟踪</strong><span>买点收盘确认后等待下一交易日开盘执行；执行后才计算价格收益</span></div>
+        <div class="pool-group-head settled"><strong>实时信号与趋势跟踪</strong><span>买点收盘确认后等待下一可交易日开盘执行；执行后才计算价格收益</span></div>
         <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>加入日 / 价格</th><th>最新价 / 时间</th><th>实时收益</th><th>时长</th><th>状态 / 操作</th></tr></thead>
         <tbody id="tracking-secondary-body">{secondary_active_rows or empty6}</tbody></table></div>
         <div class="live-exit-list" id="live-secondary-exits" hidden aria-live="polite"></div>
@@ -4166,7 +4367,7 @@ def render_report(
 
     <section class="section reveal" id="signals">
       <div class="section-head"><div><span class="section-kicker">Daily selection</span><h2>最近收盘主选信号</h2>
-      <p class="section-copy">名单按最近完整收盘确定；最新价和涨跌在交易时段更新，不改变尚未收盘确认的正式名单。</p></div><span class="count-badge">{len(selected)} 只</span></div>
+      <p class="section-copy">名单按最近完整收盘确定，仅用于观察，不生成自动买卖或生产绩效；最新价和涨跌在交易时段更新。</p></div><span class="count-badge">{len(selected)} 只</span></div>
 {legend}
       <div class="panel table-scroll"><table><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>近42日 K 线与龙虎线</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>有效黄柱</th></tr></thead>
       <tbody>{selected_rows or empty7}</tbody></table></div>
@@ -4188,8 +4389,8 @@ def render_report(
         <article class="rule"><span class="rule-num">02</span><strong>龙腾跃虎</strong><p>交叉显示窗口用于完成黄柱配对，不是卖出倒计时。自然到期不退出；应显示期间被后续K线重算掉，才视为短暂信号失效。</p></article>
         <article class="rule"><span class="rule-num">03</span><strong>近期涨停</strong><p>最近 {cfg['limit_up_lookback_days']} 个交易日至少一次收盘涨停。</p></article>
         <article class="rule"><span class="rule-num">04</span><strong>有效黄柱</strong><p>公式黄柱指龙线高于开盘价与收盘价中的较低者。主选、次选只认龙腾跃虎日前 {cfg.get('yellow_before_cross_days', 2)} 日至后 {cfg.get('yellow_after_cross_days', 2)} 个交易日内可配对的窗口黄柱；观察区独立识别。</p></article>
-        <article class="rule"><span class="rule-num">05</span><strong>买点确认与执行</strong><p>入选后第1—10个交易日，信号仍有效且收盘严格突破此前5日最高价；{_esc(buy_execution_copy)}。</p></article>
-        <article class="rule"><span class="rule-num">06</span><strong>卖点确认与执行</strong><p>浮盈达到规则阈值后回撤、龙线不再高于虎线或达到最长持有期时触发；{_esc(sell_execution_copy)}。具体阈值以本轮联合验证JSON为准。</p></article>
+        <article class="rule"><span class="rule-num">05</span><strong>次选买点确认</strong><p>{_esc(buy_execution_copy)}。主选不执行该买点。</p></article>
+        <article class="rule"><span class="rule-num">06</span><strong>次选卖点确认</strong><p>{_esc(sell_execution_copy)}；收盘确认后在下一可交易日开盘执行。</p></article>
       </div>
     </section>
 
@@ -4199,16 +4400,13 @@ def render_report(
 
     <section class="section reveal">
       <div class="panel">
-        <details><summary>查看主选区历史移出记录</summary>
-          <div class="table-scroll"><table><thead><tr><th>股票</th><th>加入</th><th>移出</th><th>收益</th><th>时长</th><th>原因</th></tr></thead><tbody>{closed_rows or empty6}</tbody></table></div>
-        </details>
         <details><summary>查看次选区历史移出记录</summary>
           <div class="table-scroll"><table><thead><tr><th>股票</th><th>加入</th><th>移出</th><th>收益</th><th>时长</th><th>原因</th></tr></thead><tbody>{secondary_closed_rows or empty6}</tbody></table></div>
         </details>
       </div>
     </section>
 
-    <p class="disclaimer">本页面按技术条件机械筛选，不构成投资建议。历史联合回测净收益按本轮JSON记录的费用与滑点假设计算；实时跟踪只显示价格收益，未扣用户账户实际费用。法定参考包括卖方印花税0.5‰、经手费0.0341‰双边和证管费0.02‰双边；佣金与滑点不是法定标准，且未模拟按笔最低5元佣金和真实冲击成本。费用来源：<a href="https://www.szse.cn/marketServices/deal/payFees/index.html" target="_blank" rel="noreferrer">深交所收费标准</a>、<a href="https://shanghai.chinatax.gov.cn/tax/zcfw/zcfgk/yhs/202308/t468451.html" target="_blank" rel="noreferrer">财政部、税务总局印花税公告</a>。</p>
+    <p class="disclaimer">本页面按技术条件机械筛选，不构成投资建议。主选仅观察；次选历史联合回测净收益按本轮JSON记录的费用与滑点假设计算，实时跟踪只显示价格收益，未扣用户账户实际费用。法定参考包括卖方印花税0.5‰、经手费0.0341‰双边和证管费0.02‰双边；佣金与滑点不是法定标准，且未模拟按笔最低5元佣金和真实冲击成本。费用来源：<a href="https://www.szse.cn/marketServices/deal/payFees/index.html" target="_blank" rel="noreferrer">深交所收费标准</a>、<a href="https://shanghai.chinatax.gov.cn/tax/zcfw/zcfgk/yhs/202308/t468451.html" target="_blank" rel="noreferrer">财政部、税务总局印花税公告</a>。</p>
   </main>
   <footer>收盘结算日 {trade_date} · 报告生成 {generated} · 全市场收盘扫描 {scanned} 只 · 数据失败 {len(errors)} 只 · 盘中行情更新时间见页首</footer>
 </div>

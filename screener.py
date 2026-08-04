@@ -1191,20 +1191,11 @@ footer{{margin-top:25px;color:#738198;font-size:13px}}@media(max-width:900px){{.
 
 <h2>{POOL_NAME}</h2>
 {event_block}
-<h3>主选区</h3>
-<p>入选后等待10日内收盘突破此前5日最高价再确认买点；曾达到3%浮盈后较最高收盘回撤2%，龙线不再高于虎线，或完成60个后续交易日时结束。</p>
-<div class="stats">
-  <div class="stat"><small>跟踪中</small><b>{stats['active_count']} 只</b></div>
-  <div class="stat"><small>已移出</small><b>{stats['closed_count']} 只</b></div>
-  <div class="stat"><small>当前成功率</small><b>{pct_html(stats['current_success_rate'])}</b></div>
-  <div class="stat"><small>样本平均收益</small><b>{pct_html(stats['all_average_return'])}</b></div>
-  <div class="stat"><small>已完成胜率</small><b>{pct_html(stats['closed_success_rate'])}</b></div>
-  <div class="stat"><small>已实现累计收益</small><b>{pct_html(stats['realized_compound_return'])}</b></div>
-</div>
-<div class="table-wrap"><table><thead><tr><th>股票</th><th>加入日/加入价</th><th>最新日/收盘价</th><th>加入日至今收益</th><th>跟踪时长</th><th>龙虎信号</th></tr></thead><tbody>{active_rows}</tbody></table></div>
+<h3>主选区 · 仅观察</h3>
+<p>四项条件同时满足的主选信号只用于观察，不生成自动买卖，也不展示生产成功率或收益率。</p>
 
 <h3>次选区</h3>
-<p>近期龙腾跃虎与窗口黄柱必须配对，并在“可能见底”或两月内涨停中至少再满足一项。窗口按上穿前 {cfg.get('yellow_before_cross_days', 2)} 日至后 {cfg.get('yellow_after_cross_days', 2)} 日计算。买点与卖点采用主选相同规则；条件补齐时转入主选区并保留原持有期。</p>
+<p>近期龙腾跃虎与窗口黄柱必须配对，并在“可能见底”或两月内涨停中至少再满足一项。窗口按上穿前 {cfg.get('yellow_before_cross_days', 2)} 日至后 {cfg.get('yellow_after_cross_days', 2)} 日计算。次选按D+2确认买点；信号重算消失或龙虎关系结束优先退出，否则使用10%激活、10%回撤及同步转弱的混合卖点。</p>
 <div class="stats">
   <div class="stat"><small>次选跟踪中</small><b>{secondary_stats['active_count']} 只</b></div>
   <div class="stat"><small>当前成功率</small><b>{pct_html(secondary_stats['current_success_rate'])}</b></div>

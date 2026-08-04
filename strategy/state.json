@@ -118,7 +118,8 @@
       "status_detail": "趋势条件仍有效",
       "strategy_version": "legacy_before_break5_trail3_2",
       "operation": "继续持有",
-      "setup_cross_date": "2026-07-24"
+      "setup_cross_date": "2026-07-24",
+      "current_area": "secondary"
     },
     {
       "position_id": "secondary_600062_2026-07-31",
@@ -159,7 +160,8 @@
       "signal_lost_date": "",
       "status_detail": "趋势条件仍有效",
       "strategy_version": "legacy_before_break5_trail3_2",
-      "operation": "继续持有"
+      "operation": "继续持有",
+      "current_area": "secondary"
     },
     {
       "position_id": "secondary_688443_2026-07-31",
@@ -200,7 +202,8 @@
       "signal_lost_date": "2026-08-04",
       "status_detail": "龙虎差与龙线同步转弱",
       "strategy_version": "legacy_before_break5_trail3_2",
-      "operation": "谨慎持有"
+      "operation": "谨慎持有",
+      "current_area": "secondary"
     }
   ],
   "secondary_closed": [
@@ -232,90 +235,25 @@
     }
   ],
   "pending_main": [],
-  "pending_secondary": [
-    {
-      "setup_id": "secondary_300981_2026-07-24",
-      "code": "300981",
-      "name": "中红医疗",
-      "market": 0,
-      "area": "secondary",
-      "origin_area": "secondary",
-      "setup_date": "2026-08-04",
-      "setup_price": 15.68,
-      "last_date": "2026-08-04",
-      "last_close": 15.68,
-      "setup_cross_date": "2026-07-24",
-      "setup_cross_age": 7,
-      "setup_cross_lookback_days": 8,
-      "setup_elapsed_bars": 0,
-      "status": "待观察中",
-      "operation": "等待买入",
-      "status_detail": "入选信号已形成，等待收盘突破此前5日最高价",
-      "strategy_version": "break5_trail3_2_v1",
-      "breakout_high_5": 15.97,
-      "selected_dates": [
-        "2026-08-04"
-      ]
-    },
-    {
-      "setup_id": "secondary_603818_2026-07-24",
-      "code": "603818",
-      "name": "曲美家居",
-      "market": 1,
-      "area": "secondary",
-      "origin_area": "secondary",
-      "setup_date": "2026-08-04",
-      "setup_price": 3.42,
-      "last_date": "2026-08-04",
-      "last_close": 3.42,
-      "setup_cross_date": "2026-07-24",
-      "setup_cross_age": 7,
-      "setup_cross_lookback_days": 8,
-      "setup_elapsed_bars": 0,
-      "status": "待观察中",
-      "operation": "等待买入",
-      "status_detail": "入选信号已形成，等待收盘突破此前5日最高价",
-      "strategy_version": "break5_trail3_2_v1",
-      "breakout_high_5": 3.55,
-      "selected_dates": [
-        "2026-08-04"
-      ]
-    },
-    {
-      "setup_id": "secondary_605179_2026-07-27",
-      "code": "605179",
-      "name": "一鸣食品",
-      "market": 1,
-      "area": "secondary",
-      "origin_area": "secondary",
-      "setup_date": "2026-08-04",
-      "setup_price": 21.69,
-      "last_date": "2026-08-04",
-      "last_close": 21.69,
-      "setup_cross_date": "2026-07-27",
-      "setup_cross_age": 6,
-      "setup_cross_lookback_days": 8,
-      "setup_elapsed_bars": 0,
-      "status": "待观察中",
-      "operation": "等待买入",
-      "status_detail": "入选信号已形成，等待收盘突破此前5日最高价",
-      "strategy_version": "break5_trail3_2_v1",
-      "breakout_high_5": 23.32,
-      "selected_dates": [
-        "2026-08-04"
-      ]
-    }
-  ],
-  "strategy_version": "break5_trail3_2_v1",
+  "pending_secondary": [],
+  "strategy_version": "secondary_lowrisk2_hybrid1010_v3",
   "strategy_migration": {
-    "from": "legacy_before_break5_trail3_2",
-    "to": "break5_trail3_2_v1",
+    "from": "break5_trail3_2_v1",
+    "to": "secondary_lowrisk2_hybrid1010_v3",
     "reset_pending_count": 3,
-    "note": "旧买点候选不沿用；按新窗口与前5日高点重新识别"
+    "note": "旧买点候选不沿用；原信号已保留消费墓碑，新交叉可重新评估"
   },
   "consumed_signals": [
     {
       "code": "300981",
+      "cross_date": "2026-07-24"
+    },
+    {
+      "code": "301516",
+      "cross_date": "2026-07-31"
+    },
+    {
+      "code": "603648",
       "cross_date": "2026-07-24"
     },
     {
@@ -325,6 +263,30 @@
     {
       "code": "605179",
       "cross_date": "2026-07-27"
+    }
+  ],
+  "pending_entry_execution": [],
+  "pending_exit_execution": [],
+  "active_signal_lineages": [
+    {
+      "code": "300981",
+      "original_cross_date": "2026-07-24"
+    },
+    {
+      "code": "301516",
+      "original_cross_date": "2026-07-31"
+    },
+    {
+      "code": "603648",
+      "original_cross_date": "2026-07-24"
+    },
+    {
+      "code": "603818",
+      "original_cross_date": "2026-07-24"
+    },
+    {
+      "code": "605179",
+      "original_cross_date": "2026-07-27"
     }
   ]
 }
