@@ -10,6 +10,7 @@ from signal_repaint_comparison import measurement
 from signal_window_optimization import (
     WaveSamples,
     append_wave_sample,
+    entry_for_method,
     exit_for_rule,
     risk_exit_index,
     signal_indices,
@@ -153,6 +154,62 @@ class SignalWindowOptimizationTests(unittest.TestCase):
             rule={"kind": "target", "target": 5.0},
         )
         self.assertEqual(exit_index, 2)
+
+    def test_next_open_does_not_use_the_same_days_closing_signal(self):
+        points = [
+            point(1, close=10.0, base_signal=True, cross_ok=True),
+            point(2, close=9.8, cross_ok=False, dragon=11.0, tiger=10.0),
+        ]
+        history = bars(points)
+        history[1] = Bar(
+            date=history[1].date,
+            open=10.2,
+            high=10.3,
+            low=9.7,
+            close=9.8,
+            volume=1000.0,
+            amount=10000.0,
+        )
+
+        next_open = entry_for_method(
+            points,
+            history,
+            0,
+            {"kind": "open", "delay": 1},
+        )
+        next_close = entry_for_method(
+            points,
+            history,
+            0,
+            {"kind": "close", "delay": 1},
+        )
+
+        self.assertEqual(next_open, (1, 10.2))
+        self.assertIsNone(next_close)
+
+    def test_price_and_recent_high_confirmations_use_only_prior_bars(self):
+        points = [
+            point(1, close=10.0, base_signal=True),
+            point(2, close=10.2),
+            point(3, close=10.5),
+        ]
+        history = bars(points, [10.3, 10.4, 10.6])
+
+        threshold = entry_for_method(
+            points,
+            history,
+            0,
+            {"kind": "threshold", "threshold": 3.0},
+        )
+        breakout = entry_for_method(
+            points,
+            history,
+            0,
+            {"kind": "recent_high", "lookback": 2},
+        )
+
+        self.assertEqual(threshold, (2, 10.5))
+        self.assertEqual(breakout, (2, 10.5))
 
 
 if __name__ == "__main__":

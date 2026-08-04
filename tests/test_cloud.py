@@ -912,6 +912,11 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertIn("最终历史图不是实盘买点", html)
         self.assertIn("德联集团", html)
         self.assertNotIn("鞍钢股份 000898", html)
+        self.assertIn("更多买卖点 · 三档候选", html)
+        self.assertIn("高成功率", html)
+        self.assertIn("均衡方案", html)
+        self.assertIn("高收益率", html)
+        self.assertIn("1,056种组合", html)
         self.assertNotIn("首次达到5%中位数", html)
         self.assertNotIn("hero-aigc-v2-poster.webp;base64", html)
 

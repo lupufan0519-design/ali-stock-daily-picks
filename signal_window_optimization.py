@@ -27,6 +27,17 @@ FORWARD_HORIZONS = (5, 10, 20, 40, 60)
 
 ENTRY_METHODS = (
     {"id": "signal_close", "label": "信号确认日收盘", "kind": "close", "delay": 0},
+    {"id": "next_open", "label": "信号确认后的下一交易日开盘", "kind": "open", "delay": 1},
+    {"id": "next_close", "label": "信号连续保持到下一交易日收盘", "kind": "close", "delay": 1},
+    {"id": "confirm_1", "label": "10日内收盘较信号价上涨1%", "kind": "threshold", "threshold": 1.0},
+    {"id": "confirm_2", "label": "10日内收盘较信号价上涨2%", "kind": "threshold", "threshold": 2.0},
+    {"id": "confirm_3", "label": "10日内收盘较信号价上涨3%", "kind": "threshold", "threshold": 3.0},
+    {"id": "confirm_5", "label": "10日内收盘较信号价上涨5%", "kind": "threshold", "threshold": 5.0},
+    {"id": "confirm_8", "label": "10日内收盘较信号价上涨8%", "kind": "threshold", "threshold": 8.0},
+    {"id": "break_signal_high", "label": "10日内收盘突破信号日最高价", "kind": "signal_high"},
+    {"id": "break_3day_high", "label": "10日内收盘突破此前3日最高价", "kind": "recent_high", "lookback": 3},
+    {"id": "break_5day_high", "label": "10日内收盘突破此前5日最高价", "kind": "recent_high", "lookback": 5},
+    {"id": "reclaim_dragon", "label": "10日内收盘重新站上龙线且龙线转升", "kind": "dragon_reclaim"},
 )
 
 
@@ -78,8 +89,8 @@ def exit_rules() -> tuple[dict, ...]:
                     "confirm": confirm,
                 }
             )
-    for activation in (0.0, 3.0, 5.0, 8.0):
-        for drawdown in (3.0, 5.0, 8.0, 10.0, 12.0, 15.0, 20.0):
+    for activation in (0.0, 3.0, 5.0, 8.0, 10.0, 15.0):
+        for drawdown in (2.0, 3.0, 5.0, 8.0, 10.0, 12.0, 15.0, 20.0):
             rules.append(
                 {
                     "id": f"trail_{activation:g}_{drawdown:g}",
@@ -309,18 +320,37 @@ def entry_for_method(
         index = setup_index + int(method["delay"])
         if index >= len(points):
             return None
-        for offset in range(setup_index + 1, index + 1):
+        # A next-open order can only use information known at the prior close.
+        visible_end = index if kind == "open" else index + 1
+        for offset in range(setup_index + 1, visible_end):
             if signal_erased(points, setup_index, offset) or points[offset].dragon <= points[offset].tiger:
                 return None
         price = bars[index].open if kind == "open" else points[index].close
         return (index, float(price)) if price > 0 else None
 
-    threshold = float(method["threshold"])
-    target = points[setup_index].close * (1.0 + threshold / 100.0)
+    signal_close = float(points[setup_index].close)
+    signal_high = float(bars[setup_index].high)
     for index in range(setup_index + 1, min(len(points), setup_index + 11)):
         if signal_erased(points, setup_index, index) or points[index].dragon <= points[index].tiger:
             return None
-        if points[index].close >= target:
+        close = float(points[index].close)
+        ready = False
+        if kind == "threshold":
+            ready = close >= signal_close * (1.0 + float(method["threshold"]) / 100.0)
+        elif kind == "signal_high":
+            ready = close > signal_high
+        elif kind == "recent_high":
+            lookback = int(method["lookback"])
+            start = max(0, index - lookback)
+            ready = close > max(float(bar.high) for bar in bars[start:index])
+        elif kind == "dragon_reclaim":
+            ready = (
+                close > float(points[index].dragon)
+                and float(points[index].dragon) > float(points[index - 1].dragon)
+            )
+        else:
+            raise ValueError(f"未知买点类型: {kind}")
+        if ready:
             return index, float(points[index].close)
     return None
 
@@ -613,34 +643,66 @@ def aggregate(
         candidate_summary(key, samples)
         for key, samples in accumulators.items()
     ]
+    for row in candidates:
+        entry_count = int(row["overall"]["sample_count"])
+        row["entry_count"] = entry_count
+        row["entry_rate_pct"] = round(
+            entry_count / common_cohort_count * 100.0,
+            2,
+        ) if common_cohort_count else 0.0
     signal_close_candidates = [
         row for row in candidates if row["entry_id"] == "signal_close"
     ]
     eligible = [
         row
-        for row in signal_close_candidates
+        for row in candidates
+        if row["overall"]["sample_count"] >= 500
         if row["development_before_2024"]["sample_count"] >= 200
         and row["validation_2024_2025"]["sample_count"] >= 200
-        and row["development_before_2024"]["average_pct"] > 0
-        and row["validation_2024_2025"]["average_pct"] > 0
+        and row["development_before_2024"]["geometric_average_pct"] > 0
+        and row["validation_2024_2025"]["geometric_average_pct"] > 0
     ]
     high_sample_candidates = [
         row
-        for row in signal_close_candidates
+        for row in candidates
         if row["overall"]["sample_count"] >= 500
-    ] or signal_close_candidates
+    ] or candidates
     highest_overall = max(
         high_sample_candidates,
         key=lambda row: row["overall"]["average_pct"],
     )
-    stable = max(
-        eligible or high_sample_candidates,
+
+    stable_pool = eligible or high_sample_candidates
+
+    def period_floor(row: dict, key: str) -> float:
+        return min(
+            float(row["development_before_2024"][key]),
+            float(row["validation_2024_2025"][key]),
+        )
+
+    return_first = max(
+        stable_pool,
         key=lambda row: (
-            min(
-                row["development_before_2024"]["average_pct"],
-                row["validation_2024_2025"]["average_pct"],
-            ),
+            period_floor(row, "average_excluding_abs_50pct_outliers_pct"),
+            period_floor(row, "geometric_average_pct"),
             row["overall"]["average_pct"],
+        ),
+    )
+    success_first = max(
+        stable_pool,
+        key=lambda row: (
+            period_floor(row, "positive_rate_pct"),
+            period_floor(row, "geometric_average_pct"),
+            period_floor(row, "average_excluding_abs_50pct_outliers_pct"),
+        ),
+    )
+    balanced = max(
+        stable_pool,
+        key=lambda row: (
+            period_floor(row, "geometric_average_pct")
+            + 0.12 * (period_floor(row, "positive_rate_pct") - 50.0),
+            period_floor(row, "average_excluding_abs_50pct_outliers_pct"),
+            period_floor(row, "positive_rate_pct"),
         ),
     )
     top = sorted(
@@ -648,9 +710,60 @@ def aggregate(
         key=lambda row: row["overall"]["average_pct"],
         reverse=True,
     )[:30]
+    top_success = sorted(
+        stable_pool,
+        key=lambda row: (
+            period_floor(row, "positive_rate_pct"),
+            period_floor(row, "geometric_average_pct"),
+        ),
+        reverse=True,
+    )[:30]
+    top_balanced = sorted(
+        stable_pool,
+        key=lambda row: (
+            period_floor(row, "geometric_average_pct")
+            + 0.12 * (period_floor(row, "positive_rate_pct") - 50.0),
+            period_floor(row, "average_excluding_abs_50pct_outliers_pct"),
+        ),
+        reverse=True,
+    )[:30]
+    best_by_entry: dict[str, dict] = {}
+    for entry in ENTRY_METHODS:
+        entry_rows = [
+            row for row in stable_pool
+            if row["entry_id"] == str(entry["id"])
+        ]
+        if not entry_rows:
+            continue
+        best_by_entry[str(entry["id"])] = {
+            "entry_label": str(entry["label"]),
+            "entry_rate_pct": float(entry_rows[0]["entry_rate_pct"]),
+            "success_first": max(
+                entry_rows,
+                key=lambda row: (
+                    period_floor(row, "positive_rate_pct"),
+                    period_floor(row, "geometric_average_pct"),
+                ),
+            ),
+            "return_first": max(
+                entry_rows,
+                key=lambda row: (
+                    period_floor(row, "average_excluding_abs_50pct_outliers_pct"),
+                    period_floor(row, "geometric_average_pct"),
+                ),
+            ),
+            "balanced": max(
+                entry_rows,
+                key=lambda row: (
+                    period_floor(row, "geometric_average_pct")
+                    + 0.12 * (period_floor(row, "positive_rate_pct") - 50.0),
+                    period_floor(row, "positive_rate_pct"),
+                ),
+            ),
+        }
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
         "definition": {
             "universe": "验证时仍上市的沪深A股，按当前名称排除ST与*ST",
@@ -662,10 +775,10 @@ def aggregate(
                 if include_retrospective
                 else "本轮跳过；事后图形对照沿用独立完整回测，不参与买卖规则选择"
             ),
-            "execution": "买点固定为信号条件首次同时成立日的收盘价；卖出条件按收盘确认；不计费用、滑点、停牌和涨跌停无法成交",
+            "execution": "比较信号日收盘、次日开盘/收盘、价格涨幅确认、突破近期高点与重新站上龙线等买点；卖出均按收盘确认；不计费用、滑点、停牌和涨跌停无法成交",
             "common_trade_cohort": f"为公平比较买卖组合，只使用信号后至少仍有{COMMON_FUTURE_BARS}根K线的共同样本",
             "wave_peak": "主统计从信号条件首次同时成立日的收盘价开始，到龙线首次不再高于虎线前后的本轮波段最高价；最长观察60个交易日，最高点必须发生在信号确认后",
-            "selection": "买点固定为信号确认日收盘；同时要求2024年前开发样本与2024-2025验证样本平均收益为正，以两段中较低的平均收益最高者作为稳定卖出方案，2026完全留出检验",
+            "selection": "买卖组合先要求2024年前开发期和2024-2025验证期各至少200笔、总样本至少500笔且两期几何平均收益均为正；成功率优先、收益优先和折中方案均不查看2026结果选参，2026仅作最终留出检验",
         },
         "coverage": {
             "requested_stock_count": len(stocks),
@@ -700,15 +813,25 @@ def aggregate(
         "optimization": {
             "candidate_count": len(candidates),
             "highest_overall_average_id": highest_overall["id"],
-            "stable_recommended_id": stable["id"],
+            "stable_recommended_id": balanced["id"],
             "highest_overall_average": highest_overall,
-            "stable_recommended": stable,
+            "stable_recommended": balanced,
+            "return_first_id": return_first["id"],
+            "return_first": return_first,
+            "success_first_id": success_first["id"],
+            "success_first": success_first,
+            "balanced_id": balanced["id"],
+            "balanced": balanced,
             "top_30_by_overall_average": top,
+            "top_30_by_stable_success": top_success,
+            "top_30_by_balanced_score": top_balanced,
+            "best_by_entry": best_by_entry,
             "top_signal_close_exit_rules": sorted(
                 signal_close_candidates,
                 key=lambda row: row["overall"]["average_pct"],
                 reverse=True,
             )[:20],
+            "all_candidates": candidates,
         },
     }
 

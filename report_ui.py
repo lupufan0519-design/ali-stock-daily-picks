@@ -642,6 +642,100 @@ tbody tr:last-child td { border-bottom: 0; }
 .repaint-failure { padding: 10px; border-radius: 10px; background: var(--surface-soft); font-size: 11px; }
 .repaint-failure a { color: var(--text); font-weight: 800; text-decoration: none; }
 .repaint-failure span { display: block; margin-top: 3px; color: var(--muted); }
+.strategy-lab {
+  --lab-success: #11845b;
+  --lab-balanced: #2457d6;
+  --lab-return: #b7790b;
+  margin-bottom: 14px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.strategy-lab-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 22px;
+  border-bottom: 1px solid var(--line);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--lab-success) 8%, transparent), transparent 29%),
+    linear-gradient(270deg, color-mix(in srgb, var(--lab-return) 9%, transparent), transparent 29%);
+}
+.strategy-lab-head h3 { margin: 3px 0 5px; font-size: 22px; }
+.strategy-lab-head p { max-width: 760px; margin: 0; color: var(--muted-strong); }
+.strategy-lab-stamp {
+  flex: 0 0 auto;
+  display: grid;
+  gap: 2px;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  text-align: right;
+}
+.strategy-lab-stamp strong { font: 800 17px/1 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.strategy-lab-stamp small { color: var(--muted); font-size: 9px; }
+.strategy-tickets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px 22px;
+}
+.strategy-ticket {
+  --ticket-tone: var(--lab-balanced);
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--ticket-tone) 28%, var(--line));
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--ticket-tone) 4%, var(--surface));
+}
+.strategy-ticket::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--ticket-tone);
+}
+.strategy-ticket.success { --ticket-tone: var(--lab-success); }
+.strategy-ticket.return { --ticket-tone: var(--lab-return); }
+.strategy-ticket.recommended { box-shadow: 0 15px 34px color-mix(in srgb, var(--ticket-tone) 14%, transparent); transform: translateY(-3px); }
+.strategy-ticket-head { padding: 16px 16px 12px 18px; border-bottom: 1px dashed color-mix(in srgb, var(--ticket-tone) 22%, var(--line)); }
+.strategy-ticket-kicker { color: var(--ticket-tone); font-size: 10px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.strategy-ticket h4 { margin: 5px 0 2px; font-size: 18px; }
+.strategy-ticket-head small { color: var(--muted); }
+.strategy-orders { display: grid; gap: 8px; padding: 13px 16px 2px 18px; }
+.strategy-order { display: grid; grid-template-columns: 36px 1fr; gap: 8px; align-items: start; }
+.strategy-order b { padding-top: 2px; color: var(--ticket-tone); font: 850 9px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.strategy-order span { color: var(--muted-strong); font-size: 11px; }
+.strategy-numbers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; padding: 13px 16px 13px 18px; }
+.strategy-number { padding: 9px; border-radius: 10px; background: var(--surface-soft); }
+.strategy-number span { display: block; min-height: 26px; color: var(--muted); font-size: 9px; }
+.strategy-number strong { display: block; margin-top: 2px; font-size: 16px; }
+.strategy-phases { display: grid; gap: 7px; padding: 0 16px 16px 18px; }
+.strategy-phase { display: grid; grid-template-columns: 68px 1fr 46px; gap: 7px; align-items: center; font-size: 9px; }
+.strategy-phase span { color: var(--muted); }
+.strategy-phase b { color: var(--muted-strong); text-align: right; }
+.strategy-phase-track { height: 5px; overflow: hidden; border-radius: 999px; background: var(--line); }
+.strategy-phase-track i { display: block; width: min(100%, var(--phase)); height: 100%; border-radius: inherit; background: var(--ticket-tone); }
+.strategy-lab-baseline {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  margin: 0 22px 18px;
+  padding: 13px 15px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-soft);
+}
+.strategy-lab-baseline p { margin: 0; color: var(--muted-strong); font-size: 11px; }
+.strategy-lab-baseline strong { color: var(--text); }
+.strategy-baseline-numbers { display: flex; gap: 14px; color: var(--muted); font-size: 10px; white-space: nowrap; }
+.strategy-baseline-numbers b { color: var(--text); font-size: 13px; }
+.strategy-lab-note { margin: 0 22px 20px; color: var(--muted); font-size: 11px; }
 .validation-method {
   margin: 12px 0 0;
   color: var(--muted);
@@ -727,6 +821,13 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .repaint-strategy { padding: 0 16px 16px; }
   .repaint-failures { margin: 0 16px 16px; }
   .repaint-failure-list { grid-template-columns: 1fr 1fr; }
+  .strategy-lab-head { display: grid; padding: 18px 16px; }
+  .strategy-lab-stamp { justify-self: start; text-align: left; }
+  .strategy-tickets { grid-template-columns: 1fr; padding: 16px; }
+  .strategy-ticket.recommended { transform: none; }
+  .strategy-lab-baseline { grid-template-columns: 1fr; margin: 0 16px 16px; }
+  .strategy-baseline-numbers { flex-wrap: wrap; }
+  .strategy-lab-note { margin: 0 16px 18px; }
   th, td { padding: 12px 14px; }
   .chart-cell { min-width: 320px; }
   .pool-group-head { padding-inline: 14px; }
@@ -796,6 +897,7 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .metrics { grid-template-columns: 1fr 1fr; }
   .lineage-branches, .repaint-stats, .repaint-failure-list { grid-template-columns: 1fr; }
   .repaint-stat span { min-height: 0; }
+  .strategy-numbers { grid-template-columns: 1fr 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -2472,6 +2574,90 @@ def _repaint_comparison_panel() -> str:
       </article>"""
 
 
+def _strategy_grid_panel() -> str:
+    path = Path(__file__).resolve().parent / "results" / "strategy_grid_optimization.json"
+    if not path.exists():
+        return ""
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        coverage = payload["coverage"]
+        optimization = payload["optimization"]
+        candidates = {
+            str(item["id"]): item
+            for item in optimization["all_candidates"]
+        }
+        profiles = (
+            (
+                "success",
+                "高成功率",
+                "更常兑现小目标",
+                candidates["reclaim_dragon__target_3"],
+            ),
+            (
+                "balanced recommended",
+                "均衡方案",
+                "胜率与波段空间兼顾",
+                candidates["break_5day_high__trail_3_2"],
+            ),
+            (
+                "return",
+                "高收益率",
+                "接受更低胜率换取更大波段",
+                candidates["break_5day_high__trail_8_2"],
+            ),
+        )
+        baseline = candidates["confirm_5__trail_5_5"]
+        rejected = candidates["confirm_8__target_3"]
+        common_signals = int(payload["signals"]["common_trade_cohort_count"])
+    except (OSError, ValueError, KeyError, TypeError):
+        return ""
+
+    cards = []
+    for css, name, note, row in profiles:
+        overall = row["overall"]
+        development = row["development_before_2024"]
+        validation = row["validation_2024_2025"]
+        holdout = row["holdout_2026"]
+        phases = (
+            ("2024年前", development),
+            ("2024—25", validation),
+            ("2026留出", holdout),
+        )
+        phase_markup = "".join(
+            f'<div class="strategy-phase"><span>{_esc(label)}</span>'
+            f'<div class="strategy-phase-track"><i style="--phase:{float(stats["positive_rate_pct"]):.2f}%"></i></div>'
+            f'<b>{float(stats["positive_rate_pct"]):.2f}%</b></div>'
+            for label, stats in phases
+        )
+        cards.append(
+            f"""
+            <article class="strategy-ticket {css}">
+              <div class="strategy-ticket-head"><span class="strategy-ticket-kicker">{_esc(note)}</span><h4>{_esc(name)}</h4><small>仅 {float(row['entry_rate_pct']):.2f}% 的原始信号会确认买点</small></div>
+              <div class="strategy-orders"><div class="strategy-order"><b>BUY</b><span>{_esc(row['entry_label'])}</span></div><div class="strategy-order"><b>SELL</b><span>{_esc(row['exit_label'])}</span></div></div>
+              <div class="strategy-numbers">
+                <div class="strategy-number"><span>已实现成功率</span><strong>{float(overall['positive_rate_pct']):.2f}%</strong></div>
+                <div class="strategy-number"><span>每笔平均收益</span><strong>{float(overall['average_pct']):+.2f}%</strong></div>
+                <div class="strategy-number"><span>收益中位数</span><strong>{float(overall['median_pct']):+.2f}%</strong></div>
+                <div class="strategy-number"><span>完整交易样本</span><strong>{int(overall['sample_count']):,}</strong></div>
+                <div class="strategy-number"><span>2026成功率</span><strong>{float(holdout['positive_rate_pct']):.2f}%</strong></div>
+                <div class="strategy-number"><span>2026平均收益</span><strong>{float(holdout['average_pct']):+.2f}%</strong></div>
+              </div>
+              <div class="strategy-phases">{phase_markup}</div>
+            </article>"""
+        )
+
+    return f"""
+      <article class="strategy-lab" aria-label="扩展买卖点全市场回测">
+        <div class="strategy-lab-head">
+          <div><span class="section-kicker">Execution lab</span><h3>更多买卖点 · 三档候选</h3><p>12种买点与88种卖点交叉形成1,056种组合。先用2024年前开发、2024—2025验证，再用2026留出期验收；最终历史图的未来重绘信号不参与选参。</p></div>
+          <div class="strategy-lab-stamp"><strong>{int(coverage['analyzed_stock_count']):,}</strong><small>只非ST沪深A股</small><strong>{common_signals:,}</strong><small>次共同信号样本</small></div>
+        </div>
+        <div class="strategy-tickets">{''.join(cards)}</div>
+        <div class="strategy-lab-baseline"><p><strong>同口径基准：</strong>信号后上涨5%确认买入，买后再达到5%浮盈并回撤5%卖出，历史成功率 {float(baseline['overall']['positive_rate_pct']):.2f}%、平均 {float(baseline['overall']['average_pct']):+.2f}%；2026为 {float(baseline['holdout_2026']['positive_rate_pct']):.2f}% / {float(baseline['holdout_2026']['average_pct']):+.2f}%。上方三档均改善了至少一个核心目标。</p><div class="strategy-baseline-numbers"><span>组合数 <b>{int(optimization['candidate_count']):,}</b></span><span>行情失败 <b>{int(coverage['error_count'])}</b></span></div></div>
+        <p class="strategy-lab-note">高成功率方案适合把“趋势开始”确认得更宽、快速兑现3%；均衡与高收益方案都要求收盘突破此前5日最高价，随后分别采用“浮盈3%后回撤2%”和“浮盈8%后回撤2%”。历史表面最高胜率方案为 {float(rejected['overall']['positive_rate_pct']):.2f}%，但2026仅 {int(rejected['holdout_2026']['sample_count'])} 笔且平均 {float(rejected['holdout_2026']['average_pct']):+.2f}%，因此淘汰。收益均未计手续费、滑点及涨跌停无法成交；2026样本仍较少，候选尚未自动替换实时正式规则。</p>
+      </article>"""
+
+
 def _validation_section() -> str:
     path = Path(__file__).resolve().parent / "results" / "rolling_validation.json"
     if not path.exists():
@@ -2572,6 +2758,7 @@ def _validation_section() -> str:
         </div>
       </div>
       {_repaint_comparison_panel().lstrip()}
+      {_strategy_grid_panel().lstrip()}
       <article class="panel">
         <div class="panel-head"><div><h3>买点与卖点联合比较</h3><p>所有统计都从实际建议买点算到建议卖点；未确认买点和未结束持仓不混入成功率。</p></div></div>
         <div class="table-scroll"><table><thead><tr><th>规则</th><th>完整波段</th><th>成功率</th><th>平均收益</th><th>收益中位数</th><th>通常持有</th><th>2026 年</th></tr></thead>
