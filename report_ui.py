@@ -467,7 +467,9 @@ tbody tr:last-child td { border-bottom: 0; }
 .trend-case-wave-head span { text-align: right; }
 .trend-case-canvas {
   position: relative;
-  height: clamp(300px, 37vw, 390px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: clamp(330px, 38vw, 410px);
   margin: 0 10px;
   overflow: hidden;
   border-radius: 14px;
@@ -475,7 +477,16 @@ tbody tr:last-child td { border-bottom: 0; }
     linear-gradient(180deg, color-mix(in srgb, var(--surface-blue) 34%, transparent), transparent 48%),
     var(--surface-soft);
 }
-.trend-case-svg { display: block; width: 100%; height: 100%; }
+.case-pin-rail {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, 22%);
+  justify-content: center;
+  align-items: start;
+  padding: 9px 0 5px;
+}
+.trend-case-svg { display: block; width: 100%; height: 100%; min-height: 0; overflow: visible; }
 .trend-case-svg line, .trend-case-svg path, .trend-case-svg rect, .trend-case-svg circle { vector-effect: non-scaling-stroke; }
 .case-grid { stroke: var(--case-grid); stroke-width: 1; stroke-dasharray: 3 5; }
 .case-axis-label { fill: var(--muted); font: 600 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace; }
@@ -498,20 +509,24 @@ tbody tr:last-child td { border-bottom: 0; }
 .case-cross-guide { stroke: var(--case-start); stroke-width: 1; stroke-dasharray: 3 4; opacity: .62; }
 .case-cross-ring { fill: var(--surface); stroke: var(--case-start); stroke-width: 2.2; }
 .case-cross-label { fill: var(--case-start); font: 800 11px/1 "Microsoft YaHei", sans-serif; }
+.case-cross-sub { fill: var(--muted); font-size: 8px; font-weight: 700; }
 .case-stop-line { stroke: var(--case-end); stroke-width: 1.25; stroke-dasharray: 5 4; }
 .case-stop-label { fill: var(--case-end); font: 750 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace; }
-.case-arrow-start, .case-arrow-end { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.case-arrow-start, .case-arrow-peak, .case-arrow-end { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
 .case-arrow-start { stroke: var(--case-start); marker-end: url(#case-arrow-blue); }
+.case-arrow-peak { stroke: var(--case-peak); marker-end: url(#case-arrow-amber); }
 .case-arrow-end { stroke: var(--case-end); marker-end: url(#case-arrow-red); }
+.case-start-target { fill: color-mix(in srgb, var(--surface) 82%, transparent); stroke: var(--case-start); stroke-width: 2.4; filter: drop-shadow(0 0 3px rgba(36,87,214,.28)); }
 .case-exit-target { fill: color-mix(in srgb, var(--surface) 82%, transparent); stroke: var(--case-end); stroke-width: 2.4; filter: drop-shadow(0 0 3px rgba(212,81,47,.32)); }
 .case-peak-ring { fill: var(--surface); stroke: var(--case-peak); stroke-width: 2.5; }
 .case-peak-guide { stroke: var(--case-peak); stroke-width: 1; stroke-dasharray: 3 4; }
 .case-pin {
-  position: absolute;
-  z-index: 2;
   display: grid;
   gap: 1px;
-  min-width: 96px;
+  justify-self: center;
+  width: min(calc(100% - 8px), 112px);
+  min-width: 0;
+  box-sizing: border-box;
   padding: 7px 9px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -522,11 +537,11 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 .case-pin b { font-size: 12px; line-height: 1.15; }
 .case-pin small { color: var(--muted); font: 650 10px/1.25 ui-monospace, SFMono-Regular, Consolas, monospace; }
-.case-pin.start { top: 9px; left: 7%; border-color: color-mix(in srgb, var(--case-start) 34%, var(--line)); }
+.case-pin.start { border-color: color-mix(in srgb, var(--case-start) 34%, var(--line)); }
 .case-pin.start b { color: var(--case-start); }
-.case-pin.peak { top: 9px; left: 58%; border-color: color-mix(in srgb, var(--case-peak) 38%, var(--line)); }
+.case-pin.peak { border-color: color-mix(in srgb, var(--case-peak) 38%, var(--line)); }
 .case-pin.peak b { color: var(--case-peak); }
-.case-pin.end { right: 2%; top: 9px; border-color: color-mix(in srgb, var(--case-end) 38%, var(--line)); }
+.case-pin.end { border-color: color-mix(in srgb, var(--case-end) 38%, var(--line)); }
 .case-pin.end b { color: var(--case-end); }
 .trend-case-notes {
   display: grid;
@@ -542,7 +557,7 @@ tbody tr:last-child td { border-bottom: 0; }
 .trend-case-note.end strong { color: var(--case-end); }
 .trend-case-foot { padding: 0 15px 14px; color: var(--muted); font-size: 10px; }
 .reveal.is-visible .case-candle { animation: case-candle-in 420ms both; animation-delay: calc(var(--i) * 12ms); }
-.reveal.is-visible .case-arrow-start, .reveal.is-visible .case-arrow-end { stroke-dasharray: 280; animation: case-arrow-draw 900ms 520ms both; }
+.reveal.is-visible .case-arrow-start, .reveal.is-visible .case-arrow-peak, .reveal.is-visible .case-arrow-end { stroke-dasharray: 280; animation: case-arrow-draw 900ms 520ms both; }
 @keyframes case-candle-in { from { opacity: 0; transform: translateY(8px); } }
 @keyframes case-arrow-draw { from { stroke-dashoffset: 280; } to { stroke-dashoffset: 0; } }
 .validation-facts {
@@ -818,14 +833,12 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .trend-case-legend { justify-self: start; flex-wrap: wrap; border-radius: 12px; }
   .trend-case-wave-head { display: grid; gap: 3px; }
   .trend-case-wave-head span { text-align: left; }
-  .trend-case-canvas { height: 285px; margin-inline: 6px; }
+  .trend-case-canvas { height: 330px; margin-inline: 6px; }
   .case-axis-label, .case-stop-label { display: none; }
-  .case-pin { min-width: 82px; padding: 6px 7px; }
+  .case-pin-rail { grid-template-columns: repeat(3, 22%); padding-top: 8px; }
+  .case-pin { width: calc(100% - 4px); padding: 6px 7px; }
   .case-pin b { font-size: 10px; }
   .case-pin small { font-size: 8.5px; }
-  .case-pin.start { left: 1%; }
-  .case-pin.peak { left: 44%; }
-  .case-pin.end { right: 1%; top: 9px; }
   .trend-case-notes { grid-template-columns: 1fr; }
   .trend-case-note { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 9px 12px; }
   .trend-case-note + .trend-case-note { border-top: 1px solid var(--line); border-left: 0; }
@@ -912,7 +925,7 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .live-exit-item { align-items: flex-start; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .reveal.is-visible .case-candle, .reveal.is-visible .case-arrow-start, .reveal.is-visible .case-arrow-end { animation: none; }
+  .reveal.is-visible .case-candle, .reveal.is-visible .case-arrow-start, .reveal.is-visible .case-arrow-peak, .reveal.is-visible .case-arrow-end { animation: none; }
 }
 @media (max-width: 430px) {
   h1 { font-size: 34px; }
@@ -1685,6 +1698,59 @@ LIVE_SCRIPT = r"""
       });
     }, { threshold: .08 });
     reveals.forEach((item) => observer.observe(item));
+  }
+
+  const syncTrendCaseLeaders = () => {
+    document.querySelectorAll(".trend-case-canvas").forEach((canvas) => {
+      const svg = canvas.querySelector(".trend-case-svg");
+      const matrix = svg?.getScreenCTM();
+      if (!svg || !matrix) return;
+      let inverse;
+      try {
+        inverse = matrix.inverse();
+      } catch (_error) {
+        return;
+      }
+      ["start", "peak", "end"].forEach((key) => {
+        const pin = canvas.querySelector(`[data-case-pin="${key}"]`);
+        const leader = svg.querySelector(`[data-case-leader="${key}"]`);
+        if (!pin || !leader) return;
+        const targetX = Number(leader.dataset.targetX);
+        const targetY = Number(leader.dataset.targetY);
+        if (!Number.isFinite(targetX) || !Number.isFinite(targetY)) return;
+        const pinBox = pin.getBoundingClientRect();
+        const originPoint = svg.createSVGPoint();
+        originPoint.x = pinBox.left + pinBox.width / 2;
+        originPoint.y = pinBox.bottom;
+        const origin = originPoint.matrixTransform(inverse);
+        const endY = targetY - 8;
+        const verticalSpan = Math.max(24, endY - origin.y);
+        const horizontalSpan = targetX - origin.x;
+        const firstControlY = origin.y + Math.min(42, verticalSpan * 0.24);
+        const secondControlX = targetX - Math.sign(horizontalSpan || 1)
+          * Math.min(32, Math.abs(horizontalSpan) * 0.22);
+        const secondControlY = endY - Math.min(38, verticalSpan * 0.24);
+        leader.setAttribute(
+          "d",
+          `M ${origin.x.toFixed(1)} ${origin.y.toFixed(1)} C `
+          + `${origin.x.toFixed(1)} ${firstControlY.toFixed(1)}, `
+          + `${secondControlX.toFixed(1)} ${secondControlY.toFixed(1)}, `
+          + `${targetX.toFixed(1)} ${endY.toFixed(1)}`,
+        );
+      });
+    });
+  };
+  window.requestAnimationFrame(syncTrendCaseLeaders);
+  document.fonts?.ready.then(syncTrendCaseLeaders);
+  if ("ResizeObserver" in window) {
+    const trendCaseResizeObserver = new ResizeObserver(() => {
+      window.requestAnimationFrame(syncTrendCaseLeaders);
+    });
+    document.querySelectorAll(".trend-case-canvas").forEach((canvas) => {
+      trendCaseResizeObserver.observe(canvas);
+    });
+  } else {
+    window.addEventListener("resize", syncTrendCaseLeaders, { passive: true });
   }
 
   const coverVideo = document.querySelector("[data-cover-video]");
@@ -2481,7 +2547,7 @@ def _trend_case_chart() -> str:
     )
 
     signal_x = x_at(signal_index)
-    signal_y = y_at(float(bars[signal_index]["high"]))
+    signal_y = y_at(float(bars[signal_index]["close"]))
     cross_x = x_at(cross_index)
     cross_y = y_at(wave_dragon[cross_index])
     peak_x = x_at(peak_index)
@@ -2502,8 +2568,9 @@ def _trend_case_chart() -> str:
             f'<text class="case-stop-label" x="{peak_x+7:.1f}" '
             f'y="{stop_y-6:.1f}">高点回撤{stop_drawdown:.0f}%</text>'
         )
-    end_path_start_x = min(width - right - 78, exit_x - 76)
-    end_path_start_y = top + 42
+    start_anchor_x = width * 0.28
+    peak_anchor_x = width * 0.50
+    end_anchor_x = width * 0.72
     date_ticks = []
     tick_indices = [0, signal_index, peak_index, exit_index]
     if len(bars) - 1 - exit_index >= 3:
@@ -2521,16 +2588,19 @@ def _trend_case_chart() -> str:
         <div><strong>真实案例 · {_esc(payload['name'])} {_esc(payload['code'])}</strong><span>前复权 · 逐日无未来数据重放</span></div>
         <div class="trend-case-legend" aria-label="完整波段图图例"><span><i class="dragon"></i>龙线</span><span><i class="tiger"></i>虎线</span><span><i class="yellow-formula"></i>公式黄柱</span><span><i class="yellow-qualified"></i>有效窗口黄柱</span></div>
       </div>
-      <div class="trend-case-wave-head"><strong>完整波段 · 龙虎线与黄柱</strong><span>蓝箭头指建议买点，红箭头落在规则卖点K线上</span></div>
+      <div class="trend-case-wave-head"><strong>完整波段 · 龙虎线与黄柱</strong><span>三条连接线分别落在买点、高点与规则卖点K线上</span></div>
       <div class="trend-case-canvas">
-        <div class="case-pin start"><b>趋势开始</b><small>{_esc(payload.get('entry_date', payload['signal_date']))}</small></div>
-        <div class="case-pin peak"><b>波段高点</b><small>+{float(payload['peak_return_pct']):.2f}%</small></div>
-        <div class="case-pin end"><b>建议结束</b><small>{_esc(payload['exit_date'])}</small></div>
+        <div class="case-pin-rail" aria-hidden="true">
+          <div class="case-pin start" data-case-pin="start"><b>趋势开始</b><small>{_esc(payload.get('entry_date', payload['signal_date']))}</small></div>
+          <div class="case-pin peak" data-case-pin="peak"><b>波段高点</b><small>+{float(payload['peak_return_pct']):.2f}%</small></div>
+          <div class="case-pin end" data-case-pin="end"><b>建议结束</b><small>{_esc(payload['exit_date'])}</small></div>
+        </div>
         <svg class="trend-case-svg" viewBox="0 0 900 320" preserveAspectRatio="none" role="img" aria-labelledby="trend-case-title trend-case-desc">
           <title id="trend-case-title">{_esc(payload['name'])}历史案例K线图</title>
-          <desc id="trend-case-desc">{_esc(payload['signal_date'])}形成入选信号，{_esc(payload.get('entry_date', payload['signal_date']))}收盘突破此前5日最高价确认趋势开始，{_esc(payload['exit_date'])}按规则结束。</desc>
+          <desc id="trend-case-desc">{_esc(payload['signal_date'])}逐日重算时首次看见日期标在{_esc(payload['cross_date'])}的龙虎上穿并形成入选信号，{_esc(payload.get('entry_date', payload['signal_date']))}收盘突破此前5日最高价确认趋势开始，{_esc(payload['exit_date'])}按规则结束。</desc>
           <defs>
             <marker id="case-arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#2457d6"/></marker>
+            <marker id="case-arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#b7790b"/></marker>
             <marker id="case-arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#d4512f"/></marker>
           </defs>
           {''.join(grid)}
@@ -2542,11 +2612,12 @@ def _trend_case_chart() -> str:
           {stop_markup}
           <line class="case-cross-guide" x1="{cross_x:.1f}" y1="{cross_y-31:.1f}" x2="{cross_x:.1f}" y2="{cross_y-7:.1f}"/>
           <circle class="case-cross-ring" cx="{cross_x:.1f}" cy="{cross_y:.1f}" r="5"/>
-          <text class="case-cross-label" x="{cross_x+8:.1f}" y="{cross_y-14:.1f}">2/5 回看上穿</text>
-          <line class="case-peak-guide" x1="{peak_x:.1f}" y1="{top+22:.1f}" x2="{peak_x:.1f}" y2="{peak_y-7:.1f}"/>
+          <text class="case-cross-label" x="{cross_x+8:.1f}" y="{cross_y-17:.1f}"><tspan x="{cross_x+8:.1f}">{_esc(str(payload['cross_date'])[5:])} 回看上穿</tspan><tspan class="case-cross-sub" x="{cross_x+8:.1f}" dy="12">{_esc(str(payload['signal_date'])[5:])} 首次可见</tspan></text>
           <circle class="case-peak-ring" cx="{peak_x:.1f}" cy="{peak_y:.1f}" r="5"/>
-          <path class="case-arrow-start" d="M {max(left+8,signal_x-63):.1f} {top+24:.1f} C {signal_x-51:.1f} {top+54:.1f}, {signal_x-17:.1f} {signal_y-24:.1f}, {signal_x:.1f} {signal_y-6:.1f}"/>
-          <path class="case-arrow-end" d="M {end_path_start_x:.1f} {end_path_start_y:.1f} C {end_path_start_x+31:.1f} {end_path_start_y+12:.1f}, {exit_x-19:.1f} {exit_y-34:.1f}, {exit_x:.1f} {exit_y-8:.1f}"/>
+          <path class="case-arrow-start" data-case-leader="start" data-target-x="{signal_x:.1f}" data-target-y="{signal_y:.1f}" d="M {start_anchor_x:.1f} 0 C {start_anchor_x:.1f} 24, {signal_x-28:.1f} {signal_y-38:.1f}, {signal_x:.1f} {signal_y-8:.1f}"/>
+          <path class="case-arrow-peak" data-case-leader="peak" data-target-x="{peak_x:.1f}" data-target-y="{peak_y:.1f}" d="M {peak_anchor_x:.1f} 0 C {peak_anchor_x:.1f} 20, {peak_x+14:.1f} {peak_y-32:.1f}, {peak_x:.1f} {peak_y-8:.1f}"/>
+          <path class="case-arrow-end" data-case-leader="end" data-target-x="{exit_x:.1f}" data-target-y="{exit_y:.1f}" d="M {end_anchor_x:.1f} 0 C {end_anchor_x:.1f} 24, {exit_x+52:.1f} {exit_y-48:.1f}, {exit_x:.1f} {exit_y-8:.1f}"/>
+          <circle class="case-start-target" cx="{signal_x:.1f}" cy="{signal_y:.1f}" r="5.5"/>
           <circle class="case-exit-target" cx="{exit_x:.1f}" cy="{exit_y:.1f}" r="5.5"/>
           {''.join(date_ticks)}
         </svg>
@@ -2556,7 +2627,7 @@ def _trend_case_chart() -> str:
         <div class="trend-case-note peak"><span>最高收盘</span><strong>{_esc(payload['peak_date'])} · +{float(payload['peak_return_pct']):.2f}%</strong></div>
         <div class="trend-case-note end"><span>建议结束</span><strong>{_esc(payload['exit_date'])} · +{float(payload['exit_return_pct']):.2f}%</strong></div>
       </div>
-      <div class="trend-case-foot">{_esc(payload['source'])}。{_esc(payload['signal_date'])}满足入选条件，只进入待观察；{_esc(payload.get('entry_date', payload['signal_date']))}收盘突破此前5日最高价，蓝色箭头标记正式建议买点。龙虎线按每天当时可见的数据逐日重算，淡黄表示公式黄柱，金色描边表示有效配对黄柱。红色箭头与圆环共同指向{_esc(payload['exit_date'])}收盘触发的“{_esc(payload['exit_reason'])}”。图中保留卖点后的行情，用于直观看到规则可能提前保护利润、也可能错过后续再加速；未计费用、滑点和涨跌停无法成交。</div>
+      <div class="trend-case-foot">{_esc(payload['source'])}。{_esc(payload['signal_date'])}逐日重算时，图上首次看见日期标在{_esc(payload['cross_date'])}的“回看上穿”；它与上穿前两个交易日（{_esc('、'.join(payload['yellow_dates']))}）的黄柱配对，因此当天形成入选信号，但仍只进入待观察。{_esc(payload.get('entry_date', payload['signal_date']))}收盘突破此前5日最高价，蓝色连接线与圆环标记正式建议买点；金色连接线落在最高收盘；红色连接线与圆环指向{_esc(payload['exit_date'])}收盘触发的“{_esc(payload['exit_reason'])}”。淡黄表示公式黄柱，金色描边表示有效窗口黄柱。图中保留卖点后的行情，用于观察规则可能提前保护利润、也可能错过后续再加速；未计费用、滑点和涨跌停无法成交。</div>
     </div>"""
 
 

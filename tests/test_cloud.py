@@ -714,11 +714,16 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertNotIn("信号形成放大图", html)
         self.assertNotIn('class="trend-case-signal"', html)
         self.assertIn("完整波段 · 龙虎线与黄柱", html)
-        self.assertIn("2/5 回看上穿", html)
+        self.assertIn("02-05 回看上穿", html)
         self.assertIn("趋势开始", html)
         self.assertEqual(html.count('class="trend-case-canvas"'), 1)
+        self.assertEqual(html.count('class="case-pin-rail"'), 1)
+        self.assertEqual(html.count('data-case-pin="'), 3)
+        self.assertEqual(html.count('data-case-leader="'), 3)
         self.assertEqual(html.count('class="case-arrow-start"'), 1)
+        self.assertEqual(html.count('class="case-arrow-peak"'), 1)
         self.assertEqual(html.count('class="case-arrow-end"'), 1)
+        self.assertEqual(html.count('class="case-start-target"'), 1)
         self.assertEqual(html.count('class="case-exit-target"'), 1)
         self.assertEqual(html.count('class="case-cross-guide"'), 1)
         self.assertEqual(html.count('class="case-dragon-line"'), 1)
@@ -727,6 +732,10 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertEqual(html.count('class="case-line-label tiger"'), 1)
         self.assertEqual(html.count('class="case-yellow-body qualified"'), 2)
         self.assertEqual(html.count('class="case-yellow-body contextual"'), 6)
+        self.assertIn("02-11 首次可见", html)
+        self.assertIn("上穿前两个交易日（2025-01-24、2025-01-27）", html)
+        self.assertIn("syncTrendCaseLeaders", LIVE_SCRIPT)
+        self.assertIn("ResizeObserver", LIVE_SCRIPT)
 
     def test_yellow_window_can_extend_after_the_cross_without_looking_before(self):
         cross = [False, True, False, False, False, False, False]
