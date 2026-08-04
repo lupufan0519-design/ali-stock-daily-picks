@@ -230,6 +230,27 @@ h3 { font-size: 19px; }
 .state.warn { background: var(--warning-soft); color: var(--warning); }
 .state.ended { background: rgba(208, 48, 48, .12); color: #b42318; }
 .state.neutral { background: #eef2f6; color: var(--muted-strong); }
+.status-operation { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.operation-ticket {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid currentColor;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 820;
+  line-height: 1.2;
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+.operation-ticket.wait { color: #475467; background: #f2f4f7; border-color: #d0d5dd; }
+.operation-ticket.buy { color: #c4322b; background: #fff1f0; border-color: #f3aaa5; }
+.operation-ticket.hold { color: #175cd3; background: #eff6ff; border-color: #a9c7f7; }
+.operation-ticket.caution { color: #9a6700; background: #fff8e7; border-color: #e8c56a; }
+.operation-ticket.sell { color: #08745b; background: #ecfdf3; border-color: #83d5bd; }
+.operation-ticket.confirm { color: #9f3a17; background: #fff4ed; border-color: #f2aa83; }
+.status-detail-line { max-width: 360px; margin-top: 6px; white-space: normal; line-height: 1.45; }
 .table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 14px 16px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
@@ -882,6 +903,9 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .pool-table .stock-link { min-height: 30px; }
   .pool-table .signal { min-width: 0; }
   .pool-table .live-pool-status { min-width: 0; }
+  .pool-table .status-operation { width: 100%; }
+  .pool-table .operation-ticket { min-height: 38px; white-space: normal; }
+  .pool-table .status-detail-line { max-width: none; }
   .live-exit-list { padding: 10px 12px; }
   .live-exit-item { align-items: flex-start; }
 }
@@ -934,6 +958,12 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   tbody tr:hover { background: #152136; }
   .count-badge { color: #bfdbfe; }
   .state.neutral { background: #26344a; }
+  .operation-ticket.wait { color: #d0d5dd; background: #202b3d; border-color: #526176; }
+  .operation-ticket.buy { color: #ffb4ad; background: #3a2024; border-color: #7f3b41; }
+  .operation-ticket.hold { color: #bfdbfe; background: #172d4f; border-color: #335f95; }
+  .operation-ticket.caution { color: #fde68a; background: #352b13; border-color: #735f22; }
+  .operation-ticket.sell { color: #9ce7cf; background: #12392d; border-color: #2a745e; }
+  .operation-ticket.confirm { color: #fdba8c; background: #3d2519; border-color: #815038; }
   .events strong, .events ul { color: #fde68a; }
 }
 
@@ -1644,7 +1674,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
             <span class="cover-count" id="lens-value">等待行情</span>
           </div>
           <div class="status-detail" id="market-detail">交易日 2026-08-03 · 云端行情自动刷新</div>
-          <div class="cover-time">最新行情<strong id="quote-time">2026-08-03 18:05</strong></div>
+          <div class="cover-time">最新行情<strong id="quote-time">2026-08-04 12:02</strong></div>
           <div class="date-strip">
             <span class="date-chip">盘中行情日<strong data-live-trade-date>等待行情</strong></span>
             <span class="date-chip">收盘结算日<strong data-close-trade-date>2026-08-03</strong></span>
@@ -1661,7 +1691,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
 
     <section class="kpi-grid reveal" aria-label="核心概览">
       <article class="kpi"><span class="kpi-label">主选实时预选</span><strong class="kpi-value" data-live-main-count>1</strong><span class="kpi-note">严格四项同时满足</span></article>
-        <article class="kpi"><span class="kpi-label">次选实时预选</span><strong class="kpi-value" data-live-secondary-count>3</strong><span class="kpi-note">龙虎 + 窗口黄柱 + 另一项</span></article>
+        <article class="kpi"><span class="kpi-label">次选实时预选</span><strong class="kpi-value" data-live-secondary-count>2</strong><span class="kpi-note">龙虎 + 窗口黄柱 + 另一项</span></article>
       <article class="kpi"><span class="kpi-label">主选信号监控</span><strong class="kpi-value" data-tracked-main-count>1</strong><span class="kpi-note">含待确认与趋势跟踪</span></article>
       <article class="kpi"><span class="kpi-label">观察标的</span><strong class="kpi-value">30</strong><span class="kpi-note">仅观察，不计入选</span></article>
       <article class="kpi"><span class="kpi-label">市场扫描</span><strong class="kpi-value">5211</strong><span class="kpi-note">失败 0 只 · ST 排除</span></article>
@@ -1669,18 +1699,19 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
 
     <section class="section reveal" id="pool">
       <div class="section-head"><div><span class="section-kicker">Tracked portfolio</span><h2>卢氏龙虎趋势池</h2>
-      <p class="section-copy">首次入选先显示“待观察中”；信号未被重算消失且收盘较信号日上涨5%，才确认“趋势开始”并给出建议买点。买点后依次显示上升趋势中、待观察中或趋势结束；只有完整买卖波段才结算成功率。</p></div></div>
+      <p class="section-copy">首次入选先显示“待观察中 / 等待买入”；信号未被重算消失且10日内收盘突破此前5日最高价，才显示“趋势开始 / 建议买入”。买入后页面同步给出继续持有、谨慎持有或卖出触发，正式结束与收益只在收盘结算。</p></div></div>
 
+<div class="events"><strong>策略切换说明</strong><ul><li>现有 4 只旧规则持仓继续按新的卖点实时管理，但不混入新策略成功率；新成功率只统计本次切换后完成的完整买卖波段。</li></ul></div>
       <div class="pool-switcher" role="tablist" aria-label="趋势池区域切换">
         <button class="pool-tab" id="tab-main" type="button" role="tab" aria-selected="true" aria-controls="pool-main" data-pool-tab="main">主选区 · <span data-area-main-count>1</span></button>
-        <button class="pool-tab" id="tab-secondary" type="button" role="tab" aria-selected="false" aria-controls="pool-secondary" data-pool-tab="secondary" tabindex="-1">次选区 · <span data-area-secondary-count>6</span></button>
+        <button class="pool-tab" id="tab-secondary" type="button" role="tab" aria-selected="false" aria-controls="pool-secondary" data-pool-tab="secondary" tabindex="-1">次选区 · <span data-area-secondary-count>5</span></button>
       </div>
       <article class="panel" id="pool-main" role="tabpanel" aria-labelledby="tab-main" data-pool-panel="main">
-        <div class="panel-head"><div><h3>主选区</h3><p>入选后先等待上涨5%确认买点；买入后再达到5%浮盈、较最高收盘回撤5%，或信号重算消失、龙线不再高于虎线时结束</p>
+        <div class="panel-head"><div><h3>主选区</h3><p>10日内收盘突破前5日最高价建议买入；浮盈达到3%后较最高收盘回撤2%、龙线不再高于虎线或满60日建议卖出</p>
           <div class="pool-composition"><span>盘中新信号 <strong data-live-main-count>1</strong> 只</span><span>实时监控 <strong data-tracked-main-count>1</strong> 只</span><span>其中已确认趋势 1 只</span></div>
         </div><span class="count-badge"><span data-area-main-count>1</span> 只</span></div>
         <div class="pool-group-head"><strong>盘中新信号</strong><span>随最新行情重算，收盘确认后加入跟踪</span></div>
-        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态</th></tr></thead>
+        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态 / 操作</th></tr></thead>
         <tbody id="live-main-body">
     <tr data-live-code="301516">
       <td data-label="股票"><a class="stock-link" href="https://quote.eastmoney.com/sz301516.html" target="_blank" rel="noreferrer">中远通</a><span class="stock-code">301516</span></td>
@@ -1691,11 +1722,11 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
       <td data-label="龙腾跃虎"><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-29</span></div></td>
       <td data-label="42日涨停"><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-07</span></div></td>
       <td data-label="窗口黄柱"><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-30 · 3 根</span></div></td>
-      <td data-label="状态" class="live-pool-status"><span class="state warn">待观察中</span>
-          <span class="subline">最近收盘主选信号已形成；较信号价上涨5%后才确认趋势开始</span></td>
+      <td data-label="状态 / 操作" class="live-pool-status"><div class="status-operation"><span class="state warn">待观察中</span><span class="operation-ticket wait">等待买入</span></div>
+          <span class="subline status-detail-line">最近收盘主选信号已形成；10日内收盘突破此前5日最高价才确认趋势开始</span></td>
     </tr></tbody></table></div>
-        <div class="pool-group-head settled"><strong>实时信号与趋势跟踪</strong><span>待确认信号看距启动线涨幅；确认买点后再计算策略收益</span></div>
-        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>加入日 / 价格</th><th>最新价 / 时间</th><th>实时收益</th><th>时长</th><th>趋势状态</th></tr></thead>
+        <div class="pool-group-head settled"><strong>实时信号与趋势跟踪</strong><span>待确认信号看前5日突破价；确认买点后再计算策略收益</span></div>
+        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>加入日 / 价格</th><th>最新价 / 时间</th><th>实时收益</th><th>时长</th><th>状态 / 操作</th></tr></thead>
         <tbody id="tracking-main-body">
     <tr data-tracking-code="301516" data-tracking-area="main">
       <td data-label="股票"><a class="stock-link" href="https://quote.eastmoney.com/sz301516.html" target="_blank" rel="noreferrer">中远通</a><span class="stock-code">301516</span></td>
@@ -1704,39 +1735,27 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
           <span class="subline" data-live-time>2026-08-03 收盘</span></td>
       <td data-label="实时收益"><span class="numeric positive" data-live-return>+3.33%</span><span class="subline">盘中估算，收盘结算</span></td>
       <td data-label="跟踪时长" class="numeric">3 日</td>
-      <td data-label="趋势状态"><span class="state good" data-live-status>上升趋势中</span><span class="subline" data-live-status-detail>趋势条件仍有效</span></td>
+      <td data-label="状态 / 操作"><div class="status-operation"><span class="state good" data-live-status>上升趋势中</span><span class="operation-ticket hold" data-live-operation>继续持有</span></div><span class="subline status-detail-line" data-live-status-detail>趋势条件仍有效</span></td>
     </tr></tbody></table></div>
         <div class="live-exit-list" id="live-main-exits" hidden aria-live="polite"></div>
         <p class="settlement-note">实时收益只用于盘中判断；趋势结束后的成功率、实现收益和正式移出记录，以收盘确认结果为准。</p>
         <div class="metrics">
-          <div class="metric"><span class="metric-label">完整波段成功率</span><strong class="metric-value"><span class="numeric positive">+0.00%</span></strong></div>
-          <div class="metric"><span class="metric-label">完整波段平均收益</span><strong class="metric-value"><span class="numeric negative">-6.08%</span></strong></div>
+          <div class="metric"><span class="metric-label">完整波段成功率</span><strong class="metric-value">—</strong></div>
+          <div class="metric"><span class="metric-label">完整波段平均收益</span><strong class="metric-value">—</strong></div>
           <div class="metric"><span class="metric-label">等待确认</span><strong class="metric-value">0 只</strong></div>
-          <div class="metric"><span class="metric-label">累计实现收益</span><strong class="metric-value"><span class="numeric negative">-6.08%</span></strong></div>
-          <div class="metric"><span class="metric-label">已移出</span><strong class="metric-value">1 只</strong></div>
-          <div class="metric"><span class="metric-label">完整波段样本</span><strong class="metric-value">1 只</strong></div>
+          <div class="metric"><span class="metric-label">累计实现收益</span><strong class="metric-value">—</strong></div>
+          <div class="metric"><span class="metric-label">已移出</span><strong class="metric-value">0 只</strong></div>
+          <div class="metric"><span class="metric-label">完整波段样本</span><strong class="metric-value">0 只</strong></div>
         </div>
       </article>
 
       <article class="panel" id="pool-secondary" role="tabpanel" aria-labelledby="tab-secondary" data-pool-panel="secondary" hidden>
-        <div class="panel-head"><div><h3>次选区</h3><p>候选需龙虎、窗口黄柱及另一项；先等待较信号日上涨5%确认买点，再采用与主选相同的趋势结束判断</p>
-          <div class="pool-composition"><span>盘中新信号 <strong data-live-secondary-count>3</strong> 只</span><span>实时监控 <strong data-tracked-secondary-count>6</strong> 只</span><span>其中已确认趋势 3 只</span></div>
-        </div><span class="count-badge"><span data-area-secondary-count>6</span> 只</span></div>
+        <div class="panel-head"><div><h3>次选区</h3><p>候选需龙虎、窗口黄柱及另一项；10日内收盘突破前5日最高价才建议买入，卖点与主选一致</p>
+          <div class="pool-composition"><span>盘中新信号 <strong data-live-secondary-count>2</strong> 只</span><span>实时监控 <strong data-tracked-secondary-count>3</strong> 只</span><span>其中已确认趋势 3 只</span></div>
+        </div><span class="count-badge"><span data-area-secondary-count>5</span> 只</span></div>
         <div class="pool-group-head"><strong>盘中新信号</strong><span>随最新行情重算，收盘确认后加入跟踪</span></div>
-        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态</th></tr></thead>
+        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态 / 操作</th></tr></thead>
         <tbody id="live-secondary-body">
-    <tr data-live-code="002558">
-      <td data-label="股票"><a class="stock-link" href="https://quote.eastmoney.com/sz002558.html" target="_blank" rel="noreferrer">巨人网络</a><span class="stock-code">002558</span></td>
-      <td data-label="最新行情"><span class="numeric" data-live-price>29.09</span>
-          <span class="subline"><span class="numeric" data-live-change>-0.65%</span>
-          · <span data-live-time>2026-08-03 收盘</span></span></td>
-      <td data-label="可能见底"><div class="signal"><span class="signal-mark no">—</span><span class="subline">未命中</span></div></td>
-      <td data-label="龙腾跃虎"><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-20</span></div></td>
-      <td data-label="42日涨停"><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-29</span></div></td>
-      <td data-label="窗口黄柱"><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-24 · 3 根</span></div></td>
-      <td data-label="状态" class="live-pool-status"><span class="state warn">待观察中</span>
-          <span class="subline">最近收盘次选信号已形成；较信号价上涨5%后才确认趋势开始</span></td>
-    </tr>
     <tr data-live-code="002827">
       <td data-label="股票"><a class="stock-link" href="https://quote.eastmoney.com/sz002827.html" target="_blank" rel="noreferrer">高争民爆</a><span class="stock-code">002827</span></td>
       <td data-label="最新行情"><span class="numeric" data-live-price>38.06</span>
@@ -1746,8 +1765,8 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
       <td data-label="龙腾跃虎"><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-27</span></div></td>
       <td data-label="42日涨停"><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-08-03</span></div></td>
       <td data-label="窗口黄柱"><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-27 · 2 根</span></div></td>
-      <td data-label="状态" class="live-pool-status"><span class="state warn">待观察中</span>
-          <span class="subline">最近收盘次选信号已形成；较信号价上涨5%后才确认趋势开始</span></td>
+      <td data-label="状态 / 操作" class="live-pool-status"><div class="status-operation"><span class="state warn">待观察中</span><span class="operation-ticket wait">等待买入</span></div>
+          <span class="subline status-detail-line">最近收盘次选信号已形成；10日内收盘突破此前5日最高价才确认趋势开始</span></td>
     </tr>
     <tr data-live-code="003032">
       <td data-label="股票"><a class="stock-link" href="https://quote.eastmoney.com/sz003032.html" target="_blank" rel="noreferrer">传智教育</a><span class="stock-code">003032</span></td>
@@ -1758,39 +1777,12 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
       <td data-label="龙腾跃虎"><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-27</span></div></td>
       <td data-label="42日涨停"><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-08-03</span></div></td>
       <td data-label="窗口黄柱"><div class="signal"><span class="signal-mark yes">✓</span><span class="subline">2026-07-23 · 2 根</span></div></td>
-      <td data-label="状态" class="live-pool-status"><span class="state warn">待观察中</span>
-          <span class="subline">最近收盘次选信号已形成；较信号价上涨5%后才确认趋势开始</span></td>
+      <td data-label="状态 / 操作" class="live-pool-status"><div class="status-operation"><span class="state warn">待观察中</span><span class="operation-ticket wait">等待买入</span></div>
+          <span class="subline status-detail-line">最近收盘次选信号已形成；10日内收盘突破此前5日最高价才确认趋势开始</span></td>
     </tr></tbody></table></div>
-        <div class="pool-group-head settled"><strong>实时信号与趋势跟踪</strong><span>待确认信号看距启动线涨幅；确认买点后再计算策略收益</span></div>
-        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>加入日 / 价格</th><th>最新价 / 时间</th><th>实时收益</th><th>时长</th><th>趋势状态</th></tr></thead>
+        <div class="pool-group-head settled"><strong>实时信号与趋势跟踪</strong><span>待确认信号看前5日突破价；确认买点后再计算策略收益</span></div>
+        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>加入日 / 价格</th><th>最新价 / 时间</th><th>实时收益</th><th>时长</th><th>状态 / 操作</th></tr></thead>
         <tbody id="tracking-secondary-body">
-    <tr data-tracking-code="002558" data-tracking-area="secondary" data-pending-setup="true">
-      <td data-label="股票"><a class="stock-link" href="https://quote.eastmoney.com/sz002558.html" target="_blank" rel="noreferrer">巨人网络</a><span class="stock-code">002558</span></td>
-      <td data-label="信号日 / 价格" class="numeric">2026-08-03<span class="subline">29.09 元</span></td>
-      <td data-label="最新价 / 时间"><span class="numeric" data-live-price>29.09</span>
-          <span class="subline" data-live-time>2026-08-03 收盘</span></td>
-      <td data-label="距信号涨幅"><span class="numeric positive" data-live-return>+0.00%</span><span class="subline">达到 +5% 才确认买点</span></td>
-      <td data-label="等待时长" class="numeric">0 日</td>
-      <td data-label="趋势状态"><span class="state warn" data-live-status>待观察中</span><span class="subline" data-live-status-detail>信号仍有效，距趋势开始确认约差5.00个百分点</span></td>
-    </tr>
-    <tr data-tracking-code="002827" data-tracking-area="secondary" data-pending-setup="true">
-      <td data-label="股票"><a class="stock-link" href="https://quote.eastmoney.com/sz002827.html" target="_blank" rel="noreferrer">高争民爆</a><span class="stock-code">002827</span></td>
-      <td data-label="信号日 / 价格" class="numeric">2026-08-03<span class="subline">38.06 元</span></td>
-      <td data-label="最新价 / 时间"><span class="numeric" data-live-price>38.06</span>
-          <span class="subline" data-live-time>2026-08-03 收盘</span></td>
-      <td data-label="距信号涨幅"><span class="numeric positive" data-live-return>+0.00%</span><span class="subline">达到 +5% 才确认买点</span></td>
-      <td data-label="等待时长" class="numeric">0 日</td>
-      <td data-label="趋势状态"><span class="state warn" data-live-status>待观察中</span><span class="subline" data-live-status-detail>信号仍有效，距趋势开始确认约差5.00个百分点</span></td>
-    </tr>
-    <tr data-tracking-code="003032" data-tracking-area="secondary" data-pending-setup="true">
-      <td data-label="股票"><a class="stock-link" href="https://quote.eastmoney.com/sz003032.html" target="_blank" rel="noreferrer">传智教育</a><span class="stock-code">003032</span></td>
-      <td data-label="信号日 / 价格" class="numeric">2026-08-03<span class="subline">9.69 元</span></td>
-      <td data-label="最新价 / 时间"><span class="numeric" data-live-price>9.69</span>
-          <span class="subline" data-live-time>2026-08-03 收盘</span></td>
-      <td data-label="距信号涨幅"><span class="numeric positive" data-live-return>+0.00%</span><span class="subline">达到 +5% 才确认买点</span></td>
-      <td data-label="等待时长" class="numeric">0 日</td>
-      <td data-label="趋势状态"><span class="state warn" data-live-status>待观察中</span><span class="subline" data-live-status-detail>信号仍有效，距趋势开始确认约差5.00个百分点</span></td>
-    </tr>
     <tr data-tracking-code="603648" data-tracking-area="secondary">
       <td data-label="股票"><a class="stock-link" href="https://quote.eastmoney.com/sh603648.html" target="_blank" rel="noreferrer">畅联股份</a><span class="stock-code">603648</span></td>
       <td data-label="加入日 / 价格" class="numeric">2026-07-24<span class="subline">8.49 元</span></td>
@@ -1798,7 +1790,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
           <span class="subline" data-live-time>2026-08-03 收盘</span></td>
       <td data-label="实时收益"><span class="numeric positive" data-live-return>+7.77%</span><span class="subline">盘中估算，收盘结算</span></td>
       <td data-label="跟踪时长" class="numeric">4 日</td>
-      <td data-label="趋势状态"><span class="state good" data-live-status>上升趋势中</span><span class="subline" data-live-status-detail>趋势条件仍有效</span></td>
+      <td data-label="状态 / 操作"><div class="status-operation"><span class="state good" data-live-status>上升趋势中</span><span class="operation-ticket hold" data-live-operation>继续持有</span></div><span class="subline status-detail-line" data-live-status-detail>趋势条件仍有效</span></td>
     </tr>
     <tr data-tracking-code="600062" data-tracking-area="secondary">
       <td data-label="股票"><a class="stock-link" href="https://quote.eastmoney.com/sh600062.html" target="_blank" rel="noreferrer">华润双鹤</a><span class="stock-code">600062</span></td>
@@ -1807,7 +1799,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
           <span class="subline" data-live-time>2026-08-03 收盘</span></td>
       <td data-label="实时收益"><span class="numeric positive" data-live-return>+0.25%</span><span class="subline">盘中估算，收盘结算</span></td>
       <td data-label="跟踪时长" class="numeric">2 日</td>
-      <td data-label="趋势状态"><span class="state good" data-live-status>上升趋势中</span><span class="subline" data-live-status-detail>趋势条件仍有效</span></td>
+      <td data-label="状态 / 操作"><div class="status-operation"><span class="state good" data-live-status>上升趋势中</span><span class="operation-ticket hold" data-live-operation>继续持有</span></div><span class="subline status-detail-line" data-live-status-detail>趋势条件仍有效</span></td>
     </tr>
     <tr data-tracking-code="688443" data-tracking-area="secondary">
       <td data-label="股票"><a class="stock-link" href="https://quote.eastmoney.com/sh688443.html" target="_blank" rel="noreferrer">智翔金泰</a><span class="stock-code">688443</span></td>
@@ -1816,17 +1808,17 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
           <span class="subline" data-live-time>2026-08-03 收盘</span></td>
       <td data-label="实时收益"><span class="numeric positive" data-live-return>+1.85%</span><span class="subline">盘中估算，收盘结算</span></td>
       <td data-label="跟踪时长" class="numeric">2 日</td>
-      <td data-label="趋势状态"><span class="state good" data-live-status>上升趋势中</span><span class="subline" data-live-status-detail>趋势条件仍有效</span></td>
+      <td data-label="状态 / 操作"><div class="status-operation"><span class="state good" data-live-status>上升趋势中</span><span class="operation-ticket hold" data-live-operation>继续持有</span></div><span class="subline status-detail-line" data-live-status-detail>趋势条件仍有效</span></td>
     </tr></tbody></table></div>
         <div class="live-exit-list" id="live-secondary-exits" hidden aria-live="polite"></div>
         <p class="settlement-note">实时收益只用于盘中判断；趋势结束后的成功率、实现收益和正式移出记录，以收盘确认结果为准。</p>
         <div class="metrics">
-          <div class="metric"><span class="metric-label">完整波段成功率</span><strong class="metric-value"><span class="numeric positive">+0.00%</span></strong></div>
-          <div class="metric"><span class="metric-label">完整波段平均收益</span><strong class="metric-value"><span class="numeric positive">+0.00%</span></strong></div>
-          <div class="metric"><span class="metric-label">等待确认</span><strong class="metric-value">3 只</strong></div>
-          <div class="metric"><span class="metric-label">累计实现收益</span><strong class="metric-value"><span class="numeric positive">+0.00%</span></strong></div>
-          <div class="metric"><span class="metric-label">已移出</span><strong class="metric-value">1 只</strong></div>
-          <div class="metric"><span class="metric-label">完整波段样本</span><strong class="metric-value">1 只</strong></div>
+          <div class="metric"><span class="metric-label">完整波段成功率</span><strong class="metric-value">—</strong></div>
+          <div class="metric"><span class="metric-label">完整波段平均收益</span><strong class="metric-value">—</strong></div>
+          <div class="metric"><span class="metric-label">等待确认</span><strong class="metric-value">0 只</strong></div>
+          <div class="metric"><span class="metric-label">累计实现收益</span><strong class="metric-value">—</strong></div>
+          <div class="metric"><span class="metric-label">已移出</span><strong class="metric-value">0 只</strong></div>
+          <div class="metric"><span class="metric-label">完整波段样本</span><strong class="metric-value">0 只</strong></div>
         </div>
       </article>
     </section>
@@ -2215,7 +2207,9 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
         <article class="rule"><span class="rule-num">01</span><strong>可能见底</strong><p>最近 5 个交易日出现信号。</p></article>
         <article class="rule"><span class="rule-num">02</span><strong>龙腾跃虎</strong><p>交叉显示窗口用于完成黄柱配对，不是卖出倒计时。自然到期不退出；应显示期间被后续K线重算掉，才视为短暂信号失效。</p></article>
         <article class="rule"><span class="rule-num">03</span><strong>近期涨停</strong><p>最近 42 个交易日至少一次收盘涨停。</p></article>
-        <article class="rule"><span class="rule-num">04</span><strong>窗口黄柱</strong><p>龙腾跃虎日前 2 日至后 10 个交易日内出现黄柱即可配对；当前至少 1 根。</p></article>
+        <article class="rule"><span class="rule-num">04</span><strong>窗口黄柱</strong><p>龙腾跃虎日前 2 日至后 7 个交易日内出现黄柱即可配对；当前至少 1 根。</p></article>
+        <article class="rule"><span class="rule-num">05</span><strong>建议买入</strong><p>入选后第1—10个交易日，信号仍有效且收盘严格突破此前5日最高价；盘中突破只提示等待收盘确认。</p></article>
+        <article class="rule"><span class="rule-num">06</span><strong>建议卖出</strong><p>浮盈曾达到3%后较最高收盘回撤2%，或龙线不再高于虎线，或完成60个后续交易日；盘中触发不提前结算。</p></article>
       </div>
     </section>
 
@@ -2225,7 +2219,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
       <p class="section-copy">逐日重放，每一天只使用当时已经存在的行情；XMA 尾部按当日可见数据重新计算，因此能识别实盘中短暂出现后又被重算掉的龙腾跃虎信号。买点与卖点按完整波段共同验证。</p></div></div>
       <div class="validation-lead">
         <article class="validation-verdict"><strong>每100次信号，约有79次在60个交易日内涨到过5%</strong>
-          <p>首次满足主选或次选只记为“信号形成”，不立刻给买点。历史中有 36.40% 的首次入选信号在自然显示期限内被后续 K 线重算掉；正式规则要求信号未被重算消失，并在 10 个交易日内收盘较信号日上涨 5%，当天才确认“趋势开始”。随后从建议买点跟踪到建议卖点，结束价高于买入价才算成功；尚未结束的实时样本不计成功率。</p>
+          <p>首次满足主选或次选只记为“信号形成”，不立刻给买点。历史中有 36.40% 的首次入选信号在自然显示期限内被后续 K 线重算掉；正式规则要求信号未被重算消失，并在 10 个交易日内收盘严格突破此前 5 日最高价，当天才确认“趋势开始 / 建议买入”。随后从建议买点跟踪到建议卖点，结束价高于买入价才算成功；尚未结束的实时样本不计成功率。</p>
           <div class="trend-case" aria-label="历史真实案例：海南华铁信号确认与建议结束点">
       <div class="trend-case-head">
         <div><strong>真实案例 · 海南华铁 603300</strong><span>前复权 · 逐日无未来数据重放</span></div>
@@ -2234,11 +2228,11 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
       <div class="trend-case-wave-head"><strong>完整波段 · 龙虎线与黄柱</strong><span>蓝箭头指建议买点，红箭头落在规则卖点K线上</span></div>
       <div class="trend-case-canvas">
         <div class="case-pin start"><b>趋势开始</b><small>2025-02-13</small></div>
-        <div class="case-pin peak"><b>波段高点</b><small>+23.32%</small></div>
-        <div class="case-pin end"><b>建议结束</b><small>2025-02-28</small></div>
+        <div class="case-pin peak"><b>波段高点</b><small>+17.38%</small></div>
+        <div class="case-pin end"><b>建议结束</b><small>2025-02-25</small></div>
         <svg class="trend-case-svg" viewBox="0 0 900 320" preserveAspectRatio="none" role="img" aria-labelledby="trend-case-title trend-case-desc">
           <title id="trend-case-title">海南华铁历史案例K线图</title>
-          <desc id="trend-case-desc">2025-02-11形成入选信号，2025-02-13上涨5%确认趋势开始，2025-02-28按规则结束。</desc>
+          <desc id="trend-case-desc">2025-02-11形成入选信号，2025-02-13收盘突破此前5日最高价确认趋势开始，2025-02-25按规则结束。</desc>
           <defs>
             <marker id="case-arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#2457d6"/></marker>
             <marker id="case-arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#d4512f"/></marker>
@@ -2249,33 +2243,33 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
           <polyline class="case-dragon-line" points="45.0,267.3 64.7,267.3 84.4,267.2 104.0,267.1 123.7,267.0 143.4,266.8 163.1,266.6 182.8,266.4 202.5,266.0 222.1,265.7 241.8,265.4 261.5,263.6 281.2,261.2 300.9,257.8 320.6,255.0 340.2,252.7 359.9,249.2 379.6,245.0 399.3,240.0 419.0,236.5 438.7,230.9 458.3,225.2 478.0,220.3 497.7,215.2 517.4,210.7 537.1,206.5 556.8,199.9 576.4,191.9 596.1,184.3 615.8,177.7 635.5,171.4 655.2,166.0 674.9,160.7 694.5,156.0 714.2,150.8 733.9,146.6 753.6,142.4 773.3,138.5 793.0,136.1 812.6,133.7 832.3,133.4 852.0,132.9"/>
           <text class="case-line-label dragon" x="860.0" y="135.9">龙</text>
           <text class="case-line-label tiger" x="860.0" y="162.0">虎</text>
-          <line class="case-stop-line" x1="478.0" y1="128.4" x2="497.7" y2="128.4"/><text class="case-stop-label" x="485.0" y="122.4">高点回撤5%</text>
+          <line class="case-stop-line" x1="419.0" y1="133.4" x2="438.7" y2="133.4"/><text class="case-stop-label" x="426.0" y="127.4">高点回撤2%</text>
           <line class="case-cross-guide" x1="163.1" y1="235.6" x2="163.1" y2="259.6"/>
           <circle class="case-cross-ring" cx="163.1" cy="266.6" r="5"/>
           <text class="case-cross-label" x="171.1" y="252.6">2/5 回看上穿</text>
-          <line class="case-peak-guide" x1="478.0" y1="61.0" x2="478.0" y2="106.9"/>
-          <circle class="case-peak-ring" cx="478.0" cy="113.9" r="5"/>
+          <line class="case-peak-guide" x1="419.0" y1="61.0" x2="419.0" y2="120.9"/>
+          <circle class="case-peak-ring" cx="419.0" cy="127.9" r="5"/>
           <path class="case-arrow-start" d="M 218.2 63.0 C 230.2 93.0, 264.2 144.8, 281.2 162.8"/>
-          <path class="case-arrow-end" d="M 421.7 81.0 C 452.7 93.0, 478.7 107.4, 497.7 133.4"/>
-          <circle class="case-exit-target" cx="497.7" cy="141.4" r="5.5"/>
-          <text class="case-axis-label" text-anchor="middle" x="45.0" y="310.0">01-20</text><text class="case-axis-label" text-anchor="middle" x="281.2" y="310.0">02-13</text><text class="case-axis-label" text-anchor="middle" x="478.0" y="310.0">02-27</text><text class="case-axis-label" text-anchor="middle" x="497.7" y="310.0">02-28</text><text class="case-axis-label" text-anchor="middle" x="852.0" y="310.0">03-26</text>
+          <path class="case-arrow-end" d="M 362.7 81.0 C 393.7 93.0, 419.7 107.1, 438.7 133.1"/>
+          <circle class="case-exit-target" cx="438.7" cy="141.1" r="5.5"/>
+          <text class="case-axis-label" text-anchor="middle" x="45.0" y="310.0">01-20</text><text class="case-axis-label" text-anchor="middle" x="281.2" y="310.0">02-13</text><text class="case-axis-label" text-anchor="middle" x="419.0" y="310.0">02-24</text><text class="case-axis-label" text-anchor="middle" x="438.7" y="310.0">02-25</text><text class="case-axis-label" text-anchor="middle" x="852.0" y="310.0">03-26</text>
         </svg>
       </div>
       <div class="trend-case-notes">
         <div class="trend-case-note start"><span>信号形成 / 趋势开始（建议买点）</span><strong>2025-02-11 / 2025-02-13 · 8.92元</strong></div>
-        <div class="trend-case-note peak"><span>最高收盘</span><strong>2025-02-27 · +23.32%</strong></div>
-        <div class="trend-case-note end"><span>建议结束</span><strong>2025-02-28 · +11.66%</strong></div>
+        <div class="trend-case-note peak"><span>最高收盘</span><strong>2025-02-24 · +17.38%</strong></div>
+        <div class="trend-case-note end"><span>建议结束</span><strong>2025-02-25 · +11.77%</strong></div>
       </div>
-      <div class="trend-case-foot">通达信前复权日线。2025-02-11满足入选条件，只进入待观察；2025-02-13收盘较信号日上涨5%，蓝色箭头标记正式建议买点。龙虎线按每天当时可见的数据逐日重算，淡黄表示公式黄柱，金色描边表示有效配对黄柱。红色箭头与圆环共同指向2025-02-28收盘触发的“买入后达到5%浮盈，较最高收盘价回撤5%”。图中保留卖点后的行情，用于直观看到规则可能提前保护利润、也可能错过后续再加速；未计费用、滑点和涨跌停无法成交。</div>
+      <div class="trend-case-foot">通达信前复权日线。2025-02-11满足入选条件，只进入待观察；2025-02-13收盘突破此前5日最高价，蓝色箭头标记正式建议买点。龙虎线按每天当时可见的数据逐日重算，淡黄表示公式黄柱，金色描边表示有效配对黄柱。红色箭头与圆环共同指向2025-02-25收盘触发的“买入后浮盈达到3%，较最高收盘价回撤2%”。图中保留卖点后的行情，用于直观看到规则可能提前保护利润、也可能错过后续再加速；未计费用、滑点和涨跌停无法成交。</div>
     </div>
         </article>
         <div class="validation-facts">
-          <div class="validation-fact"><span>形成信号后最终确认买点</span><strong>316 次</strong></div>
-          <div class="validation-fact"><span>完整波段成功率</span><strong>57.28%</strong></div>
-          <div class="validation-fact"><span>每个完整波段平均收益</span><strong>+2.85%</strong></div>
-          <div class="validation-fact"><span>完整波段收益中位数</span><strong>+0.62%</strong></div>
-          <div class="validation-fact"><span>通常持有</span><strong>5.5 个交易日</strong></div>
-          <div class="validation-fact"><span>2026 年独立时段</span><strong>57.89% / +2.47%</strong></div>
+          <div class="validation-fact"><span>形成信号后最终确认买点</span><strong>1015 次</strong></div>
+          <div class="validation-fact"><span>完整波段成功率</span><strong>61.48%</strong></div>
+          <div class="validation-fact"><span>每个完整波段平均收益</span><strong>+5.45%</strong></div>
+          <div class="validation-fact"><span>完整波段收益中位数</span><strong>+1.47%</strong></div>
+          <div class="validation-fact"><span>通常持有</span><strong>7.0 个交易日</strong></div>
+          <div class="validation-fact"><span>2026 年独立时段</span><strong>66.67% / +2.25%</strong></div>
           <div class="validation-fact"><span>回测覆盖股票</span><strong>4997 只</strong></div>
           <div class="validation-fact"><span>未取得完整历史行情</span><strong>8 只</strong></div>
         </div>
@@ -2352,7 +2346,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
       <!-- strategy-grid:start -->
       <article class="strategy-lab" aria-label="扩展买卖点全市场回测">
         <div class="strategy-lab-head">
-          <div><span class="section-kicker">Execution lab</span><h3>更多买卖点 · 三档候选</h3><p>12种买点与88种卖点交叉形成1,056种组合。先用2024年前开发、2024—2025验证，再用2026留出期验收；最终历史图的未来重绘信号不参与选参。</p></div>
+          <div><span class="section-kicker">Execution lab</span><h3>正式策略与两档对照</h3><p>12种买点与88种卖点交叉形成1,056种组合。先用2024年前开发、2024—2025验证，再用2026留出期验收；最终历史图的未来重绘信号不参与选参。</p></div>
           <div class="strategy-lab-stamp"><strong>4,998</strong><small>只非ST沪深A股</small><strong>6,841</strong><small>次共同信号样本</small></div>
         </div>
         <div class="strategy-tickets">
@@ -2370,7 +2364,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
               <div class="strategy-phases"><div class="strategy-phase"><span>2024年前</span><div class="strategy-phase-track"><i style="--phase:66.33%"></i></div><b>66.33%</b></div><div class="strategy-phase"><span>2024—25</span><div class="strategy-phase-track"><i style="--phase:72.57%"></i></div><b>72.57%</b></div><div class="strategy-phase"><span>2026留出</span><div class="strategy-phase-track"><i style="--phase:68.83%"></i></div><b>68.83%</b></div></div>
             </article>
             <article class="strategy-ticket balanced recommended">
-              <div class="strategy-ticket-head"><span class="strategy-ticket-kicker">胜率与波段空间兼顾</span><h4>均衡方案</h4><small>仅 14.84% 的原始信号会确认买点</small></div>
+              <div class="strategy-ticket-head"><span class="strategy-ticket-kicker">胜率与波段空间兼顾 · 已启用</span><h4>正式执行策略</h4><small>仅 14.84% 的原始信号会确认买点</small></div>
               <div class="strategy-orders"><div class="strategy-order"><b>BUY</b><span>10日内收盘突破此前5日最高价</span></div><div class="strategy-order"><b>SELL</b><span>浮盈达到3%后，较最高收盘回撤2%卖出；最迟龙虎关系结束或60日</span></div></div>
               <div class="strategy-numbers">
                 <div class="strategy-number"><span>已实现成功率</span><strong>61.48%</strong></div>
@@ -2395,8 +2389,8 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
               </div>
               <div class="strategy-phases"><div class="strategy-phase"><span>2024年前</span><div class="strategy-phase-track"><i style="--phase:50.86%"></i></div><b>50.86%</b></div><div class="strategy-phase"><span>2024—25</span><div class="strategy-phase-track"><i style="--phase:64.67%"></i></div><b>64.67%</b></div><div class="strategy-phase"><span>2026留出</span><div class="strategy-phase-track"><i style="--phase:54.76%"></i></div><b>54.76%</b></div></div>
             </article></div>
-        <div class="strategy-lab-baseline"><p><strong>同口径基准：</strong>信号后上涨5%确认买入，买后再达到5%浮盈并回撤5%卖出，历史成功率 51.49%、平均 +1.61%；2026为 50.00% / +0.64%。上方三档均改善了至少一个核心目标。</p><div class="strategy-baseline-numbers"><span>组合数 <b>1,056</b></span><span>行情失败 <b>7</b></span></div></div>
-        <p class="strategy-lab-note">高成功率方案适合把“趋势开始”确认得更宽、快速兑现3%；均衡与高收益方案都要求收盘突破此前5日最高价，随后分别采用“浮盈3%后回撤2%”和“浮盈8%后回撤2%”。历史表面最高胜率方案为 71.06%，但2026仅 20 笔且平均 -3.45%，因此淘汰。收益均未计手续费、滑点及涨跌停无法成交；2026样本仍较少，候选尚未自动替换实时正式规则。</p>
+        <div class="strategy-lab-baseline"><p><strong>上一版同口径基准：</strong>信号后上涨5%确认买入，买后再达到5%浮盈并回撤5%卖出，历史成功率 51.49%、平均 +1.61%；2026为 50.00% / +0.64%。正式策略与对照方案均改善了至少一个核心目标。</p><div class="strategy-baseline-numbers"><span>组合数 <b>1,056</b></span><span>行情失败 <b>7</b></span></div></div>
+        <p class="strategy-lab-note"><strong>当前正式执行：</strong>信号形成后先等待，10个交易日内收盘严格突破此前5日最高价才建议买入；买入后浮盈曾达到3%，再较最高收盘回撤2%时建议卖出，龙线不再高于虎线或满60日也结束。盘中触发只提示等待收盘确认。高成功率与高收益率方案继续保留为对照，不自动切换。历史表面最高胜率方案为 71.06%，但2026仅 20 笔且平均 -3.45%，因此淘汰。收益未计手续费、滑点及涨跌停无法成交，2026样本仍较少。</p>
       </article>
       <!-- strategy-grid:end -->
       <article class="panel">
@@ -2404,7 +2398,16 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
         <div class="table-scroll"><table><thead><tr><th>规则</th><th>完整波段</th><th>成功率</th><th>平均收益</th><th>收益中位数</th><th>通常持有</th><th>2026 年</th></tr></thead>
         <tbody>
         <tr>
-          <td><strong>正式采用：5%确认启动 + 5%移动止盈</strong><span class="subline">信号持续；10日内较信号价上涨5%才买入；买入后达到5%浮盈，再从最高收盘回撤5%卖出；信号重算消失或龙线不再高于虎线立即结束</span></td>
+          <td><strong>正式采用：突破5日高点 + 3%/2%移动止盈</strong><span class="subline">信号持续；10日内收盘突破此前5日最高价才买入；买入后达到3%浮盈，再从最高收盘回撤2%卖出；龙线不再高于虎线或60日结束</span></td>
+          <td class="numeric">1015</td>
+          <td><span class="numeric positive">61.48%</span></td>
+          <td><span class="numeric positive">+5.45%</span></td>
+          <td><span class="numeric positive">+1.47%</span></td>
+          <td class="numeric">7.0 日</td>
+          <td><span class="numeric positive">66.67%</span><span class="subline">均值 +2.25%</span></td>
+        </tr>
+        <tr>
+          <td><strong>上一版：5%确认启动 + 5%移动止盈</strong><span class="subline">仅作历史对照，已停止新增样本</span></td>
           <td class="numeric">316</td>
           <td><span class="numeric positive">57.28%</span></td>
           <td><span class="numeric positive">+2.85%</span></td>
@@ -2420,17 +2423,8 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
           <td><span class="numeric negative">-0.35%</span></td>
           <td class="numeric">2.0 日</td>
           <td><span class="numeric positive">42.55%</span><span class="subline">均值 +0.19%</span></td>
-        </tr>
-        <tr>
-          <td><strong>交叉显示窗口到期即卖</strong><span class="subline">把自然到期误当信号消失的对照方案，不采用</span></td>
-          <td class="numeric">3055</td>
-          <td><span class="numeric positive">45.96%</span></td>
-          <td><span class="numeric positive">+0.02%</span></td>
-          <td><span class="numeric negative">-0.25%</span></td>
-          <td class="numeric">1.0 日</td>
-          <td><span class="numeric positive">45.86%</span><span class="subline">均值 +0.66%</span></td>
         </tr></tbody></table></div>
-        <p class="validation-method">正式状态：首次入选为“待观察中”；达到 5% 启动线的收盘日为“趋势开始”；未触发风险时为“上升趋势中”；龙虎同步转弱或接近止盈线时为“待观察中”；信号在自然期限内被重算消失、龙线不再高于虎线、达到5%浮盈后从最高收盘回撤5%，或满60个后续交易日时为“趋势结束”。回测覆盖 2023-09-25—2026-08-03，分析 4997/5005 只，失败 8 只。未计手续费、滑点和涨跌停无法成交，并存在当前上市股票样本的幸存者偏差。本结果用于规则验证，不构成收益承诺。</p>
+        <p class="validation-method">正式状态：首次入选为“待观察中 / 等待买入”；突破前5日高点的收盘日为“趋势开始 / 建议买入”；未触发风险时为“上升趋势中 / 继续持有”；标签重算消失、龙虎同步转弱或接近止盈线时为“待观察中 / 谨慎持有”；龙线不再高于虎线、达到3%浮盈后从最高收盘回撤2%，或满60个后续交易日时为“趋势结束 / 建议卖出”。盘中触发只显示“等待收盘确认”，不提前移出或结算。回测覆盖 2023-09-25—2026-08-03，分析 4997/5005 只，失败 8 只。未计手续费、滑点和涨跌停无法成交，并存在当前上市股票样本的幸存者偏差。本结果用于规则验证，不构成收益承诺。</p>
       </article>
     </section>
 
@@ -2444,7 +2438,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
       <td class="numeric">2026-07-22<span class="subline">10.50 元</span></td>
       <td><span class="numeric negative">-6.08%</span></td>
       <td class="numeric">3 日</td>
-      <td class="muted">龙线连续第二个交易日未高于虎线</td>
+      <td class="muted"><span class="operation-ticket sell">建议卖出</span><span class="subline status-detail-line">龙线连续第二个交易日未高于虎线</span></td>
     </tr></tbody></table></div>
         </details>
         <details><summary>查看次选区历史移出记录</summary>
@@ -2455,7 +2449,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
       <td class="numeric">2026-07-30<span class="subline">12.60 元</span></td>
       <td><span class="numeric positive">+0.00%</span></td>
       <td class="numeric">4 日</td>
-      <td class="muted">龙线不再高于虎线</td>
+      <td class="muted"><span class="operation-ticket sell">建议卖出</span><span class="subline status-detail-line">龙线不再高于虎线</span></td>
     </tr></tbody></table></div>
         </details>
       </div>
@@ -2463,7 +2457,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
 
     <p class="disclaimer">本页面按技术条件机械筛选，不构成投资建议。收益按每只股票等权计算，未计手续费、滑点和实际仓位；免费公开行情仅适合个人研究与小范围分享。</p>
   </main>
-  <footer>收盘交易日 2026-08-03 · 报告生成 2026-08-03 18:05 · 沪深 A 股 5211 只 · 数据失败 0 只</footer>
+  <footer>收盘交易日 2026-08-03 · 报告生成 2026-08-04 12:02 · 沪深 A 股 5211 只 · 数据失败 0 只</footer>
 </div>
 <nav class="mobile-dock" aria-label="手机快捷导航">
   <a href="#content"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19V10l8-6 8 6v9H4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 19v-5h5v5" stroke="currentColor" stroke-width="1.8"/></svg><span>概览</span></a>
@@ -2578,6 +2572,20 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
     element.classList.toggle("positive", value >= 0);
     element.classList.toggle("negative", value < 0);
   };
+  const operationTone = (label) => {
+    const value = String(label || "");
+    if (value.includes("等待收盘") || value.includes("触发")) return "confirm";
+    if (value.includes("买入") && !value.includes("等待")) return "buy";
+    if (value.includes("卖出") || value.includes("停止")) return "sell";
+    if (value.includes("谨慎") || value.includes("取消")) return "caution";
+    if (value.includes("持有")) return "hold";
+    return "wait";
+  };
+  const setOperation = (element, label) => {
+    if (!element) return;
+    element.textContent = label || "继续观察";
+    element.className = `operation-ticket ${operationTone(label)}`;
+  };
   const quoteHref = (quote) => {
     const prefix = Number(quote.market) === 1 ? "sh" : Number(quote.market) === 0 ? "sz" : "bj";
     return `https://quote.eastmoney.com/${prefix}${quote.code}.html`;
@@ -2649,18 +2657,26 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
       priceCell.append(price, quoteLine);
 
       const statusCell = document.createElement("td");
-      statusCell.dataset.label = "状态";
+      statusCell.dataset.label = "状态 / 操作";
       statusCell.className = "live-pool-status";
+      const statusOperation = document.createElement("div");
+      statusOperation.className = "status-operation";
       const state = document.createElement("span");
       state.className = "state warn";
       const areaLabel = area === "main" ? "主选" : "次选";
       state.textContent = "待观察中";
+      const operation = document.createElement("span");
+      setOperation(
+        operation,
+        mode === "intraday" ? "等待收盘确认" : "等待买入",
+      );
       const settlement = document.createElement("span");
-      settlement.className = "subline";
+      settlement.className = "subline status-detail-line";
       settlement.textContent = mode === "intraday"
-        ? `新${areaLabel}信号，收盘后保存形成价`
-        : `已形成${areaLabel}信号；上涨5%后确认趋势开始`;
-      statusCell.append(state, settlement);
+        ? `新${areaLabel}信号，收盘后保存并进入买点观察`
+        : `已形成${areaLabel}信号；10日内收盘突破前5日高点才建议买入`;
+      statusOperation.append(state, operation);
+      statusCell.append(statusOperation, settlement);
 
       row.append(
         stockCell,
@@ -2718,6 +2734,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
         const time = row.querySelector("[data-live-time]");
         const liveReturn = row.querySelector("[data-live-return]");
         const liveStatus = row.querySelector("[data-live-status]");
+        const liveOperation = row.querySelector("[data-live-operation]");
         const statusDetail = row.querySelector("[data-live-status-detail]");
         if (price) price.textContent = Number(item.live_price).toFixed(2);
         if (time) {
@@ -2730,8 +2747,9 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
         }
         if (liveStatus) {
           liveStatus.textContent = item.status || "上升趋势中";
-          liveStatus.className = `state ${item.trend_ended && !item.setup_cancelled ? "ended" : item.status === "待观察中" ? "warn" : "good"}`;
+          liveStatus.className = `state ${item.trend_ended && !item.setup_cancelled ? "ended" : item.status === "待观察中" ? "warn" : item.status === "数据待确认" ? "neutral" : "good"}`;
         }
+        setOperation(liveOperation, item.operation || "继续观察");
         if (statusDetail) statusDetail.textContent = item.status_detail || "盘中持续跟踪";
         row.classList.remove("quote-updated");
         void row.offsetWidth;
@@ -2741,7 +2759,7 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
       const exitList = document.querySelector(`#live-${area}-exits`);
       if (!exitList) return;
       exitList.replaceChildren();
-      items.filter((item) => item.trend_ended).forEach((item) => {
+      items.filter((item) => item.provisional_exit || item.provisional_cancel).forEach((item) => {
         const card = document.createElement("div");
         card.className = "live-exit-item";
         const stock = document.createElement("div");
@@ -2749,19 +2767,21 @@ html[data-theme="dark"] tbody tr:hover { background: #152136; }
         const title = document.createElement("strong");
         title.textContent = `${item.name || item.code} · ${item.code}`;
         const reason = document.createElement("small");
-        reason.textContent = String(item.exit_reason || "趋势结束").replace(/^趋势结束：/, "");
+        reason.textContent = item.status_detail || String(item.exit_reason || "等待收盘确认").replace(/^趋势结束：/, "");
         stock.append(title, reason);
         const result = document.createElement("div");
         result.className = "live-exit-result";
         const state = document.createElement("span");
-        state.className = `state ${item.setup_cancelled ? "warn" : "ended"}`;
-        state.textContent = item.setup_cancelled ? "候选失效" : "趋势结束";
+        state.className = "state warn";
+        state.textContent = item.provisional_cancel ? "候选待复核" : "卖点待确认";
+        const operation = document.createElement("span");
+        setOperation(operation, item.operation || "等待收盘确认");
         const returns = document.createElement("span");
         returns.className = "subline numeric";
-        returns.textContent = item.setup_cancelled
+        returns.textContent = item.provisional_cancel
           ? "未确认买点，不计收益"
-          : `${formatPct(Number(item.live_return_pct))} · 待收盘结算`;
-        result.append(state, returns);
+          : `${formatPct(Number(item.live_return_pct))} · 仅盘中预告`;
+        result.append(state, operation, returns);
         card.append(stock, result);
         exitList.append(card);
       });

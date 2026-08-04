@@ -17,7 +17,7 @@ STATE_PATH = ROOT / "strategy" / "state.json"
 LATEST_PATH = ROOT / "results" / "latest.json"
 LATEST_HTML_PATH = ROOT / "results" / "latest.html"
 SNAPSHOT_PATH = ROOT / "cloud_snapshot.json"
-LIVE_SEED_FORMAT = 3
+LIVE_SEED_FORMAT = 4
 
 
 def snapshot_json(payload: dict) -> str:
@@ -77,6 +77,7 @@ def pack_live_seed(seed: dict) -> list:
         list(seed.get("body_low_tail_dates", [])),
         int(seed.get("observation_yellow_count", 0)),
         str(seed.get("observation_yellow_date", "")),
+        float(seed.get("next_breakout_high_5", 0.0)),
     ]
 
 
@@ -158,7 +159,7 @@ def bootstrap_payload(
 
 def bootstrap_live_snapshot() -> int:
     """Build live seeds from the last settled date without changing strategy state."""
-    strategy = json.loads(STATE_PATH.read_text(encoding="utf-8"))
+    strategy = screener.load_state(STATE_PATH)
     base_date = str(strategy.get("last_trade_date", ""))
     if not base_date:
         raise RuntimeError("策略状态没有可用于初始化的收盘交易日")

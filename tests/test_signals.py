@@ -29,9 +29,9 @@ class SignalMathTests(unittest.TestCase):
         self.assertFalse(config["include_st"])
         self.assertEqual(config["limit_up_lookback_days"], 42)
         self.assertEqual(config["yellow_consecutive_days"], 1)
-        self.assertEqual(config["cross_lookback_days"], 11)
+        self.assertEqual(config["cross_lookback_days"], 8)
         self.assertEqual(config["yellow_before_cross_days"], 2)
-        self.assertEqual(config["yellow_after_cross_days"], 10)
+        self.assertEqual(config["yellow_after_cross_days"], 7)
         self.assertEqual(config["near_match_minimum"], 3)
 
     def test_cci_has_warmup(self):

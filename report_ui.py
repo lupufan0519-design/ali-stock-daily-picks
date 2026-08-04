@@ -232,6 +232,27 @@ h3 { font-size: 19px; }
 .state.warn { background: var(--warning-soft); color: var(--warning); }
 .state.ended { background: rgba(208, 48, 48, .12); color: #b42318; }
 .state.neutral { background: #eef2f6; color: var(--muted-strong); }
+.status-operation { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.operation-ticket {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid currentColor;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 820;
+  line-height: 1.2;
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+.operation-ticket.wait { color: #475467; background: #f2f4f7; border-color: #d0d5dd; }
+.operation-ticket.buy { color: #c4322b; background: #fff1f0; border-color: #f3aaa5; }
+.operation-ticket.hold { color: #175cd3; background: #eff6ff; border-color: #a9c7f7; }
+.operation-ticket.caution { color: #9a6700; background: #fff8e7; border-color: #e8c56a; }
+.operation-ticket.sell { color: #08745b; background: #ecfdf3; border-color: #83d5bd; }
+.operation-ticket.confirm { color: #9f3a17; background: #fff4ed; border-color: #f2aa83; }
+.status-detail-line { max-width: 360px; margin-top: 6px; white-space: normal; line-height: 1.45; }
 .table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 14px 16px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
@@ -884,6 +905,9 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   .pool-table .stock-link { min-height: 30px; }
   .pool-table .signal { min-width: 0; }
   .pool-table .live-pool-status { min-width: 0; }
+  .pool-table .status-operation { width: 100%; }
+  .pool-table .operation-ticket { min-height: 38px; white-space: normal; }
+  .pool-table .status-detail-line { max-width: none; }
   .live-exit-list { padding: 10px 12px; }
   .live-exit-item { align-items: flex-start; }
 }
@@ -936,6 +960,12 @@ footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   tbody tr:hover { background: #152136; }
   .count-badge { color: #bfdbfe; }
   .state.neutral { background: #26344a; }
+  .operation-ticket.wait { color: #d0d5dd; background: #202b3d; border-color: #526176; }
+  .operation-ticket.buy { color: #ffb4ad; background: #3a2024; border-color: #7f3b41; }
+  .operation-ticket.hold { color: #bfdbfe; background: #172d4f; border-color: #335f95; }
+  .operation-ticket.caution { color: #fde68a; background: #352b13; border-color: #735f22; }
+  .operation-ticket.sell { color: #9ce7cf; background: #12392d; border-color: #2a745e; }
+  .operation-ticket.confirm { color: #fdba8c; background: #3d2519; border-color: #815038; }
   .events strong, .events ul { color: #fde68a; }
 }
 
@@ -1715,6 +1745,20 @@ LIVE_SCRIPT = r"""
     element.classList.toggle("positive", value >= 0);
     element.classList.toggle("negative", value < 0);
   };
+  const operationTone = (label) => {
+    const value = String(label || "");
+    if (value.includes("等待收盘") || value.includes("触发")) return "confirm";
+    if (value.includes("买入") && !value.includes("等待")) return "buy";
+    if (value.includes("卖出") || value.includes("停止")) return "sell";
+    if (value.includes("谨慎") || value.includes("取消")) return "caution";
+    if (value.includes("持有")) return "hold";
+    return "wait";
+  };
+  const setOperation = (element, label) => {
+    if (!element) return;
+    element.textContent = label || "继续观察";
+    element.className = `operation-ticket ${operationTone(label)}`;
+  };
   const quoteHref = (quote) => {
     const prefix = Number(quote.market) === 1 ? "sh" : Number(quote.market) === 0 ? "sz" : "bj";
     return `https://quote.eastmoney.com/${prefix}${quote.code}.html`;
@@ -1786,18 +1830,26 @@ LIVE_SCRIPT = r"""
       priceCell.append(price, quoteLine);
 
       const statusCell = document.createElement("td");
-      statusCell.dataset.label = "状态";
+      statusCell.dataset.label = "状态 / 操作";
       statusCell.className = "live-pool-status";
+      const statusOperation = document.createElement("div");
+      statusOperation.className = "status-operation";
       const state = document.createElement("span");
       state.className = "state warn";
       const areaLabel = area === "main" ? "主选" : "次选";
       state.textContent = "待观察中";
+      const operation = document.createElement("span");
+      setOperation(
+        operation,
+        mode === "intraday" ? "等待收盘确认" : "等待买入",
+      );
       const settlement = document.createElement("span");
-      settlement.className = "subline";
+      settlement.className = "subline status-detail-line";
       settlement.textContent = mode === "intraday"
-        ? `新${areaLabel}信号，收盘后保存形成价`
-        : `已形成${areaLabel}信号；上涨5%后确认趋势开始`;
-      statusCell.append(state, settlement);
+        ? `新${areaLabel}信号，收盘后保存并进入买点观察`
+        : `已形成${areaLabel}信号；10日内收盘突破前5日高点才建议买入`;
+      statusOperation.append(state, operation);
+      statusCell.append(statusOperation, settlement);
 
       row.append(
         stockCell,
@@ -1855,6 +1907,7 @@ LIVE_SCRIPT = r"""
         const time = row.querySelector("[data-live-time]");
         const liveReturn = row.querySelector("[data-live-return]");
         const liveStatus = row.querySelector("[data-live-status]");
+        const liveOperation = row.querySelector("[data-live-operation]");
         const statusDetail = row.querySelector("[data-live-status-detail]");
         if (price) price.textContent = Number(item.live_price).toFixed(2);
         if (time) {
@@ -1867,8 +1920,9 @@ LIVE_SCRIPT = r"""
         }
         if (liveStatus) {
           liveStatus.textContent = item.status || "上升趋势中";
-          liveStatus.className = `state ${item.trend_ended && !item.setup_cancelled ? "ended" : item.status === "待观察中" ? "warn" : "good"}`;
+          liveStatus.className = `state ${item.trend_ended && !item.setup_cancelled ? "ended" : item.status === "待观察中" ? "warn" : item.status === "数据待确认" ? "neutral" : "good"}`;
         }
+        setOperation(liveOperation, item.operation || "继续观察");
         if (statusDetail) statusDetail.textContent = item.status_detail || "盘中持续跟踪";
         row.classList.remove("quote-updated");
         void row.offsetWidth;
@@ -1878,7 +1932,7 @@ LIVE_SCRIPT = r"""
       const exitList = document.querySelector(`#live-${area}-exits`);
       if (!exitList) return;
       exitList.replaceChildren();
-      items.filter((item) => item.trend_ended).forEach((item) => {
+      items.filter((item) => item.provisional_exit || item.provisional_cancel).forEach((item) => {
         const card = document.createElement("div");
         card.className = "live-exit-item";
         const stock = document.createElement("div");
@@ -1886,19 +1940,21 @@ LIVE_SCRIPT = r"""
         const title = document.createElement("strong");
         title.textContent = `${item.name || item.code} · ${item.code}`;
         const reason = document.createElement("small");
-        reason.textContent = String(item.exit_reason || "趋势结束").replace(/^趋势结束：/, "");
+        reason.textContent = item.status_detail || String(item.exit_reason || "等待收盘确认").replace(/^趋势结束：/, "");
         stock.append(title, reason);
         const result = document.createElement("div");
         result.className = "live-exit-result";
         const state = document.createElement("span");
-        state.className = `state ${item.setup_cancelled ? "warn" : "ended"}`;
-        state.textContent = item.setup_cancelled ? "候选失效" : "趋势结束";
+        state.className = "state warn";
+        state.textContent = item.provisional_cancel ? "候选待复核" : "卖点待确认";
+        const operation = document.createElement("span");
+        setOperation(operation, item.operation || "等待收盘确认");
         const returns = document.createElement("span");
         returns.className = "subline numeric";
-        returns.textContent = item.setup_cancelled
+        returns.textContent = item.provisional_cancel
           ? "未确认买点，不计收益"
-          : `${formatPct(Number(item.live_return_pct))} · 待收盘结算`;
-        result.append(state, returns);
+          : `${formatPct(Number(item.live_return_pct))} · 仅盘中预告`;
+        result.append(state, operation, returns);
         card.append(stock, result);
         exitList.append(card);
       });
@@ -2052,6 +2108,42 @@ def _signal(ok: bool, note: str) -> str:
     )
 
 
+def _operation_for_status(status: str, explicit: object = "", *, pending: bool = False) -> str:
+    if str(explicit).strip():
+        return str(explicit).strip()
+    if pending:
+        return "等待买入"
+    return {
+        "趋势开始": "建议买入",
+        "上升趋势中": "继续持有",
+        "待观察中": "谨慎持有",
+        "趋势结束": "建议卖出",
+        "数据待确认": "暂停操作",
+    }.get(status, "继续观察")
+
+
+def _operation_class(operation: str) -> str:
+    if "等待收盘" in operation or "触发" in operation:
+        return "confirm"
+    if "买入" in operation and "等待" not in operation:
+        return "buy"
+    if "卖出" in operation or "停止" in operation:
+        return "sell"
+    if "谨慎" in operation or "取消" in operation:
+        return "caution"
+    if "持有" in operation:
+        return "hold"
+    return "wait"
+
+
+def _operation_badge(operation: str, *, live: bool = False) -> str:
+    live_attr = " data-live-operation" if live else ""
+    return (
+        f'<span class="operation-ticket {_operation_class(operation)}"'
+        f'{live_attr}>{_esc(operation)}</span>'
+    )
+
+
 def _position_row(position: dict, area: str = "main") -> str:
     status = str(position.get("status", "上升趋势中"))
     status_class = (
@@ -2071,6 +2163,10 @@ def _position_row(position: dict, area: str = "main") -> str:
             else "趋势条件仍有效，盘中持续跟踪"
         )
     )
+    operation = _operation_for_status(
+        status,
+        position.get("operation", ""),
+    )
     return f"""
     <tr data-tracking-code="{_esc(position['code'])}" data-tracking-area="{_esc(area)}">
       <td data-label="股票">{_stock_cell(position['code'], position['name'], int(position['market']))}</td>
@@ -2079,7 +2175,7 @@ def _position_row(position: dict, area: str = "main") -> str:
           <span class="subline" data-live-time>{_esc(position['last_date'])} 收盘</span></td>
       <td data-label="实时收益"><span class="numeric {return_class}" data-live-return>{settled_return:+.2f}%</span><span class="subline">盘中估算，收盘结算</span></td>
       <td data-label="跟踪时长" class="numeric">{int(position['holding_days'])} 日</td>
-      <td data-label="趋势状态"><span class="state {status_class}" data-live-status>{_esc(status)}</span><span class="subline" data-live-status-detail>{_esc(detail)}</span></td>
+      <td data-label="状态 / 操作"><div class="status-operation"><span class="state {status_class}" data-live-status>{_esc(status)}</span>{_operation_badge(operation, live=True)}</div><span class="subline status-detail-line" data-live-status-detail>{_esc(detail)}</span></td>
     </tr>"""
 
 
@@ -2090,19 +2186,34 @@ def _pending_row(setup: dict, area: str = "main") -> str:
         (last_close / setup_price - 1.0) * 100.0 if setup_price else 0.0
     )
     return_class = "positive" if setup_return >= 0 else "negative"
+    operation = _operation_for_status(
+        "待观察中",
+        setup.get("operation", ""),
+        pending=True,
+    )
+    breakout_high = float(setup.get("breakout_high_5", 0.0) or 0.0)
+    breakout_note = (
+        f"收盘突破 {breakout_high:.2f} 元确认买点"
+        if breakout_high > 0
+        else "前5日高点数据等待更新"
+    )
     return f"""
     <tr data-tracking-code="{_esc(setup['code'])}" data-tracking-area="{_esc(area)}" data-pending-setup="true">
       <td data-label="股票">{_stock_cell(setup['code'], setup['name'], int(setup['market']))}</td>
       <td data-label="信号日 / 价格" class="numeric">{_esc(setup['setup_date'])}<span class="subline">{setup_price:.2f} 元</span></td>
       <td data-label="最新价 / 时间"><span class="numeric" data-live-price>{last_close:.2f}</span>
           <span class="subline" data-live-time>{_esc(setup.get('last_date', setup['setup_date']))} 收盘</span></td>
-      <td data-label="距信号涨幅"><span class="numeric {return_class}" data-live-return>{setup_return:+.2f}%</span><span class="subline">达到 +5% 才确认买点</span></td>
+      <td data-label="距信号涨幅"><span class="numeric {return_class}" data-live-return>{setup_return:+.2f}%</span><span class="subline">{_esc(breakout_note)}</span></td>
       <td data-label="等待时长" class="numeric">{int(setup.get('setup_elapsed_bars', 0))} 日</td>
-      <td data-label="趋势状态"><span class="state warn" data-live-status>待观察中</span><span class="subline" data-live-status-detail>{_esc(setup.get('status_detail', '等待上涨趋势确认'))}</span></td>
+      <td data-label="状态 / 操作"><div class="status-operation"><span class="state warn" data-live-status>待观察中</span>{_operation_badge(operation, live=True)}</div><span class="subline status-detail-line" data-live-status-detail>{_esc(setup.get('status_detail', '等待收盘突破前5日高点'))}</span></td>
     </tr>"""
 
 
 def _closed_row(position: dict) -> str:
+    operation = _operation_for_status(
+        "趋势结束",
+        position.get("operation", "建议卖出"),
+    )
     return f"""
     <tr>
       <td>{_stock_cell(position['code'], position['name'], int(position['market']))}</td>
@@ -2110,7 +2221,7 @@ def _closed_row(position: dict) -> str:
       <td class="numeric">{_esc(position.get('exit_date', ''))}<span class="subline">{float(position.get('exit_price', 0)):.2f} 元</span></td>
       <td>{_pct(float(position.get('exit_return_pct', 0.0)))}</td>
       <td class="numeric">{int(position.get('holding_days', 0))} 日</td>
-      <td class="muted">{_esc(position.get('exit_reason', ''))}</td>
+      <td class="muted">{_operation_badge(operation)}<span class="subline status-detail-line">{_esc(position.get('exit_reason', ''))}</span></td>
     </tr>"""
 
 
@@ -2174,8 +2285,8 @@ def _live_pool_row(item, area: str) -> str:
       <td data-label="龙腾跃虎">{_signal(item.cross_ok, item.cross_date or '未命中')}</td>
       <td data-label="42日涨停">{_signal(item.limit_up_ok, item.limit_up_date or '未命中')}</td>
       <td data-label="窗口黄柱">{_signal(item.yellow_ok, _yellow_note(item))}</td>
-      <td data-label="状态" class="live-pool-status"><span class="state warn">待观察中</span>
-          <span class="subline">{label}已形成；较信号价上涨5%后才确认趋势开始</span></td>
+      <td data-label="状态 / 操作" class="live-pool-status"><div class="status-operation"><span class="state warn">待观察中</span>{_operation_badge('等待买入')}</div>
+          <span class="subline status-detail-line">{label}已形成；10日内收盘突破此前5日最高价才确认趋势开始</span></td>
     </tr>"""
 
 
@@ -2207,11 +2318,11 @@ def _events(events: Sequence[dict]) -> str:
         "secondary_removed": "趋势结束，已移出次选区",
         "trend_warning": "趋势转弱预警，继续跟踪止盈线",
         "secondary_promoted": "条件补齐，升级主选区；持有期不断开",
-        "setup_added": "主选信号形成，等待上涨5%确认趋势开始",
-        "secondary_setup_added": "次选信号形成，等待上涨5%确认趋势开始",
+        "setup_added": "主选信号形成，等待收盘突破前5日高点",
+        "secondary_setup_added": "次选信号形成，等待收盘突破前5日高点",
         "setup_promoted": "候选条件补齐，升级为主选等待确认",
         "setup_cancelled": "候选信号失效，未产生建议买点",
-        "trend_started": "上涨5%确认趋势开始，给出建议买点",
+        "trend_started": "收盘突破前5日高点，确认趋势开始并建议买入",
     }
     items = []
     for event in events:
@@ -2380,15 +2491,16 @@ def _trend_case_chart() -> str:
     line_label_x = x_at(len(bars) - 1) + 8
     dragon_label_y = y_at(wave_dragon[-1]) + 3
     tiger_label_y = y_at(wave_tiger[-1]) + 3
-    stop_price = float(payload["peak_close"]) * 0.95
+    stop_drawdown = 2.0 if "回撤2%" in str(payload["exit_reason"]) else 5.0
+    stop_price = float(payload["peak_close"]) * (1.0 - stop_drawdown / 100.0)
     stop_y = y_at(stop_price)
     stop_markup = ""
-    if "回撤5%" in str(payload["exit_reason"]):
+    if "回撤" in str(payload["exit_reason"]):
         stop_markup = (
             f'<line class="case-stop-line" x1="{peak_x:.1f}" y1="{stop_y:.1f}" '
             f'x2="{exit_x:.1f}" y2="{stop_y:.1f}"/>'
             f'<text class="case-stop-label" x="{peak_x+7:.1f}" '
-            f'y="{stop_y-6:.1f}">高点回撤5%</text>'
+            f'y="{stop_y-6:.1f}">高点回撤{stop_drawdown:.0f}%</text>'
         )
     end_path_start_x = min(width - right - 78, exit_x - 76)
     end_path_start_y = top + 42
@@ -2416,7 +2528,7 @@ def _trend_case_chart() -> str:
         <div class="case-pin end"><b>建议结束</b><small>{_esc(payload['exit_date'])}</small></div>
         <svg class="trend-case-svg" viewBox="0 0 900 320" preserveAspectRatio="none" role="img" aria-labelledby="trend-case-title trend-case-desc">
           <title id="trend-case-title">{_esc(payload['name'])}历史案例K线图</title>
-          <desc id="trend-case-desc">{_esc(payload['signal_date'])}形成入选信号，{_esc(payload.get('entry_date', payload['signal_date']))}上涨5%确认趋势开始，{_esc(payload['exit_date'])}按规则结束。</desc>
+          <desc id="trend-case-desc">{_esc(payload['signal_date'])}形成入选信号，{_esc(payload.get('entry_date', payload['signal_date']))}收盘突破此前5日最高价确认趋势开始，{_esc(payload['exit_date'])}按规则结束。</desc>
           <defs>
             <marker id="case-arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#2457d6"/></marker>
             <marker id="case-arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#d4512f"/></marker>
@@ -2444,7 +2556,7 @@ def _trend_case_chart() -> str:
         <div class="trend-case-note peak"><span>最高收盘</span><strong>{_esc(payload['peak_date'])} · +{float(payload['peak_return_pct']):.2f}%</strong></div>
         <div class="trend-case-note end"><span>建议结束</span><strong>{_esc(payload['exit_date'])} · +{float(payload['exit_return_pct']):.2f}%</strong></div>
       </div>
-      <div class="trend-case-foot">{_esc(payload['source'])}。{_esc(payload['signal_date'])}满足入选条件，只进入待观察；{_esc(payload.get('entry_date', payload['signal_date']))}收盘较信号日上涨5%，蓝色箭头标记正式建议买点。龙虎线按每天当时可见的数据逐日重算，淡黄表示公式黄柱，金色描边表示有效配对黄柱。红色箭头与圆环共同指向{_esc(payload['exit_date'])}收盘触发的“{_esc(payload['exit_reason'])}”。图中保留卖点后的行情，用于直观看到规则可能提前保护利润、也可能错过后续再加速；未计费用、滑点和涨跌停无法成交。</div>
+      <div class="trend-case-foot">{_esc(payload['source'])}。{_esc(payload['signal_date'])}满足入选条件，只进入待观察；{_esc(payload.get('entry_date', payload['signal_date']))}收盘突破此前5日最高价，蓝色箭头标记正式建议买点。龙虎线按每天当时可见的数据逐日重算，淡黄表示公式黄柱，金色描边表示有效配对黄柱。红色箭头与圆环共同指向{_esc(payload['exit_date'])}收盘触发的“{_esc(payload['exit_reason'])}”。图中保留卖点后的行情，用于直观看到规则可能提前保护利润、也可能错过后续再加速；未计费用、滑点和涨跌停无法成交。</div>
     </div>"""
 
 
@@ -2595,8 +2707,8 @@ def _strategy_grid_panel() -> str:
             ),
             (
                 "balanced recommended",
-                "均衡方案",
-                "胜率与波段空间兼顾",
+                "正式执行策略",
+                "胜率与波段空间兼顾 · 已启用",
                 candidates["break_5day_high__trail_3_2"],
             ),
             (
@@ -2649,12 +2761,12 @@ def _strategy_grid_panel() -> str:
     return f"""
       <article class="strategy-lab" aria-label="扩展买卖点全市场回测">
         <div class="strategy-lab-head">
-          <div><span class="section-kicker">Execution lab</span><h3>更多买卖点 · 三档候选</h3><p>12种买点与88种卖点交叉形成1,056种组合。先用2024年前开发、2024—2025验证，再用2026留出期验收；最终历史图的未来重绘信号不参与选参。</p></div>
+          <div><span class="section-kicker">Execution lab</span><h3>正式策略与两档对照</h3><p>12种买点与88种卖点交叉形成1,056种组合。先用2024年前开发、2024—2025验证，再用2026留出期验收；最终历史图的未来重绘信号不参与选参。</p></div>
           <div class="strategy-lab-stamp"><strong>{int(coverage['analyzed_stock_count']):,}</strong><small>只非ST沪深A股</small><strong>{common_signals:,}</strong><small>次共同信号样本</small></div>
         </div>
         <div class="strategy-tickets">{''.join(cards)}</div>
-        <div class="strategy-lab-baseline"><p><strong>同口径基准：</strong>信号后上涨5%确认买入，买后再达到5%浮盈并回撤5%卖出，历史成功率 {float(baseline['overall']['positive_rate_pct']):.2f}%、平均 {float(baseline['overall']['average_pct']):+.2f}%；2026为 {float(baseline['holdout_2026']['positive_rate_pct']):.2f}% / {float(baseline['holdout_2026']['average_pct']):+.2f}%。上方三档均改善了至少一个核心目标。</p><div class="strategy-baseline-numbers"><span>组合数 <b>{int(optimization['candidate_count']):,}</b></span><span>行情失败 <b>{int(coverage['error_count'])}</b></span></div></div>
-        <p class="strategy-lab-note">高成功率方案适合把“趋势开始”确认得更宽、快速兑现3%；均衡与高收益方案都要求收盘突破此前5日最高价，随后分别采用“浮盈3%后回撤2%”和“浮盈8%后回撤2%”。历史表面最高胜率方案为 {float(rejected['overall']['positive_rate_pct']):.2f}%，但2026仅 {int(rejected['holdout_2026']['sample_count'])} 笔且平均 {float(rejected['holdout_2026']['average_pct']):+.2f}%，因此淘汰。收益均未计手续费、滑点及涨跌停无法成交；2026样本仍较少，候选尚未自动替换实时正式规则。</p>
+        <div class="strategy-lab-baseline"><p><strong>上一版同口径基准：</strong>信号后上涨5%确认买入，买后再达到5%浮盈并回撤5%卖出，历史成功率 {float(baseline['overall']['positive_rate_pct']):.2f}%、平均 {float(baseline['overall']['average_pct']):+.2f}%；2026为 {float(baseline['holdout_2026']['positive_rate_pct']):.2f}% / {float(baseline['holdout_2026']['average_pct']):+.2f}%。正式策略与对照方案均改善了至少一个核心目标。</p><div class="strategy-baseline-numbers"><span>组合数 <b>{int(optimization['candidate_count']):,}</b></span><span>行情失败 <b>{int(coverage['error_count'])}</b></span></div></div>
+        <p class="strategy-lab-note"><strong>当前正式执行：</strong>信号形成后先等待，10个交易日内收盘严格突破此前5日最高价才建议买入；买入后浮盈曾达到3%，再较最高收盘回撤2%时建议卖出，龙线不再高于虎线或满60日也结束。盘中触发只提示等待收盘确认。高成功率与高收益率方案继续保留为对照，不自动切换。历史表面最高胜率方案为 {float(rejected['overall']['positive_rate_pct']):.2f}%，但2026仅 {int(rejected['holdout_2026']['sample_count'])} 笔且平均 {float(rejected['holdout_2026']['average_pct']):+.2f}%，因此淘汰。收益未计手续费、滑点及涨跌停无法成交，2026样本仍较少。</p>
       </article>"""
 
 
@@ -2696,6 +2808,18 @@ def _validation_section() -> str:
         literal_expiry_rule = lifecycle_candidates["signal_window_end"]
         relationship_rule = lifecycle_candidates["death_cross"]
         persistence = lifecycle["signal_persistence_analysis"]
+        grid_payload = json.loads(
+            (
+                Path(__file__).resolve().parent
+                / "results"
+                / "strategy_grid_optimization.json"
+            ).read_text(encoding="utf-8")
+        )
+        balanced_rule = next(
+            item
+            for item in grid_payload["optimization"]["all_candidates"]
+            if item["id"] == "break_5day_high__trail_3_2"
+        )
     except (OSError, ValueError, KeyError, TypeError):
         return ""
 
@@ -2737,22 +2861,36 @@ def _validation_section() -> str:
           <td>{_rate(float(recent['success_rate_pct']))}<span class="subline">均值 {float(recent['average_pct']):+.2f}%</span></td>
         </tr>"""
 
+    def grid_lifecycle_row(name: str, candidate: dict, note: str) -> str:
+        stats = candidate["overall"]
+        recent = candidate["holdout_2026"]
+        return f"""
+        <tr>
+          <td><strong>{_esc(name)}</strong><span class="subline">{_esc(note)}</span></td>
+          <td class="numeric">{int(stats['sample_count'])}</td>
+          <td>{_rate(float(stats['positive_rate_pct']))}</td>
+          <td>{_pct(float(stats['average_pct']))}</td>
+          <td>{_pct(float(stats['median_pct']))}</td>
+          <td class="numeric">{float(stats['median_holding_bars']):.1f} 日</td>
+          <td>{_rate(float(recent['positive_rate_pct']))}<span class="subline">均值 {float(recent['average_pct']):+.2f}%</span></td>
+        </tr>"""
+
     return f"""
     <section class="section reveal" id="validation">
       <div class="section-head"><div><span class="section-kicker">Walk-forward evidence</span><h2>历史滚动验证</h2>
       <p class="section-copy">逐日重放，每一天只使用当时已经存在的行情；XMA 尾部按当日可见数据重新计算，因此能识别实盘中短暂出现后又被重算掉的龙腾跃虎信号。买点与卖点按完整波段共同验证。</p></div></div>
       <div class="validation-lead">
         <article class="validation-verdict"><strong>{_esc(verdict)}</strong>
-          <p>首次满足主选或次选只记为“信号形成”，不立刻给买点。历史中有 {float(persistence['erased_before_natural_expiry_rate_pct']):.2f}% 的首次入选信号在自然显示期限内被后续 K 线重算掉；正式规则要求信号未被重算消失，并在 10 个交易日内收盘较信号日上涨 5%，当天才确认“趋势开始”。随后从建议买点跟踪到建议卖点，结束价高于买入价才算成功；尚未结束的实时样本不计成功率。</p>
+          <p>首次满足主选或次选只记为“信号形成”，不立刻给买点。历史中有 {float(persistence['erased_before_natural_expiry_rate_pct']):.2f}% 的首次入选信号在自然显示期限内被后续 K 线重算掉；正式规则要求信号未被重算消失，并在 10 个交易日内收盘严格突破此前 5 日最高价，当天才确认“趋势开始 / 建议买入”。随后从建议买点跟踪到建议卖点，结束价高于买入价才算成功；尚未结束的实时样本不计成功率。</p>
           {_trend_case_chart().lstrip()}
         </article>
         <div class="validation-facts">
-          <div class="validation-fact"><span>形成信号后最终确认买点</span><strong>{int(operational_rule['overall']['sample_count'])} 次</strong></div>
-          <div class="validation-fact"><span>完整波段成功率</span><strong>{float(operational_rule['overall']['success_rate_pct']):.2f}%</strong></div>
-          <div class="validation-fact"><span>每个完整波段平均收益</span><strong>{float(operational_rule['overall']['average_pct']):+.2f}%</strong></div>
-          <div class="validation-fact"><span>完整波段收益中位数</span><strong>{float(operational_rule['overall']['median_pct']):+.2f}%</strong></div>
-          <div class="validation-fact"><span>通常持有</span><strong>{float(operational_rule['overall']['median_holding_bars']):.1f} 个交易日</strong></div>
-          <div class="validation-fact"><span>2026 年独立时段</span><strong>{float(operational_rule['holdout_2026']['success_rate_pct']):.2f}% / {float(operational_rule['holdout_2026']['average_pct']):+.2f}%</strong></div>
+          <div class="validation-fact"><span>形成信号后最终确认买点</span><strong>{int(balanced_rule['overall']['sample_count'])} 次</strong></div>
+          <div class="validation-fact"><span>完整波段成功率</span><strong>{float(balanced_rule['overall']['positive_rate_pct']):.2f}%</strong></div>
+          <div class="validation-fact"><span>每个完整波段平均收益</span><strong>{float(balanced_rule['overall']['average_pct']):+.2f}%</strong></div>
+          <div class="validation-fact"><span>完整波段收益中位数</span><strong>{float(balanced_rule['overall']['median_pct']):+.2f}%</strong></div>
+          <div class="validation-fact"><span>通常持有</span><strong>{float(balanced_rule['overall']['median_holding_bars']):.1f} 个交易日</strong></div>
+          <div class="validation-fact"><span>2026 年独立时段</span><strong>{float(balanced_rule['holdout_2026']['positive_rate_pct']):.2f}% / {float(balanced_rule['holdout_2026']['average_pct']):+.2f}%</strong></div>
           <div class="validation-fact"><span>回测覆盖股票</span><strong>{int(coverage['analyzed_stock_count'])} 只</strong></div>
           <div class="validation-fact"><span>未取得完整历史行情</span><strong>{int(coverage.get('error_count', 0))} 只</strong></div>
         </div>
@@ -2764,8 +2902,8 @@ def _validation_section() -> str:
       <article class="panel">
         <div class="panel-head"><div><h3>买点与卖点联合比较</h3><p>所有统计都从实际建议买点算到建议卖点；未确认买点和未结束持仓不混入成功率。</p></div></div>
         <div class="table-scroll"><table><thead><tr><th>规则</th><th>完整波段</th><th>成功率</th><th>平均收益</th><th>收益中位数</th><th>通常持有</th><th>2026 年</th></tr></thead>
-        <tbody>{lifecycle_row('正式采用：5%确认启动 + 5%移动止盈', operational_rule, '信号持续；10日内较信号价上涨5%才买入；买入后达到5%浮盈，再从最高收盘回撤5%卖出；信号重算消失或龙线不再高于虎线立即结束')}{lifecycle_row('首次入选即买，等龙虎关系结束', relationship_rule, '用于比较延后确认买点的价值')}{lifecycle_row('交叉显示窗口到期即卖', literal_expiry_rule, '把自然到期误当信号消失的对照方案，不采用')}</tbody></table></div>
-        <p class="validation-method">正式状态：首次入选为“待观察中”；达到 5% 启动线的收盘日为“趋势开始”；未触发风险时为“上升趋势中”；龙虎同步转弱或接近止盈线时为“待观察中”；信号在自然期限内被重算消失、龙线不再高于虎线、达到5%浮盈后从最高收盘回撤5%，或满60个后续交易日时为“趋势结束”。回测覆盖 {_esc(str(coverage['start_date']))}—{_esc(str(coverage['end_date']))}，分析 {int(coverage['analyzed_stock_count'])}/{int(coverage['requested_stock_count'])} 只，失败 {int(coverage.get('error_count', 0))} 只。未计手续费、滑点和涨跌停无法成交，并存在当前上市股票样本的幸存者偏差。本结果用于规则验证，不构成收益承诺。</p>
+        <tbody>{grid_lifecycle_row('正式采用：突破5日高点 + 3%/2%移动止盈', balanced_rule, '信号持续；10日内收盘突破此前5日最高价才买入；买入后达到3%浮盈，再从最高收盘回撤2%卖出；龙线不再高于虎线或60日结束')}{lifecycle_row('上一版：5%确认启动 + 5%移动止盈', operational_rule, '仅作历史对照，已停止新增样本')}{lifecycle_row('首次入选即买，等龙虎关系结束', relationship_rule, '用于比较延后确认买点的价值')}</tbody></table></div>
+        <p class="validation-method">正式状态：首次入选为“待观察中 / 等待买入”；突破前5日高点的收盘日为“趋势开始 / 建议买入”；未触发风险时为“上升趋势中 / 继续持有”；标签重算消失、龙虎同步转弱或接近止盈线时为“待观察中 / 谨慎持有”；龙线不再高于虎线、达到3%浮盈后从最高收盘回撤2%，或满60个后续交易日时为“趋势结束 / 建议卖出”。盘中触发只显示“等待收盘确认”，不提前移出或结算。回测覆盖 {_esc(str(coverage['start_date']))}—{_esc(str(coverage['end_date']))}，分析 {int(coverage['analyzed_stock_count'])}/{int(coverage['requested_stock_count'])} 只，失败 {int(coverage.get('error_count', 0))} 只。未计手续费、滑点和涨跌停无法成交，并存在当前上市股票样本的幸存者偏差。本结果用于规则验证，不构成收益承诺。</p>
       </article>
     </section>"""
 
@@ -2829,6 +2967,14 @@ def render_report(
     cover_mobile = "assets/hero-aigc-v2-poster-mobile.webp"
     main_stats = strategy_stats(strategy_state)
     secondary_stats = secondary_strategy_stats(strategy_state)
+    legacy_active_total = int(main_stats.get("legacy_active_count", 0)) + int(
+        secondary_stats.get("legacy_active_count", 0)
+    )
+    migration_note = (
+        f'<div class="events"><strong>策略切换说明</strong><ul><li>现有 {legacy_active_total} 只旧规则持仓继续按新的卖点实时管理，但不混入新策略成功率；新成功率只统计本次切换后完成的完整买卖波段。</li></ul></div>'
+        if legacy_active_total
+        else ""
+    )
     tracked_main_count = len(strategy_state["active"])
     tracked_secondary_count = len(strategy_state.get("secondary_active", []))
     pending_main_count = len(strategy_state.get("pending_main", []))
@@ -2978,21 +3124,22 @@ def render_report(
 
     <section class="section reveal" id="pool">
       <div class="section-head"><div><span class="section-kicker">Tracked portfolio</span><h2>{POOL_NAME}</h2>
-      <p class="section-copy">首次入选先显示“待观察中”；信号未被重算消失且收盘较信号日上涨5%，才确认“趋势开始”并给出建议买点。买点后依次显示上升趋势中、待观察中或趋势结束；只有完整买卖波段才结算成功率。</p></div></div>
+      <p class="section-copy">首次入选先显示“待观察中 / 等待买入”；信号未被重算消失且10日内收盘突破此前5日最高价，才显示“趋势开始 / 建议买入”。买入后页面同步给出继续持有、谨慎持有或卖出触发，正式结束与收益只在收盘结算。</p></div></div>
 {_events(events)}
+{migration_note}
       <div class="pool-switcher" role="tablist" aria-label="趋势池区域切换">
         <button class="pool-tab" id="tab-main" type="button" role="tab" aria-selected="true" aria-controls="pool-main" data-pool-tab="main">主选区 · <span data-area-main-count>{main_area_count}</span></button>
         <button class="pool-tab" id="tab-secondary" type="button" role="tab" aria-selected="false" aria-controls="pool-secondary" data-pool-tab="secondary" tabindex="-1">次选区 · <span data-area-secondary-count>{secondary_area_count}</span></button>
       </div>
       <article class="panel" id="pool-main" role="tabpanel" aria-labelledby="tab-main" data-pool-panel="main">
-        <div class="panel-head"><div><h3>主选区</h3><p>入选后先等待上涨5%确认买点；买入后再达到5%浮盈、较最高收盘回撤5%，或信号重算消失、龙线不再高于虎线时结束</p>
+        <div class="panel-head"><div><h3>主选区</h3><p>10日内收盘突破前5日最高价建议买入；浮盈达到3%后较最高收盘回撤2%、龙线不再高于虎线或满60日建议卖出</p>
           <div class="pool-composition"><span>盘中新信号 <strong data-live-main-count>{len(selected)}</strong> 只</span><span>实时监控 <strong data-tracked-main-count>{tracked_main_count + pending_main_count}</strong> 只</span><span>其中已确认趋势 {tracked_main_count} 只</span></div>
         </div><span class="count-badge"><span data-area-main-count>{main_area_count}</span> 只</span></div>
         <div class="pool-group-head"><strong>盘中新信号</strong><span>随最新行情重算，收盘确认后加入跟踪</span></div>
-        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态</th></tr></thead>
+        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态 / 操作</th></tr></thead>
         <tbody id="live-main-body">{main_pool_rows or '<tr><td class="empty" colspan="7">当前没有符合条件的主选预选</td></tr>'}</tbody></table></div>
-        <div class="pool-group-head settled"><strong>实时信号与趋势跟踪</strong><span>待确认信号看距启动线涨幅；确认买点后再计算策略收益</span></div>
-        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>加入日 / 价格</th><th>最新价 / 时间</th><th>实时收益</th><th>时长</th><th>趋势状态</th></tr></thead>
+        <div class="pool-group-head settled"><strong>实时信号与趋势跟踪</strong><span>待确认信号看前5日突破价；确认买点后再计算策略收益</span></div>
+        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>加入日 / 价格</th><th>最新价 / 时间</th><th>实时收益</th><th>时长</th><th>状态 / 操作</th></tr></thead>
         <tbody id="tracking-main-body">{active_rows or empty6}</tbody></table></div>
         <div class="live-exit-list" id="live-main-exits" hidden aria-live="polite"></div>
         <p class="settlement-note">实时收益只用于盘中判断；趋势结束后的成功率、实现收益和正式移出记录，以收盘确认结果为准。</p>
@@ -3007,14 +3154,14 @@ def render_report(
       </article>
 
       <article class="panel" id="pool-secondary" role="tabpanel" aria-labelledby="tab-secondary" data-pool-panel="secondary" hidden>
-        <div class="panel-head"><div><h3>次选区</h3><p>候选需龙虎、窗口黄柱及另一项；先等待较信号日上涨5%确认买点，再采用与主选相同的趋势结束判断</p>
+        <div class="panel-head"><div><h3>次选区</h3><p>候选需龙虎、窗口黄柱及另一项；10日内收盘突破前5日最高价才建议买入，卖点与主选一致</p>
           <div class="pool-composition"><span>盘中新信号 <strong data-live-secondary-count>{len(secondary)}</strong> 只</span><span>实时监控 <strong data-tracked-secondary-count>{tracked_secondary_count + pending_secondary_count}</strong> 只</span><span>其中已确认趋势 {tracked_secondary_count} 只</span></div>
         </div><span class="count-badge"><span data-area-secondary-count>{secondary_area_count}</span> 只</span></div>
         <div class="pool-group-head"><strong>盘中新信号</strong><span>随最新行情重算，收盘确认后加入跟踪</span></div>
-        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态</th></tr></thead>
+        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>最新价 / 涨跌</th><th>可能见底</th><th>龙腾跃虎</th><th>42日涨停</th><th>黄柱</th><th>状态 / 操作</th></tr></thead>
         <tbody id="live-secondary-body">{secondary_pool_rows or '<tr><td class="empty" colspan="7">当前没有符合条件的次选预选</td></tr>'}</tbody></table></div>
-        <div class="pool-group-head settled"><strong>实时信号与趋势跟踪</strong><span>待确认信号看距启动线涨幅；确认买点后再计算策略收益</span></div>
-        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>加入日 / 价格</th><th>最新价 / 时间</th><th>实时收益</th><th>时长</th><th>趋势状态</th></tr></thead>
+        <div class="pool-group-head settled"><strong>实时信号与趋势跟踪</strong><span>待确认信号看前5日突破价；确认买点后再计算策略收益</span></div>
+        <div class="table-scroll pool-table-shell"><table class="pool-table"><thead><tr><th>股票</th><th>加入日 / 价格</th><th>最新价 / 时间</th><th>实时收益</th><th>时长</th><th>状态 / 操作</th></tr></thead>
         <tbody id="tracking-secondary-body">{secondary_active_rows or empty6}</tbody></table></div>
         <div class="live-exit-list" id="live-secondary-exits" hidden aria-live="polite"></div>
         <p class="settlement-note">实时收益只用于盘中判断；趋势结束后的成功率、实现收益和正式移出记录，以收盘确认结果为准。</p>
@@ -3053,6 +3200,8 @@ def render_report(
         <article class="rule"><span class="rule-num">02</span><strong>龙腾跃虎</strong><p>交叉显示窗口用于完成黄柱配对，不是卖出倒计时。自然到期不退出；应显示期间被后续K线重算掉，才视为短暂信号失效。</p></article>
         <article class="rule"><span class="rule-num">03</span><strong>近期涨停</strong><p>最近 {cfg['limit_up_lookback_days']} 个交易日至少一次收盘涨停。</p></article>
         <article class="rule"><span class="rule-num">04</span><strong>窗口黄柱</strong><p>龙腾跃虎日前 {cfg.get('yellow_before_cross_days', 2)} 日至后 {cfg.get('yellow_after_cross_days', 2)} 个交易日内出现黄柱即可配对；当前至少 {cfg['yellow_consecutive_days']} 根。</p></article>
+        <article class="rule"><span class="rule-num">05</span><strong>建议买入</strong><p>入选后第1—10个交易日，信号仍有效且收盘严格突破此前5日最高价；盘中突破只提示等待收盘确认。</p></article>
+        <article class="rule"><span class="rule-num">06</span><strong>建议卖出</strong><p>浮盈曾达到3%后较最高收盘回撤2%，或龙线不再高于虎线，或完成60个后续交易日；盘中触发不提前结算。</p></article>
       </div>
     </section>
 

@@ -63,6 +63,7 @@ class Evaluation:
     market: int
     date: str
     close: float
+    entry_breakout_high_5: float
     change_pct: float
     bottom_ok: bool
     cross_ok: bool
@@ -430,6 +431,14 @@ def make_live_seed(
         "market": stock.market,
         "base_date": bars[-1].date,
         "previous_close": round(float(bars[-1].close), 4),
+        "entry_breakout_high_5": round(
+            max(float(bar.high) for bar in bars[-6:-1]),
+            4,
+        ),
+        "next_breakout_high_5": round(
+            max(float(bar.high) for bar in bars[-5:]),
+            4,
+        ),
         "min_close_15": round(min(bar.close for bar in bars[-15:]), 4),
         "typical_13": [round(value, 6) for value in typical],
         "next_limit_price": round(
@@ -578,6 +587,9 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
         market=stock.market,
         date=bars[-1].date,
         close=bars[-1].close,
+        entry_breakout_high_5=float(
+            max(bar.high for bar in bars[-6:-1])
+        ),
         change_pct=change_pct,
         bottom_ok=bottom_ok,
         cross_ok=cross_ok,
@@ -1145,7 +1157,7 @@ footer{{margin-top:25px;color:#738198;font-size:13px}}@media(max-width:900px){{.
 <h2>{POOL_NAME}</h2>
 {event_block}
 <h3>主选区</h3>
-<p>入选日收盘价作为加入价。龙虎连续两日转弱只作预警；曾达到5%浮盈后，较最高收盘回撤20%时止盈，或完成60个后续交易日后结束。</p>
+<p>入选后等待10日内收盘突破此前5日最高价再确认买点；曾达到3%浮盈后较最高收盘回撤2%，龙线不再高于虎线，或完成60个后续交易日时结束。</p>
 <div class="stats">
   <div class="stat"><small>跟踪中</small><b>{stats['active_count']} 只</b></div>
   <div class="stat"><small>已移出</small><b>{stats['closed_count']} 只</b></div>
@@ -1157,7 +1169,7 @@ footer{{margin-top:25px;color:#738198;font-size:13px}}@media(max-width:900px){{.
 <div class="table-wrap"><table><thead><tr><th>股票</th><th>加入日/加入价</th><th>最新日/收盘价</th><th>加入日至今收益</th><th>跟踪时长</th><th>龙虎信号</th></tr></thead><tbody>{active_rows}</tbody></table></div>
 
 <h3>次选区</h3>
-<p>近期龙腾跃虎与窗口黄柱必须配对，并在“可能见底”或两月内涨停中至少再满足一项。窗口按上穿前 {cfg.get('yellow_before_cross_days', 2)} 日至后 {cfg.get('yellow_after_cross_days', 2)} 日计算。龙虎转弱只作预警；曾达到5%浮盈后较最高收盘回撤20%时止盈，或完成60个后续交易日后结束；条件补齐时转入主选区并保留原持有期。</p>
+<p>近期龙腾跃虎与窗口黄柱必须配对，并在“可能见底”或两月内涨停中至少再满足一项。窗口按上穿前 {cfg.get('yellow_before_cross_days', 2)} 日至后 {cfg.get('yellow_after_cross_days', 2)} 日计算。买点与卖点采用主选相同规则；条件补齐时转入主选区并保留原持有期。</p>
 <div class="stats">
   <div class="stat"><small>次选跟踪中</small><b>{secondary_stats['active_count']} 只</b></div>
   <div class="stat"><small>当前成功率</small><b>{pct_html(secondary_stats['current_success_rate'])}</b></div>

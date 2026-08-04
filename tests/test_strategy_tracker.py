@@ -10,6 +10,7 @@ sys.path.insert(0, str(ROOT))
 
 from strategy_tracker import (
     empty_state,
+    load_state,
     replay_state,
     secondary_strategy_stats,
     strategy_stats,
@@ -31,7 +32,10 @@ def row(
     dragon=11.0,
     tiger=10.0,
     cross_age=-1,
-    cross_lookback_days=11,
+    cross_lookback_days=8,
+    cross_date=None,
+    entry_breakout_high=10.4,
+    next_breakout_high=10.4,
 ):
     return {
         "code": "600001",
@@ -45,11 +49,20 @@ def row(
         "tiger_value": tiger,
         "eligible": eligible,
         "cross_ok": cross,
+        "cross_date": (
+            cross_date
+            if cross_date is not None
+            else "2026-07-20"
+            if cross
+            else ""
+        ),
         "bottom_ok": bottom,
         "limit_up_ok": limit_up,
         "yellow_ok": yellow,
         "cross_age": cross_age,
         "cross_lookback_days": cross_lookback_days,
+        "entry_breakout_high_5": entry_breakout_high,
+        "next_breakout_high_5": next_breakout_high,
     }
 
 
@@ -119,24 +132,24 @@ class StrategyTrackerTests(unittest.TestCase):
         self.assertEqual(state["active"][0]["status"], "待观察中")
         self.assertEqual(events[0]["type"], "trend_warning")
 
-    def test_peak_drawdown_five_percent_after_five_percent_profit_takes_profit(self):
+    def test_peak_drawdown_two_percent_after_three_percent_profit_takes_profit(self):
         state = self.start_main()
         state, _ = update_state(
             state,
-            [row("2026-07-22", close=12.0, cross=True)],
+            [row("2026-07-22", close=11.0, cross=True)],
             "2026-07-22",
         )
         state, events = update_state(
             state,
-            [row("2026-07-23", close=11.3, cross=True)],
+            [row("2026-07-23", close=10.77, cross=True)],
             "2026-07-23",
         )
         self.assertEqual(state["active"], [])
         self.assertAlmostEqual(
             state["closed"][0]["exit_return_pct"],
-            (11.3 / 10.5 - 1.0) * 100.0,
+            (10.77 / 10.5 - 1.0) * 100.0,
         )
-        self.assertIn("回撤5%", state["closed"][0]["exit_reason"])
+        self.assertIn("回撤2%", state["closed"][0]["exit_reason"])
         self.assertEqual(state["closed"][0]["status"], "趋势结束")
         self.assertEqual(events[0]["type"], "removed")
 
@@ -160,15 +173,154 @@ class StrategyTrackerTests(unittest.TestCase):
             [row("2026-07-24", selected=True, cross=True, close=12.5)],
             "2026-07-24",
         )
-        self.assertEqual(events[0]["type"], "setup_added")
+        self.assertEqual(events, [])
         self.assertEqual(state["active"], [])
+
         state, events = update_state(
             state,
-            [row("2026-07-25", selected=True, cross=True, close=13.2)],
+            [
+                row(
+                    "2026-07-25",
+                    selected=True,
+                    cross=True,
+                    cross_date="2026-07-25",
+                    close=12.5,
+                    next_breakout_high=13.0,
+                )
+            ],
             "2026-07-25",
         )
+        self.assertEqual(events[0]["type"], "setup_added")
+        state, events = update_state(
+            state,
+            [
+                row(
+                    "2026-07-26",
+                    selected=True,
+                    cross=True,
+                    cross_date="2026-07-25",
+                    close=13.2,
+                    entry_breakout_high=13.0,
+                )
+            ],
+            "2026-07-26",
+        )
         self.assertEqual(events[-1]["type"], "trend_started")
-        self.assertEqual(state["active"][0]["entry_date"], "2026-07-25")
+        self.assertEqual(state["active"][0]["entry_date"], "2026-07-26")
+
+    def test_cancelled_main_setup_cannot_reuse_the_same_cross_date(self):
+        state, events = update_state(
+            empty_state(),
+            [
+                row(
+                    "2026-07-20",
+                    selected=True,
+                    cross=True,
+                    cross_age=0,
+                    cross_date="2026-07-20",
+                )
+            ],
+            "2026-07-20",
+        )
+        self.assertEqual(events[-1]["type"], "setup_added")
+        self.assertEqual(
+            state["consumed_signals"],
+            [{"code": "600001", "cross_date": "2026-07-20"}],
+        )
+
+        state, events = update_state(
+            state,
+            [row("2026-07-21", dragon_above=False)],
+            "2026-07-21",
+        )
+        self.assertEqual(state["pending_main"], [])
+        self.assertEqual(events[-1]["type"], "setup_cancelled")
+
+        state, events = update_state(
+            state,
+            [
+                row(
+                    "2026-07-22",
+                    selected=True,
+                    cross=True,
+                    cross_age=2,
+                    cross_date="2026-07-20",
+                )
+            ],
+            "2026-07-22",
+        )
+        self.assertEqual(events, [])
+        self.assertEqual(state["pending_main"], [])
+
+        state, events = update_state(
+            state,
+            [
+                row(
+                    "2026-07-23",
+                    selected=True,
+                    cross=True,
+                    cross_age=0,
+                    cross_date="2026-07-23",
+                )
+            ],
+            "2026-07-23",
+        )
+        self.assertEqual(events[-1]["type"], "setup_added")
+        self.assertEqual(len(state["pending_main"]), 1)
+
+    def test_cancelled_secondary_setup_cannot_reuse_the_same_cross_date(self):
+        candidate = row(
+            "2026-07-20",
+            cross=True,
+            cross_age=0,
+            cross_date="2026-07-20",
+            limit_up=True,
+            yellow=True,
+        )
+        state, events = update_state(empty_state(), [candidate], "2026-07-20")
+        self.assertEqual(events[-1]["type"], "secondary_setup_added")
+
+        state, events = update_state(
+            state,
+            [row("2026-07-21", dragon_above=False)],
+            "2026-07-21",
+        )
+        self.assertEqual(state["pending_secondary"], [])
+        self.assertEqual(events[-1]["type"], "setup_cancelled")
+
+        state, events = update_state(
+            state,
+            [
+                row(
+                    "2026-07-22",
+                    cross=True,
+                    cross_age=2,
+                    cross_date="2026-07-20",
+                    limit_up=True,
+                    yellow=True,
+                )
+            ],
+            "2026-07-22",
+        )
+        self.assertEqual(events, [])
+        self.assertEqual(state["pending_secondary"], [])
+
+        state, events = update_state(
+            state,
+            [
+                row(
+                    "2026-07-23",
+                    cross=True,
+                    cross_age=0,
+                    cross_date="2026-07-23",
+                    limit_up=True,
+                    yellow=True,
+                )
+            ],
+            "2026-07-23",
+        )
+        self.assertEqual(events[-1]["type"], "secondary_setup_added")
+        self.assertEqual(len(state["pending_secondary"]), 1)
 
     def test_sixty_following_bars_end_tracking(self):
         state = self.start_main()
@@ -226,7 +378,7 @@ class StrategyTrackerTests(unittest.TestCase):
     def test_natural_cross_label_expiry_is_not_an_exit_or_warning(self):
         state, _ = update_state(
             empty_state(),
-            [row("2026-07-20", selected=True, cross=True, cross_age=10)],
+            [row("2026-07-20", selected=True, cross=True, cross_age=7)],
             "2026-07-20",
         )
         state, _ = update_state(
@@ -260,7 +412,7 @@ class StrategyTrackerTests(unittest.TestCase):
         self.assertEqual(events[0]["type"], "setup_cancelled")
         self.assertIn("重算消失", events[0]["reason"])
 
-    def test_recalculated_signal_erasure_after_buy_ends_trend(self):
+    def test_recalculated_signal_erasure_after_buy_only_warns(self):
         state, _ = update_state(
             empty_state(),
             [row("2026-07-20", selected=True, cross=True, cross_age=0, cross_lookback_days=5)],
@@ -276,9 +428,12 @@ class StrategyTrackerTests(unittest.TestCase):
             [row("2026-07-22", close=10.2, cross=False, dragon_above=True)],
             "2026-07-22",
         )
-        self.assertEqual(state["active"], [])
-        self.assertIn("重算消失", state["closed"][0]["exit_reason"])
-        self.assertEqual(events[0]["type"], "removed")
+        self.assertEqual(len(state["active"]), 1)
+        self.assertEqual(state["closed"], [])
+        self.assertEqual(state["active"][0]["status"], "待观察中")
+        self.assertEqual(state["active"][0]["operation"], "谨慎持有")
+        self.assertTrue(state["active"][0]["signal_repainted_after_entry"])
+        self.assertEqual(events[0]["type"], "trend_warning")
 
     def test_secondary_accepts_bottom_instead_of_limit_up(self):
         candidate = row(
@@ -345,6 +500,189 @@ class StrategyTrackerTests(unittest.TestCase):
             {event["type"] for event in events},
             {"setup_promoted", "trend_started"},
         )
+
+    def test_close_must_strictly_break_previous_five_day_high(self):
+        state, _ = update_state(
+            empty_state(),
+            [
+                row(
+                    "2026-07-20",
+                    selected=True,
+                    cross=True,
+                    next_breakout_high=10.5,
+                )
+            ],
+            "2026-07-20",
+        )
+        state, events = update_state(
+            state,
+            [
+                row(
+                    "2026-07-21",
+                    selected=True,
+                    cross=True,
+                    close=10.5,
+                    entry_breakout_high=10.5,
+                    next_breakout_high=10.5,
+                )
+            ],
+            "2026-07-21",
+        )
+        self.assertEqual(state["active"], [])
+        self.assertEqual(events, [])
+        state, events = update_state(
+            state,
+            [
+                row(
+                    "2026-07-22",
+                    selected=True,
+                    cross=True,
+                    close=10.51,
+                    entry_breakout_high=10.5,
+                )
+            ],
+            "2026-07-22",
+        )
+        self.assertEqual(events[-1]["type"], "trend_started")
+        self.assertEqual(state["active"][0]["operation"], "建议买入")
+
+    def test_missing_breakout_high_never_falls_back_to_old_five_percent_rule(self):
+        state, _ = update_state(
+            empty_state(),
+            [
+                row(
+                    "2026-07-20",
+                    selected=True,
+                    cross=True,
+                    next_breakout_high=None,
+                    entry_breakout_high=None,
+                )
+            ],
+            "2026-07-20",
+        )
+        state, events = update_state(
+            state,
+            [
+                row(
+                    "2026-07-21",
+                    selected=True,
+                    cross=True,
+                    close=20.0,
+                    next_breakout_high=None,
+                    entry_breakout_high=None,
+                )
+            ],
+            "2026-07-21",
+        )
+        self.assertEqual(events, [])
+        self.assertEqual(state["active"], [])
+        self.assertIn("数据等待更新", state["pending_main"][0]["status_detail"])
+
+    def test_tenth_day_can_enter_and_eleventh_day_cancels(self):
+        state, _ = update_state(
+            empty_state(),
+            [row("2026-07-01", selected=True, cross=True)],
+            "2026-07-01",
+        )
+        state["pending_main"][0]["setup_elapsed_bars"] = 9
+        state["last_trade_date"] = "2026-07-09"
+        state, events = update_state(
+            state,
+            [row("2026-07-10", selected=True, cross=True, close=10.41)],
+            "2026-07-10",
+        )
+        self.assertEqual(events[-1]["type"], "trend_started")
+
+        state, _ = update_state(
+            empty_state(),
+            [row("2026-07-01", selected=True, cross=True)],
+            "2026-07-01",
+        )
+        state["pending_main"][0]["setup_elapsed_bars"] = 10
+        state["last_trade_date"] = "2026-07-10"
+        state, events = update_state(
+            state,
+            [row("2026-07-11", selected=True, cross=True, close=10.41)],
+            "2026-07-11",
+        )
+        self.assertEqual(state["pending_main"], [])
+        self.assertEqual(events[0]["type"], "setup_cancelled")
+
+    def test_trailing_stop_is_inactive_before_three_percent_peak(self):
+        state = self.start_main()
+        state, _ = update_state(
+            state,
+            [row("2026-07-22", close=10.8, cross=True)],
+            "2026-07-22",
+        )
+        state, _ = update_state(
+            state,
+            [row("2026-07-23", close=10.5, cross=True)],
+            "2026-07-23",
+        )
+        self.assertEqual(len(state["active"]), 1)
+        state, _ = update_state(
+            state,
+            [row("2026-07-24", close=11.0, cross=True)],
+            "2026-07-24",
+        )
+        state, _ = update_state(
+            state,
+            [row("2026-07-25", close=10.78, cross=True)],
+            "2026-07-25",
+        )
+        self.assertEqual(state["active"], [])
+        self.assertIn("回撤2%", state["closed"][0]["exit_reason"])
+
+    def test_new_strategy_stats_exclude_legacy_positions(self):
+        state = empty_state()
+        state["active"] = [
+            {"return_pct": 8.0, "strategy_version": "legacy_before_break5_trail3_2"}
+        ]
+        state["closed"] = [
+            {"exit_return_pct": 9.0, "strategy_version": "legacy_before_break5_trail3_2"},
+            {"exit_return_pct": 3.0, "strategy_version": state["strategy_version"]},
+        ]
+        stats = strategy_stats(state)
+        self.assertEqual(stats["tracked_active_count"], 1)
+        self.assertEqual(stats["active_count"], 0)
+        self.assertEqual(stats["legacy_active_count"], 1)
+        self.assertEqual(stats["sample_count"], 1)
+        self.assertEqual(stats["all_average_return"], 3.0)
+
+    def test_legacy_state_migration_keeps_positions_but_resets_old_pending(self):
+        legacy = {
+            "version": 1,
+            "last_trade_date": "2026-08-03",
+            "active": [
+                {
+                    "code": "600001",
+                    "entry_date": "2026-08-01",
+                    "last_date": "2026-08-03",
+                }
+            ],
+            "closed": [],
+            "secondary_active": [],
+            "secondary_closed": [],
+            "pending_main": [
+                {"code": "600002", "status": "待观察中"}
+            ],
+            "pending_secondary": [],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "state.json"
+            path.write_text(
+                json.dumps(legacy, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            migrated = load_state(path)
+        self.assertEqual(len(migrated["active"]), 1)
+        self.assertEqual(migrated["pending_main"], [])
+        self.assertEqual(
+            migrated["active"][0]["strategy_version"],
+            "legacy_before_break5_trail3_2",
+        )
+        self.assertEqual(migrated["strategy_migration"]["reset_pending_count"], 1)
 
     def test_replay_state_stops_at_requested_date(self):
         with tempfile.TemporaryDirectory() as tmp:

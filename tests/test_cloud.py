@@ -49,6 +49,8 @@ class CloudWorkflowTests(unittest.TestCase):
             "market": 1,
             "base_date": "2026-07-30",
             "previous_close": 10.0,
+            "entry_breakout_high_5": 10.3,
+            "next_breakout_high_5": 10.4,
             "min_close_15": 9.0,
             "typical_13": [10.0] * 13,
             "next_limit_price": 11.0,
@@ -212,7 +214,7 @@ class CloudWorkflowTests(unittest.TestCase):
             {"main": ["600001"], "secondary": ["603648"]},
         )
 
-    def test_live_tracking_updates_return_and_marks_trend_end(self):
+    def test_live_tracking_marks_sell_trigger_as_provisional_until_close(self):
         payload = {
             "strategy": {
                 "active": [
@@ -252,17 +254,48 @@ class CloudWorkflowTests(unittest.TestCase):
         tracking = build_live_tracking(payload, quotes)
         main = tracking["main"][0]
         secondary = tracking["secondary"][0]
-        self.assertTrue(main["trend_ended"])
-        self.assertEqual(main["status"], "趋势结束")
+        self.assertFalse(main["trend_ended"])
+        self.assertTrue(main["provisional_exit"])
+        self.assertEqual(main["status"], "待观察中")
+        self.assertEqual(main["operation"], "卖出触发 · 等待收盘")
         self.assertAlmostEqual(main["live_return_pct"], 20.0)
-        self.assertIn("回撤5%", main["exit_reason"])
+        self.assertIn("回撤2%", main["exit_reason"])
         self.assertFalse(secondary["trend_ended"])
         self.assertEqual(secondary["status"], "上升趋势中")
         self.assertAlmostEqual(secondary["live_return_pct"], 8.0)
         self.assertEqual(
             collect_tracking_codes(payload, tracking),
-            {"main": [], "secondary": ["603648"]},
+            {"main": ["600001"], "secondary": ["603648"]},
         )
+
+    def test_live_tracking_previews_the_sixtieth_following_day_exit(self):
+        payload = {
+            "strategy": {
+                "active": [
+                    {
+                        "code": "600001",
+                        "name": "主选",
+                        "market": 1,
+                        "entry_price": 10.0,
+                        "entry_date": "2026-05-01",
+                        "last_close": 10.5,
+                        "last_date": "2026-07-30",
+                        "return_pct": 5.0,
+                        "best_return_pct": 5.0,
+                        "holding_days": 60,
+                    }
+                ],
+                "secondary_active": [],
+            }
+        }
+        tracking = build_live_tracking(
+            payload,
+            {"600001": self.live_quote("600001")},
+        )["main"][0]
+        self.assertFalse(tracking["trend_ended"])
+        self.assertTrue(tracking["provisional_exit"])
+        self.assertEqual(tracking["operation"], "卖出触发 · 等待收盘")
+        self.assertIn("60个后续交易日", tracking["exit_reason"])
 
     def test_live_pool_does_not_readd_a_position_ending_intraday(self):
         payload = {
@@ -370,7 +403,7 @@ class CloudWorkflowTests(unittest.TestCase):
             ],
         }
         snapshot = compact_snapshot(payload)
-        self.assertEqual(snapshot["live_seed_format"], 3)
+        self.assertEqual(snapshot["live_seed_format"], 4)
         self.assertEqual(
             [item[0] for item in snapshot["live_universe"]],
             ["600001"],
@@ -382,6 +415,56 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertEqual(seed["code"], "600001")
         self.assertTrue(seed["eligible"])
         self.assertEqual(seed["observation_matched_count"], 2)
+        self.assertEqual(seed["next_breakout_high_5"], 10.4)
+        legacy_seed = unpack_live_seed(
+            snapshot["live_universe"][0][:-1],
+            3,
+        )
+        self.assertEqual(legacy_seed["next_breakout_high_5"], 0.0)
+
+    def test_pending_breakout_is_only_a_close_confirmation_preview(self):
+        seed = self.live_seed("600020")
+        payload = {
+            "trade_date": "2026-07-30",
+            "config": {
+                "bottom_lookback_days": 5,
+                "cross_lookback_days": 8,
+                "limit_up_lookback_days": 42,
+                "yellow_consecutive_days": 1,
+                "yellow_before_cross_days": 2,
+                "yellow_after_cross_days": 7,
+            },
+            "live_universe": [seed],
+            "strategy": {
+                "pending_main": [
+                    {
+                        "setup_id": "main_600020_2026-07-30",
+                        "code": "600020",
+                        "name": "待确认",
+                        "market": 1,
+                        "setup_date": "2026-07-30",
+                        "setup_price": 10.0,
+                        "last_date": "2026-07-30",
+                        "last_close": 10.0,
+                        "setup_elapsed_bars": 0,
+                        "setup_cross_age": 0,
+                        "setup_cross_lookback_days": 8,
+                        "breakout_high_5": 10.4,
+                    }
+                ]
+            },
+        }
+        quote = {**self.live_quote("600020"), "price": 10.41}
+        tracking = build_live_tracking(payload, {"600020": quote})["main"][0]
+        self.assertFalse(tracking["trend_ended"])
+        self.assertTrue(tracking["provisional_entry"])
+        self.assertEqual(tracking["status"], "待观察中")
+        self.assertEqual(tracking["operation"], "买入触发 · 等待收盘")
+
+        quote["price"] = 10.4
+        tracking = build_live_tracking(payload, {"600020": quote})["main"][0]
+        self.assertFalse(tracking["provisional_entry"])
+        self.assertEqual(tracking["operation"], "等待买入")
 
     def test_compact_snapshot_sorts_live_universe_and_result_keys(self):
         first = self.live_seed("600002")
@@ -906,15 +989,17 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertNotIn("观察示例0", html)
         self.assertEqual(html.count("观察示例1"), 1)
         self.assertIn("首次入选信号在自然显示期限内", html)
-        self.assertIn("10 个交易日内收盘较信号日上涨 5%", html)
+        self.assertIn("10日内收盘突破此前5日最高价", html)
+        self.assertIn("data-live-operation", html)
+        self.assertIn("浮盈达到3%后较最高收盘回撤2%", html)
         self.assertIn("信号重绘对照 · 独立统计", html)
         self.assertIn("98.96%", html)
         self.assertIn("最终历史图不是实盘买点", html)
         self.assertIn("德联集团", html)
         self.assertNotIn("鞍钢股份 000898", html)
-        self.assertIn("更多买卖点 · 三档候选", html)
+        self.assertIn("正式策略与两档对照", html)
         self.assertIn("高成功率", html)
-        self.assertIn("均衡方案", html)
+        self.assertIn("正式执行策略", html)
         self.assertIn("高收益率", html)
         self.assertIn("1,056种组合", html)
         self.assertNotIn("首次达到5%中位数", html)
