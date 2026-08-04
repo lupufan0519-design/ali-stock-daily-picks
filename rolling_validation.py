@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import statistics
@@ -9,8 +10,9 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
 from datetime import datetime
+from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
-from typing import Iterable, Sequence
+from typing import Callable, Iterable, Sequence
 
 from screener import (
     Bar,
@@ -46,6 +48,183 @@ YELLOW_WINDOW_VARIANTS = (
     ("post_10", "上穿当天至后10日", 0, 10),
     ("pre2_post10", "上穿前2日至后10日", 2, 10),
 )
+
+
+@dataclass(frozen=True)
+class ExecutionAssumptions:
+    """A-share execution assumptions used by every joint entry/exit replay."""
+
+    commission_bps_per_side: float = 3.0
+    exchange_fee_bps_per_side: float = 0.341
+    regulatory_fee_bps_per_side: float = 0.2
+    stamp_duty_bps_sell: float = 5.0
+    slippage_bps_per_side: float = 5.0
+    entry_execution_max_wait_bars: int = 5
+
+    @property
+    def buy_cost_bps(self) -> float:
+        return (
+            self.commission_bps_per_side
+            + self.exchange_fee_bps_per_side
+            + self.regulatory_fee_bps_per_side
+            + self.slippage_bps_per_side
+        )
+
+    @property
+    def sell_cost_bps(self) -> float:
+        return self.buy_cost_bps + self.stamp_duty_bps_sell
+
+    def as_dict(self) -> dict:
+        return {
+            **asdict(self),
+            "buy_cost_bps": round(self.buy_cost_bps, 4),
+            "sell_cost_bps": round(self.sell_cost_bps, 4),
+            "commission_note": "券商佣金为可配置假设，不是法定统一费率；未模拟单笔最低5元",
+            "execution_timing": "收盘确认指令，下一交易日开盘成交；一字涨跌停或停牌则顺延至下一可成交开盘",
+        }
+
+
+@dataclass(frozen=True)
+class OpenFill:
+    index: int
+    raw_price: float
+    effective_price: float
+    deferred_bars: int = 0
+
+
+def execution_assumptions(cfg: dict | None = None) -> ExecutionAssumptions:
+    cfg = cfg or {}
+    return ExecutionAssumptions(
+        commission_bps_per_side=float(cfg.get("backtest_commission_bps_per_side", 3.0)),
+        exchange_fee_bps_per_side=float(cfg.get("backtest_exchange_fee_bps_per_side", 0.341)),
+        regulatory_fee_bps_per_side=float(cfg.get("backtest_regulatory_fee_bps_per_side", 0.2)),
+        stamp_duty_bps_sell=float(cfg.get("backtest_stamp_duty_bps_sell", 5.0)),
+        slippage_bps_per_side=float(cfg.get("backtest_slippage_bps_per_side", 5.0)),
+        entry_execution_max_wait_bars=int(cfg.get("entry_execution_max_wait_bars", 5)),
+    )
+
+
+def _limit_down_price(previous_close: float, rate: Decimal) -> float:
+    price = Decimal(str(previous_close)) * (Decimal("1") - rate)
+    return float(price.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+
+
+def _locked_at_limit(
+    stock: Stock,
+    bars: Sequence[Bar],
+    index: int,
+    side: str,
+) -> bool:
+    if index <= 0 or index >= len(bars):
+        return False
+    bar = bars[index]
+    if bar.volume <= 0:
+        return True
+    rate = price_limit_rate(stock)
+    target = (
+        limit_up_price(bars[index - 1].close, rate)
+        if side == "buy"
+        else _limit_down_price(bars[index - 1].close, rate)
+    )
+    tolerance = 0.011
+    if side == "buy":
+        return bar.open >= target - tolerance and bar.low >= target - tolerance
+    return bar.open <= target + tolerance and bar.high <= target + tolerance
+
+
+def next_open_fill(
+    stock: Stock,
+    bars: Sequence[Bar],
+    trigger_index: int,
+    side: str,
+    assumptions: ExecutionAssumptions,
+    *,
+    can_continue_after_close: Callable[[int], bool] | None = None,
+) -> OpenFill | None:
+    """Fill at the first tradable open after a close trigger.
+
+    A buy blocked by a one-price limit-up day is cancelled when the setup is no
+    longer valid after that day's close. A sell blocked by a one-price
+    limit-down day remains queued. Suspended/zero-volume days are also deferred.
+    """
+    if side not in {"buy", "sell"}:
+        raise ValueError(f"未知成交方向: {side}")
+    deferred = 0
+    for index in range(trigger_index + 1, len(bars)):
+        bar = bars[index]
+        if bar.open <= 0 or _locked_at_limit(stock, bars, index, side):
+            deferred += 1
+            if (
+                side == "buy"
+                and can_continue_after_close is not None
+                and not can_continue_after_close(index)
+            ):
+                return None
+            if side == "buy" and deferred >= assumptions.entry_execution_max_wait_bars:
+                return None
+            continue
+        cost_bps = (
+            assumptions.buy_cost_bps
+            if side == "buy"
+            else assumptions.sell_cost_bps
+        )
+        direction = 1.0 if side == "buy" else -1.0
+        raw = float(bar.open)
+        effective = raw * (1.0 + direction * cost_bps / 10000.0)
+        return OpenFill(index, raw, effective, deferred)
+    return None
+
+
+def completed_trade_date(root: Path = ROOT) -> str:
+    state_path = root / "strategy" / "state.json"
+    if not state_path.exists():
+        raise RuntimeError("缺少 strategy/state.json，无法确认最后完整交易日")
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    value = str(state.get("last_trade_date", "")).strip()
+    if not value:
+        raise RuntimeError("strategy/state.json 缺少 last_trade_date")
+    return value
+
+
+def truncate_histories(
+    histories: Sequence[tuple[Stock, list[Bar]]],
+    cutoff: str,
+) -> list[tuple[Stock, list[Bar]]]:
+    return [
+        (stock, [bar for bar in bars if bar.date <= cutoff])
+        for stock, bars in histories
+    ]
+
+
+def research_meta(
+    cfg: dict,
+    cutoff: str,
+    assumptions: ExecutionAssumptions,
+    *,
+    run_id: str | None = None,
+) -> dict:
+    fingerprint_payload = {
+        "config": cfg,
+        "completed_trade_date": cutoff,
+        "execution_assumptions": assumptions.as_dict(),
+    }
+    config_hash = hashlib.sha256(
+        json.dumps(
+            fingerprint_payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+    generated_at = datetime.now().astimezone().isoformat(timespec="seconds")
+    return {
+        "run_id": run_id or f"{cutoff}-{config_hash[:12]}-{datetime.now().strftime('%H%M%S')}",
+        "config_hash": config_hash,
+        "completed_trade_date": cutoff,
+        "generated_at": generated_at,
+        "selection_policy": "仅用2026年前开发/验证期选参；2026及以后只作冻结后的样本外观察",
+        "execution_assumptions": assumptions.as_dict(),
+    }
 
 
 class CausalLineState:
@@ -820,6 +999,18 @@ def simulate_trades(
 def lifecycle_rule_candidates() -> tuple[dict, ...]:
     rules: list[dict] = [
         {
+            "id": "break5_trail3_2_next_open_v2",
+            "label": (
+                "主选或次选信号持续，收盘突破此前5个完整交易日最高价后，"
+                "下一可交易日开盘买入；浮盈达到3%后，较最高收盘回撤2%确认卖出，"
+                "下一可交易日开盘卖出；最迟龙虎关系结束"
+            ),
+            "entry_recent_high_lookback": 5,
+            "entry_max_wait_bars": 10,
+            "activation_threshold_pct": 3.0,
+            "trailing_drawdown_pct": 2.0,
+        },
+        {
             "id": "signal_window_end",
             "label": "近期龙腾跃虎标签到期即结束",
             "signal_expiry_exit": True,
@@ -954,6 +1145,7 @@ def _lifecycle_entry_indices(
     points: Sequence[SignalPoint],
     entry_mode: str,
     rule: dict,
+    bars: Sequence[Bar] | None = None,
 ) -> list[tuple[int, int]]:
     if entry_mode not in {"base", "pool", "main"}:
         raise ValueError(f"未知生命周期入场模式: {entry_mode}")
@@ -963,6 +1155,7 @@ def _lifecycle_entry_indices(
     setup_index = -1
     confirmation_days = int(rule.get("entry_confirmation_days", 0))
     breakout_pct = rule.get("entry_breakout_pct")
+    recent_high_lookback = rule.get("entry_recent_high_lookback")
     max_wait = int(rule.get("entry_max_wait_bars", 10))
     for index, point in enumerate(points):
         if point.dragon <= point.tiger:
@@ -1001,17 +1194,33 @@ def _lifecycle_entry_indices(
             and not point.cross_ok
             and point.dragon > point.tiger
         )
-        if signal_erased or elapsed > max_wait:
+        cross_changed = bool(
+            setup.cross_date
+            and point.cross_date
+            and setup.cross_date != point.cross_date
+        )
+        if signal_erased or cross_changed or elapsed > max_wait:
             setup_index = index if should_enter else -1
             selected_streak = 1 if should_enter else 0
             continue
 
-        entry_ready = (
-            selected_streak >= confirmation_days + 1
-            if breakout_pct is None
-            else elapsed > 0
-            and point.close >= setup.close * (1.0 + float(breakout_pct) / 100.0)
-        )
+        if recent_high_lookback is not None:
+            lookback = int(recent_high_lookback)
+            start = max(0, index - lookback)
+            entry_ready = bool(
+                bars is not None
+                and elapsed > 0
+                and index > start
+                and point.close
+                > max(float(bar.high) for bar in bars[start:index])
+            )
+        else:
+            entry_ready = (
+                selected_streak >= confirmation_days + 1
+                if breakout_pct is None
+                else elapsed > 0
+                and point.close >= setup.close * (1.0 + float(breakout_pct) / 100.0)
+            )
         if entry_ready:
             indices.append((index, setup_index))
             armed = False
@@ -1050,19 +1259,73 @@ def simulate_lifecycle_trades(
     *,
     entry_mode: str = "pool",
     horizon: int = 60,
+    bars: Sequence[Bar] | None = None,
+    execution: ExecutionAssumptions | None = None,
 ) -> list[dict]:
-    """Close every eligible wave causally and record the four-stage lifecycle."""
+    """Jointly replay one causal entry-to-exit transaction chain.
+
+    Production callers pass ``bars`` so a close trigger fills at the next
+    tradable open. Omitting ``bars`` retains the historical same-close helper
+    behaviour for callers that only test signal semantics.
+    """
     trades: list[dict] = []
     confirmation_days = int(rule.get("entry_confirmation_days", 0))
-    for entry_index, setup_index in _lifecycle_entry_indices(
+    assumptions = execution or execution_assumptions()
+    for entry_trigger_index, setup_index in _lifecycle_entry_indices(
         points,
         entry_mode,
         rule,
+        bars,
     ):
-        if entry_index + horizon >= len(points):
-            continue
-        entry = points[entry_index]
         setup = points[setup_index]
+        if bars is not None:
+            def setup_still_valid(index: int) -> bool:
+                point = points[index]
+                natural_cross_remaining = max(
+                    0,
+                    int(setup.cross_lookback_days)
+                    - int(setup.cross_age)
+                    - 1,
+                )
+                erased = bool(
+                    setup.cross_age >= 0
+                    and setup.cross_lookback_days > 0
+                    and index - setup_index <= natural_cross_remaining
+                    and not point.cross_ok
+                    and point.dragon > point.tiger
+                )
+                cross_changed = bool(
+                    setup.cross_date
+                    and point.cross_date
+                    and setup.cross_date != point.cross_date
+                )
+                return not erased and not cross_changed and point.dragon > point.tiger
+
+            entry_fill = next_open_fill(
+                stock,
+                bars,
+                entry_trigger_index,
+                "buy",
+                assumptions,
+                can_continue_after_close=setup_still_valid,
+            )
+            if entry_fill is None:
+                continue
+            entry_index = entry_fill.index
+            entry_raw_price = entry_fill.raw_price
+            entry_price = entry_fill.effective_price
+            entry_deferred_bars = entry_fill.deferred_bars
+            # A completed transaction also needs a later open for the exit.
+            if entry_index + horizon + 1 >= len(points):
+                continue
+        else:
+            entry_index = entry_trigger_index
+            entry_raw_price = float(points[entry_index].close)
+            entry_price = entry_raw_price
+            entry_deferred_bars = 0
+            if entry_index + horizon >= len(points):
+                continue
+
         running_peak_return = 0.0
         best_return = 0.0
         worst_return = 0.0
@@ -1073,12 +1336,15 @@ def simulate_lifecycle_trades(
         pending_days = 0
         recovered_count = 0
         was_pending = False
-        exit_index = entry_index + horizon
+        exit_trigger_index = entry_index + horizon
         exit_reason = "完成60个后续交易日"
 
-        for index in range(entry_index + 1, entry_index + horizon + 1):
+        first_close_index = entry_index if bars is not None else entry_index + 1
+        for index in range(first_close_index, entry_index + horizon + 1):
             point = points[index]
-            current_return = (point.close / entry.close - 1.0) * 100.0
+            # Strategy thresholds are observable market-price rules. Costs and
+            # slippage affect realized net return only, never the trigger date.
+            current_return = (point.close / entry_raw_price - 1.0) * 100.0
             if current_return > best_return:
                 best_return = current_return
                 peak_index = index
@@ -1139,7 +1405,7 @@ def simulate_lifecycle_trades(
             was_pending = pending
 
             reason = ""
-            if signal_erased:
+            if rule.get("exit_on_erasure") and signal_erased:
                 reason = "龙腾跃虎信号被K线重算消失"
             elif rule.get("signal_expiry_exit") and label_expired:
                 reason = "近期龙腾跃虎标签超过有效窗口"
@@ -1173,25 +1439,49 @@ def simulate_lifecycle_trades(
                 reason = "完成60个后续交易日"
 
             if reason:
-                exit_index = index
+                exit_trigger_index = index
                 exit_reason = reason
                 break
 
-        exit_point = points[exit_index]
-        exit_return = (exit_point.close / entry.close - 1.0) * 100.0
+        if bars is not None:
+            exit_fill = next_open_fill(
+                stock,
+                bars,
+                exit_trigger_index,
+                "sell",
+                assumptions,
+            )
+            if exit_fill is None:
+                continue
+            exit_index = exit_fill.index
+            exit_raw_price = exit_fill.raw_price
+            exit_price = exit_fill.effective_price
+            exit_deferred_bars = exit_fill.deferred_bars
+        else:
+            exit_index = exit_trigger_index
+            exit_raw_price = float(points[exit_index].close)
+            exit_price = exit_raw_price
+            exit_deferred_bars = 0
+        exit_return = (exit_price / entry_price - 1.0) * 100.0
         trades.append(
             {
                 "code": stock.code,
                 "name": stock.name,
                 "entry_area": setup.area if entry_mode != "base" else "base",
-                "entry_date": entry.date,
-                "entry_price": entry.close,
+                "entry_trigger_date": points[entry_trigger_index].date,
+                "entry_date": points[entry_index].date,
+                "entry_raw_open": round(entry_raw_price, 4),
+                "entry_price": round(entry_price, 6),
+                "entry_deferred_bars": entry_deferred_bars,
                 "entry_confirmation_days": confirmation_days,
                 "entry_breakout_pct": rule.get("entry_breakout_pct"),
                 "signal_setup_date": setup.date,
                 "entry_cross_date": setup.cross_date,
-                "exit_date": exit_point.date,
-                "exit_price": exit_point.close,
+                "exit_trigger_date": points[exit_trigger_index].date,
+                "exit_date": points[exit_index].date,
+                "exit_raw_open": round(exit_raw_price, 4),
+                "exit_price": round(exit_price, 6),
+                "exit_deferred_bars": exit_deferred_bars,
                 "return_pct": round(exit_return, 4),
                 "holding_bars": exit_index - entry_index,
                 "best_return_pct": round(best_return, 4),
@@ -1204,6 +1494,11 @@ def simulate_lifecycle_trades(
                 "recovered_count": recovered_count,
                 "exit_reason": exit_reason,
                 "success": exit_return > 0,
+                "execution_model": (
+                    "next_tradable_open_with_costs"
+                    if bars is not None
+                    else "legacy_same_close_without_costs"
+                ),
             }
         )
     return trades
@@ -1469,7 +1764,10 @@ def aggregate_result(
     stocks: Sequence[Stock],
     histories: Sequence[tuple[Stock, list[Bar]]],
     errors: Sequence[str],
+    meta: dict | None = None,
+    execution: ExecutionAssumptions | None = None,
 ) -> dict:
+    assumptions = execution or execution_assumptions(cfg)
     forward_rows: list[dict] = []
     yellow_window_rows: dict[str, list[dict]] = {
         variant_id: [] for variant_id, _, _, _ in YELLOW_WINDOW_VARIANTS
@@ -1564,6 +1862,8 @@ def aggregate_result(
                     points,
                     lifecycle_rule,
                     entry_mode="pool",
+                    bars=bars,
+                    execution=assumptions,
                 )
             )
         if bars:
@@ -1684,6 +1984,25 @@ def aggregate_result(
             )
             for area in ("main", "secondary")
         }
+        by_area_periods = {}
+        for area in ("main", "secondary"):
+            area_rows = [row for row in rows if row["entry_area"] == area]
+            by_area_periods[area] = {
+                "overall": lifecycle_trade_stats(area_rows),
+                "development_before_2025": lifecycle_trade_stats(
+                    [row for row in area_rows if row["entry_date"] < "2025-01-01"]
+                ),
+                "validation_2025": lifecycle_trade_stats(
+                    [
+                        row
+                        for row in area_rows
+                        if "2025-01-01" <= row["entry_date"] < "2026-01-01"
+                    ]
+                ),
+                "holdout_2026": lifecycle_trade_stats(
+                    [row for row in area_rows if row["entry_date"] >= "2026-01-01"]
+                ),
+            }
         development_stats = lifecycle_trade_stats(development)
         validation_stats = lifecycle_trade_stats(validation_2025)
         holdout_stats = lifecycle_trade_stats(holdout_2026)
@@ -1703,6 +2022,7 @@ def aggregate_result(
                 "validation_2025": validation_stats,
                 "holdout_2026": holdout_stats,
                 "by_entry_area": by_area,
+                "by_entry_area_periods": by_area_periods,
                 "selection_success_floor_pct": round(stable_success, 2),
                 "selection_average_return_floor_pct": round(stable_average, 4),
             }
@@ -1742,58 +2062,13 @@ def aggregate_result(
             item["selection_success_floor_pct"],
         ),
     )
-    operational_candidates = [
+    # Research recommendation is selected strictly pre-2026. The separately
+    # approved live strategy remains frozen and must never be described as the
+    # automatic optimum.
+    operational_recommended = next(
         item
         for item in lifecycle_candidates
-        if item["development_before_2025"]["sample_count"] >= 50
-        and item["validation_2025"]["sample_count"] >= 50
-        and item["holdout_2026"]["sample_count"] >= 50
-        and min(
-            float(item["development_before_2025"]["average_pct"]),
-            float(item["validation_2025"]["average_pct"]),
-            float(item["holdout_2026"]["average_pct"]),
-        ) > 0
-    ] or lifecycle_candidates
-    for item in operational_candidates:
-        item["operational_success_floor_pct"] = round(
-            min(
-                float(item["development_before_2025"]["success_rate_pct"]),
-                float(item["validation_2025"]["success_rate_pct"]),
-                float(item["holdout_2026"]["success_rate_pct"]),
-            ),
-            2,
-        )
-        item["operational_average_return_floor_pct"] = round(
-            min(
-                float(item["development_before_2025"]["average_pct"]),
-                float(item["validation_2025"]["average_pct"]),
-                float(item["holdout_2026"]["average_pct"]),
-            ),
-            4,
-        )
-    operational_highest_success = max(
-        operational_candidates,
-        key=lambda item: (
-            item["operational_success_floor_pct"],
-            item["operational_average_return_floor_pct"],
-        ),
-    )
-    operational_success_cutoff = (
-        float(operational_highest_success["operational_success_floor_pct"])
-        - 3.0
-    )
-    operational_balanced_pool = [
-        item
-        for item in operational_candidates
-        if float(item["operational_success_floor_pct"])
-        >= operational_success_cutoff
-    ]
-    operational_recommended = max(
-        operational_balanced_pool,
-        key=lambda item: (
-            item["operational_average_return_floor_pct"],
-            item["operational_success_floor_pct"],
-        ),
+        if item["id"] == "break5_trail3_2_next_open_v2"
     )
     operational_rows = lifecycle_trades[str(operational_recommended["id"])]
     persistence_reference_rows = lifecycle_trades["death_cross"]
@@ -1816,7 +2091,11 @@ def aggregate_result(
     )
 
     return {
-        "schema_version": 5,
+        "schema_version": 6,
+        "meta": meta or {},
+        "run_id": (meta or {}).get("run_id", ""),
+        "config_hash": (meta or {}).get("config_hash", ""),
+        "completed_trade_date": (meta or {}).get("completed_trade_date", date_max),
         "generated_at": datetime.now().astimezone().isoformat(
             timespec="seconds"
         ),
@@ -1829,7 +2108,11 @@ def aggregate_result(
             ),
             "price_basis": "通达信日线按最新除权除息记录前复权",
             "universe_basis": "验证时仍上市的沪深A股，按当前名称排除ST与*ST",
-            "execution_basis": "信号日收盘加入，退出信号日收盘移出，不计费用与滑点",
+            "execution_basis": (
+                "买点与卖点均由当日收盘确认，下一可交易日开盘成交；"
+                "一字涨停买不到则候选继续等待并在信号失效时取消，"
+                "一字跌停卖不出则顺延；收益已扣除配置中的双边费用、卖方印花税与滑点"
+            ),
             "entry_definition": (
                 f"近{cfg['cross_lookback_days']}个交易日发生龙线上穿虎线、当前龙线仍高于虎线，且上穿日前"
                 f"{cfg.get('yellow_before_cross_days', 2)}日至后{cfg.get('yellow_after_cross_days', 2)}日内黄柱满足配置阈值；"
@@ -1840,7 +2123,7 @@ def aggregate_result(
                 "当前上市股票样本存在幸存者偏差，未包含历史退市股票",
                 "历史ST名称变化未完整还原",
                 "除权除息记录按验证日可取得的最新记录统一前复权",
-                "涨跌停无法成交、停牌、滑点和手续费未纳入",
+                "未模拟券商单笔最低5元佣金，结果不代表任一账户的实际成交成本",
             ],
         },
         "coverage": {
@@ -1883,26 +2166,30 @@ def aggregate_result(
         },
         "trend_lifecycle_analysis": {
             "success_definition": (
-                "只统计已经从建议趋势开始走到建议趋势结束的完整波段；"
-                "结束价高于开始价才算成功，未结束样本不进入成功率"
+                "只统计已经完成买入与卖出成交的完整交易；"
+                "扣除配置费用与滑点后的卖出有效价高于买入有效价才算成功，"
+                "未成交或尚未完成卖出的样本不进入成功率"
             ),
             "entry_definition": (
-                "主选或次选首次满足日只作为待观察信号；信号未被重算消失，且10个交易日内收盘较信号日上涨5%时才确认趋势开始；同一轮龙线高于虎线期间只进入一次"
+                "当前冻结实盘策略：主选或次选首次满足日只进入待观察；"
+                "信号持续且10个交易日内收盘突破此前5个完整交易日最高价时确认买点，"
+                "下一可交易日开盘买入；同一事件中的次选升级主选不重复买入"
             ),
             "mandatory_end_definition": (
-                "龙线不再高于虎线时，龙腾跃虎的多头关系消失，当日收盘确认趋势结束"
+                "达到3%浮盈后较最高收盘回撤2%，或龙线不再高于虎线时，"
+                "当日收盘确认趋势结束，下一可交易日开盘卖出"
             ),
             "label_expiry_comparison": (
                 "自然超过交叉显示窗口不等同趋势结束；另行识别仍在自然窗口内却因XMA尾部重算而消失的短暂信号"
             ),
             "status_definition": {
-                "trend_start": "主选或次选信号形成后，10个交易日内收盘较信号日上涨5%的建议买入日",
+                "trend_start": "收盘突破此前5个完整交易日最高价后的买入待执行状态；实际成交为下一可交易日开盘",
                 "rising": "尚未出现风险预警或结束条件",
                 "pending": (
                     "龙虎同步转弱、跌破5日均线，"
                     "或达到浮盈阈值后回撤达到止盈线的60%"
                 ),
-                "trend_end": "触发推荐结束规则的建议卖出日",
+                "trend_end": "收盘触发推荐结束规则后的卖出待执行状态；实际成交为下一可交易日开盘",
             },
             "selection_method": (
                 "参数只用2025年前开发样本与2025年验证样本选择；"
@@ -1910,21 +2197,25 @@ def aggregate_result(
                 "再选两段平均收益下限最高者；2026样本不参与选择，只用于最终检验"
             ),
             "recommended_id": recommended_lifecycle["id"],
+            "automatic_recommended_id": recommended_lifecycle["id"],
+            "automatic_recommended": recommended_lifecycle,
             "highest_success_id": highest_success["id"],
             "highest_return_id": highest_return["id"],
             "operational_selection_method": (
-                "正式执行规则同时比较2025年前、2025年与2026年三个时段；"
-                "在各时段平均收益均为正的候选中，先保留最低胜率距最高方案不超过3个百分点的候选，"
-                "再选各时段最低平均收益最高者。规则自本次选择后冻结，后续行情继续样本外检验"
+                "正式执行规则为用户已确认并冻结的 break5_trail3_2_next_open_v2；"
+                "它与严格使用2026年前开发/验证期得到的自动研究推荐分开披露，"
+                "不宣称冻结策略是自动最优；2026及以后只作冻结后的样本外观察"
             ),
             "operational_recommended_id": operational_recommended["id"],
+            "frozen_live_strategy_id": operational_recommended["id"],
+            "frozen_live_strategy": operational_recommended,
             "signal_persistence_analysis": {
                 "definition": (
                     "信号首次出现后，在按初始交叉年龄推算的自然显示期限内，"
                     "若龙线仍高于虎线但龙腾跃虎被后续K线重算掉，记为短暂信号消失；"
                     "自然到期不记为消失"
                 ),
-                "reference_rule": "首次入选即开始、仅以信号重算消失或龙虎关系结束作为退出",
+                "reference_rule": "首次入选收盘确认、下一可交易日开盘开始；仅以信号重算消失或龙虎关系结束触发退出，下一可交易日开盘成交",
                 "reference_entry_count": len(persistence_reference_rows),
                 "erased_before_natural_expiry_count": len(
                     erased_operational_rows
@@ -1945,6 +2236,41 @@ def aggregate_result(
             "entry_mode": "main_or_secondary_pool",
             "forward_horizon_bars": 60,
             "candidates": lifecycle_candidates,
+        },
+        "cohorts": {
+            "combined": {
+                "definition": "首次进入主选区或次选区形成的真实选区样本；正式指标绑定当前冻结实盘策略",
+                "selected_strategy_id": operational_recommended["id"],
+                "selected_strategy": operational_recommended,
+                "frozen_live_strategy_id": operational_recommended["id"],
+                "frozen_live_strategy": operational_recommended,
+                "automatic_recommended_id": recommended_lifecycle["id"],
+                "automatic_recommended": recommended_lifecycle,
+            },
+            "main": {
+                "definition": "联合选区样本中，首次入选区域为主选区",
+                "selected_strategy_id": operational_recommended["id"],
+                "selected_strategy": {
+                    "id": operational_recommended["id"],
+                    "label": operational_recommended["label"],
+                    **operational_recommended["by_entry_area_periods"]["main"],
+                },
+                "automatic_recommended_id": recommended_lifecycle["id"],
+            },
+            "secondary": {
+                "definition": "联合选区样本中，首次入选区域为次选区",
+                "selected_strategy_id": operational_recommended["id"],
+                "selected_strategy": {
+                    "id": operational_recommended["id"],
+                    "label": operational_recommended["label"],
+                    **operational_recommended["by_entry_area_periods"]["secondary"],
+                },
+                "automatic_recommended_id": recommended_lifecycle["id"],
+            },
+            "base_research": {
+                "definition": "仅满足龙腾跃虎与窗口黄柱的广义研究样本，不属于主选区或次选区正式绩效",
+                "forward_returns": _group_forward(forward_rows),
+            },
         },
         "retrospective_chart_analysis": {
             "warning": (
@@ -2149,11 +2475,53 @@ def main(argv: Iterable[str] | None = None) -> int:
     parser.add_argument("--workers", type=int)
     parser.add_argument("--codes", help="仅验证指定股票代码，逗号分隔")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--completed-trade-date", help="最后完整交易日，默认读取 strategy/state.json")
+    parser.add_argument("--run-id", help="与页面研究结果绑定的运行批次号")
+    parser.add_argument("--commission-bps", type=float, help="券商佣金，单边基点")
+    parser.add_argument("--exchange-fee-bps", type=float, help="经手费，单边基点")
+    parser.add_argument("--regulatory-fee-bps", type=float, help="证管费，单边基点")
+    parser.add_argument("--stamp-duty-bps", type=float, help="卖方印花税，基点")
+    parser.add_argument("--slippage-bps", type=float, help="滑点，单边基点")
+    parser.add_argument("--entry-execution-max-wait-bars", type=int, help="涨停/停牌导致买不到时最多等待的交易日")
     args = parser.parse_args(list(argv) if argv is not None else None)
     if args.bars < 120:
         parser.error("--bars 至少为 120")
 
     cfg = load_config(ROOT / "config.json")
+    defaults = execution_assumptions(cfg)
+    assumptions = ExecutionAssumptions(
+        commission_bps_per_side=(
+            defaults.commission_bps_per_side
+            if args.commission_bps is None
+            else args.commission_bps
+        ),
+        exchange_fee_bps_per_side=(
+            defaults.exchange_fee_bps_per_side
+            if args.exchange_fee_bps is None
+            else args.exchange_fee_bps
+        ),
+        regulatory_fee_bps_per_side=(
+            defaults.regulatory_fee_bps_per_side
+            if args.regulatory_fee_bps is None
+            else args.regulatory_fee_bps
+        ),
+        stamp_duty_bps_sell=(
+            defaults.stamp_duty_bps_sell
+            if args.stamp_duty_bps is None
+            else args.stamp_duty_bps
+        ),
+        slippage_bps_per_side=(
+            defaults.slippage_bps_per_side
+            if args.slippage_bps is None
+            else args.slippage_bps
+        ),
+        entry_execution_max_wait_bars=(
+            defaults.entry_execution_max_wait_bars
+            if args.entry_execution_max_wait_bars is None
+            else args.entry_execution_max_wait_bars
+        ),
+    )
+    cutoff = args.completed_trade_date or completed_trade_date(ROOT)
     universe = cached_universe()
     if not universe:
         raise RuntimeError("缺少 cache/universe.json，请先运行一次完整扫描")
@@ -2170,12 +2538,21 @@ def main(argv: Iterable[str] | None = None) -> int:
         args.bars,
         args.workers or cfg["workers"],
     )
+    histories = truncate_histories(histories, cutoff)
+    meta = research_meta(
+        cfg,
+        cutoff,
+        assumptions,
+        run_id=args.run_id,
+    )
     result = aggregate_result(
         cfg=cfg,
         requested_bars=args.bars,
         stocks=universe,
         histories=histories,
         errors=errors,
+        meta=meta,
+        execution=assumptions,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(

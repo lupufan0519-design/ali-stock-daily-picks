@@ -5,10 +5,12 @@ import unittest
 
 from rolling_validation import (
     CausalLineState,
+    ExecutionAssumptions,
     SignalPoint,
     forward_returns,
     lifecycle_trade_stats,
     replay_signals,
+    next_open_fill,
     simulate_lifecycle_trades,
     simulate_trades,
 )
@@ -233,7 +235,7 @@ class ExitRuleTests(unittest.TestCase):
         rows = simulate_lifecycle_trades(
             Stock(1, "600001", "示例"),
             points,
-            {"id": "death_cross"},
+            {"id": "death_cross", "exit_on_erasure": True},
         )
         self.assertEqual(rows[0]["exit_date"], "2026-07-02")
         self.assertEqual(
@@ -407,6 +409,140 @@ class ExitRuleTests(unittest.TestCase):
         )
         self.assertEqual(stats["success_rate_pct"], 50.0)
         self.assertEqual(stats["sample_count"], 2)
+
+    def test_joint_lifecycle_fills_entry_and_exit_at_following_opens(self):
+        points = [
+            self.point(1, 11, 10, "main", 10.0),
+            self.point(2, 11.2, 10, "", 11.1),
+            self.point(3, 9.8, 10, "", 10.7),
+            self.point(4, 9.7, 10, "", 10.4),
+            self.point(5, 9.6, 10, "", 10.3),
+            self.point(6, 9.5, 10, "", 10.2),
+        ]
+        opens = [10.0, 11.0, 10.8, 10.5, 10.3, 10.2]
+        history = [
+            Bar(
+                date=point.date,
+                open=open_price,
+                high=max(open_price, point.close) + 0.1,
+                low=min(open_price, point.close) - 0.1,
+                close=point.close,
+                volume=1000.0,
+                amount=10000.0,
+            )
+            for point, open_price in zip(points, opens)
+        ]
+        assumptions = ExecutionAssumptions(
+            commission_bps_per_side=3.0,
+            exchange_fee_bps_per_side=0.341,
+            regulatory_fee_bps_per_side=0.2,
+            stamp_duty_bps_sell=5.0,
+            slippage_bps_per_side=5.0,
+        )
+        rows = simulate_lifecycle_trades(
+            Stock(1, "600001", "示例"),
+            points,
+            {"id": "death_cross"},
+            horizon=2,
+            bars=history,
+            execution=assumptions,
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["entry_trigger_date"], "2026-07-01")
+        self.assertEqual(rows[0]["entry_date"], "2026-07-02")
+        self.assertEqual(rows[0]["exit_trigger_date"], "2026-07-03")
+        self.assertEqual(rows[0]["exit_date"], "2026-07-04")
+        self.assertEqual(rows[0]["entry_raw_open"], 11.0)
+        self.assertEqual(rows[0]["exit_raw_open"], 10.5)
+        self.assertGreater(rows[0]["entry_price"], 11.0)
+        self.assertLess(rows[0]["exit_price"], 10.5)
+
+    def test_limit_locked_orders_defer_and_buy_wait_is_capped(self):
+        stock = Stock(1, "600001", "示例")
+        history = [
+            Bar("2026-07-01", 10.0, 10.1, 9.9, 10.0, 1000.0, 10000.0),
+            Bar("2026-07-02", 11.0, 11.0, 11.0, 11.0, 1000.0, 10000.0),
+            Bar("2026-07-03", 10.8, 10.9, 10.7, 10.8, 1000.0, 10000.0),
+        ]
+        zero_cost = ExecutionAssumptions(
+            commission_bps_per_side=0.0,
+            exchange_fee_bps_per_side=0.0,
+            regulatory_fee_bps_per_side=0.0,
+            stamp_duty_bps_sell=0.0,
+            slippage_bps_per_side=0.0,
+            entry_execution_max_wait_bars=5,
+        )
+        fill = next_open_fill(stock, history, 0, "buy", zero_cost)
+        self.assertEqual(fill.index, 2)
+        self.assertEqual(fill.deferred_bars, 1)
+        capped = ExecutionAssumptions(**{
+            **{key: value for key, value in vars(zero_cost).items() if key != "entry_execution_max_wait_bars"},
+            "entry_execution_max_wait_bars": 1,
+        })
+        self.assertIsNone(next_open_fill(stock, history, 0, "buy", capped))
+
+        down_history = [
+            Bar("2026-07-01", 10.0, 10.1, 9.9, 10.0, 1000.0, 10000.0),
+            Bar("2026-07-02", 9.0, 9.0, 9.0, 9.0, 1000.0, 10000.0),
+            Bar("2026-07-03", 8.9, 9.0, 8.8, 8.9, 1000.0, 10000.0),
+        ]
+        sell_fill = next_open_fill(stock, down_history, 0, "sell", capped)
+        self.assertEqual(sell_fill.index, 2)
+        self.assertEqual(sell_fill.deferred_bars, 1)
+
+    def test_frozen_live_rule_uses_break5_trigger_and_next_open_chain(self):
+        closes = [10.0, 10.3, 10.5, 10.8, 10.55, 10.5, 10.4, 10.3, 10.2]
+        points = [
+            self.point(
+                day,
+                11.0,
+                10.0,
+                "secondary" if day == 1 else "",
+                close,
+                cross_age=0 if day == 1 else -1,
+                cross_lookback_days=8 if day == 1 else 0,
+            )
+            for day, close in enumerate(closes, start=1)
+        ]
+        opens = [10.0, 10.1, 10.4, 10.6, 10.7, 10.5, 10.4, 10.3, 10.2]
+        highs = [10.2, 10.35, 10.6, 10.9, 10.65, 10.6, 10.5, 10.4, 10.3]
+        history = [
+            Bar(
+                date=point.date,
+                open=open_price,
+                high=high,
+                low=min(open_price, point.close) - 0.1,
+                close=point.close,
+                volume=1000.0,
+                amount=10000.0,
+            )
+            for point, open_price, high in zip(points, opens, highs)
+        ]
+        zero_cost = ExecutionAssumptions(
+            commission_bps_per_side=0.0,
+            exchange_fee_bps_per_side=0.0,
+            regulatory_fee_bps_per_side=0.0,
+            stamp_duty_bps_sell=0.0,
+            slippage_bps_per_side=0.0,
+        )
+        rows = simulate_lifecycle_trades(
+            Stock(1, "600001", "示例"),
+            points,
+            {
+                "id": "break5_trail3_2_next_open_v2",
+                "entry_recent_high_lookback": 5,
+                "entry_max_wait_bars": 10,
+                "activation_threshold_pct": 3.0,
+                "trailing_drawdown_pct": 2.0,
+            },
+            horizon=5,
+            bars=history,
+            execution=zero_cost,
+        )
+        self.assertEqual(rows[0]["entry_trigger_date"], "2026-07-02")
+        self.assertEqual(rows[0]["entry_date"], "2026-07-03")
+        self.assertEqual(rows[0]["exit_trigger_date"], "2026-07-05")
+        self.assertEqual(rows[0]["exit_date"], "2026-07-06")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import json
 import unittest
+from unittest.mock import patch
 from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
@@ -196,6 +197,37 @@ class CloudWorkflowTests(unittest.TestCase):
             ["600001", "600002"],
         )
 
+    def test_live_universe_keeps_pending_entry_target_and_previews_st_cancellation(self):
+        order = {
+            "execution_id": "entry_600004_2026-07-30",
+            "code": "600004",
+            "name": "原普通股票",
+            "market": 1,
+            "area": "main",
+            "entry_trigger_date": "2026-07-30",
+            "entry_trigger_close": 10.5,
+        }
+        payload = {
+            "trade_date": "2026-07-30",
+            "live_universe": [self.live_seed("600001")],
+            "strategy": {"pending_entry_execution": [order]},
+            "results": [],
+        }
+
+        self.assertEqual(
+            [item["code"] for item in collect_targets(payload)],
+            ["600001", "600004"],
+        )
+        quote = {
+            **self.live_quote("600004"),
+            "name": "ST新名称",
+        }
+        tracking = build_live_tracking(payload, {"600004": quote})["main"][0]
+        self.assertTrue(tracking["provisional_cancel"])
+        self.assertFalse(tracking["provisional_entry_execution"])
+        self.assertEqual(tracking["status"], "待观察中")
+        self.assertEqual(tracking["operation"], "取消买入待收盘")
+
     def test_area_tracking_codes_are_unique_and_exclude_st(self):
         payload = {
             "strategy": {
@@ -267,6 +299,48 @@ class CloudWorkflowTests(unittest.TestCase):
             collect_tracking_codes(payload, tracking),
             {"main": ["600001"], "secondary": ["603648"]},
         )
+
+    def test_live_name_change_to_st_previews_exit_and_blocks_pool_entry(self):
+        payload = {
+            "trade_date": "2026-07-30",
+            "config": {
+                "bottom_lookback_days": 5,
+                "cross_lookback_days": 8,
+                "limit_up_lookback_days": 42,
+                "yellow_consecutive_days": 1,
+                "yellow_before_cross_days": 2,
+                "yellow_after_cross_days": 7,
+            },
+            "live_universe": [self.live_seed("600001")],
+            "strategy": {
+                "active": [
+                    {
+                        "code": "600001",
+                        "name": "原普通股票",
+                        "market": 1,
+                        "entry_price": 10.0,
+                        "entry_date": "2026-07-20",
+                        "last_close": 10.2,
+                        "last_date": "2026-07-30",
+                        "return_pct": 2.0,
+                        "best_return_pct": 2.0,
+                        "holding_days": 8,
+                    }
+                ],
+                "secondary_active": [],
+            },
+        }
+        quote = {**self.live_quote("600001"), "name": "ST新名称"}
+
+        tracking = build_live_tracking(payload, {"600001": quote})["main"][0]
+        pools = build_live_pools(payload, {"600001": quote}, set())
+
+        self.assertEqual(tracking["name"], "ST新名称")
+        self.assertTrue(tracking["provisional_exit"])
+        self.assertIn("ST", tracking["exit_reason"])
+        self.assertEqual(tracking["operation"], "卖出触发 · 等待收盘")
+        self.assertEqual(pools["main"], [])
+        self.assertEqual(pools["secondary"], [])
 
     def test_live_tracking_previews_the_sixtieth_following_day_exit(self):
         payload = {
@@ -459,12 +533,159 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertFalse(tracking["trend_ended"])
         self.assertTrue(tracking["provisional_entry"])
         self.assertEqual(tracking["status"], "待观察中")
-        self.assertEqual(tracking["operation"], "买入触发 · 等待收盘")
+        self.assertEqual(tracking["operation"], "买点触发 · 等待收盘")
 
         quote["price"] = 10.4
         tracking = build_live_tracking(payload, {"600020": quote})["main"][0]
         self.assertFalse(tracking["provisional_entry"])
         self.assertEqual(tracking["operation"], "等待买入")
+
+    def test_pending_entry_execution_is_only_previewed_intraday(self):
+        order = {
+            "execution_id": "entry_600020_2026-07-30",
+            "code": "600020",
+            "name": "待执行买入",
+            "market": 1,
+            "area": "main",
+            "setup_date": "2026-07-28",
+            "setup_price": 10.0,
+            "entry_trigger_date": "2026-07-30",
+            "entry_trigger_close": 10.6,
+        }
+        payload = {
+            "trade_date": "2026-07-30",
+            "strategy": {"pending_entry_execution": [order]},
+        }
+        before = json.loads(json.dumps(payload, ensure_ascii=False))
+
+        tracking = build_live_tracking(
+            payload,
+            {"600020": self.live_quote("600020")},
+        )["main"][0]
+
+        self.assertEqual(payload, before)
+        self.assertTrue(tracking["pending_entry_execution"])
+        self.assertTrue(tracking["provisional_entry_execution"])
+        self.assertFalse(tracking["execution_blocked"])
+        self.assertEqual(tracking["status"], "买点已确认")
+        self.assertEqual(tracking["operation"], "开盘买入待结算")
+        self.assertEqual(tracking["entry_price"], 10.0)
+
+    def test_pending_entry_execution_does_not_assume_a_fill_at_one_word_limit_up(self):
+        payload = {
+            "trade_date": "2026-07-30",
+            "strategy": {
+                "pending_entry_execution": [
+                    {
+                        "execution_id": "entry_600020_2026-07-30",
+                        "code": "600020",
+                        "name": "待执行买入",
+                        "market": 1,
+                        "area": "main",
+                        "setup_date": "2026-07-28",
+                        "setup_price": 10.0,
+                        "entry_trigger_date": "2026-07-30",
+                        "entry_trigger_close": 10.6,
+                    }
+                ]
+            },
+        }
+        quote = {
+            **self.live_quote("600020"),
+            "price": 11.0,
+            "open": 11.0,
+            "high": 11.0,
+            "low": 11.0,
+        }
+
+        tracking = build_live_tracking(payload, {"600020": quote})["main"][0]
+
+        self.assertFalse(tracking["provisional_entry_execution"])
+        self.assertTrue(tracking["execution_blocked"])
+        self.assertEqual(tracking["entry_price"], 0.0)
+        self.assertEqual(tracking["operation"], "等待可成交开盘")
+
+    def test_pending_exit_execution_previews_open_without_settling(self):
+        order = {
+            "execution_id": "exit_600001_2026-07-30",
+            "position_id": "600001_2026-07-20",
+            "code": "600001",
+            "name": "待执行卖出",
+            "market": 1,
+            "area": "main",
+            "entry_date": "2026-07-20",
+            "entry_price": 8.0,
+            "holding_days": 8,
+            "last_date": "2026-07-30",
+            "last_close": 10.0,
+            "return_pct": 25.0,
+            "exit_trigger_date": "2026-07-30",
+            "exit_trigger_close": 10.0,
+            "exit_reason": "趋势结束：高点回撤2%",
+        }
+        payload = {
+            "trade_date": "2026-07-30",
+            "strategy": {"pending_exit_execution": [order]},
+        }
+        before = json.loads(json.dumps(payload, ensure_ascii=False))
+
+        tracking = build_live_tracking(
+            payload,
+            {"600001": self.live_quote("600001")},
+        )["main"][0]
+
+        self.assertEqual(payload, before)
+        self.assertFalse(tracking["trend_ended"])
+        self.assertTrue(tracking["pending_exit_execution"])
+        self.assertTrue(tracking["provisional_exit_execution"])
+        self.assertFalse(tracking["execution_blocked"])
+        self.assertEqual(tracking["status"], "卖点已确认")
+        self.assertEqual(tracking["operation"], "开盘卖出待结算")
+        self.assertEqual(tracking["preview_exit_price"], 10.0)
+        self.assertAlmostEqual(tracking["preview_exit_return_pct"], 25.0)
+
+    def test_pending_exit_execution_waits_through_one_word_limit_down(self):
+        payload = {
+            "trade_date": "2026-07-30",
+            "strategy": {
+                "pending_exit_execution": [
+                    {
+                        "execution_id": "exit_600001_2026-07-30",
+                        "position_id": "600001_2026-07-20",
+                        "code": "600001",
+                        "name": "原普通股票",
+                        "market": 1,
+                        "area": "main",
+                        "entry_date": "2026-07-20",
+                        "entry_price": 10.0,
+                        "holding_days": 8,
+                        "last_date": "2026-07-30",
+                        "last_close": 10.0,
+                        "return_pct": 0.0,
+                        "exit_trigger_date": "2026-07-30",
+                        "exit_trigger_close": 10.0,
+                        "exit_reason": "股票名称含 ST",
+                    }
+                ]
+            },
+        }
+        quote = {
+            **self.live_quote("600001"),
+            "name": "ST待执行卖出",
+            "price": 9.5,
+            "open": 9.5,
+            "high": 9.5,
+            "low": 9.5,
+        }
+
+        targets = collect_targets(payload)
+        tracking = build_live_tracking(payload, {"600001": quote})["main"][0]
+
+        self.assertEqual([target["code"] for target in targets], ["600001"])
+        self.assertFalse(tracking["provisional_exit_execution"])
+        self.assertTrue(tracking["execution_blocked"])
+        self.assertIsNone(tracking["preview_exit_price"])
+        self.assertEqual(tracking["operation"], "等待可成交开盘")
 
     def test_compact_snapshot_sorts_live_universe_and_result_keys(self):
         first = self.live_seed("600002")
@@ -688,17 +909,23 @@ class CloudWorkflowTests(unittest.TestCase):
             (Path(__file__).resolve().parents[1] / "results" / "trend_case.json")
             .read_text(encoding="utf-8")
         )
-        bars = payload["bars"]
-        dragon = payload["dragon"]
-        tiger = payload["tiger"]
+        case = next(
+            item
+            for item in payload["cancelled_cases"]
+            if item.get("code") == "603300"
+        )
+        bars = case["bars"]
+        dragon = case["wave_dragon"]
+        tiger = case["wave_tiger"]
         cross_index = next(
             index
             for index, bar in enumerate(bars)
-            if bar["date"] == payload["cross_date"]
+            if bar["date"] == case["cross_date"]
         )
         self.assertLessEqual(dragon[cross_index - 1], tiger[cross_index - 1])
         self.assertGreater(dragon[cross_index], tiger[cross_index])
-        for yellow_date in payload["yellow_dates"]:
+        self.assertEqual(case["qualified_yellow_dates"], ["2025-01-24", "2025-01-27"])
+        for yellow_date in case["yellow_dates"]:
             index = next(
                 index
                 for index, bar in enumerate(bars)
@@ -713,27 +940,31 @@ class CloudWorkflowTests(unittest.TestCase):
         html = _trend_case_chart()
         self.assertNotIn("信号形成放大图", html)
         self.assertNotIn('class="trend-case-signal"', html)
-        self.assertIn("完整波段 · 龙虎线与黄柱", html)
+        self.assertIn("完整波段 · 龙虎线与有效黄柱", html)
+        self.assertIn("真实案例 · 皖天然气 603689", html)
+        self.assertIn("2022-11-16 / 2022-11-17", html)
+        self.assertIn("2022-12-05 / 2022-12-06", html)
         self.assertIn("02-05 回看上穿", html)
-        self.assertIn("趋势开始", html)
-        self.assertEqual(html.count('class="trend-case-canvas"'), 1)
-        self.assertEqual(html.count('class="case-pin-rail"'), 1)
-        self.assertEqual(html.count('data-case-pin="'), 3)
-        self.assertEqual(html.count('data-case-leader="'), 3)
-        self.assertEqual(html.count('class="case-arrow-start"'), 1)
-        self.assertEqual(html.count('class="case-arrow-peak"'), 1)
-        self.assertEqual(html.count('class="case-arrow-end"'), 1)
-        self.assertEqual(html.count('class="case-start-target"'), 1)
-        self.assertEqual(html.count('class="case-exit-target"'), 1)
-        self.assertEqual(html.count('class="case-cross-guide"'), 1)
-        self.assertEqual(html.count('class="case-dragon-line"'), 1)
-        self.assertEqual(html.count('class="case-tiger-line"'), 1)
-        self.assertEqual(html.count('class="case-line-label dragon"'), 1)
-        self.assertEqual(html.count('class="case-line-label tiger"'), 1)
-        self.assertEqual(html.count('class="case-yellow-body qualified"'), 2)
-        self.assertEqual(html.count('class="case-yellow-body contextual"'), 6)
         self.assertIn("02-11 首次可见", html)
-        self.assertIn("上穿前两个交易日（2025-01-24、2025-01-27）", html)
+        self.assertIn("查看候选取消反例", html)
+        self.assertIn("买入执行", html)
+        self.assertEqual(html.count('class="trend-case-canvas"'), 2)
+        self.assertEqual(html.count('class="case-pin-rail'), 2)
+        self.assertEqual(html.count('data-case-pin="'), 5)
+        self.assertEqual(html.count('data-case-leader="'), 5)
+        self.assertEqual(html.count('class="case-arrow-start"'), 2)
+        self.assertEqual(html.count('class="case-arrow-peak"'), 1)
+        self.assertEqual(html.count('class="case-arrow-end"'), 2)
+        self.assertEqual(html.count('class="case-start-target"'), 2)
+        self.assertEqual(html.count('class="case-exit-target"'), 1)
+        self.assertEqual(html.count('class="case-cancel-target"'), 1)
+        self.assertEqual(html.count('class="case-cross-guide"'), 2)
+        self.assertEqual(html.count('class="case-dragon-line"'), 2)
+        self.assertEqual(html.count('class="case-tiger-line"'), 2)
+        self.assertEqual(html.count('class="case-line-label dragon"'), 2)
+        self.assertEqual(html.count('class="case-line-label tiger"'), 2)
+        self.assertEqual(html.count('class="case-yellow-body qualified"'), 3)
+        self.assertIn("信号形成 / 买点触发 / 买入执行", html)
         self.assertIn("syncTrendCaseLeaders", LIVE_SCRIPT)
         self.assertIn("ResizeObserver", LIVE_SCRIPT)
 
@@ -898,7 +1129,8 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertIn("tracking_codes", LIVE_SCRIPT)
         self.assertIn('row.querySelector("[data-live-return]")', LIVE_SCRIPT)
 
-    def test_report_separates_live_and_settled_dates_and_defers_video(self):
+    @patch("report_ui._read_result_json", return_value={})
+    def test_report_separates_live_and_settled_dates_and_defers_video(self, _read_result):
         item = SimpleNamespace(
             code="301516",
             name="中远通",
@@ -985,32 +1217,15 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertIn('preload="none"', html)
         self.assertIn('class="pool-table"', html)
         self.assertIn("中远通 最近42日K线", html)
-        self.assertIn("真实案例 · 海南华铁", html)
-        self.assertIn("信号确认", html)
-        self.assertIn("建议结束", html)
-        self.assertIn('class="case-dragon-line"', html)
-        self.assertIn('class="case-tiger-line"', html)
-        self.assertIn('class="case-yellow-body qualified"', html)
-        self.assertIn("通达信前复权日线", html)
-        self.assertIn("2025-02-11 / 2025-02-13 · 8.92元", html)
+        self.assertIn("联合验证数据待生成", html)
+        self.assertNotIn("真实案例 · 海南华铁", html)
         self.assertIn("默认展示优先级最高的 5 只", html)
         self.assertIn("展开更多：其余 1 只观察标的", html)
         self.assertNotIn("观察示例0", html)
         self.assertEqual(html.count("观察示例1"), 1)
-        self.assertIn("首次入选信号在自然显示期限内", html)
-        self.assertIn("10日内收盘突破此前5日最高价", html)
         self.assertIn("data-live-operation", html)
-        self.assertIn("浮盈达到3%后较最高收盘回撤2%", html)
-        self.assertIn("信号重绘对照 · 独立统计", html)
-        self.assertIn("98.96%", html)
-        self.assertIn("最终历史图不是实盘买点", html)
-        self.assertIn("德联集团", html)
-        self.assertNotIn("鞍钢股份 000898", html)
-        self.assertIn("正式策略与两档对照", html)
-        self.assertIn("高成功率", html)
-        self.assertIn("正式执行策略", html)
-        self.assertIn("高收益率", html)
-        self.assertIn("1,056种组合", html)
+        self.assertIn("收盘确认买点后，下一交易日开盘执行", html)
+        self.assertNotIn("基础双信号研究 · 非主次选绩效", html)
         self.assertNotIn("首次达到5%中位数", html)
         self.assertNotIn("hero-aigc-v2-poster.webp;base64", html)
 

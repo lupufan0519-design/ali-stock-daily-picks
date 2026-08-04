@@ -9,7 +9,7 @@ from typing import Sequence
 
 POOL_NAME = "卢氏龙虎趋势池"
 STATE_VERSION = 1
-CURRENT_STRATEGY_VERSION = "break5_trail3_2_v1"
+CURRENT_STRATEGY_VERSION = "break5_trail3_2_next_open_v2"
 LEGACY_STRATEGY_VERSION = "legacy_before_break5_trail3_2"
 TREND_START_LOOKBACK_BARS = 5
 TREND_START_MAX_WAIT_BARS = 10
@@ -18,6 +18,7 @@ TREND_PROFIT_ACTIVATION_PCT = 3.0
 TREND_TRAILING_DRAWDOWN_PCT = 2.0
 TREND_PENDING_DRAWDOWN_RATIO = 0.5
 TREND_MAX_HOLDING_BARS = 60
+ENTRY_EXECUTION_MAX_WAIT_BARS = 5
 
 
 def empty_state() -> dict:
@@ -32,6 +33,8 @@ def empty_state() -> dict:
         "secondary_closed": [],
         "pending_main": [],
         "pending_secondary": [],
+        "pending_entry_execution": [],
+        "pending_exit_execution": [],
         "consumed_signals": [],
     }
 
@@ -51,6 +54,8 @@ def load_state(path: Path) -> dict:
     data.setdefault("secondary_closed", [])
     data.setdefault("pending_main", [])
     data.setdefault("pending_secondary", [])
+    data.setdefault("pending_entry_execution", [])
+    data.setdefault("pending_exit_execution", [])
     data.setdefault("last_trade_date", "")
     for section in (
         "active",
@@ -59,6 +64,8 @@ def load_state(path: Path) -> dict:
         "secondary_closed",
         "pending_main",
         "pending_secondary",
+        "pending_entry_execution",
+        "pending_exit_execution",
     ):
         for position in data[section]:
             if not position.get("strategy_version"):
@@ -81,32 +88,38 @@ def load_state(path: Path) -> dict:
             if section in {"pending_main", "pending_secondary"}:
                 position["status"] = "待观察中"
                 position["operation"] = "等待买入"
+            elif section == "pending_entry_execution":
+                position["status"] = "买点已确认"
+                position["operation"] = "下一交易日开盘买入"
+            elif section == "pending_exit_execution":
+                position["status"] = "卖点已确认"
+                position["operation"] = "下一交易日开盘卖出"
             elif section in {"closed", "secondary_closed"}:
                 if position.get("status") != "已移出":
                     position["status"] = "趋势结束"
-                position["operation"] = "建议卖出"
+                position["operation"] = (
+                    "开盘已执行卖出"
+                    if position.get("exit_trigger_date")
+                    and position.get("exit_date")
+                    else "建议卖出"
+                )
             elif position.get("status") != "数据待确认":
                 if position.get("missing_streak", 0):
                     position["status"] = "待观察中"
                     position["operation"] = "谨慎持有"
                 elif position.get("entry_date") == position.get("last_date"):
                     position["status"] = "趋势开始"
-                    position["operation"] = "建议买入"
+                    position["operation"] = (
+                        "开盘已执行买入"
+                        if position.get("entry_trigger_date")
+                        else "建议买入"
+                    )
                 else:
                     position["status"] = "上升趋势中"
                     position["operation"] = "继续持有"
-    if stored_strategy_version != CURRENT_STRATEGY_VERSION:
-        reset_pending_count = len(data["pending_main"]) + len(
-            data["pending_secondary"]
-        )
-        data["pending_main"] = []
-        data["pending_secondary"] = []
-        data["strategy_migration"] = {
-            "from": stored_strategy_version or LEGACY_STRATEGY_VERSION,
-            "to": CURRENT_STRATEGY_VERSION,
-            "reset_pending_count": reset_pending_count,
-            "note": "旧买点候选不沿用；按新窗口与前5日高点重新识别",
-        }
+    # Build the tombstone set before a strategy migration clears old pending
+    # setups.  Otherwise the same historical crossover can be recreated on the
+    # next daily run even though that setup was already consumed.
     consumed_signals = _stored_signal_keys(data.get("consumed_signals", []))
     for section in (
         "active",
@@ -115,6 +128,8 @@ def load_state(path: Path) -> dict:
         "secondary_closed",
         "pending_main",
         "pending_secondary",
+        "pending_entry_execution",
+        "pending_exit_execution",
     ):
         consumed_signals.update(
             key
@@ -122,10 +137,25 @@ def load_state(path: Path) -> dict:
             if (
                 key := _signal_key(
                     item.get("code"),
-                    item.get("setup_cross_date"),
+                    item.get("setup_cross_date") or item.get("cross_date"),
                 )
             )
         )
+    if stored_strategy_version != CURRENT_STRATEGY_VERSION:
+        reset_pending_count = (
+            len(data["pending_main"])
+            + len(data["pending_secondary"])
+            + len(data["pending_entry_execution"])
+        )
+        data["pending_main"] = []
+        data["pending_secondary"] = []
+        data["pending_entry_execution"] = []
+        data["strategy_migration"] = {
+            "from": stored_strategy_version or LEGACY_STRATEGY_VERSION,
+            "to": CURRENT_STRATEGY_VERSION,
+            "reset_pending_count": reset_pending_count,
+            "note": "旧买点候选不沿用；按新窗口与前5日高点重新识别",
+        }
     data["consumed_signals"] = _serialize_signal_keys(consumed_signals)
     return data
 
@@ -320,6 +350,62 @@ def _finite_positive(value: object) -> float | None:
     return parsed if math.isfinite(parsed) and parsed > 0 else None
 
 
+def _row_open_price(row: dict) -> float | None:
+    return _finite_positive(row.get("open"))
+
+
+def _row_is_one_word_limit(row: dict, direction: str) -> bool:
+    explicit_key = f"one_word_limit_{direction}"
+    if explicit_key in row:
+        return bool(row.get(explicit_key))
+    limit_price = _finite_positive(row.get(f"limit_{direction}_price"))
+    if limit_price is None:
+        return False
+    prices = [
+        _finite_positive(row.get(key))
+        for key in ("open", "high", "low", "close")
+    ]
+    if any(value is None for value in prices):
+        return False
+    return all(abs(float(value) - limit_price) <= 0.0051 for value in prices)
+
+
+def _record_execution_wait(order: dict, trade_date: str) -> tuple[bool, int]:
+    new_attempt = trade_date > str(order.get("last_execution_attempt_date", ""))
+    if new_attempt:
+        order["execution_wait_bars"] = int(
+            order.get("execution_wait_bars", 0)
+        ) + 1
+        order["last_execution_attempt_date"] = trade_date
+    return new_attempt, int(order.get("execution_wait_bars", 0))
+
+
+def _mark_position_at_close(
+    position: dict,
+    row: dict,
+    trade_date: str,
+    *,
+    increment_holding: bool = False,
+) -> None:
+    position["last_date"] = trade_date
+    position["last_close"] = float(row["close"])
+    position["return_pct"] = _return_pct(
+        float(position["entry_price"]),
+        position["last_close"],
+    )
+    position["best_return_pct"] = max(
+        float(position.get("best_return_pct", position["return_pct"])),
+        position["return_pct"],
+    )
+    position["worst_return_pct"] = min(
+        float(position.get("worst_return_pct", position["return_pct"])),
+        position["return_pct"],
+    )
+    if increment_holding:
+        position["holding_days"] = int(position.get("holding_days", 1)) + 1
+    _record_line_point(position, row, trade_date)
+
+
 def _row_entry_breakout_high(row: dict) -> float | None:
     value = row.get("entry_breakout_high_5")
     if value is None and isinstance(row.get("live_seed"), dict):
@@ -476,26 +562,60 @@ def _new_pending_setup(row: dict, trade_date: str, area: str) -> dict:
     }
 
 
+def _new_pending_entry_execution(
+    setup: dict,
+    row: dict,
+    trade_date: str,
+    area: str,
+    breakout_high: float,
+) -> dict:
+    order = deepcopy(setup)
+    order.update(
+        {
+            "execution_id": f"entry_{row['code']}_{trade_date}",
+            "name": str(row.get("name", setup.get("name", ""))),
+            "market": int(row.get("market", setup.get("market", 0))),
+            "area": area,
+            "entry_trigger_date": trade_date,
+            "entry_trigger_close": float(row["close"]),
+            "entry_breakout_high_5": float(breakout_high),
+            "execution_wait_bars": 0,
+            "last_execution_attempt_date": "",
+            "execution_blocked_reason": "",
+            "status": "买点已确认",
+            "operation": "下一交易日开盘买入",
+            "status_detail": "收盘已确认买点；下一交易日按开盘价模拟执行",
+        }
+    )
+    return order
+
+
 def _confirmed_position(setup: dict, row: dict, trade_date: str) -> dict:
-    price = float(row["close"])
+    entry_price = _row_open_price(row)
+    if entry_price is None:
+        raise ValueError("开盘价缺失，不能确认模拟买入")
+    close_price = float(row["close"])
+    close_return = _return_pct(entry_price, close_price)
     position = {
         "position_id": f"{row['code']}_{trade_date}",
         "code": str(row["code"]),
         "name": str(row["name"]),
         "market": int(row["market"]),
         "entry_date": trade_date,
-        "entry_price": price,
+        "entry_price": entry_price,
+        "entry_trigger_date": str(setup.get("entry_trigger_date", "")),
+        "entry_trigger_close": float(setup.get("entry_trigger_close", 0.0)),
         "last_date": trade_date,
-        "last_close": price,
-        "return_pct": 0.0,
-        "best_return_pct": 0.0,
-        "worst_return_pct": 0.0,
+        "last_close": close_price,
+        "return_pct": close_return,
+        "best_return_pct": max(0.0, close_return),
+        "worst_return_pct": min(0.0, close_return),
         "holding_days": 1,
         "missing_streak": 0,
         "signal_lost_date": "",
         "status": "趋势开始",
-        "operation": "建议买入",
-        "status_detail": "收盘突破此前5日最高价，确认趋势开始与建议买点",
+        "operation": "开盘已执行买入",
+        "status_detail": "前一交易日收盘确认买点，今日按开盘价模拟买入",
         "strategy_version": str(
             setup.get("strategy_version", CURRENT_STRATEGY_VERSION)
         ),
@@ -514,7 +634,7 @@ def _confirmed_position(setup: dict, row: dict, trade_date: str) -> dict:
         "setup_elapsed_bars_at_entry": int(
             setup.get("setup_elapsed_bars", 0)
         ),
-        "entry_rule": "信号持续且10日内收盘突破此前5日最高价",
+        "entry_rule": "信号持续且10日内收盘突破此前5日最高价，下一交易日开盘执行",
         "entry_breakout_high_5": _row_entry_breakout_high(row)
         or _finite_positive(setup.get("breakout_high_5")),
         "origin_area": str(
@@ -525,6 +645,35 @@ def _confirmed_position(setup: dict, row: dict, trade_date: str) -> dict:
         position["selected_dates"].append(trade_date)
     _record_line_point(position, row, trade_date)
     return position
+
+
+def _new_pending_exit_execution(
+    position: dict,
+    row: dict,
+    trade_date: str,
+    reason: str,
+    area: str,
+) -> dict:
+    order = deepcopy(position)
+    order.update(
+        {
+            "execution_id": f"exit_{position['code']}_{trade_date}",
+            "name": str(row.get("name", position.get("name", ""))),
+            "market": int(row.get("market", position.get("market", 0))),
+            "area": area,
+            "exit_trigger_date": trade_date,
+            "exit_trigger_close": float(row["close"]),
+            "exit_trigger_return_pct": float(position.get("return_pct", 0.0)),
+            "exit_reason": reason,
+            "execution_wait_bars": 0,
+            "last_execution_attempt_date": "",
+            "execution_blocked_reason": "",
+            "status": "卖点已确认",
+            "operation": "下一交易日开盘卖出",
+            "status_detail": "收盘已确认卖点；下一交易日按开盘价模拟执行",
+        }
+    )
+    return order
 
 
 def _advance_pending_setups(
@@ -600,16 +749,22 @@ def _advance_pending_setups(
             and breakout_high is not None
             and float(setup["last_close"]) > breakout_high + 1e-8
         ):
-            position = _confirmed_position(setup, row, trade_date)
-            confirmed.append(position)
+            order = _new_pending_entry_execution(
+                setup,
+                row,
+                trade_date,
+                area,
+                breakout_high,
+            )
+            confirmed.append(order)
             events.append(
                 {
-                    "type": "trend_started",
+                    "type": "entry_triggered",
                     "code": setup["code"],
                     "name": setup["name"],
                     "area": area,
                     "breakout_high_5": breakout_high,
-                    "entry_price": float(setup["last_close"]),
+                    "trigger_close": float(setup["last_close"]),
                 }
             )
             continue
@@ -634,9 +789,310 @@ def _advance_pending_setups(
     return remaining, confirmed, events
 
 
+def _advance_pending_entry_executions(
+    pending: Sequence[dict],
+    row_by_code: dict[str, dict],
+    trade_date: str,
+    is_new_day: bool,
+) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
+    remaining: list[dict] = []
+    main_positions: list[dict] = []
+    secondary_positions: list[dict] = []
+    events: list[dict] = []
+    for order in pending:
+        trigger_date = str(order.get("entry_trigger_date", ""))
+        if not is_new_day or not trigger_date or trade_date <= trigger_date:
+            remaining.append(order)
+            continue
+        row = row_by_code.get(str(order["code"]))
+        if row is None:
+            _, wait_bars = _record_execution_wait(order, trade_date)
+            if wait_bars >= ENTRY_EXECUTION_MAX_WAIT_BARS:
+                events.append(
+                    {
+                        "type": "entry_cancelled",
+                        "code": order["code"],
+                        "name": order["name"],
+                        "area": order.get("area", "main"),
+                        "reason": (
+                            f"连续{ENTRY_EXECUTION_MAX_WAIT_BARS}个交易日"
+                            "停牌或行情缺失，无法按开盘价买入"
+                        ),
+                    }
+                )
+                continue
+            order["status"] = "数据待确认"
+            order["operation"] = "暂停执行买入"
+            order["execution_blocked_reason"] = "停牌或行情缺失"
+            order["status_detail"] = (
+                f"第{wait_bars}个交易日行情缺失；未使用替代价格成交，继续等待"
+            )
+            remaining.append(order)
+            continue
+        if not _eligible(row):
+            events.append(
+                {
+                    "type": "entry_cancelled",
+                    "code": order["code"],
+                    "name": order["name"],
+                    "area": order.get("area", "main"),
+                    "reason": "股票名称含 ST，取消待执行买入",
+                }
+            )
+            continue
+        open_price = _row_open_price(row)
+        if open_price is None:
+            new_attempt, wait_bars = _record_execution_wait(order, trade_date)
+            invalid_reason = ""
+            if not _dragon_above_tiger(row):
+                invalid_reason = "等待成交期间龙线不再高于虎线"
+            else:
+                setup_cross_date = str(order.get("setup_cross_date", ""))
+                current_cross_date = _row_cross_date(row)
+                if (
+                    setup_cross_date
+                    and current_cross_date
+                    and current_cross_date != setup_cross_date
+                ):
+                    invalid_reason = "原龙腾跃虎信号已结束并形成新交叉"
+                elif signal_recalculated_away(
+                    order,
+                    row,
+                    int(order.get("setup_elapsed_bars", 0)) + wait_bars,
+                ):
+                    invalid_reason = "原龙腾跃虎信号被K线重算消失"
+            if not invalid_reason and wait_bars >= ENTRY_EXECUTION_MAX_WAIT_BARS:
+                invalid_reason = (
+                    f"连续{ENTRY_EXECUTION_MAX_WAIT_BARS}个交易日"
+                    "停牌或开盘价缺失，无法买入"
+                )
+            if invalid_reason:
+                events.append(
+                    {
+                        "type": "entry_cancelled",
+                        "code": order["code"],
+                        "name": order["name"],
+                        "area": order.get("area", "main"),
+                        "reason": invalid_reason,
+                    }
+                )
+                continue
+            order["status"] = "数据待确认"
+            order["operation"] = "暂停执行买入"
+            order["execution_blocked_reason"] = "停牌或开盘价缺失"
+            order["status_detail"] = (
+                f"第{wait_bars}个交易日开盘价缺失；未使用收盘价代替成交，继续等待"
+            )
+            if new_attempt:
+                events.append(
+                    {
+                        "type": "entry_execution_blocked",
+                        "code": order["code"],
+                        "name": order["name"],
+                        "area": order.get("area", "main"),
+                        "reason": order["execution_blocked_reason"],
+                    }
+                )
+            remaining.append(order)
+            continue
+        if _row_is_one_word_limit(row, "up"):
+            new_attempt, wait_bars = _record_execution_wait(order, trade_date)
+            invalid_reason = ""
+            if not _dragon_above_tiger(row):
+                invalid_reason = "等待成交期间龙线不再高于虎线"
+            else:
+                setup_cross_date = str(order.get("setup_cross_date", ""))
+                current_cross_date = _row_cross_date(row)
+                if (
+                    setup_cross_date
+                    and current_cross_date
+                    and current_cross_date != setup_cross_date
+                ):
+                    invalid_reason = "原龙腾跃虎信号已结束并形成新交叉"
+                elif signal_recalculated_away(
+                    order,
+                    row,
+                    int(order.get("setup_elapsed_bars", 0)) + wait_bars,
+                ):
+                    invalid_reason = "原龙腾跃虎信号被K线重算消失"
+            if not invalid_reason and wait_bars >= ENTRY_EXECUTION_MAX_WAIT_BARS:
+                invalid_reason = (
+                    f"连续{ENTRY_EXECUTION_MAX_WAIT_BARS}个交易日一字涨停无法买入"
+                )
+            if invalid_reason:
+                events.append(
+                    {
+                        "type": "entry_cancelled",
+                        "code": order["code"],
+                        "name": order["name"],
+                        "area": order.get("area", "main"),
+                        "reason": invalid_reason,
+                    }
+                )
+                continue
+            order["execution_blocked_reason"] = "一字涨停，开盘无法买入"
+            order["status"] = "买点已确认"
+            order["operation"] = "等待可成交开盘"
+            order["status_detail"] = (
+                f"第{wait_bars}个交易日一字涨停未成交；信号仍有效，继续等待"
+            )
+            if new_attempt:
+                events.append(
+                    {
+                        "type": "entry_execution_blocked",
+                        "code": order["code"],
+                        "name": order["name"],
+                        "area": order.get("area", "main"),
+                        "reason": order["execution_blocked_reason"],
+                    }
+                )
+            remaining.append(order)
+            continue
+
+        position = _confirmed_position(order, row, trade_date)
+        area = str(order.get("area", "main"))
+        if area == "secondary":
+            secondary_positions.append(position)
+        else:
+            main_positions.append(position)
+        events.append(
+            {
+                "type": "entry_executed",
+                "code": order["code"],
+                "name": order["name"],
+                "area": area,
+                "trigger_date": trigger_date,
+                "entry_date": trade_date,
+                "entry_price": open_price,
+            }
+        )
+    return remaining, main_positions, secondary_positions, events
+
+
+def _advance_pending_exit_executions(
+    pending: Sequence[dict],
+    row_by_code: dict[str, dict],
+    trade_date: str,
+    is_new_day: bool,
+) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
+    remaining: list[dict] = []
+    main_closed: list[dict] = []
+    secondary_closed: list[dict] = []
+    events: list[dict] = []
+    for order in pending:
+        trigger_date = str(order.get("exit_trigger_date", ""))
+        if not is_new_day or not trigger_date or trade_date <= trigger_date:
+            remaining.append(order)
+            continue
+        row = row_by_code.get(str(order["code"]))
+        if row is None:
+            order["status"] = "数据待确认"
+            order["operation"] = "暂停执行卖出"
+            order["status_detail"] = "下一交易日行情缺失，未使用替代价格成交"
+            remaining.append(order)
+            continue
+        open_price = _row_open_price(row)
+        if open_price is None:
+            order["status"] = "数据待确认"
+            order["operation"] = "暂停执行卖出"
+            order["status_detail"] = "开盘价缺失，未使用收盘价代替成交"
+            remaining.append(order)
+            continue
+        if _row_is_one_word_limit(row, "down"):
+            new_attempt = trade_date > str(
+                order.get("last_execution_attempt_date", "")
+            )
+            if new_attempt:
+                order["execution_wait_bars"] = int(
+                    order.get("execution_wait_bars", 0)
+                ) + 1
+                order["last_execution_attempt_date"] = trade_date
+            _mark_position_at_close(
+                order,
+                row,
+                trade_date,
+                increment_holding=(trade_date > str(order.get("last_date", ""))),
+            )
+            order["execution_blocked_reason"] = "一字跌停，开盘无法卖出"
+            order["status"] = "卖点已确认"
+            order["operation"] = "等待可成交开盘"
+            order["status_detail"] = (
+                f"卖点已确认；第{int(order.get('execution_wait_bars', 0))}个交易日"
+                "一字跌停未成交，继续等待首次可成交开盘"
+            )
+            if new_attempt:
+                events.append(
+                    {
+                        "type": "exit_execution_blocked",
+                        "code": order["code"],
+                        "name": order["name"],
+                        "area": order.get("area", "main"),
+                        "reason": order["execution_blocked_reason"],
+                    }
+                )
+            remaining.append(order)
+            continue
+
+        closed = deepcopy(order)
+        if trade_date > str(closed.get("last_date", "")):
+            closed["holding_days"] = int(closed.get("holding_days", 1)) + 1
+        closed["last_date"] = trade_date
+        closed["last_close"] = open_price
+        closed["return_pct"] = _return_pct(
+            float(closed["entry_price"]),
+            open_price,
+        )
+        closed["best_return_pct"] = max(
+            float(closed.get("best_return_pct", closed["return_pct"])),
+            closed["return_pct"],
+        )
+        closed["worst_return_pct"] = min(
+            float(closed.get("worst_return_pct", closed["return_pct"])),
+            closed["return_pct"],
+        )
+        closed["exit_date"] = trade_date
+        closed["exit_price"] = open_price
+        closed["exit_return_pct"] = closed["return_pct"]
+        closed["status"] = "趋势结束"
+        closed["operation"] = "开盘已执行卖出"
+        closed["status_detail"] = "前一交易日收盘确认卖点，今日按开盘价模拟卖出"
+        area = str(closed.get("area", "main"))
+        if area == "secondary":
+            secondary_closed.append(closed)
+            event_type = "secondary_removed"
+        else:
+            main_closed.append(closed)
+            event_type = "removed"
+        events.append(
+            {
+                "type": event_type,
+                "execution": "next_open",
+                "code": closed["code"],
+                "name": closed["name"],
+                "trigger_date": trigger_date,
+                "exit_date": trade_date,
+                "exit_price": open_price,
+                "return_pct": closed["return_pct"],
+            }
+        )
+    return remaining, main_closed, secondary_closed, events
+
+
 def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[dict, list[dict]]:
     """处理一个交易日；同一日期重复运行不会重复累计消失天数。"""
     state = deepcopy(state)
+    for section in (
+        "active",
+        "closed",
+        "secondary_active",
+        "secondary_closed",
+        "pending_main",
+        "pending_secondary",
+        "pending_entry_execution",
+        "pending_exit_execution",
+    ):
+        state.setdefault(section, [])
+    state.setdefault("last_trade_date", "")
     row_by_code = {str(row["code"]): row for row in rows}
     is_new_day = not state["last_trade_date"] or trade_date > state["last_trade_date"]
     events: list[dict] = []
@@ -654,15 +1110,47 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             "secondary_closed",
             "pending_main",
             "pending_secondary",
+            "pending_entry_execution",
+            "pending_exit_execution",
         )
         for item in state.get(section, [])
         if (
             key := _signal_key(
                 item.get("code"),
-                item.get("setup_cross_date"),
+                item.get("setup_cross_date") or item.get("cross_date"),
             )
         )
     })
+
+    (
+        state["pending_exit_execution"],
+        executed_main_closed,
+        executed_secondary_closed,
+        execution_events,
+    ) = _advance_pending_exit_executions(
+        state.get("pending_exit_execution", []),
+        row_by_code,
+        trade_date,
+        is_new_day,
+    )
+    state["closed"].extend(executed_main_closed)
+    state["secondary_closed"].extend(executed_secondary_closed)
+    events.extend(execution_events)
+
+    (
+        state["pending_entry_execution"],
+        executed_main_positions,
+        executed_secondary_positions,
+        execution_events,
+    ) = _advance_pending_entry_executions(
+        state.get("pending_entry_execution", []),
+        row_by_code,
+        trade_date,
+        is_new_day,
+    )
+    state["active"].extend(executed_main_positions)
+    state["secondary_active"].extend(executed_secondary_positions)
+    events.extend(execution_events)
     still_active: list[dict] = []
 
     for position in state["active"]:
@@ -672,6 +1160,9 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             position["operation"] = "暂停操作"
             still_active.append(position)
             continue
+
+        if signal_key := _signal_key(position["code"], _row_cross_date(row)):
+            consumed_signals.add(signal_key)
 
         position["last_date"] = trade_date
         if not position.get("setup_cross_date") and _row_cross_date(row):
@@ -695,30 +1186,52 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             position["holding_days"] = int(position.get("holding_days", 1)) + 1
 
         if not _eligible(row):
-            position["status"] = "已移出"
-            position["operation"] = "停止跟踪"
-            position["exit_date"] = trade_date
-            position["exit_price"] = position["last_close"]
-            position["exit_return_pct"] = position["return_pct"]
-            position["exit_reason"] = "股票名称含 ST，不符合入选范围"
-            state["closed"].append(position)
+            exit_reason = "股票名称含 ST，不符合入选范围"
+            state["pending_exit_execution"].append(
+                _new_pending_exit_execution(
+                    position,
+                    row,
+                    trade_date,
+                    exit_reason,
+                    "main",
+                )
+            )
             exited_codes.add(str(position["code"]))
-            events.append({"type": "ineligible_removed", "code": position["code"], "name": str(row.get("name", position["name"])), "return_pct": position["return_pct"]})
+            events.append(
+                {
+                    "type": "exit_triggered",
+                    "code": position["code"],
+                    "name": str(row.get("name", position["name"])),
+                    "area": "main",
+                    "reason": exit_reason,
+                }
+            )
             continue
 
         if is_later_day:
             _update_repaint_risk(position, row, trade_date)
             exit_reason = _take_profit_exit_reason(position, row)
             if exit_reason:
-                position["status"] = "趋势结束"
-                position["operation"] = "建议卖出"
-                position["exit_date"] = trade_date
-                position["exit_price"] = position["last_close"]
-                position["exit_return_pct"] = position["return_pct"]
-                position["exit_reason"] = exit_reason
-                state["closed"].append(position)
+                state["pending_exit_execution"].append(
+                    _new_pending_exit_execution(
+                        position,
+                        row,
+                        trade_date,
+                        exit_reason,
+                        "main",
+                    )
+                )
                 exited_codes.add(str(position["code"]))
-                events.append({"type": "removed", "code": position["code"], "name": position["name"], "return_pct": position["return_pct"]})
+                events.append(
+                    {
+                        "type": "exit_triggered",
+                        "code": position["code"],
+                        "name": position["name"],
+                        "area": "main",
+                        "reason": exit_reason,
+                        "trigger_return_pct": position["return_pct"],
+                    }
+                )
                 continue
             pending_reason = trend_pending_reason(position, row)
             if pending_reason:
@@ -768,7 +1281,7 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
         "main",
     )
     state["pending_main"] = pending_main
-    state["active"].extend(confirmed_main)
+    state["pending_entry_execution"].extend(confirmed_main)
     events.extend(pending_events)
     setup_cancelled_codes.update(
         str(event["code"])
@@ -786,6 +1299,13 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
         str(setup["code"])
         for setup in state.get("pending_secondary", [])
     }
+    execution_codes = {
+        str(item["code"])
+        for item in (
+            list(state.get("pending_entry_execution", []))
+            + list(state.get("pending_exit_execution", []))
+        )
+    }
     for row in rows:
         if not _eligible(row) or not row.get("selected"):
             continue
@@ -800,7 +1320,7 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             if trade_date not in dates:
                 dates.append(trade_date)
             continue
-        if code in pending_main_codes:
+        if code in pending_main_codes or code in execution_codes:
             continue
         if code in secondary_position_codes or code in secondary_pending_codes:
             # 次选升级由下方流程原位转入，保留最初加入日和加入价。
@@ -820,6 +1340,9 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             position["operation"] = "暂停操作"
             secondary_still_active.append(position)
             continue
+
+        if signal_key := _signal_key(position["code"], _row_cross_date(row)):
+            consumed_signals.add(signal_key)
 
         position["last_date"] = trade_date
         if not position.get("setup_cross_date") and _row_cross_date(row):
@@ -843,15 +1366,26 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
             position["holding_days"] = int(position.get("holding_days", 1)) + 1
 
         if not _eligible(row):
-            position["status"] = "已移出"
-            position["operation"] = "停止跟踪"
-            position["exit_date"] = trade_date
-            position["exit_price"] = position["last_close"]
-            position["exit_return_pct"] = position["return_pct"]
-            position["exit_reason"] = "股票名称含 ST，不符合入选范围"
-            state["secondary_closed"].append(position)
+            exit_reason = "股票名称含 ST，不符合入选范围"
+            state["pending_exit_execution"].append(
+                _new_pending_exit_execution(
+                    position,
+                    row,
+                    trade_date,
+                    exit_reason,
+                    "secondary",
+                )
+            )
             exited_codes.add(str(position["code"]))
-            events.append({"type": "ineligible_removed", "code": position["code"], "name": str(row.get("name", position["name"])), "return_pct": position["return_pct"]})
+            events.append(
+                {
+                    "type": "exit_triggered",
+                    "code": position["code"],
+                    "name": str(row.get("name", position["name"])),
+                    "area": "secondary",
+                    "reason": exit_reason,
+                }
+            )
             continue
 
         if is_later_day:
@@ -881,19 +1415,23 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
                 })
                 continue
             if exit_reason:
-                position["status"] = "趋势结束"
-                position["operation"] = "建议卖出"
-                position["exit_date"] = trade_date
-                position["exit_price"] = position["last_close"]
-                position["exit_return_pct"] = position["return_pct"]
-                position["exit_reason"] = exit_reason
-                state["secondary_closed"].append(position)
+                state["pending_exit_execution"].append(
+                    _new_pending_exit_execution(
+                        position,
+                        row,
+                        trade_date,
+                        exit_reason,
+                        "secondary",
+                    )
+                )
                 exited_codes.add(str(position["code"]))
                 events.append({
-                    "type": event_type,
+                    "type": "exit_triggered",
                     "code": position["code"],
                     "name": position["name"],
-                    "return_pct": position["return_pct"],
+                    "area": "secondary",
+                    "reason": exit_reason,
+                    "trigger_return_pct": position["return_pct"],
                 })
                 continue
             pending_reason = trend_pending_reason(position, row)
@@ -913,6 +1451,24 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
                 position["status"] = "上升趋势中"
                 position["operation"] = "继续持有"
                 position["status_detail"] = "趋势条件仍有效"
+        elif row.get("selected"):
+            position["status"] = "趋势开始"
+            position["operation"] = "开盘已执行买入"
+            position["origin_area"] = position.get("origin_area", "secondary")
+            dates = position.setdefault("selected_dates", [])
+            if trade_date not in dates:
+                dates.append(trade_date)
+            state["active"].append(position)
+            active_by_code[position["code"]] = position
+            events.append(
+                {
+                    "type": "secondary_promoted",
+                    "code": position["code"],
+                    "name": position["name"],
+                    "return_pct": position["return_pct"],
+                }
+            )
+            continue
         elif not position.get("status"):
             position["status"] = "趋势开始"
             position["operation"] = "建议买入"
@@ -929,7 +1485,7 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
         )
     )
     state["pending_secondary"] = pending_secondary
-    state["secondary_active"].extend(confirmed_secondary)
+    state["pending_entry_execution"].extend(confirmed_secondary)
     events.extend(pending_events)
     setup_cancelled_codes.update(
         str(event["code"])
@@ -943,11 +1499,18 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
         str(setup["code"])
         for setup in state.get("pending_secondary", [])
     }
+    execution_codes = {
+        str(item["code"])
+        for item in (
+            list(state.get("pending_entry_execution", []))
+            + list(state.get("pending_exit_execution", []))
+        )
+    }
     primary_codes = {
         position["code"] for position in state["active"]
     } | {
         str(setup["code"]) for setup in state.get("pending_main", [])
-    }
+    } | execution_codes
     for row in rows:
         if not _secondary_selected(row):
             continue
@@ -985,6 +1548,12 @@ def update_state(state: dict, rows: Sequence[dict], trade_date: str) -> tuple[di
     state["pending_secondary"].sort(
         key=lambda x: (x.get("setup_date", ""), x["code"])
     )
+    state["pending_entry_execution"].sort(
+        key=lambda x: (x.get("entry_trigger_date", ""), x["code"])
+    )
+    state["pending_exit_execution"].sort(
+        key=lambda x: (x.get("exit_trigger_date", ""), x["code"])
+    )
     state["consumed_signals"] = _serialize_signal_keys(consumed_signals)
     if is_new_day:
         state["last_trade_date"] = trade_date
@@ -1015,9 +1584,15 @@ def strategy_stats(state: dict) -> dict:
     default_version = str(
         state.get("strategy_version", LEGACY_STRATEGY_VERSION)
     )
+    main_exit_pending = [
+        x
+        for x in state.get("pending_exit_execution", [])
+        if str(x.get("area", "main")) == "main"
+    ]
+    tracked_active = list(state.get("active", [])) + main_exit_pending
     current_active = [
         x
-        for x in state["active"]
+        for x in tracked_active
         if str(x.get("strategy_version", default_version))
         == CURRENT_STRATEGY_VERSION
     ]
@@ -1036,8 +1611,13 @@ def strategy_stats(state: dict) -> dict:
     realized_factor = math.prod(1.0 + value / 100.0 for value in closed_returns)
     return {
         "active_count": len(active_returns),
-        "tracked_active_count": len(state["active"]),
-        "legacy_active_count": len(state["active"]) - len(current_active),
+        "tracked_active_count": len(tracked_active),
+        "legacy_active_count": len(tracked_active) - len(current_active),
+        "pending_entry_execution_count": sum(
+            str(x.get("area", "main")) == "main"
+            for x in state.get("pending_entry_execution", [])
+        ),
+        "pending_exit_execution_count": len(main_exit_pending),
         "closed_count": len(closed_returns),
         "legacy_closed_count": len(state["closed"]) - len(current_closed),
         "warning_count": sum(
@@ -1051,7 +1631,7 @@ def strategy_stats(state: dict) -> dict:
         "best_return": max(closed_returns) if closed_returns else None,
         "worst_return": min(closed_returns) if closed_returns else None,
         "sample_count": len(closed_returns),
-        "success_definition": "当前正式策略中，建议卖出价高于建议买入价；未结束和旧规则样本不计入",
+        "success_definition": "当前正式策略中，卖出触发后下一交易日开盘成交价高于买入触发后下一交易日开盘成交价；未结束和旧规则样本不计入",
         "strategy_version": CURRENT_STRATEGY_VERSION,
     }
 
@@ -1060,9 +1640,15 @@ def secondary_strategy_stats(state: dict) -> dict:
     default_version = str(
         state.get("strategy_version", LEGACY_STRATEGY_VERSION)
     )
+    secondary_exit_pending = [
+        x
+        for x in state.get("pending_exit_execution", [])
+        if str(x.get("area", "main")) == "secondary"
+    ]
+    tracked_active = list(state.get("secondary_active", [])) + secondary_exit_pending
     current_active = [
         x
-        for x in state.get("secondary_active", [])
+        for x in tracked_active
         if str(x.get("strategy_version", default_version))
         == CURRENT_STRATEGY_VERSION
     ]
@@ -1081,10 +1667,15 @@ def secondary_strategy_stats(state: dict) -> dict:
     realized_factor = math.prod(1.0 + value / 100.0 for value in closed_returns)
     return {
         "active_count": len(active_returns),
-        "tracked_active_count": len(state.get("secondary_active", [])),
+        "tracked_active_count": len(tracked_active),
         "legacy_active_count": (
-            len(state.get("secondary_active", [])) - len(current_active)
+            len(tracked_active) - len(current_active)
         ),
+        "pending_entry_execution_count": sum(
+            str(x.get("area", "main")) == "secondary"
+            for x in state.get("pending_entry_execution", [])
+        ),
+        "pending_exit_execution_count": len(secondary_exit_pending),
         "closed_count": len(closed_returns),
         "legacy_closed_count": len(state.get("secondary_closed", [])) - len(current_closed),
         "current_success_rate": (
@@ -1103,6 +1694,6 @@ def secondary_strategy_stats(state: dict) -> dict:
             (realized_factor - 1.0) * 100.0 if closed_returns else None
         ),
         "sample_count": len(closed_returns),
-        "success_definition": "当前正式策略中，建议卖出价高于建议买入价；未结束和旧规则样本不计入",
+        "success_definition": "当前正式策略中，卖出触发后下一交易日开盘成交价高于买入触发后下一交易日开盘成交价；未结束和旧规则样本不计入",
         "strategy_version": CURRENT_STRATEGY_VERSION,
     }
