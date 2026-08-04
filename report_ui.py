@@ -2758,7 +2758,9 @@ def _validation_section() -> str:
         </div>
       </div>
       {_repaint_comparison_panel().lstrip()}
+      <!-- strategy-grid:start -->
       {_strategy_grid_panel().lstrip()}
+      <!-- strategy-grid:end -->
       <article class="panel">
         <div class="panel-head"><div><h3>买点与卖点联合比较</h3><p>所有统计都从实际建议买点算到建议卖点；未确认买点和未结束持仓不混入成功率。</p></div></div>
         <div class="table-scroll"><table><thead><tr><th>规则</th><th>完整波段</th><th>成功率</th><th>平均收益</th><th>收益中位数</th><th>通常持有</th><th>2026 年</th></tr></thead>
