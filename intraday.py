@@ -14,8 +14,12 @@ from zoneinfo import ZoneInfo
 
 from observation import OBSERVATION_LIMIT, visible_observations
 from screener import cross_yellow_pair
+from strategy_contract import (
+    ENTRY_DELAY_BARS,
+    ENTRY_EXECUTION_MAX_WAIT_BARS,
+    ENTRY_MAX_PULLBACK_PCT,
+)
 from strategy_tracker import (
-    TREND_START_MAX_WAIT_BARS,
     signal_recalculated_away,
     trend_exit_reason,
     trend_pending_reason,
@@ -317,7 +321,12 @@ def collect_tracking_codes(
     }
 
 
-def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, list[dict]]:
+def build_live_tracking(
+    payload: dict,
+    quotes: dict[str, dict],
+    *,
+    live_trade_date: str = "",
+) -> dict[str, list[dict]]:
     """Project settled positions onto live prices without settling strategy state."""
     strategy = payload.get("strategy", {})
     cfg = payload.get("config", {})
@@ -387,6 +396,8 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                         live_position,
                         live_price,
                         dragon_above_tiger=dragon_above_tiger,
+                        signal_erased=signal_erased,
+                        row=live_signal,
                     )
                     if has_quote
                     else ""
@@ -433,7 +444,9 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                     <= str(position.get("last_date", ""))
                     else "上升趋势中"
                 )
-                operation = "建议买入" if status == "趋势开始" else "继续持有"
+                operation = (
+                    "开盘已执行买入" if status == "趋势开始" else "继续持有"
+                )
             else:
                 detail = "最新行情待确认，暂按最近收盘展示"
                 status = str(position.get("status", "上升趋势中"))
@@ -451,7 +464,7 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                     "market": int(position.get("market", quote.get("market", 0))),
                     "entry_date": str(position.get("entry_date", "")),
                     "entry_price": entry_price,
-                    "holding_days": int(position.get("holding_days", 0)),
+                    "holding_days": int(live_position.get("holding_days", 0)),
                     "settled_date": str(position.get("last_date", "")),
                     "settled_price": float(position.get("last_close", 0.0)),
                     "settled_return_pct": float(position.get("return_pct", 0.0)),
@@ -501,7 +514,12 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
             )
             elapsed = int(setup.get("setup_elapsed_bars", 0)) + live_extra_bar
             cancel_reason = ""
-            if is_st_name(live_name):
+            if area == "main":
+                confirmed = False
+                status = "观察中"
+                operation = "仅观察"
+                detail = "主选信号不进入自动交易；同一信号仅记录一次"
+            elif is_st_name(live_name):
                 cancel_reason = "股票名称含 ST，不符合入选范围"
             elif live_signal is not None and signal_recalculated_away(
                 setup,
@@ -514,21 +532,31 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                 and not live_signal.get("dragon_above_tiger")
             ):
                 cancel_reason = "龙线不再高于虎线"
-            elif elapsed > TREND_START_MAX_WAIT_BARS:
-                cancel_reason = "10个交易日内未确认上涨趋势"
-            breakout_high = float(
-                (live_signal or {}).get("entry_breakout_high_5", 0.0)
-                or setup.get("breakout_high_5", 0.0)
-                or 0.0
-            )
-            confirmed = bool(
-                not cancel_reason
-                and elapsed > 0
-                and elapsed <= TREND_START_MAX_WAIT_BARS
-                and breakout_high > 0
-                and live_price > breakout_high + 1e-8
-            )
-            if cancel_reason:
+            elif elapsed > ENTRY_DELAY_BARS:
+                cancel_reason = "已错过D+2收盘确认窗口"
+            if area != "main":
+                current_dragon = float(
+                    (live_signal or {}).get("dragon_value", 0.0) or 0.0
+                )
+                d1_dragon = float(
+                    setup.get("confirmation_d1_dragon", 0.0) or 0.0
+                )
+                pullback_floor = setup_price * (
+                    1.0 - ENTRY_MAX_PULLBACK_PCT / 100.0
+                )
+                confirmed = bool(
+                    not cancel_reason
+                    and live_signal is not None
+                    and elapsed == ENTRY_DELAY_BARS
+                    and current_dragon > 0
+                    and d1_dragon > 0
+                    and live_price + 1e-8 >= current_dragon
+                    and current_dragon + 1e-8 >= d1_dragon
+                    and live_price + 1e-8 >= pullback_floor
+                )
+            if area == "main":
+                pass
+            elif cancel_reason:
                 status = "待观察中"
                 operation = "取消候选 · 等待收盘"
                 detail = f"{cancel_reason}；若收盘仍成立则停止等待买点"
@@ -536,20 +564,26 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                 status = "待观察中"
                 operation = "买点触发 · 等待收盘"
                 detail = (
-                    f"盘中已突破前5日高点 {breakout_high:.2f} 元；"
-                    "若收盘保持则确认买点，下一交易日开盘执行"
+                    "盘中满足D+2低风险确认条件；若收盘保持，"
+                    "下一可交易日开盘执行买入"
                 )
             else:
                 status = "待观察中"
-                operation = "等待买入"
-                if breakout_high > 0:
-                    gap = max(0.0, breakout_high - live_price)
-                    detail = (
-                        f"信号仍有效；收盘突破 {breakout_high:.2f} 元确认买点，"
-                        f"当前还差 {gap:.2f} 元"
-                    )
+                operation = "等待D+2收盘确认"
+                if live_signal is None:
+                    detail = "盘中信号数据待确认，不提前给出买点"
+                elif elapsed < ENTRY_DELAY_BARS:
+                    detail = "信号与龙虎关系仍有效；等待D+2收盘确认"
+                elif current_dragon <= 0 or d1_dragon <= 0:
+                    detail = "D+2确认所需的龙线数据不足，不提前给出买点"
+                elif live_price + 1e-8 < current_dragon:
+                    detail = "盘中价格仍低于龙线，尚未满足D+2确认条件"
+                elif current_dragon + 1e-8 < d1_dragon:
+                    detail = "当前龙线低于D+1龙线，尚未满足D+2确认条件"
+                elif live_price + 1e-8 < pullback_floor:
+                    detail = "盘中价格较信号日收盘回撤超过3%，尚未满足确认条件"
                 else:
-                    detail = "信号仍有效；前5日高点数据等待更新，不提前给买点"
+                    detail = "等待D+2收盘完成正式确认"
             result[area].append(
                 {
                     "position_id": str(setup.get("setup_id", "")),
@@ -575,7 +609,9 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                     "exit_reason": cancel_reason,
                     "setup_cancelled": False,
                     "pending_setup": True,
-                    "breakout_high_5": breakout_high,
+                    "confirmation_d1_dragon": float(
+                        setup.get("confirmation_d1_dragon", 0.0) or 0.0
+                    ),
                 }
             )
     for order in strategy.get("pending_entry_execution", []):
@@ -586,7 +622,7 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
         quote = quotes.get(code, {})
         quote_price = float(quote.get("price", 0.0) or 0.0)
         open_price = float(quote.get("open", 0.0) or 0.0)
-        quote_date = str(quote.get("server_time", ""))[:10]
+        quote_date = str(quote.get("server_time", ""))[:10] or live_trade_date
         trigger_date = str(order.get("entry_trigger_date", ""))
         execution_day = bool(quote_date and trigger_date and quote_date > trigger_date)
         ineligible = bool(
@@ -605,12 +641,50 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                 "up",
             )
         )
+        live_signal = evaluated_by_code.get(code)
+        invalid_reason = ""
+        preview_wait = int(order.get("execution_wait_bars", 0))
+        if execution_day and not ineligible and not (
+            open_price > 0 and not locked
+        ):
+            preview_wait += int(
+                quote_date
+                > str(order.get("last_execution_attempt_date", ""))
+            )
+            if live_signal is not None:
+                if not live_signal.get("dragon_above_tiger"):
+                    invalid_reason = "等待成交期间龙线不再高于虎线"
+                elif signal_recalculated_away(
+                    order,
+                    live_signal,
+                    int(order.get("setup_elapsed_bars", 0)) + preview_wait,
+                ):
+                    invalid_reason = "原龙腾跃虎信号被K线重算消失"
+            if (
+                not invalid_reason
+                and preview_wait >= ENTRY_EXECUTION_MAX_WAIT_BARS
+            ):
+                invalid_reason = (
+                    f"连续{ENTRY_EXECUTION_MAX_WAIT_BARS}个交易日"
+                    + (
+                        "一字涨停无法买入"
+                        if locked
+                        else "停牌或开盘价缺失，无法买入"
+                    )
+                )
         provisional_execution = bool(
-            execution_day and not ineligible and open_price > 0 and not locked
+            execution_day
+            and not ineligible
+            and not invalid_reason
+            and open_price > 0
+            and not locked
         )
         if ineligible:
             operation = "取消买入待收盘"
             detail = "股票名称含 ST；盘中不执行买入，收盘任务确认取消候选"
+        elif invalid_reason:
+            operation = "取消买入待收盘"
+            detail = f"{invalid_reason}；盘中仅预览，收盘任务确认取消"
         elif locked:
             operation = "等待可成交开盘"
             detail = "当前仍封在一字涨停，盘中不假定可以买入；收盘后确认是否继续等待"
@@ -653,12 +727,18 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                 "pending_execution": True,
                 "pending_entry_execution": True,
                 "provisional_entry_execution": provisional_execution,
-                "execution_blocked": bool(locked or ineligible),
-                "provisional_cancel": ineligible,
-                "status": "待观察中" if ineligible else "买点已确认",
+                "execution_blocked": bool(locked or ineligible or invalid_reason),
+                "provisional_cancel": bool(ineligible or invalid_reason),
+                "status": (
+                    "待观察中"
+                    if ineligible or invalid_reason
+                    else "买点已确认"
+                ),
                 "operation": operation,
                 "status_detail": detail,
-                "exit_reason": "股票名称含 ST" if ineligible else "",
+                "exit_reason": (
+                    "股票名称含 ST" if ineligible else invalid_reason
+                ),
                 "setup_cancelled": False,
             }
         )
@@ -711,6 +791,9 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
             if provisional_execution and entry_price > 0
             else None
         )
+        live_holding_days = int(order.get("holding_days", 0)) + int(
+            bool(quote_date and quote_date > str(order.get("last_date", "")))
+        )
         result[area].append(
             {
                 "position_id": str(order.get("position_id", "")),
@@ -719,7 +802,7 @@ def build_live_tracking(payload: dict, quotes: dict[str, dict]) -> dict[str, lis
                 "market": int(order.get("market", quote.get("market", 0))),
                 "entry_date": str(order.get("entry_date", "")),
                 "entry_price": entry_price,
-                "holding_days": int(order.get("holding_days", 0)),
+                "holding_days": live_holding_days,
                 "exit_trigger_date": trigger_date,
                 "exit_trigger_close": float(order.get("exit_trigger_close", 0.0)),
                 "settled_date": str(order.get("last_date", "")),
@@ -1306,7 +1389,19 @@ def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
     targets = collect_targets(payload)
     label, note = market_state(local_now)
     quotes, source, host = fetch_quotes(targets)
-    live_tracking = build_live_tracking(payload, quotes)
+    live_dates = sorted(
+        {
+            str(item.get("server_time", ""))[:10]
+            for item in quotes.values()
+            if len(str(item.get("server_time", ""))) >= 10
+        }
+    )
+    live_trade_date = live_dates[-1] if live_dates else ""
+    live_tracking = build_live_tracking(
+        payload,
+        quotes,
+        live_trade_date=live_trade_date,
+    )
     tracked_codes = {
         str(item["code"])
         for area in ("main", "secondary")
@@ -1346,14 +1441,6 @@ def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
         for code, quote in quotes.items()
         if code in display_codes
     }
-    live_dates = sorted(
-        {
-            str(item.get("server_time", ""))[:10]
-            for item in quotes.values()
-            if len(str(item.get("server_time", ""))) >= 10
-        }
-    )
-    live_trade_date = live_dates[-1] if live_dates else ""
     selection_mode = (
         "intraday"
         if live_trade_date and live_trade_date > str(payload.get("trade_date", ""))

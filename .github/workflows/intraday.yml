@@ -23,8 +23,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: stock-pages-intraday
-  cancel-in-progress: true
+  group: stock-pages-publish
+  cancel-in-progress: false
 
 jobs:
   refresh:

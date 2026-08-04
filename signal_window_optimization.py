@@ -23,6 +23,27 @@ from rolling_validation import (
     truncate_histories,
 )
 from screener import Bar, Stock, cached_universe, has_yellow_segment, is_st_name, load_config
+from strategy_contract import (
+    ENTRY_DELAY_BARS,
+    ENTRY_EXECUTION_MAX_WAIT_BARS,
+    ENTRY_LABEL,
+    ENTRY_MAX_PULLBACK_PCT,
+    ENTRY_REQUIRE_CLOSE_ABOVE_DRAGON,
+    ENTRY_REQUIRE_DRAGON_NONFALLING,
+    ENTRY_REQUIRE_SIGNAL_VALID,
+    EXECUTION_SCOPE,
+    EXIT_MAX_HOLDING_BARS,
+    EXIT_ON_DRAGON_TIGER_END,
+    EXIT_ON_TRUE_ERASURE,
+    EXIT_PROFIT_ACTIVATION_PCT,
+    EXIT_LABEL,
+    EXIT_TRAILING_DRAWDOWN_PCT,
+    EXIT_WEAKENING_CONFIRMATIONS,
+    EXIT_WEAKENING_POINTS,
+    FROZEN_CANDIDATE_ID,
+    LIVE_STRATEGY_ID,
+    strategy_contract,
+)
 
 
 ROOT = Path(__file__).resolve().parent
@@ -30,27 +51,114 @@ DEFAULT_OUTPUT = ROOT / "results" / "signal_window_optimization.json"
 YELLOW_BEFORE_DAYS = 2
 YELLOW_AFTER_DAYS = 7
 CROSS_LOOKBACK_DAYS = YELLOW_AFTER_DAYS + 1
-MAX_HOLD_BARS = 60
+MAX_HOLD_BARS = EXIT_MAX_HOLDING_BARS
 # 10 closes to confirm + following-open entry + 60 close observations +
 # following-open exit. Every candidate sees the exact same completed horizon.
 COMMON_FUTURE_BARS = 72
 FORWARD_HORIZONS = (5, 10, 20, 40, 60)
-FROZEN_LIVE_STRATEGY_ID = "break5_trail3_2_next_open_v2"
-FROZEN_LIVE_CANDIDATE_ID = "break_5day_high__trail_3_2"
+# Backward-compatible names retained for readers of the existing research
+# schema. Their values come exclusively from the shared live contract.
+FROZEN_LIVE_STRATEGY_ID = LIVE_STRATEGY_ID
+FROZEN_LIVE_CANDIDATE_ID = FROZEN_CANDIDATE_ID
+FROZEN_ENTRY_ID, FROZEN_EXIT_ID = FROZEN_CANDIDATE_ID.split("__", 1)
+FORWARD_SELECTION_POLICY = (
+    "开发期与2024-2025验证期用于策略研究；2026结果已被反复查看并参与本次人工冻结，"
+    "因此不再属于盲测。真正的forward验证只从本次冻结批次截止日之后的新交易日开始。"
+)
 
 
 ENTRY_METHODS = (
     {"id": "signal_close", "label": "信号日收盘确认，下一可交易日开盘买入", "kind": "close", "delay": 0},
     {"id": "next_close", "label": "信号保持到下一交易日收盘，再于随后可交易日开盘买入", "kind": "close", "delay": 1},
+    {"id": "persist_2", "label": "信号保持2个交易日，再于随后可交易日开盘买入", "kind": "close", "delay": 2},
+    {"id": "persist_3", "label": "信号保持3个交易日，再于随后可交易日开盘买入", "kind": "close", "delay": 3},
+    {
+        "id": "low_risk_1",
+        "label": "信号后第1日仍有效、收盘站上龙线且较信号价回撤不超过3%，下一可交易日开盘买入",
+        "kind": "timed_filter",
+        "delay": 1,
+        "max_pullback": 3.0,
+        "require_above_dragon": True,
+    },
+    {
+        "id": "low_risk_2",
+        "label": ENTRY_LABEL,
+        "kind": "timed_filter",
+        "delay": ENTRY_DELAY_BARS,
+        "max_pullback": ENTRY_MAX_PULLBACK_PCT,
+        "require_above_dragon": ENTRY_REQUIRE_CLOSE_ABOVE_DRAGON,
+        "require_dragon_nonfalling": ENTRY_REQUIRE_DRAGON_NONFALLING,
+    },
+    {
+        "id": "low_risk_3",
+        "label": "信号后第3日仍有效、收盘站上龙线且龙线未转跌，下一可交易日开盘买入",
+        "kind": "timed_filter",
+        "delay": 3,
+        "max_pullback": 3.0,
+        "require_above_dragon": True,
+        "require_dragon_nonfalling": True,
+    },
+    {
+        "id": "confirm_0_5_3d",
+        "label": "3日内收盘较信号价上涨0.5%",
+        "kind": "threshold",
+        "threshold": 0.5,
+        "max_wait": 3,
+    },
+    {
+        "id": "confirm_1_3d",
+        "label": "3日内收盘较信号价上涨1%",
+        "kind": "threshold",
+        "threshold": 1.0,
+        "max_wait": 3,
+    },
+    {
+        "id": "confirm_1_5d",
+        "label": "5日内收盘较信号价上涨1%",
+        "kind": "threshold",
+        "threshold": 1.0,
+        "max_wait": 5,
+    },
     {"id": "confirm_1", "label": "10日内收盘较信号价上涨1%", "kind": "threshold", "threshold": 1.0},
     {"id": "confirm_2", "label": "10日内收盘较信号价上涨2%", "kind": "threshold", "threshold": 2.0},
     {"id": "confirm_3", "label": "10日内收盘较信号价上涨3%", "kind": "threshold", "threshold": 3.0},
     {"id": "confirm_5", "label": "10日内收盘较信号价上涨5%", "kind": "threshold", "threshold": 5.0},
     {"id": "confirm_8", "label": "10日内收盘较信号价上涨8%", "kind": "threshold", "threshold": 8.0},
+    {
+        "id": "break_signal_high_3d",
+        "label": "3日内收盘突破信号日最高价",
+        "kind": "signal_high",
+        "max_wait": 3,
+    },
+    {
+        "id": "break_signal_high_5d",
+        "label": "5日内收盘突破信号日最高价",
+        "kind": "signal_high",
+        "max_wait": 5,
+    },
     {"id": "break_signal_high", "label": "10日内收盘突破信号日最高价", "kind": "signal_high"},
     {"id": "break_3day_high", "label": "10日内收盘突破此前3日最高价", "kind": "recent_high", "lookback": 3},
     {"id": "break_5day_high", "label": "10日内收盘突破此前5日最高价", "kind": "recent_high", "lookback": 5},
     {"id": "reclaim_dragon", "label": "10日内收盘重新站上龙线且龙线转升", "kind": "dragon_reclaim"},
+)
+
+EARLY_WAVE_ENTRY_IDS = frozenset(
+    {
+        "signal_close",
+        "next_close",
+        "persist_2",
+        "persist_3",
+        "low_risk_1",
+        "low_risk_2",
+        "low_risk_3",
+        "confirm_0_5_3d",
+        "confirm_1_3d",
+        "confirm_1_5d",
+        "confirm_1",
+        "break_signal_high_3d",
+        "break_signal_high_5d",
+        "break_signal_high",
+    }
 )
 
 
@@ -136,10 +244,173 @@ def exit_rules() -> tuple[dict, ...]:
                     "stop": stop,
                 }
             )
+    wave_trailing_grid = {
+        5.0: (2.0, 3.0, 5.0, 8.0),
+        8.0: (3.0, 5.0, 8.0, 10.0, 12.0),
+        10.0: (5.0, 8.0, 10.0),
+        15.0: (8.0, 10.0, 12.0),
+    }
+    for activation, drawdowns in wave_trailing_grid.items():
+        for drawdown in drawdowns:
+            rules.append(
+                {
+                    "id": f"wave_erasure_trail_{activation:g}_{drawdown:g}",
+                    "label": (
+                        "信号重算消失优先退出；"
+                        f"浮盈达到{activation:g}%后较最高收盘回撤{drawdown:g}%，"
+                        "或龙虎关系结束"
+                    ),
+                    "kind": "trailing",
+                    "activation": activation,
+                    "drawdown": drawdown,
+                    "exit_on_erasure": True,
+                }
+            )
+    for activation, drawdown in (
+        (8.0, 3.0),
+        (8.0, 5.0),
+        (10.0, 5.0),
+        (10.0, 10.0),
+    ):
+        rule_id = f"wave_erasure_hybrid_or_{activation:g}_{drawdown:g}_weakening"
+        rules.append(
+            {
+                "id": rule_id,
+                "label": EXIT_LABEL
+                if rule_id == FROZEN_EXIT_ID
+                else (
+                    "信号重算消失优先退出；"
+                    f"浮盈达到{activation:g}%后回撤{drawdown:g}%或龙虎线同步转弱，"
+                    "二者先到先卖；最迟龙虎关系结束"
+                ),
+                "kind": "hybrid",
+                "activation": (
+                    EXIT_PROFIT_ACTIVATION_PCT
+                    if rule_id == FROZEN_EXIT_ID
+                    else activation
+                ),
+                "drawdown": (
+                    EXIT_TRAILING_DRAWDOWN_PCT
+                    if rule_id == FROZEN_EXIT_ID
+                    else drawdown
+                ),
+                "weakening_confirm": (
+                    EXIT_WEAKENING_CONFIRMATIONS
+                    if rule_id == FROZEN_EXIT_ID
+                    else 1
+                ),
+                "combine": "either",
+                "exit_on_erasure": (
+                    EXIT_ON_TRUE_ERASURE if rule_id == FROZEN_EXIT_ID else True
+                ),
+            }
+        )
+    for activation, drawdown in ((8.0, 5.0), (10.0, 5.0)):
+        rules.append(
+            {
+                "id": (
+                    f"wave_erasure_hybrid_and_{activation:g}_{drawdown:g}_weakening"
+                ),
+                "label": (
+                    "信号重算消失优先退出；"
+                    f"浮盈达到{activation:g}%后回撤{drawdown:g}%且龙虎线已同步转弱，"
+                    "两项均出现后卖出；最迟龙虎关系结束"
+                ),
+                "kind": "hybrid",
+                "activation": activation,
+                "drawdown": drawdown,
+                "weakening_confirm": 1,
+                "combine": "all",
+                "exit_on_erasure": True,
+            }
+        )
+    rules.extend(
+        [
+            {
+                "id": "wave_erasure_weakening_1",
+                "label": "信号重算消失优先退出；龙虎线首次同步转弱，或龙虎关系结束",
+                "kind": "weakening",
+                "confirm": 1,
+                "exit_on_erasure": True,
+            },
+            {
+                "id": "wave_erasure_weakening_2",
+                "label": "信号重算消失优先退出；龙虎线连续2日同步转弱，或龙虎关系结束",
+                "kind": "weakening",
+                "confirm": 2,
+                "exit_on_erasure": True,
+            },
+            {
+                "id": "wave_erasure_ma_5_10",
+                "label": "信号重算消失优先退出；连续2日收盘跌破10日均线且5日均线转弱，或龙虎关系结束",
+                "kind": "wave_end",
+                "fast_period": 5,
+                "slow_period": 10,
+                "ma_confirm": 2,
+                "minimum_holding_bars": 3,
+                "exit_on_erasure": True,
+            },
+            {
+                "id": "wave_erasure_ma_5_20",
+                "label": "信号重算消失优先退出；连续2日收盘跌破20日均线且5日均线转弱，或龙虎关系结束",
+                "kind": "wave_end",
+                "fast_period": 5,
+                "slow_period": 20,
+                "ma_confirm": 2,
+                "minimum_holding_bars": 5,
+                "exit_on_erasure": True,
+            },
+            {
+                "id": "wave_erasure_structure_5",
+                "label": "信号重算消失优先退出；连续2日收盘跌破此前5日最低收盘且龙线转弱，或龙虎关系结束",
+                "kind": "wave_end",
+                "structure_lookback": 5,
+                "structure_confirm": 2,
+                "minimum_holding_bars": 3,
+                "exit_on_erasure": True,
+            },
+            {
+                "id": "wave_erasure_adaptive_5_8",
+                "label": "信号重算消失优先退出；浮盈5%后回撤8%，或均线与低点结构共同转弱，最迟龙虎关系结束",
+                "kind": "wave_end",
+                "activation": 5.0,
+                "drawdown": 8.0,
+                "trailing_confirm": 1,
+                "fast_period": 5,
+                "slow_period": 10,
+                "ma_confirm": 2,
+                "structure_lookback": 5,
+                "structure_confirm": 2,
+                "minimum_holding_bars": 3,
+                "exit_on_erasure": True,
+            },
+            {
+                "id": "wave_erasure_adaptive_8_10",
+                "label": "信号重算消失优先退出；浮盈8%后回撤10%，或中期均线与低点结构转弱，最迟龙虎关系结束",
+                "kind": "wave_end",
+                "activation": 8.0,
+                "drawdown": 10.0,
+                "trailing_confirm": 2,
+                "fast_period": 5,
+                "slow_period": 20,
+                "ma_confirm": 2,
+                "structure_lookback": 8,
+                "structure_confirm": 2,
+                "require_ma_and_structure": True,
+                "minimum_holding_bars": 5,
+                "exit_on_erasure": True,
+            },
+        ]
+    )
     return tuple(rules)
 
 
 EXIT_RULES = exit_rules()
+LONG_WAVE_EXIT_IDS = frozenset(
+    str(rule["id"])
+    for rule in EXIT_RULES
+    if str(rule["id"]).startswith("wave_erasure_")
+)
 
 
 @dataclass
@@ -147,18 +418,45 @@ class Samples:
     returns: array = field(default_factory=lambda: array("f"))
     holding: array = field(default_factory=lambda: array("H"))
     development: array = field(default_factory=lambda: array("f"))
+    development_holding: array = field(default_factory=lambda: array("H"))
     validation: array = field(default_factory=lambda: array("f"))
+    validation_holding: array = field(default_factory=lambda: array("H"))
     holdout: array = field(default_factory=lambda: array("f"))
+    holdout_holding: array = field(default_factory=lambda: array("H"))
+    by_completed_year: dict[str, array] = field(default_factory=dict)
+    holding_by_completed_year: dict[str, array] = field(default_factory=dict)
 
-    def add(self, value: float, holding_bars: int, entry_date: str) -> None:
+    def add(
+        self,
+        value: float,
+        holding_bars: int,
+        entry_date: str,
+        exit_date: str,
+    ) -> None:
         self.returns.append(float(value))
-        self.holding.append(max(0, int(holding_bars)))
-        if entry_date < "2024-01-01":
+        normalized_holding = max(0, int(holding_bars))
+        self.holding.append(normalized_holding)
+        completed_year = exit_date[:4]
+        self.by_completed_year.setdefault(completed_year, array("f")).append(
+            float(value)
+        )
+        self.holding_by_completed_year.setdefault(
+            completed_year,
+            array("H"),
+        ).append(normalized_holding)
+
+        # A period may only score a trade whose entry and exit were both known
+        # before that period ended. Trades spanning 2024-01-01 or 2026-01-01
+        # remain in ``returns`` but are deliberately absent from period buckets.
+        if entry_date < "2024-01-01" and exit_date < "2024-01-01":
             self.development.append(float(value))
-        elif entry_date < "2026-01-01":
+            self.development_holding.append(normalized_holding)
+        elif entry_date >= "2024-01-01" and exit_date < "2026-01-01":
             self.validation.append(float(value))
-        else:
+            self.validation_holding.append(normalized_holding)
+        elif entry_date >= "2026-01-01":
             self.holdout.append(float(value))
+            self.holdout_holding.append(normalized_holding)
 
 
 @dataclass
@@ -172,13 +470,14 @@ class CohortSamples:
         value: float,
         holding_bars: int,
         entry_date: str,
+        exit_date: str,
         entry_area: str,
     ) -> None:
-        self.combined.add(value, holding_bars, entry_date)
+        self.combined.add(value, holding_bars, entry_date, exit_date)
         if entry_area == "main":
-            self.main.add(value, holding_bars, entry_date)
+            self.main.add(value, holding_bars, entry_date, exit_date)
         elif entry_area == "secondary":
-            self.secondary.add(value, holding_bars, entry_date)
+            self.secondary.add(value, holding_bars, entry_date, exit_date)
 
 
 @dataclass
@@ -199,6 +498,63 @@ class WaveSamples:
         self.peak_close_returns.append(float(peak_close_return))
         self.days_to_peak_high.append(max(0, int(days_to_peak)))
         self.wave_lengths.append(max(0, int(wave_length)))
+
+
+@dataclass
+class WaveCaptureSamples:
+    pre_exit_peak_close_returns: array = field(default_factory=lambda: array("f"))
+    peak_close_returns: array = field(default_factory=lambda: array("f"))
+    peak_givebacks: array = field(default_factory=lambda: array("f"))
+    capture_ratios: array = field(default_factory=lambda: array("f"))
+
+    def add(
+        self,
+        net_return: float,
+        peak_close_return: float,
+        full_wave_peak_close_return: float | None = None,
+    ) -> None:
+        full_wave_peak = (
+            float(peak_close_return)
+            if full_wave_peak_close_return is None
+            else float(full_wave_peak_close_return)
+        )
+        self.pre_exit_peak_close_returns.append(float(peak_close_return))
+        self.peak_close_returns.append(full_wave_peak)
+        self.peak_givebacks.append(float(full_wave_peak - net_return))
+        if full_wave_peak > 0:
+            self.capture_ratios.append(float(net_return / full_wave_peak * 100.0))
+
+
+@dataclass
+class CohortWaveCaptureSamples:
+    combined: WaveCaptureSamples = field(default_factory=WaveCaptureSamples)
+    main: WaveCaptureSamples = field(default_factory=WaveCaptureSamples)
+    secondary: WaveCaptureSamples = field(default_factory=WaveCaptureSamples)
+
+    def add(
+        self,
+        net_return: float,
+        pre_exit_peak_close_return: float,
+        full_wave_peak_close_return: float,
+        entry_area: str,
+    ) -> None:
+        self.combined.add(
+            net_return,
+            pre_exit_peak_close_return,
+            full_wave_peak_close_return,
+        )
+        if entry_area == "main":
+            self.main.add(
+                net_return,
+                pre_exit_peak_close_return,
+                full_wave_peak_close_return,
+            )
+        elif entry_area == "secondary":
+            self.secondary.add(
+                net_return,
+                pre_exit_peak_close_return,
+                full_wave_peak_close_return,
+            )
 
 
 def percentile(values: Sequence[float], q: float) -> float:
@@ -223,6 +579,8 @@ def stats(values: Sequence[float], holding: Sequence[int] | None = None) -> dict
             "positive_rate_pct": 0.0,
             "geometric_average_pct": 0.0,
             "profit_factor": None,
+            "average_ci95_lower_pct": 0.0,
+            "p10_pct": 0.0,
             "p25_pct": 0.0,
             "p75_pct": 0.0,
             "average_excluding_abs_50pct_outliers_pct": 0.0,
@@ -232,13 +590,21 @@ def stats(values: Sequence[float], holding: Sequence[int] | None = None) -> dict
     losses = abs(sum(value for value in numbers if value <= 0))
     regular = [value for value in numbers if abs(value) <= 50.0]
     logs = [math.log1p(value / 100.0) for value in numbers if value > -100.0]
+    mean_value = statistics.fmean(numbers)
+    standard_error = (
+        statistics.stdev(numbers) / math.sqrt(len(numbers))
+        if len(numbers) > 1
+        else 0.0
+    )
     return {
         "sample_count": len(numbers),
-        "average_pct": round(statistics.fmean(numbers), 4),
+        "average_pct": round(mean_value, 4),
         "median_pct": round(statistics.median(numbers), 4),
         "positive_rate_pct": round(sum(value > 0 for value in numbers) / len(numbers) * 100.0, 2),
         "geometric_average_pct": round(math.expm1(statistics.fmean(logs)) * 100.0, 4) if logs else 0.0,
         "profit_factor": round(gains / losses, 4) if losses else None,
+        "average_ci95_lower_pct": round(mean_value - 1.96 * standard_error, 4),
+        "p10_pct": round(percentile(numbers, 0.10), 4),
         "p25_pct": round(percentile(numbers, 0.25), 4),
         "p75_pct": round(percentile(numbers, 0.75), 4),
         "average_excluding_abs_50pct_outliers_pct": round(statistics.fmean(regular), 4) if regular else 0.0,
@@ -274,32 +640,70 @@ def wave_stats(samples: WaveSamples) -> dict:
     }
 
 
+def wave_capture_stats(samples: WaveCaptureSamples) -> dict:
+    pre_exit_peaks = [
+        float(value) for value in samples.pre_exit_peak_close_returns
+    ]
+    peaks = [float(value) for value in samples.peak_close_returns]
+    givebacks = [float(value) for value in samples.peak_givebacks]
+    captures = [float(value) for value in samples.capture_ratios]
+    if not peaks:
+        return {"sample_count": 0}
+    return {
+        "sample_count": len(peaks),
+        "definition": (
+            "完整波段最高收盘浮盈从实际买入开盘起算，到龙虎关系结束或60日上限；"
+            "卖前最高浮盈只统计到本策略卖出触发收盘；峰值回吐=完整波段最高浮盈-扣费净收益；"
+            "兑现比例仅统计完整波段曾有正浮盈的交易，属于事后效率上限，不参与买卖触发"
+        ),
+        "average_pre_exit_peak_close_return_pct": round(
+            statistics.fmean(pre_exit_peaks), 4
+        ),
+        "median_pre_exit_peak_close_return_pct": round(
+            statistics.median(pre_exit_peaks), 4
+        ),
+        "average_peak_close_return_pct": round(statistics.fmean(peaks), 4),
+        "median_peak_close_return_pct": round(statistics.median(peaks), 4),
+        "average_peak_giveback_pct": round(statistics.fmean(givebacks), 4),
+        "median_peak_giveback_pct": round(statistics.median(givebacks), 4),
+        "capture_sample_count": len(captures),
+        "median_net_capture_ratio_pct": (
+            round(statistics.median(captures), 2) if captures else 0.0
+        ),
+    }
+
+
 def signal_indices(points: Sequence, cohort: str = "base") -> list[int]:
-    """Record every real-time appearance, including a later reappearance.
+    """Record causal signal appearances without duplicating one bull lineage.
 
     ``pool`` starts when a stock first enters either main or secondary. A later
     secondary-to-main promotion stays in the same transaction and is therefore
-    not counted again.
+    not counted again.  The lineage is released only after dragon is no longer
+    above tiger; a drifting ``cross_date`` while the relationship remains bullish
+    is a recalculation of the same cross, not a new opportunity.
     """
     if cohort not in {"base", "pool", "main", "secondary"}:
         raise ValueError(f"未知信号样本口径: {cohort}")
     indices: list[int] = []
     previous = False
-    consumed_cross_dates: set[str] = set()
+    pool_lineage_active = False
     for index, point in enumerate(points):
+        if cohort == "pool":
+            relationship_alive = bool(point.dragon > point.tiger)
+            if not relationship_alive:
+                pool_lineage_active = False
+            current = bool(point.area) and relationship_alive
+            if current and not pool_lineage_active:
+                indices.append(index)
+                pool_lineage_active = True
+            continue
         current = (
             bool(point.base_signal)
             if cohort == "base"
-            else bool(point.area)
-            if cohort == "pool"
             else point.area == cohort
         )
         if current and not previous:
-            cross_key = str(getattr(point, "cross_date", ""))
-            if cohort != "pool" or not cross_key or cross_key not in consumed_cross_dates:
-                indices.append(index)
-                if cohort == "pool" and cross_key:
-                    consumed_cross_dates.add(cross_key)
+            indices.append(index)
         previous = current
     return indices
 
@@ -313,12 +717,6 @@ def signal_erased(points: Sequence, setup_index: int, index: int) -> bool:
         and not points[index].cross_ok
         and points[index].dragon > points[index].tiger
     )
-
-
-def signal_cross_changed(points: Sequence, setup_index: int, index: int) -> bool:
-    setup_cross = str(getattr(points[setup_index], "cross_date", ""))
-    current_cross = str(getattr(points[index], "cross_date", ""))
-    return bool(setup_cross and current_cross and setup_cross != current_cross)
 
 
 def append_wave_sample(
@@ -356,6 +754,7 @@ def risk_exit_index(
     start_index: int,
     *,
     exit_on_erasure: bool = False,
+    exit_on_relationship_end: bool = True,
     include_start: bool = False,
 ) -> int:
     end = min(len(points) - 1, start_index + MAX_HOLD_BARS)
@@ -363,7 +762,7 @@ def risk_exit_index(
     for index in range(first, end + 1):
         if exit_on_erasure and signal_erased(points, setup_index, index):
             return index
-        if points[index].dragon <= points[index].tiger:
+        if exit_on_relationship_end and points[index].dragon <= points[index].tiger:
             return index
     return end
 
@@ -385,20 +784,49 @@ def entry_for_method(
     both and turns every close confirmation into a next-tradable-open fill.
     """
     kind = str(method["kind"])
+    require_signal_valid = bool(
+        ENTRY_REQUIRE_SIGNAL_VALID
+        if str(method.get("id", "")) == FROZEN_ENTRY_ID
+        else True
+    )
     trigger_index = -1
     legacy_index = -1
     legacy_price = 0.0
-    if kind in {"close", "open"}:
+    if kind in {"close", "open", "timed_filter"}:
         index = setup_index + int(method["delay"])
         if index >= len(points):
             return None
         # A next-open order can only use information known at the prior close.
+        # ``cross_date`` can drift when the causal XMA tail is recalculated.
+        # While cross_ok remains true and dragon stays above tiger this is the
+        # same active setup, not a new independent cross. A real new cycle must
+        # first pass through relationship loss, which is rejected below.
         visible_end = index if kind == "open" else index + 1
         for offset in range(setup_index + 1, visible_end):
             if (
-                signal_erased(points, setup_index, offset)
-                or signal_cross_changed(points, setup_index, offset)
+                (require_signal_valid and signal_erased(points, setup_index, offset))
                 or points[offset].dragon <= points[offset].tiger
+            ):
+                return None
+        if kind == "timed_filter":
+            close = float(points[index].close)
+            setup_close = float(points[setup_index].close)
+            if (
+                method.get("require_above_dragon")
+                and close < float(points[index].dragon)
+            ):
+                return None
+            if (
+                method.get("require_dragon_nonfalling")
+                and index > 0
+                and float(points[index].dragon) < float(points[index - 1].dragon)
+            ):
+                return None
+            max_pullback = method.get("max_pullback")
+            if (
+                max_pullback is not None
+                and close
+                < setup_close * (1.0 - float(max_pullback) / 100.0)
             ):
                 return None
         trigger_index = setup_index if kind == "open" else index
@@ -407,12 +835,15 @@ def entry_for_method(
     else:
         signal_close = float(points[setup_index].close)
         signal_high = float(bars[setup_index].high)
-        for index in range(setup_index + 1, min(len(points), setup_index + 11)):
+        max_wait = int(method.get("max_wait", 10))
+        for index in range(
+            setup_index + 1,
+            min(len(points), setup_index + max_wait + 1),
+        ):
             # The end-of-day setup must still exist on the confirmation close.
             # This is what correctly cancels 海南华铁 on 2025-02-12.
             if (
-                signal_erased(points, setup_index, index)
-                or signal_cross_changed(points, setup_index, index)
+                (require_signal_valid and signal_erased(points, setup_index, index))
                 or points[index].dragon <= points[index].tiger
             ):
                 return None
@@ -449,8 +880,7 @@ def entry_for_method(
 
     def setup_still_valid(index: int) -> bool:
         return (
-            not signal_erased(points, setup_index, index)
-            and not signal_cross_changed(points, setup_index, index)
+            (not require_signal_valid or not signal_erased(points, setup_index, index))
             and points[index].dragon > points[index].tiger
         )
 
@@ -469,12 +899,17 @@ def entry_for_method(
 
 
 def weakening(points: Sequence, index: int) -> bool:
-    if index < 2 or points[index].dragon <= points[index].tiger:
+    if (
+        index + 1 < EXIT_WEAKENING_POINTS
+        or points[index].dragon <= points[index].tiger
+    ):
         return False
-    latest = points[index - 2 : index + 1]
+    latest = points[index - EXIT_WEAKENING_POINTS + 1 : index + 1]
     dragons = [point.dragon for point in latest]
     spreads = [point.dragon - point.tiger for point in latest]
-    return dragons[0] > dragons[1] > dragons[2] and spreads[0] > spreads[1] > spreads[2]
+    return all(left > right for left, right in zip(dragons, dragons[1:])) and all(
+        left > right for left, right in zip(spreads, spreads[1:])
+    )
 
 
 def moving_average(points: Sequence, index: int, period: int) -> float | None:
@@ -499,9 +934,16 @@ def exit_for_rule(
 
     weakening_streak = 0
     ma_streak = 0
-    peak_close = entry_price
+    structure_streak = 0
+    trailing_streak = 0
+    trailing_seen = False
+    weakening_seen = False
+    peak_close = max(entry_price, float(points[entry_index].close))
     activated = float(rule.get("activation", 0.0)) <= 0
-    for index in range(entry_index + 1, hard_end + 1):
+    # The entry order fills at the open, so the same day's close is the first
+    # causal moment at which an exit may be confirmed. This mirrors the live
+    # tracker, including delayed fills whose lines have weakened while blocked.
+    for index in range(entry_index, hard_end + 1):
         close = float(points[index].close)
         peak_close = max(peak_close, close)
         if kind == "weakening":
@@ -524,7 +966,165 @@ def exit_for_rule(
                 return index
             if rule.get("stop") is not None and current_return <= -float(rule["stop"]):
                 return index
+        elif kind == "hybrid":
+            if peak_close / entry_price - 1.0 >= float(rule["activation"]) / 100.0:
+                activated = True
+            trailing_hit = bool(
+                activated
+                and close / peak_close - 1.0
+                <= -float(rule["drawdown"]) / 100.0
+            )
+            weakening_streak = (
+                weakening_streak + 1 if weakening(points, index) else 0
+            )
+            weakening_hit = weakening_streak >= int(
+                rule.get("weakening_confirm", 1)
+            )
+            if str(rule.get("combine", "either")) == "either":
+                if trailing_hit or weakening_hit:
+                    return index
+            else:
+                trailing_seen = trailing_seen or trailing_hit
+                weakening_seen = weakening_seen or weakening_hit
+                if trailing_seen and weakening_seen:
+                    return index
+        elif kind == "wave_end":
+            activation = rule.get("activation")
+            drawdown = rule.get("drawdown")
+            if (
+                activation is not None
+                and peak_close / entry_price - 1.0
+                >= float(activation) / 100.0
+            ):
+                activated = True
+            trailing_breach = bool(
+                activated
+                and drawdown is not None
+                and close / peak_close - 1.0
+                <= -float(drawdown) / 100.0
+            )
+            trailing_streak = trailing_streak + 1 if trailing_breach else 0
+
+            fast_period = int(rule.get("fast_period", 0))
+            slow_period = int(rule.get("slow_period", 0))
+            fast_average = (
+                moving_average(points, index, fast_period)
+                if fast_period > 0
+                else None
+            )
+            slow_average = (
+                moving_average(points, index, slow_period)
+                if slow_period > 0
+                else None
+            )
+            ma_weak = bool(
+                fast_average is not None
+                and slow_average is not None
+                and close < slow_average
+                and fast_average <= slow_average
+            )
+            ma_streak = ma_streak + 1 if ma_weak else 0
+
+            structure_lookback = int(rule.get("structure_lookback", 0))
+            structure_weak = bool(
+                structure_lookback > 0
+                and index >= structure_lookback
+                and close
+                < min(
+                    float(point.close)
+                    for point in points[index - structure_lookback : index]
+                )
+                and float(points[index].dragon)
+                < float(points[index - 1].dragon)
+            )
+            structure_streak = structure_streak + 1 if structure_weak else 0
+
+            if index - entry_index < int(rule.get("minimum_holding_bars", 0)):
+                continue
+            if trailing_streak >= int(rule.get("trailing_confirm", 1)):
+                return index
+            ma_finished = bool(
+                int(rule.get("ma_confirm", 0)) > 0
+                and ma_streak >= int(rule["ma_confirm"])
+            )
+            structure_finished = bool(
+                int(rule.get("structure_confirm", 0)) > 0
+                and structure_streak >= int(rule["structure_confirm"])
+            )
+            if rule.get("require_ma_and_structure"):
+                if ma_finished and structure_finished:
+                    return index
+            elif ma_finished or structure_finished:
+                return index
     return hard_end
+
+
+def exit_reason_for_trade(
+    points: Sequence,
+    setup_index: int,
+    entry_index: int,
+    entry_price: float,
+    exit_trigger_index: int,
+    rule: dict,
+) -> str:
+    """Describe the close-known condition that actually ended a trade."""
+    if signal_erased(points, setup_index, exit_trigger_index):
+        return "signal_recalculated_away"
+    if points[exit_trigger_index].dragon <= points[exit_trigger_index].tiger:
+        return "dragon_tiger_relationship_end"
+
+    kind = str(rule["kind"])
+    peak_close = max(
+        entry_price,
+        *(
+            float(points[index].close)
+            for index in range(entry_index, exit_trigger_index + 1)
+        ),
+    )
+    close = float(points[exit_trigger_index].close)
+    activation = float(rule.get("activation", 0.0))
+    drawdown = float(rule.get("drawdown", 0.0))
+    trailing_hit = bool(
+        peak_close / entry_price - 1.0 >= activation / 100.0
+        and close / peak_close - 1.0 <= -drawdown / 100.0
+    )
+    weakening_confirm = int(rule.get("weakening_confirm", rule.get("confirm", 1)))
+    weakening_hit = bool(
+        weakening_confirm > 0
+        and exit_trigger_index - weakening_confirm + 1 >= entry_index
+        and all(
+            weakening(points, index)
+            for index in range(
+                exit_trigger_index - weakening_confirm + 1,
+                exit_trigger_index + 1,
+            )
+        )
+    )
+    if kind == "hybrid":
+        if trailing_hit and weakening_hit:
+            return "profit_trailing_drawdown_and_dragon_tiger_weakening"
+        if trailing_hit:
+            return "profit_trailing_drawdown"
+        if weakening_hit:
+            return "dragon_tiger_weakening"
+    elif kind == "trailing" and trailing_hit:
+        return "profit_trailing_drawdown"
+    elif kind == "weakening" and weakening_hit:
+        return "dragon_tiger_weakening"
+    elif kind == "fixed":
+        return "fixed_holding_period"
+    elif kind == "target":
+        current_return = (close / entry_price - 1.0) * 100.0
+        if current_return >= float(rule["target"]):
+            return "profit_target"
+        if (
+            rule.get("stop") is not None
+            and current_return <= -float(rule["stop"])
+        ):
+            return "stop_loss"
+    if exit_trigger_index - entry_index >= MAX_HOLD_BARS:
+        return "maximum_holding_period"
+    return "rule_condition"
 
 
 def joint_trade_for_setup(
@@ -556,6 +1156,11 @@ def joint_trade_for_setup(
         setup_index,
         entry_index,
         exit_on_erasure=False,
+        exit_on_relationship_end=(
+            EXIT_ON_DRAGON_TIGER_END
+            if str(exit_rule.get("id", "")) == FROZEN_EXIT_ID
+            else True
+        ),
         include_start=True,
     )
     erasure_end = risk_exit_index(
@@ -563,6 +1168,11 @@ def joint_trade_for_setup(
         setup_index,
         entry_index,
         exit_on_erasure=True,
+        exit_on_relationship_end=(
+            EXIT_ON_DRAGON_TIGER_END
+            if str(exit_rule.get("id", "")) == FROZEN_EXIT_ID
+            else True
+        ),
         include_start=True,
     )
     hard_end = erasure_end if exit_rule.get("exit_on_erasure") else relationship_end
@@ -583,6 +1193,14 @@ def joint_trade_for_setup(
     )
     if exit_fill is None:
         return None
+    exit_reason = exit_reason_for_trade(
+        points,
+        setup_index,
+        entry_index,
+        entry_raw,
+        exit_trigger_index,
+        exit_rule,
+    )
     return {
         "setup_index": setup_index,
         "entry_area": points[setup_index].area or "base",
@@ -602,6 +1220,7 @@ def joint_trade_for_setup(
         "entry_method_label": str(entry_method["label"]),
         "exit_rule_id": str(exit_rule["id"]),
         "exit_rule_label": str(exit_rule["label"]),
+        "exit_reason": exit_reason,
     }
 
 
@@ -693,6 +1312,8 @@ def trade_case_payload(
     ) * 100.0
     return {
         "outcome": "trade",
+        "candidate_id": f"{entry_method['id']}__{exit_rule['id']}",
+        "execution_scope": EXECUTION_SCOPE,
         "code": stock.code,
         "name": stock.name,
         "source": "通达信前复权日线",
@@ -716,7 +1337,13 @@ def trade_case_payload(
         "peak_close": round(float(points[peak_index].close), 4),
         "peak_return_pct": round(peak_return, 4),
         "entry_method_id": entry_method["id"],
+        "entry_rule_id": entry_method["id"],
+        "entry_rule": dict(entry_method),
         "exit_rule_id": exit_rule["id"],
+        "exit_rule": dict(exit_rule),
+        "activation": float(exit_rule.get("activation", 0.0)),
+        "drawdown": float(exit_rule.get("drawdown", 0.0)),
+        "exit_reason": str(trade["exit_reason"]),
         "method": f"{entry_method['label']}；{exit_rule['label']}",
         "chart_caption": (
             f"{points[setup_index].date}收盘形成正式选区事件；"
@@ -749,6 +1376,10 @@ def cancelled_case_payload(
 ) -> dict:
     return {
         "outcome": "cancelled",
+        "candidate_id": FROZEN_CANDIDATE_ID,
+        "execution_scope": EXECUTION_SCOPE,
+        "entry_rule_id": FROZEN_ENTRY_ID,
+        "exit_rule_id": FROZEN_EXIT_ID,
         "code": stock.code,
         "name": stock.name,
         "source": "通达信前复权日线",
@@ -758,10 +1389,10 @@ def cancelled_case_payload(
         "signal_price": round(float(points[setup_index].close), 4),
         "cancel_date": points[cancel_index].date,
         "cancel_price": round(float(points[cancel_index].close), 4),
-        "cancel_reason": "突破确认日收盘时龙腾跃虎已被逐日重算消失，候选取消且没有买卖成交",
+        "cancel_reason": "买点确认前龙腾跃虎已被逐日重算消失，候选取消且没有买卖成交",
         "chart_caption": (
             f"{points[setup_index].date}收盘首次进入{points[setup_index].area}；"
-            f"{points[cancel_index].date}虽出现价格突破，但同一收盘重算后龙腾跃虎消失，"
+            f"{points[cancel_index].date}收盘重算后龙腾跃虎消失，"
             "状态机先取消候选，因此没有建议买点和卖点。"
         ),
         "case_notes": [
@@ -817,6 +1448,23 @@ def candidate_summary(key: tuple[str, str], samples: Samples) -> dict:
     entry_id, exit_id = key
     entry = next(item for item in ENTRY_METHODS if item["id"] == entry_id)
     exit_rule = next(item for item in EXIT_RULES if item["id"] == exit_id)
+    by_completed_year = {
+        year: stats(
+            values,
+            samples.holding_by_completed_year.get(year),
+        )
+        for year, values in sorted(samples.by_completed_year.items())
+    }
+    positive_completed_years = [
+        year
+        for year, year_stats in by_completed_year.items()
+        if float(year_stats["geometric_average_pct"]) > 0.0
+    ]
+    period_bucket_count = (
+        len(samples.development)
+        + len(samples.validation)
+        + len(samples.holdout)
+    )
     return {
         "id": f"{entry_id}__{exit_id}",
         "entry_id": entry_id,
@@ -824,9 +1472,31 @@ def candidate_summary(key: tuple[str, str], samples: Samples) -> dict:
         "exit_id": exit_id,
         "exit_label": exit_rule["label"],
         "overall": stats(samples.returns, samples.holding),
-        "development_before_2024": stats(samples.development),
-        "validation_2024_2025": stats(samples.validation),
-        "holdout_2026": stats(samples.holdout),
+        "development_before_2024": stats(
+            samples.development,
+            samples.development_holding,
+        ),
+        "validation_2024_2025": stats(
+            samples.validation,
+            samples.validation_holding,
+        ),
+        "holdout_2026": stats(
+            samples.holdout,
+            samples.holdout_holding,
+        ),
+        "period_boundary_spanning_trade_count": (
+            len(samples.returns) - period_bucket_count
+        ),
+        "by_completed_year": by_completed_year,
+        "positive_completed_years": positive_completed_years,
+        "positive_completed_year_count": len(positive_completed_years),
+        "positive_completed_years_before_2026": [
+            year for year in positive_completed_years if year < "2026"
+        ],
+        "positive_completed_year_count_before_2026": sum(
+            year < "2026" for year in positive_completed_years
+        ),
+        "completed_year_selection_use": "report_only",
     }
 
 
@@ -872,6 +1542,64 @@ def balanced_candidate(rows: Sequence[dict]) -> dict:
     )
 
 
+def user_long_wave_summary(rows: Sequence[dict]) -> dict:
+    """Summarize the user's early-entry/long-wave idea without holdout tuning."""
+    family = [
+        row
+        for row in rows
+        if str(row["entry_id"]) in EARLY_WAVE_ENTRY_IDS
+        and str(row["exit_id"]) in LONG_WAVE_EXIT_IDS
+    ]
+    if not family:
+        return {"candidate_count": 0}
+    stable = stable_candidate_pool(family)
+    balanced = balanced_candidate(family)
+    success_first = max(
+        stable,
+        key=lambda row: (
+            period_floor(row, "positive_rate_pct"),
+            period_floor(row, "geometric_average_pct"),
+            period_floor(row, "average_excluding_abs_50pct_outliers_pct"),
+        ),
+    )
+    return_first = max(
+        stable,
+        key=lambda row: (
+            period_floor(row, "average_excluding_abs_50pct_outliers_pct"),
+            period_floor(row, "geometric_average_pct"),
+            period_floor(row, "positive_rate_pct"),
+        ),
+    )
+    return {
+        "candidate_count": len(family),
+        "definition": (
+            "信号形成收盘后尽早或经1至3日因果确认，于下一可交易日开盘买入；"
+            "买入后信号重算消失优先卖出，其余规则跟随龙虎关系、最高收盘回撤、"
+            "短中期均线与最低收盘结构判断长上涨波段结束"
+        ),
+        "selection_guard": (
+            "仅使用2024年前开发期与2024-2025验证期选参；"
+            "2026留出结果不参与资格判断或排序"
+        ),
+        "balanced_id": balanced["id"],
+        "balanced": balanced,
+        "success_first_id": success_first["id"],
+        "success_first": success_first,
+        "return_first_id": return_first["id"],
+        "return_first": return_first,
+        "top_20_by_balanced_score": sorted(
+            stable,
+            key=lambda row: (
+                period_floor(row, "geometric_average_pct")
+                + 0.12 * (period_floor(row, "positive_rate_pct") - 50.0),
+                period_floor(row, "average_excluding_abs_50pct_outliers_pct"),
+                period_floor(row, "positive_rate_pct"),
+            ),
+            reverse=True,
+        )[:20],
+    }
+
+
 def aggregate(
     cfg: dict,
     stocks: Sequence[Stock],
@@ -880,10 +1608,37 @@ def aggregate(
     requested_bars: int,
     *,
     include_retrospective: bool = True,
+    include_area_candidates: bool = False,
     meta: dict | None = None,
     execution: ExecutionAssumptions | None = None,
 ) -> dict:
     assumptions = execution or execution_assumptions(cfg)
+    meta = dict(meta or {})
+    live_contract = strategy_contract()
+    freeze_cutoff = str(meta.get("completed_trade_date", ""))
+    meta.update(
+        {
+            "live_strategy_id": LIVE_STRATEGY_ID,
+            "frozen_candidate_id": FROZEN_CANDIDATE_ID,
+            "execution_scope": EXECUTION_SCOPE,
+            "live_strategy_contract": live_contract,
+            "selection_policy": FORWARD_SELECTION_POLICY,
+            "forward_evaluation": {
+                "historical_2026_is_blind_holdout": False,
+                "starts_strictly_after_completed_trade_date": freeze_cutoff,
+                "definition": (
+                    "2026历史结果已被反复查看；只有本次冻结之后新产生且此前未见的"
+                    "交易日，才计为真正forward。"
+                ),
+                "period_key_semantics": {
+                    "holdout_2026": (
+                        "历史兼容字段名，展示时必须称为2026历史观察段；"
+                        "它不是盲测或未见留出集"
+                    )
+                },
+            },
+        }
+    )
     accumulators = {
         (entry["id"], exit_rule["id"]): CohortSamples()
         for entry in ENTRY_METHODS
@@ -901,6 +1656,13 @@ def aggregate(
         }
         for entry in ENTRY_METHODS
         for exit_rule in EXIT_RULES
+    }
+    long_wave_capture_accumulators = {
+        (entry["id"], exit_rule["id"]): CohortWaveCaptureSamples()
+        for entry in ENTRY_METHODS
+        if str(entry["id"]) in EARLY_WAVE_ENTRY_IDS
+        for exit_rule in EXIT_RULES
+        if str(exit_rule["id"]) in LONG_WAVE_EXIT_IDS
     }
     representative_case: tuple[
         float,
@@ -940,6 +1702,7 @@ def aggregate(
     }
     date_min = ""
     date_max = ""
+    last_mature_signal_date = ""
 
     for stock_index, (stock, bars) in enumerate(histories, start=1):
         if len(bars) < int(cfg["minimum_history_bars"]):
@@ -1024,7 +1787,7 @@ def aggregate(
             formal_pool: bool,
         ) -> None:
             nonlocal common_cohort_count, base_common_cohort_count, erased_count
-            nonlocal representative_case
+            nonlocal representative_case, last_mature_signal_date
             for setup_index in setup_indices:
                 if setup_index + COMMON_FUTURE_BARS >= len(causal):
                     continue
@@ -1045,6 +1808,10 @@ def aggregate(
                 if formal_pool:
                     common_cohort_count += 1
                     common_cohort_by_area[setup_area] += 1
+                    last_mature_signal_date = max(
+                        last_mature_signal_date,
+                        str(causal[setup_index].date),
+                    )
                     if was_erased:
                         erased_count += 1
                 else:
@@ -1095,13 +1862,55 @@ def aggregate(
                                 float(trade["return_pct"]),
                                 int(trade["holding_bars"]),
                                 causal[int(trade["entry_index"])].date,
+                                causal[int(trade["exit_index"])].date,
                                 setup_area,
                             )
+                            if key in long_wave_capture_accumulators:
+                                entry_index = int(trade["entry_index"])
+                                exit_trigger_index = int(trade["exit_trigger_index"])
+                                pre_exit_peak_close = max(
+                                    float(causal[index].close)
+                                    for index in range(
+                                        entry_index,
+                                        exit_trigger_index + 1,
+                                    )
+                                )
+                                relationship_end_index = risk_exit_index(
+                                    causal,
+                                    setup_index,
+                                    entry_index,
+                                    exit_on_erasure=False,
+                                    include_start=True,
+                                )
+                                full_wave_peak_close = max(
+                                    float(causal[index].close)
+                                    for index in range(
+                                        entry_index,
+                                        relationship_end_index + 1,
+                                    )
+                                )
+                                pre_exit_peak_close_return = (
+                                    pre_exit_peak_close
+                                    / float(trade["entry_raw_price"])
+                                    - 1.0
+                                ) * 100.0
+                                full_wave_peak_close_return = (
+                                    full_wave_peak_close
+                                    / float(trade["entry_raw_price"])
+                                    - 1.0
+                                ) * 100.0
+                                long_wave_capture_accumulators[key].add(
+                                    float(trade["return_pct"]),
+                                    pre_exit_peak_close_return,
+                                    full_wave_peak_close_return,
+                                    setup_area,
+                                )
                         else:
                             base_research_accumulators[key].add(
                                 float(trade["return_pct"]),
                                 int(trade["holding_bars"]),
                                 causal[int(trade["entry_index"])].date,
+                                causal[int(trade["exit_index"])].date,
                             )
                             lineage_key = (
                                 "causal_recalculated_away"
@@ -1112,22 +1921,30 @@ def aggregate(
                                 float(trade["return_pct"]),
                                 int(trade["holding_bars"]),
                                 causal[int(trade["entry_index"])].date,
+                                causal[int(trade["exit_index"])].date,
                             )
-                        if formal_pool and key == ("break_5day_high", "trail_3_2"):
+                        if (
+                            formal_pool
+                            and setup_area == EXECUTION_SCOPE
+                            and key == (FROZEN_ENTRY_ID, FROZEN_EXIT_ID)
+                        ):
                             net_return = float(trade["return_pct"])
                             holding = int(trade["holding_bars"])
-                            if net_return > 0 and 2 <= holding <= 40:
-                                score = abs(net_return - 12.0) + abs(holding - 10) * 0.15
-                                if representative_case is None or score < representative_case[0]:
-                                    representative_case = (
-                                        score,
-                                        stock,
-                                        bars,
-                                        causal,
-                                        dict(trade),
-                                        dict(method),
-                                        dict(exit_rule),
-                                    )
+                            score = (
+                                (0.0 if net_return > 0 else 100.0)
+                                + abs(net_return - 15.0)
+                                + abs(holding - 15) * 0.15
+                            )
+                            if representative_case is None or score < representative_case[0]:
+                                representative_case = (
+                                    score,
+                                    stock,
+                                    bars,
+                                    causal,
+                                    dict(trade),
+                                    dict(method),
+                                    dict(exit_rule),
+                                )
 
         replay_joint(pool_indices, formal_pool=True)
         replay_joint(causal_indices, formal_pool=False)
@@ -1169,6 +1986,11 @@ def aggregate(
         for key, samples in accumulators.items()
     ]
     for row in candidates:
+        key = (str(row["entry_id"]), str(row["exit_id"]))
+        if key in long_wave_capture_accumulators:
+            row["wave_capture"] = wave_capture_stats(
+                long_wave_capture_accumulators[key].combined
+            )
         entry_count = int(row["overall"]["sample_count"])
         row["entry_count"] = entry_count
         row["entry_rate_pct"] = round(
@@ -1183,6 +2005,11 @@ def aggregate(
         ]
         denominator = common_cohort_by_area[area]
         for row in rows:
+            key = (str(row["entry_id"]), str(row["exit_id"]))
+            if key in long_wave_capture_accumulators:
+                row["wave_capture"] = wave_capture_stats(
+                    getattr(long_wave_capture_accumulators[key], area)
+                )
             entry_count = int(row["overall"]["sample_count"])
             row["entry_count"] = entry_count
             row["entry_rate_pct"] = (
@@ -1340,6 +2167,7 @@ def aggregate(
             "success_first": success_choice,
             "return_first_id": return_choice["id"],
             "return_first": return_choice,
+            "user_long_wave_research": user_long_wave_summary(rows),
             "top_30_by_balanced_score": sorted(
                 stable_rows,
                 key=lambda row: (
@@ -1357,11 +2185,13 @@ def aggregate(
     main_optimization = summarize_cohort(
         area_candidates["main"],
         common_cohort_by_area["main"],
+        include_all=include_area_candidates,
         frozen_id=frozen_live["id"],
     )
     secondary_optimization = summarize_cohort(
         area_candidates["secondary"],
         common_cohort_by_area["secondary"],
+        include_all=include_area_candidates,
         frozen_id=frozen_live["id"],
     )
     main_automatic = next(
@@ -1369,6 +2199,16 @@ def aggregate(
     )
     secondary_automatic = next(
         row for row in area_candidates["secondary"] if row["id"] == balanced["id"]
+    )
+    main_frozen_live = next(
+        row
+        for row in area_candidates["main"]
+        if row["id"] == FROZEN_CANDIDATE_ID
+    )
+    secondary_frozen_live = next(
+        row
+        for row in area_candidates["secondary"]
+        if row["id"] == FROZEN_CANDIDATE_ID
     )
     for area_summary, automatic_row in (
         (main_optimization, main_automatic),
@@ -1426,8 +2266,26 @@ def aggregate(
         "selected_strategy_id": FROZEN_LIVE_STRATEGY_ID,
         "frozen_live_strategy_id": FROZEN_LIVE_STRATEGY_ID,
         "frozen_candidate_id": FROZEN_LIVE_CANDIDATE_ID,
+        "candidate_id": FROZEN_CANDIDATE_ID,
+        "execution_scope": EXECUTION_SCOPE,
+        "strategy_contract": live_contract,
+        "entry_rule_id": FROZEN_ENTRY_ID,
+        "entry_rule": dict(
+            next(item for item in ENTRY_METHODS if item["id"] == FROZEN_ENTRY_ID)
+        ),
+        "exit_rule_id": FROZEN_EXIT_ID,
+        "exit_rule": dict(
+            next(item for item in EXIT_RULES if item["id"] == FROZEN_EXIT_ID)
+        ),
+        "activation": EXIT_PROFIT_ACTIVATION_PCT,
+        "drawdown": EXIT_TRAILING_DRAWDOWN_PCT,
+        "exit_reason": (
+            str(representative_payload["exit_reason"])
+            if representative_payload is not None
+            else ""
+        ),
         "automatic_recommended_id": balanced["id"],
-        "primary_case": representative_payload if representative_payload is not None else cancelled_case,
+        "primary_case": representative_payload,
         "cancelled_cases": [cancelled_case] if cancelled_case is not None else [],
         "cases": cases,
         "signal_lineage_execution": lineage_execution,
@@ -1441,10 +2299,12 @@ def aggregate(
         "completed_trade_date": (meta or {}).get("completed_trade_date", date_max),
         "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
         "live_strategy": {
-            "live_strategy_id": FROZEN_LIVE_STRATEGY_ID,
-            "candidate_id": FROZEN_LIVE_CANDIDATE_ID,
-            "status": "人工冻结并用于实时跟踪",
-            "metrics": frozen_live,
+            **live_contract,
+            "contract": live_contract,
+            "status": "人工冻结；仅次选区生成买卖操作，主选区只作覆盖观察",
+            "scope_policy": "secondary_only; main_coverage_observation_only",
+            "metrics": secondary_frozen_live,
+            "main_coverage_metrics": main_frozen_live,
             "automatic_recommended_id": balanced["id"],
             "automatic_recommended_is_live": False,
         },
@@ -1461,7 +2321,11 @@ def aggregate(
             "execution": "买卖条件均在收盘确认，下一可交易日开盘成交；一字涨停买入订单等待期间若信号消失则取消，一字跌停卖出订单持续顺延；收益已扣配置的佣金假设、经手费、证管费、卖方印花税和滑点",
             "common_trade_cohort": f"为公平比较买卖组合，只使用信号后至少仍有{COMMON_FUTURE_BARS}根K线的共同样本",
             "wave_peak": "主统计从信号条件首次同时成立日的收盘价开始，到龙线首次不再高于虎线前后的本轮波段最高价；最长观察60个交易日，最高点必须发生在信号确认后",
-            "selection": "买卖组合只用2026年前样本选参：2024年前开发期与2024-2025验证期各至少200笔、两期合计至少400笔且两期几何平均收益均为正；所有资格判断与并列排序均不读取2026结果，2026仅作冻结后的样本外检验",
+            "selection": FORWARD_SELECTION_POLICY,
+            "live_execution_scope": (
+                "冻结策略只对次选来源给出买卖操作；主选来源保留相同规则的覆盖统计，"
+                "但不计入实盘建议或正式策略绩效。"
+            ),
         },
         "coverage": {
             "requested_stock_count": len(stocks),
@@ -1477,6 +2341,8 @@ def aggregate(
             "retrospective_chart_total_count": retrospective_signal_count,
             "common_trade_cohort_count": common_cohort_count,
             "common_trade_cohort_by_entry_area": common_cohort_by_area,
+            "last_mature_signal_date": last_mature_signal_date,
+            "maturity_future_bars": COMMON_FUTURE_BARS,
             "base_research_common_trade_cohort_count": base_common_cohort_count,
             "recalculated_away_count": erased_count,
             "recalculated_away_rate_pct": round(erased_count / common_cohort_count * 100.0, 2) if common_cohort_count else 0.0,
@@ -1534,6 +2400,7 @@ def aggregate(
         },
         "optimization": {
             "candidate_count": len(candidates),
+            "user_long_wave_research": user_long_wave_summary(candidates),
             "automatic_recommended_id": balanced["id"],
             "automatic_recommended": balanced,
             "frozen_live_strategy_id": FROZEN_LIVE_STRATEGY_ID,
@@ -1558,13 +2425,20 @@ def aggregate(
                 key=lambda row: row["overall"]["average_pct"],
                 reverse=True,
             )[:20],
-            "all_candidates": candidates,
+            "research_comparators": [
+                row
+                for row in candidates
+                if row["id"] == "break_5day_high__trail_3_2"
+            ],
+            **({"all_candidates": candidates} if include_area_candidates else {}),
         },
         "cohorts": {
             "combined": {
-                "definition": "首次进入主选区或次选区形成的正式事件；次选升级主选仍属于原交易。selected_strategy为当前人工冻结实盘策略，不代表自动研究最优",
+                "definition": "首次进入主选区或次选区形成的研究覆盖事件；次选升级主选仍属于原交易。合计口径仅用于对照，不是冻结策略的实盘执行范围",
                 "setup_count": common_cohort_count,
                 "entry_area_counts": common_cohort_by_area,
+                "execution_scope": "research_coverage_only",
+                "live_action_enabled": False,
                 "selected_strategy_id": FROZEN_LIVE_STRATEGY_ID,
                 "selected_strategy": frozen_live,
                 "frozen_live_strategy_id": FROZEN_LIVE_STRATEGY_ID,
@@ -1574,6 +2448,7 @@ def aggregate(
                 "automatic_recommended": balanced,
                 "optimization": {
                     "candidate_count": len(candidates),
+                    "user_long_wave_research": user_long_wave_summary(candidates),
                     "selected_strategy_id": FROZEN_LIVE_STRATEGY_ID,
                     "selected_strategy": frozen_live,
                     "frozen_live_strategy_id": FROZEN_LIVE_STRATEGY_ID,
@@ -1589,15 +2464,21 @@ def aggregate(
                 },
             },
             "main": {
-                "definition": "正式事件首次出现时即位于主选区；不含次选后的升级；正式指标使用与combined相同的冻结实盘策略",
+                "definition": "正式事件首次出现时即位于主选区；不含次选后的升级。仅保留冻结候选的覆盖观察统计，不生成买卖操作，也不计入正式实盘策略绩效",
                 **main_optimization,
+                "execution_scope": "coverage_observation_only",
+                "live_action_enabled": False,
+                "strategy_role": "coverage_observation",
                 "selected_strategy_id": FROZEN_LIVE_STRATEGY_ID,
                 "selected_strategy": main_optimization["frozen_live_strategy"],
                 "optimization": main_optimization,
             },
             "secondary": {
-                "definition": "正式事件首次出现时位于次选区；后续升级仍归入次选来源；正式指标使用与combined相同的冻结实盘策略",
+                "definition": "正式事件首次出现时位于次选区；后续升级仍归入次选来源。冻结策略只在本口径生成买卖操作并计算正式策略绩效",
                 **secondary_optimization,
+                "execution_scope": EXECUTION_SCOPE,
+                "live_action_enabled": True,
+                "strategy_role": "live_execution",
                 "selected_strategy_id": FROZEN_LIVE_STRATEGY_ID,
                 "selected_strategy": secondary_optimization["frozen_live_strategy"],
                 "optimization": secondary_optimization,
@@ -1637,15 +2518,33 @@ def main(argv: Iterable[str] | None = None) -> int:
     parser.add_argument("--regulatory-fee-bps", type=float, help="证管费，单边基点")
     parser.add_argument("--stamp-duty-bps", type=float, help="卖方印花税，基点")
     parser.add_argument("--slippage-bps", type=float, help="滑点，单边基点")
-    parser.add_argument("--entry-execution-max-wait-bars", type=int, help="涨停/停牌导致买不到时最多等待的交易日")
+    parser.add_argument(
+        "--entry-execution-max-wait-bars",
+        type=int,
+        default=ENTRY_EXECUTION_MAX_WAIT_BARS,
+        help=(
+            "涨停/停牌导致买不到时最多等待的交易日；正式策略固定为"
+            f"{ENTRY_EXECUTION_MAX_WAIT_BARS}日"
+        ),
+    )
     parser.add_argument(
         "--causal-only",
         action="store_true",
         help="只重放实盘因果信号，跳过不参与规则选择的事后图形对照",
     )
+    parser.add_argument(
+        "--include-area-candidates",
+        action="store_true",
+        help="研究模式：在JSON中保留总体、主选和次选的全部候选，正式页面默认只保留精选项",
+    )
     args = parser.parse_args(list(argv) if argv is not None else None)
     if args.bars < 200:
         parser.error("--bars 至少为 200")
+    if args.entry_execution_max_wait_bars != ENTRY_EXECUTION_MAX_WAIT_BARS:
+        parser.error(
+            "--entry-execution-max-wait-bars 与冻结生产合同不一致；"
+            "如需研究新值，请先建立新的策略ID和合同"
+        )
 
     cfg = load_config(ROOT / "config.json")
     cfg["yellow_consecutive_days"] = 1
@@ -1676,11 +2575,7 @@ def main(argv: Iterable[str] | None = None) -> int:
             if args.slippage_bps is None
             else args.slippage_bps
         ),
-        entry_execution_max_wait_bars=(
-            defaults.entry_execution_max_wait_bars
-            if args.entry_execution_max_wait_bars is None
-            else args.entry_execution_max_wait_bars
-        ),
+        entry_execution_max_wait_bars=ENTRY_EXECUTION_MAX_WAIT_BARS,
     )
     cutoff = args.completed_trade_date or completed_trade_date(ROOT)
     universe = [stock for stock in cached_universe() if not is_st_name(stock.name)]
@@ -1710,6 +2605,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         errors,
         args.bars,
         include_retrospective=not args.causal_only,
+        include_area_candidates=args.include_area_candidates,
         meta=meta,
         execution=assumptions,
     )
