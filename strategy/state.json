@@ -1,7 +1,7 @@
 {
   "version": 1,
   "pool_name": "卢氏龙虎趋势池",
-  "last_trade_date": "2026-08-04",
+  "last_trade_date": "2026-08-05",
   "active": [
     {
       "position_id": "301516_2026-07-30",
@@ -10,14 +10,14 @@
       "market": 0,
       "entry_date": "2026-07-30",
       "entry_price": 14.43,
-      "last_date": "2026-08-04",
-      "last_close": 15.54,
-      "return_pct": 7.692307692307687,
-      "best_return_pct": 7.692307692307687,
+      "last_date": "2026-08-05",
+      "last_close": 15.75,
+      "return_pct": 9.147609147609149,
+      "best_return_pct": 9.147609147609149,
       "worst_return_pct": 0.0,
-      "holding_days": 4,
+      "holding_days": 5,
       "missing_streak": 1,
-      "signal_lost_date": "2026-08-04",
+      "signal_lost_date": "2026-08-05",
       "status": "待观察中",
       "selected_dates": [
         "2026-07-30",
@@ -27,11 +27,6 @@
       ],
       "line_history": [
         {
-          "date": "2026-07-31",
-          "dragon": 15.320033955696822,
-          "tiger": 15.227721986496169
-        },
-        {
           "date": "2026-08-03",
           "dragon": 15.253171430491452,
           "tiger": 15.189380460985321
@@ -40,6 +35,11 @@
           "date": "2026-08-04",
           "dragon": 15.172385492750784,
           "tiger": 15.144866504476461
+        },
+        {
+          "date": "2026-08-05",
+          "dragon": 15.122612386807972,
+          "tiger": 15.118332564926412
         }
       ],
       "peak_drawdown_pct": 0.0,
@@ -85,22 +85,17 @@
       "market": 1,
       "entry_date": "2026-07-24",
       "entry_price": 8.49,
-      "last_date": "2026-08-04",
-      "last_close": 9.11,
-      "return_pct": 7.302709069493507,
+      "last_date": "2026-08-05",
+      "last_close": 9.1,
+      "return_pct": 7.184923439340385,
       "best_return_pct": 7.773851590106018,
       "worst_return_pct": 0.0,
-      "holding_days": 5,
+      "holding_days": 6,
       "status": "上升趋势中",
       "selected_dates": [
         "2026-07-24"
       ],
       "line_history": [
-        {
-          "date": "2026-07-31",
-          "dragon": 8.517772508535211,
-          "tiger": 8.505648066712174
-        },
         {
           "date": "2026-08-03",
           "dragon": 8.519991683030359,
@@ -110,9 +105,14 @@
           "date": "2026-08-04",
           "dragon": 8.533732303441987,
           "tiger": 8.517535481447567
+        },
+        {
+          "date": "2026-08-05",
+          "dragon": 8.543618525217301,
+          "tiger": 8.525915203706134
         }
       ],
-      "peak_drawdown_pct": -0.43715846994536456,
+      "peak_drawdown_pct": -0.5464480874317057,
       "missing_streak": 0,
       "signal_lost_date": "",
       "status_detail": "趋势条件仍有效",
@@ -128,22 +128,17 @@
       "market": 1,
       "entry_date": "2026-07-31",
       "entry_price": 16.27,
-      "last_date": "2026-08-04",
-      "last_close": 16.3,
-      "return_pct": 0.18438844499077955,
+      "last_date": "2026-08-05",
+      "last_close": 16.18,
+      "return_pct": -0.5531653349723387,
       "best_return_pct": 0.24585125998770607,
-      "worst_return_pct": 0.0,
-      "holding_days": 3,
+      "worst_return_pct": -0.5531653349723387,
+      "holding_days": 4,
       "status": "上升趋势中",
       "selected_dates": [
         "2026-07-31"
       ],
       "line_history": [
-        {
-          "date": "2026-07-31",
-          "dragon": 15.796142007039457,
-          "tiger": 15.735604417024875
-        },
         {
           "date": "2026-08-03",
           "dragon": 15.820748760609604,
@@ -153,9 +148,14 @@
           "date": "2026-08-04",
           "dragon": 15.844053349046451,
           "tiger": 15.765357421853073
+        },
+        {
+          "date": "2026-08-05",
+          "dragon": 15.852419266174472,
+          "tiger": 15.774742399688316
         }
       ],
-      "peak_drawdown_pct": -0.06131207847944742,
+      "peak_drawdown_pct": -0.797057020232983,
       "missing_streak": 0,
       "signal_lost_date": "",
       "status_detail": "趋势条件仍有效",
@@ -170,19 +170,14 @@
       "market": 1,
       "entry_date": "2026-07-31",
       "entry_price": 22.22,
-      "last_date": "2026-08-04",
-      "last_close": 23.15,
-      "return_pct": 4.185418541854191,
-      "best_return_pct": 4.185418541854191,
+      "last_date": "2026-08-05",
+      "last_close": 23.42,
+      "return_pct": 5.400540054005409,
+      "best_return_pct": 5.400540054005409,
       "worst_return_pct": 0.0,
-      "holding_days": 3,
+      "holding_days": 4,
       "status": "待观察中",
       "line_history": [
-        {
-          "date": "2026-07-31",
-          "dragon": 22.12626467711918,
-          "tiger": 21.99213434617141
-        },
         {
           "date": "2026-08-03",
           "dragon": 22.08164616296542,
@@ -192,6 +187,11 @@
           "date": "2026-08-04",
           "dragon": 22.070095463347993,
           "tiger": 21.977292742934893
+        },
+        {
+          "date": "2026-08-05",
+          "dragon": 22.046710995961035,
+          "tiger": 21.972289765330736
         }
       ],
       "selected_dates": [
@@ -199,7 +199,7 @@
       ],
       "peak_drawdown_pct": 0.0,
       "missing_streak": 1,
-      "signal_lost_date": "2026-08-04",
+      "signal_lost_date": "2026-08-05",
       "status_detail": "龙虎差与龙线同步转弱",
       "strategy_version": "legacy_before_break5_trail3_2",
       "operation": "谨慎持有",
@@ -235,7 +235,39 @@
     }
   ],
   "pending_main": [],
-  "pending_secondary": [],
+  "pending_secondary": [
+    {
+      "setup_id": "secondary_000428_2026-07-28",
+      "code": "000428",
+      "name": "华天酒店",
+      "market": 0,
+      "area": "secondary",
+      "origin_area": "secondary",
+      "setup_date": "2026-08-05",
+      "setup_price": 4.1,
+      "last_date": "2026-08-05",
+      "last_close": 4.1,
+      "setup_cross_date": "2026-07-28",
+      "setup_cross_age": 6,
+      "setup_cross_lookback_days": 8,
+      "setup_elapsed_bars": 0,
+      "status": "待观察中",
+      "operation": "等待D+2收盘确认",
+      "status_detail": "次选信号已形成；等待第二个完整交易日收盘确认信号、龙虎关系、龙线与最大3%回撤",
+      "strategy_version": "secondary_lowrisk2_hybrid1010_v3",
+      "confirmation_d1_dragon": null,
+      "line_history": [
+        {
+          "date": "2026-08-05",
+          "dragon": 3.107964432270478,
+          "tiger": 3.0734176468080543
+        }
+      ],
+      "selected_dates": [
+        "2026-08-05"
+      ]
+    }
+  ],
   "strategy_version": "secondary_lowrisk2_hybrid1010_v3",
   "strategy_migration": {
     "from": "break5_trail3_2_v1",
@@ -244,6 +276,10 @@
     "note": "旧买点候选不沿用；原信号已保留消费墓碑，新交叉可重新评估"
   },
   "consumed_signals": [
+    {
+      "code": "000428",
+      "cross_date": "2026-07-28"
+    },
     {
       "code": "300981",
       "cross_date": "2026-07-24"
@@ -268,6 +304,10 @@
   "pending_entry_execution": [],
   "pending_exit_execution": [],
   "active_signal_lineages": [
+    {
+      "code": "000428",
+      "original_cross_date": "2026-07-28"
+    },
     {
       "code": "300981",
       "original_cross_date": "2026-07-24"
