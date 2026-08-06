@@ -19,6 +19,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: stock-pages-publish
@@ -28,6 +30,9 @@ jobs:
   screen:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     env:
       TZ: Asia/Shanghai
       PYTHONUTF8: "1"
@@ -82,6 +87,13 @@ jobs:
           git add -- results/latest.html results/history.json index.html cloud_snapshot.json cache/universe.json
           git commit -m "Update daily report ${{ steps.screening.outputs.trade_date }}"
           git push origin main
-      - name: Publish static site branch
+      - if: steps.screening.outputs.changed == 'true'
+        uses: actions/configure-pages@v5
+      - if: steps.screening.outputs.changed == 'true'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - name: Deploy GitHub Pages
         if: steps.screening.outputs.changed == 'true'
-        run: python publish_pages_branch.py --site _site
+        id: deployment
+        uses: actions/deploy-pages@v5

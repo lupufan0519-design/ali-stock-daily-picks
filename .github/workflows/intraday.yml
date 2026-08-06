@@ -18,7 +18,9 @@ on:
         default: false
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: stock-pages-publish
@@ -28,6 +30,9 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     env:
       TZ: Asia/Shanghai
       PYTHONUTF8: "1"
@@ -79,6 +84,13 @@ jobs:
       - name: Build static site
         if: steps.market.outputs.run == 'true'
         run: python prepare_site.py
-      - name: Publish static site branch
+      - uses: actions/configure-pages@v5
         if: steps.market.outputs.run == 'true'
-        run: python publish_pages_branch.py --site _site
+      - uses: actions/upload-pages-artifact@v4
+        if: steps.market.outputs.run == 'true'
+        with:
+          path: _site
+      - name: Deploy GitHub Pages
+        if: steps.market.outputs.run == 'true'
+        id: deployment
+        uses: actions/deploy-pages@v5
