@@ -611,15 +611,15 @@ def render_report(
         <div class="today-total"><strong id="today-total-value">0</strong><span>今日合计</span></div>
       </header>
       <section class="tier-section first">
-        <div class="tier-title-row"><div><div class="tier-kicker"><span class="tier-index">01</span>优先查看</div><h2>第一梯队 <span id="first-count">0</span></h2></div><p class="tier-rule">近 3 个交易日出现可能见底，且此前连续 3 个交易日的龙虎线差值绝对值，每一天都不大于 0.5。</p></div>
+        <div class="tier-title-row"><div><div class="tier-kicker"><span class="tier-index">01</span>优先查看</div><h2>第一梯队 <span id="first-count">0</span></h2></div><p class="tier-rule">近 4 个交易日出现可能见底，且此前连续 3 个交易日的龙虎线差值绝对值，每一天都不大于 0.5。</p></div>
         <div id="first-picks" class="pick-grid"></div>
       </section>
       <section class="tier-section second">
-        <div class="tier-title-row"><div><div class="tier-kicker"><span class="tier-index">02</span>继续留意</div><h2>第二梯队 <span id="second-count">0</span></h2></div><p class="tier-rule">近 3 个交易日出现可能见底，且当前价不高于黄线。</p></div>
+        <div class="tier-title-row"><div><div class="tier-kicker"><span class="tier-index">02</span>继续留意</div><h2>第二梯队 <span id="second-count">0</span></h2></div><p class="tier-rule">近 4 个交易日出现可能见底，且当前价不高于黄线。</p></div>
         <div id="second-picks" class="pick-grid"></div>
       </section>
       <section class="tier-section third">
-        <div class="tier-title-row"><div><div class="tier-kicker"><span class="tier-index">03</span>新近信号</div><h2>第三梯队 <span id="third-count">0</span></h2></div><p class="tier-rule">近 3 个交易日出现可能见底，且没有进入第一梯队或第二梯队。</p></div>
+        <div class="tier-title-row"><div><div class="tier-kicker"><span class="tier-index">03</span>新近信号</div><h2>第三梯队 <span id="third-count">0</span></h2></div><p class="tier-rule">近 4 个交易日出现可能见底，且没有进入第一梯队或第二梯队。</p></div>
         <div id="third-picks" class="pick-grid"></div>
       </section>
     </section>
