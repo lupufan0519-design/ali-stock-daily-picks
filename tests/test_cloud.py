@@ -478,7 +478,7 @@ class CloudWorkflowTests(unittest.TestCase):
             ],
         }
         snapshot = compact_snapshot(payload)
-        self.assertEqual(snapshot["live_seed_format"], 4)
+        self.assertEqual(snapshot["live_seed_format"], 5)
         self.assertEqual(
             [item[0] for item in snapshot["live_universe"]],
             ["600001"],
@@ -839,6 +839,13 @@ class CloudWorkflowTests(unittest.TestCase):
                 "eligible",
                 "selected",
                 "cross_date",
+                "dragon_value",
+                "tiger_value",
+                "yellow_line_value",
+                "tier",
+                "line_gap_abs",
+                "prior_three_gap_abs",
+                "prior_three_gap_max",
             ],
         )
         encoded = snapshot_json(snapshot)

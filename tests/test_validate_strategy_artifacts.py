@@ -250,29 +250,25 @@ def valid_payloads() -> tuple[dict, dict, dict]:
 
 
 class ValidateStrategyArtifactsTests(unittest.TestCase):
-    def test_weekly_workflow_runs_and_persists_the_portfolio_gate(self):
+    def test_retired_validation_workflow_cannot_overwrite_the_simple_site(self):
         workflow = (
             Path(__file__).resolve().parents[1]
             / ".github"
             / "workflows"
             / "rolling-validation.yml"
-        ).read_text(encoding="utf-8")
-
-        self.assertIn("python strategy_portfolio_validation.py", workflow)
-        self.assertIn("--omit-trades", workflow)
-        self.assertIn("python validate_strategy_artifacts.py", workflow)
-        self.assertIn("--require-portfolio", workflow)
-        self.assertIn("results/strategy_portfolio_validation.json", workflow)
-        self.assertIn("results/latest.html index.html", workflow)
+        )
+        self.assertFalse(workflow.exists())
 
     def test_publish_workflows_share_one_non_cancelling_concurrency_group(self):
         workflows = Path(__file__).resolve().parents[1] / ".github" / "workflows"
-        for filename in ("daily.yml", "intraday.yml", "rolling-validation.yml"):
+        for filename in ("daily.yml", "intraday.yml"):
             workflow = (workflows / filename).read_text(encoding="utf-8")
             self.assertIn("group: stock-pages-publish", workflow)
             self.assertIn("cancel-in-progress: false", workflow)
         daily = (workflows / "daily.yml").read_text(encoding="utf-8")
-        self.assertIn("git add -- results/latest.html index.html", daily)
+        self.assertIn("results/history.json", daily)
+        self.assertIn("results/latest.html", daily)
+        self.assertIn("index.html", daily)
 
     def validate(self, mutate=None):
         grid, case, portfolio = valid_payloads()

@@ -24,6 +24,8 @@ from strategy_tracker import (
     strategy_stats,
     update_state,
 )
+from selection_history import load_history, record_close, write_history
+from simple_strategy import FIRST_TIER, SECOND_TIER, decorate_row, split_tiers
 
 
 ROOT = Path(__file__).resolve().parent
@@ -33,6 +35,7 @@ CACHE_DIR = ROOT / "cache"
 UNIVERSE_CACHE = CACHE_DIR / "universe.json"
 STRATEGY_DIR = ROOT / "strategy"
 STRATEGY_STATE_PATH = STRATEGY_DIR / "state.json"
+SELECTION_HISTORY_PATH = OUTPUT_DIR / "history.json"
 FINAL_INDIVIDUAL_RETRY_LIMIT = 200
 FINAL_RETRY_TIME_BUDGET_SECONDS = 600
 MAX_UNRESOLVED_ERRORS = 10
@@ -94,6 +97,11 @@ class Evaluation:
     selected: bool
     chart: str
     live_seed: dict = field(default_factory=dict)
+    yellow_line_value: float = 0.0
+    tier: str = ""
+    line_gap_abs: float = 0.0
+    prior_three_gap_abs: list[float] = field(default_factory=list)
+    prior_three_gap_max: float = 0.0
 
 
 def load_config(path: Path) -> dict:
@@ -111,17 +119,20 @@ def load_config(path: Path) -> dict:
         "workers",
         "include_st",
         "near_match_minimum",
+        "line_gap_max_abs",
     }
     missing = required.difference(cfg)
     if missing:
         raise ValueError(f"配置缺少字段: {', '.join(sorted(missing))}")
     nonnegative = {"yellow_before_cross_days", "yellow_after_cross_days"}
-    for key in required - {"include_st"} - nonnegative:
+    for key in required - {"include_st", "line_gap_max_abs"} - nonnegative:
         if not isinstance(cfg[key], int) or cfg[key] <= 0:
             raise ValueError(f"配置 {key} 必须是正整数")
     for key in nonnegative:
         if not isinstance(cfg[key], int) or cfg[key] < 0:
             raise ValueError(f"配置 {key} 不能是负数")
+    if not isinstance(cfg["line_gap_max_abs"], (int, float)) or cfg["line_gap_max_abs"] <= 0:
+        raise ValueError("配置 line_gap_max_abs 必须是正数")
     if cfg["minimum_history_bars"] > cfg["history_bars"]:
         raise ValueError("minimum_history_bars 不能大于 history_bars")
     return cfg
@@ -165,12 +176,24 @@ def rolling_cci(bars: Sequence[Bar], period: int = 14) -> list[float]:
     return out
 
 
-def line_series(bars: Sequence[Bar]) -> tuple[list[float], list[float]]:
+def indicator_lines(
+    bars: Sequence[Bar],
+) -> tuple[list[float], list[float], list[float]]:
     low2 = xma(xma([b.low for b in bars], 25), 25)
     high2 = xma(xma([b.high for b in bars], 25), 25)
     dragon = [2.0 * low - high for low, high in zip(low2, high2)]
     tiger = ema(dragon, 25)
+    return dragon, tiger, high2
+
+
+def line_series(bars: Sequence[Bar]) -> tuple[list[float], list[float]]:
+    dragon, tiger, _yellow = indicator_lines(bars)
     return dragon, tiger
+
+
+def yellow_line_series(bars: Sequence[Bar]) -> list[float]:
+    _dragon, _tiger, yellow = indicator_lines(bars)
+    return yellow
 
 
 def has_yellow_segment(bar: Bar, dragon_value: float) -> bool:
@@ -373,7 +396,10 @@ def append_line_coefficients(
 ) -> dict[str, list]:
     """Encode exact next-bar dragon/tiger values as linear high/low functions."""
 
-    def values(low: float, high: float) -> tuple[list[float], list[float]]:
+    def values(
+        low: float,
+        high: float,
+    ) -> tuple[list[float], list[float], list[float]]:
         probe = Bar(
             date="",
             open=0.0,
@@ -383,8 +409,12 @@ def append_line_coefficients(
             volume=1.0,
             amount=0.0,
         )
-        dragon, tiger = line_series([*bars, probe])
-        return dragon[-tail_size:], tiger[-tail_size:]
+        dragon, tiger, yellow = indicator_lines([*bars, probe])
+        return (
+            dragon[-tail_size:],
+            tiger[-tail_size:],
+            yellow[-tail_size:],
+        )
 
     base = values(0.0, 0.0)
     low_unit = values(1.0, 0.0)
@@ -405,6 +435,7 @@ def append_line_coefficients(
 
     dragon_tail = [coeff(0, index) for index in range(-tail_size, 0)]
     tiger_tail = [coeff(1, index) for index in range(-tail_size, 0)]
+    yellow_tail = [coeff(2, index) for index in range(-tail_size, 0)]
     return {
         "dragon": dragon_tail[-1],
         "tiger": tiger_tail[-1],
@@ -412,6 +443,9 @@ def append_line_coefficients(
         "previous_tiger": tiger_tail[-2],
         "dragon_tail": dragon_tail,
         "tiger_tail": tiger_tail,
+        "yellow": yellow_tail[-1],
+        "previous_yellow": yellow_tail[-2],
+        "yellow_tail": yellow_tail,
     }
 
 
@@ -434,6 +468,12 @@ def make_live_seed(
     limit_ok: bool,
     yellow_ok: bool,
     dragon_above_tiger: bool,
+    dragon_value: float,
+    tiger_value: float,
+    yellow_line_value: float,
+    tier: str,
+    line_gap_abs: float,
+    prior_three_gap_abs: Sequence[float],
 ) -> dict:
     typical = [
         (bar.high + bar.low + bar.close) / 3.0
@@ -502,8 +542,14 @@ def make_live_seed(
         "yellow_count": yellow_count,
         "matched_count": matched,
         "dragon_above_tiger": dragon_above_tiger,
+        "dragon_value": float(dragon_value),
+        "tiger_value": float(tiger_value),
+        "yellow_line_value": float(yellow_line_value),
+        "tier": tier,
+        "line_gap_abs": float(line_gap_abs),
+        "prior_three_gap_abs": [float(value) for value in prior_three_gap_abs[-3:]],
         "eligible": eligible,
-        "selected": eligible and matched == 4,
+        "selected": eligible and tier == FIRST_TIER,
     }
 
 
@@ -515,7 +561,7 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
         return None
     eligible = bool(cfg["include_st"] or not is_st_name(stock.name))
 
-    dragon, tiger = line_series(bars)
+    dragon, tiger, yellow_line = indicator_lines(bars)
     cci = rolling_cci(bars)
     close = [b.close for b in bars]
 
@@ -580,6 +626,28 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
     rate = price_limit_rate(stock)
     daily_limit_up = limit_up_price(previous, rate)
     daily_limit_down = limit_down_price(previous, rate)
+    prior_three_gap_abs = [
+        abs(float(dragon[index]) - float(tiger[index]))
+        for index in range(len(dragon) - 4, len(dragon) - 1)
+    ]
+    simple = decorate_row(
+        {
+            "code": stock.code,
+            "name": stock.name,
+            "market": stock.market,
+            "close": bars[-1].close,
+            "bottom_ok": bottom_ok,
+            "bottom_date": bottom_date,
+            "dragon_value": float(dragon[-1]),
+            "tiger_value": float(tiger[-1]),
+            "yellow_line_value": float(yellow_line[-1]),
+            "prior_three_gap_abs": prior_three_gap_abs,
+            "eligible": eligible,
+        },
+        cfg,
+    )
+    tier = str(simple["tier"])
+    line_gap_abs = float(simple.get("line_gap_abs") or 0.0)
     live_seed = make_live_seed(
         stock,
         bars,
@@ -598,6 +666,12 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
         limit_ok=limit_ok,
         yellow_ok=yellow_ok,
         dragon_above_tiger=dragon_above_tiger,
+        dragon_value=dragon[-1],
+        tiger_value=tiger[-1],
+        yellow_line_value=yellow_line[-1],
+        tier=tier,
+        line_gap_abs=line_gap_abs,
+        prior_three_gap_abs=prior_three_gap_abs,
     )
     live_seed.update(
         {
@@ -644,9 +718,14 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
         dragon_value=float(dragon[-1]),
         tiger_value=float(tiger[-1]),
         eligible=eligible,
-        selected=eligible and matched == 4,
-        chart=make_sparkline(bars, dragon, tiger),
+        selected=eligible and tier == FIRST_TIER,
+        chart="",
         live_seed=live_seed,
+        yellow_line_value=float(yellow_line[-1]),
+        tier=tier,
+        line_gap_abs=line_gap_abs,
+        prior_three_gap_abs=prior_three_gap_abs,
+        prior_three_gap_max=float(simple.get("prior_three_gap_max") or 0.0),
     )
 
 
@@ -1133,13 +1212,14 @@ def event_text(event: dict) -> str:
     return f"{event.get('code', '')} {event.get('name', '')}：{label}{suffix}"
 
 
-def render_html(
+def legacy_render_html(
     evaluations: Sequence[Evaluation],
     cfg: dict,
     scanned: int,
     errors: Sequence[str],
     strategy_state: dict,
     events: Sequence[dict],
+    history: dict | None = None,
 ) -> str:
     selected = [x for x in evaluations if x.selected]
     near = sorted([
@@ -1227,9 +1307,10 @@ def render_html(
     errors: Sequence[str],
     strategy_state: dict,
     events: Sequence[dict],
+    history: dict | None = None,
 ) -> str:
-    """使用独立的响应式报告模板，保留筛选与跟踪逻辑不变。"""
-    from report_ui import render_report
+    """Render the production two-tier dashboard."""
+    from simple_report_ui import render_report
 
     return render_report(
         evaluations,
@@ -1238,6 +1319,7 @@ def render_html(
         errors,
         strategy_state,
         events,
+        history,
     )
 
 
@@ -1298,25 +1380,39 @@ def write_outputs(
 
     with csv_path.open("w", newline="", encoding="utf-8-sig") as f:
         writer = csv.writer(f, lineterminator="\n")
-        writer.writerow(["代码", "名称", "交易日", "收盘", "涨跌幅", "见底日期", "龙腾跃虎日期", "涨停日期", "连续黄柱", "龙线在虎线上方", "是否排除ST", "命中项数", "严格入选"])
+        writer.writerow(["代码", "名称", "交易日", "收盘", "涨跌幅", "见底日期", "龙线", "虎线", "黄线", "此前三日最大龙虎差", "梯队"])
         for x in evaluations:
-            writer.writerow([x.code, x.name, x.date, f"{x.close:.2f}", f"{x.change_pct:.2f}%", x.bottom_date, x.cross_date, x.limit_up_date, x.yellow_count, "是" if x.dragon_above_tiger else "否", "否" if x.eligible else "是", x.matched_count, "是" if x.selected else "否"])
+            writer.writerow([x.code, x.name, x.date, f"{x.close:.2f}", f"{x.change_pct:.2f}%", x.bottom_date, f"{x.dragon_value:.4f}", f"{x.tiger_value:.4f}", f"{x.yellow_line_value:.4f}", f"{x.prior_three_gap_max:.4f}", x.tier])
 
+    generated_at = datetime.now().astimezone().isoformat(timespec="seconds")
+    result_rows = [{k: v for k, v in asdict(x).items() if k != "chart"} for x in evaluations]
+    tiers = split_tiers(result_rows, cfg)
+    history = load_history(SELECTION_HISTORY_PATH)
+    if publish_latest:
+        history = record_close(
+            history,
+            trade_date,
+            tiers,
+            result_rows,
+            generated_at,
+        )
+        write_history(SELECTION_HISTORY_PATH, history)
     payload = {
         "trade_date": trade_date,
-        "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "generated_at": generated_at,
         "scanned": scanned,
         "errors": list(errors),
         "config": {k: v for k, v in cfg.items() if not k.startswith("_")},
-        "results": [{k: v for k, v in asdict(x).items() if k != "chart"} for x in evaluations],
+        "results": result_rows,
+        "tiers": tiers,
+        "history_summary": history.get("summary", {}),
         "strategy": strategy_state,
         "strategy_stats": strategy_stats(strategy_state),
         "secondary_strategy_stats": secondary_strategy_stats(strategy_state),
         "strategy_events": list(events),
     }
     json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    html_path.write_text(render_html(evaluations, cfg, scanned, errors, strategy_state, events), encoding="utf-8")
-    write_strategy_csv(strategy_state, trade_date, publish_latest)
+    html_path.write_text(render_html(evaluations, cfg, scanned, errors, strategy_state, events, history), encoding="utf-8")
     if publish_latest:
         (OUTPUT_DIR / "latest.html").write_text(html_path.read_text(encoding="utf-8"), encoding="utf-8")
         (OUTPUT_DIR / "latest.json").write_text(json_path.read_text(encoding="utf-8"), encoding="utf-8")
@@ -1360,23 +1456,15 @@ def main(argv: Iterable[str] | None = None) -> int:
             and current_state
             and current_state.get("last_trade_date", "") > args.as_of
         )
-        strategy_state = (
-            replay_state(OUTPUT_DIR, args.as_of)
-            if historical_only
-            else bootstrap_state(STRATEGY_STATE_PATH, OUTPUT_DIR)
-        )
-        strategy_rows = [{k: v for k, v in asdict(x).items() if k != "chart"} for x in evaluations]
+        strategy_state = current_state or bootstrap_state(STRATEGY_STATE_PATH, OUTPUT_DIR)
         events: list[dict] = []
-        if not args.codes:
-            strategy_state, events = update_state(strategy_state, strategy_rows, trade_date)
-            if not historical_only:
-                save_state(STRATEGY_STATE_PATH, strategy_state)
         html_path, csv_path, _ = write_outputs(
             evaluations, cfg, scanned, errors, strategy_state, events,
             publish_latest=not historical_only,
         )
-        selected = sum(x.selected for x in evaluations)
-        print(f"完成：严格命中 {selected} 只；行情失败 {len(errors)} 只")
+        first_count = sum(x.tier == FIRST_TIER for x in evaluations)
+        second_count = sum(x.tier == SECOND_TIER for x in evaluations)
+        print(f"完成：第一梯队 {first_count} 只；第二梯队 {second_count} 只；行情失败 {len(errors)} 只")
         print(f"报告：{html_path}")
         print(f"表格：{csv_path}")
         return 0 if evaluations else 2

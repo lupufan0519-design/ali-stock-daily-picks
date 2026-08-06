@@ -13,7 +13,9 @@ from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
 from observation import OBSERVATION_LIMIT, visible_observations
+from selection_history import load_history, refresh_history
 from screener import cross_yellow_pair
+from simple_strategy import FIRST_TIER, SECOND_TIER, decorate_row, split_tiers
 from strategy_contract import (
     ENTRY_DELAY_BARS,
     ENTRY_EXECUTION_MAX_WAIT_BARS,
@@ -29,6 +31,7 @@ from strategy_tracker import (
 ROOT = Path(__file__).resolve().parent
 DEFAULT_RESULT = ROOT / "results" / "latest.json"
 DEFAULT_OUTPUT = ROOT / "results" / "live.json"
+HISTORY_PATH = ROOT / "results" / "history.json"
 SHANGHAI = ZoneInfo("Asia/Shanghai")
 
 
@@ -77,7 +80,7 @@ def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
     """Decode the compact close-generated seed used by the intraday workflow."""
     if isinstance(item, dict):
         return item
-    if seed_format not in {1, 2, 3, 4} or not isinstance(item, list) or len(item) < 19:
+    if seed_format not in {1, 2, 3, 4, 5} or not isinstance(item, list) or len(item) < 19:
         return {}
 
     def triples(values: object) -> list[list[float]]:
@@ -90,6 +93,11 @@ def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
 
     dragon_tail = triples(item[8])
     tiger_tail = triples(item[9])
+    yellow_tail = (
+        triples(item[25])
+        if seed_format >= 5 and len(item) > 25
+        else []
+    )
     if len(dragon_tail) < 2 or len(tiger_tail) < 2:
         return {}
     flags = int(item[18])
@@ -109,6 +117,9 @@ def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
             "tiger": tiger_tail[-1],
             "previous_dragon": dragon_tail[-2],
             "previous_tiger": tiger_tail[-2],
+            "yellow_tail": yellow_tail,
+            "yellow": yellow_tail[-1] if yellow_tail else [],
+            "previous_yellow": yellow_tail[-2] if len(yellow_tail) >= 2 else [],
         },
         "cross_tail_dates": [str(value) for value in item[10]],
         "bottom_date": str(item[11]),
@@ -162,6 +173,21 @@ def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
             float(item[24])
             if seed_format >= 4 and len(item) > 24
             else 0.0
+        ),
+        "dragon_value": (
+            float(item[26]) if seed_format >= 5 and len(item) > 26 else 0.0
+        ),
+        "tiger_value": (
+            float(item[27]) if seed_format >= 5 and len(item) > 27 else 0.0
+        ),
+        "yellow_line_value": (
+            float(item[28]) if seed_format >= 5 and len(item) > 28 else 0.0
+        ),
+        "tier": str(item[29]) if seed_format >= 5 and len(item) > 29 else "",
+        "prior_three_gap_abs": (
+            [float(value) for value in item[30]]
+            if seed_format >= 5 and len(item) > 30 and isinstance(item[30], list)
+            else []
         ),
     }
 
@@ -1055,7 +1081,7 @@ def current_cci(typical_13: Sequence[float], high: float, low: float, close: flo
 
 
 def _baseline_live_row(seed: dict, quote: dict, cfg: dict | None = None) -> dict:
-    return {
+    row = {
         "code": str(seed["code"]),
         "name": str(seed.get("name", quote.get("name", ""))),
         "market": int(seed["market"]),
@@ -1094,7 +1120,14 @@ def _baseline_live_row(seed: dict, quote: dict, cfg: dict | None = None) -> dict
         "entry_breakout_high_5": float(
             seed.get("next_breakout_high_5", 0.0) or 0.0
         ),
+        "dragon_value": float(seed.get("dragon_value", 0.0) or 0.0),
+        "tiger_value": float(seed.get("tiger_value", 0.0) or 0.0),
+        "yellow_line_value": float(seed.get("yellow_line_value", 0.0) or 0.0),
+        "prior_three_gap_abs": [
+            float(value) for value in seed.get("prior_three_gap_abs", [])
+        ],
     }
+    return decorate_row(row, cfg or {}) if "line_gap_max_abs" in (cfg or {}) else row
 
 
 def evaluate_live_seed(
@@ -1128,6 +1161,7 @@ def evaluate_live_seed(
     coefficients = seed["line_coefficients"]
     dragon_tail_coefficients = coefficients.get("dragon_tail")
     tiger_tail_coefficients = coefficients.get("tiger_tail")
+    yellow_tail_coefficients = coefficients.get("yellow_tail")
     if dragon_tail_coefficients and tiger_tail_coefficients:
         dragon_tail = [
             coefficient_value(parts, low, high)
@@ -1146,8 +1180,16 @@ def evaluate_live_seed(
             coefficient_value(coefficients["previous_tiger"], low, high),
             coefficient_value(coefficients["tiger"], low, high),
         ]
+    if yellow_tail_coefficients:
+        yellow_line_tail = [
+            coefficient_value(parts, low, high)
+            for parts in yellow_tail_coefficients
+        ]
+    else:
+        yellow_line_tail = [float(seed.get("yellow_line_value", 0.0) or 0.0)]
     dragon = dragon_tail[-1]
     tiger = tiger_tail[-1]
+    yellow_line = yellow_line_tail[-1]
     dragon_above_tiger = dragon > tiger
     prior_cross_age = int(seed.get("cross_age", -1))
     cross_age = prior_cross_age + 1 if prior_cross_age >= 0 else -1
@@ -1307,7 +1349,11 @@ def evaluate_live_seed(
         (bottom_ok, cross_ok, limit_up_ok, observation_yellow_ok)
     )
     selected = bool(seed.get("eligible") and matched_count == 4)
-    return {
+    prior_three_gap_abs = [
+        abs(float(dragon_tail[index]) - float(tiger_tail[index]))
+        for index in range(max(0, len(dragon_tail) - 4), len(dragon_tail) - 1)
+    ]
+    row = {
         "code": str(seed["code"]),
         "name": str(seed.get("name", quote.get("name", ""))),
         "market": int(seed["market"]),
@@ -1333,6 +1379,8 @@ def evaluate_live_seed(
         "dragon_above_tiger": dragon_above_tiger,
         "dragon_value": dragon,
         "tiger_value": tiger,
+        "yellow_line_value": yellow_line,
+        "prior_three_gap_abs": prior_three_gap_abs,
         "date": live_date,
         "eligible": True,
         "selected": selected,
@@ -1340,6 +1388,7 @@ def evaluate_live_seed(
             seed.get("next_breakout_high_5", 0.0) or 0.0
         ),
     }
+    return decorate_row(row, cfg) if "line_gap_max_abs" in cfg else row
 
 
 def build_live_pools(
@@ -1362,6 +1411,15 @@ def build_live_pools(
             rows.append(row)
     excluded = excluded_codes or set()
     rows = [row for row in rows if row["code"] not in excluded]
+    if "line_gap_max_abs" in cfg:
+        tiers = split_tiers(rows, cfg)
+        return {
+            FIRST_TIER: tiers[FIRST_TIER],
+            SECOND_TIER: tiers[SECOND_TIER],
+            "main": tiers[FIRST_TIER],
+            "secondary": tiers[SECOND_TIER],
+            "available": True,
+        }
     main = [row for row in rows if row["selected"]]
     secondary = [
         row
@@ -1402,13 +1460,13 @@ def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
         quotes,
         live_trade_date=live_trade_date,
     )
-    tracked_codes = {
-        str(item["code"])
-        for area in ("main", "secondary")
-        for item in live_tracking.get(area, [])
-        if item.get("code")
-    }
-    live_pools = build_live_pools(payload, quotes, tracked_codes)
+    live_pools = build_live_pools(payload, quotes, set())
+    history = refresh_history(
+        load_history(HISTORY_PATH),
+        quotes,
+        live_trade_date or str(payload.get("trade_date", "")),
+        local_now.isoformat(timespec="seconds"),
+    )
     quote_times = [
         datetime.fromisoformat(str(item["server_time"]))
         for item in quotes.values()
@@ -1464,6 +1522,7 @@ def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
         "live_trade_date": live_trade_date,
         "selection_mode": selection_mode,
         "live_pools": live_pools,
+        "history": history,
         "live_tracking": live_tracking,
         "tracking_codes": collect_tracking_codes(payload, live_tracking),
         "target_count": len(targets),
