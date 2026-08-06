@@ -607,19 +607,19 @@ def render_report(
     <section id="today-view" class="view-panel">
       <header class="day-head">
         <div class="date-seal" aria-label="交易日期"><span id="date-day" class="date-day">{html.escape(trade_date[-2:] if trade_date else '--')}</span><span id="date-month" class="date-month">{html.escape(trade_date[:7].replace('-', ' / ') if trade_date else '')}</span></div>
-        <div><p class="eyebrow">TODAY / <span id="today-date-copy">{html.escape(trade_date)}</span></p><h1>今天，只看三梯队。</h1><p class="intro">第一梯队看龙虎线靠拢，第二梯队看当前价格是否处在黄线下方，第三梯队收纳其余近两日见底信号。</p></div>
+        <div><p class="eyebrow">TODAY / <span id="today-date-copy">{html.escape(trade_date)}</span></p><h1>今天，只看三梯队。</h1><p class="intro">第一梯队看龙虎线靠拢，第二梯队看当前价格是否处在黄线下方，第三梯队收纳其余近三个交易日见底信号。</p></div>
         <div class="today-total"><strong id="today-total-value">0</strong><span>今日合计</span></div>
       </header>
       <section class="tier-section first">
-        <div class="tier-title-row"><div><div class="tier-kicker"><span class="tier-index">01</span>优先查看</div><h2>第一梯队 <span id="first-count">0</span></h2></div><p class="tier-rule">近 2 个交易日出现可能见底，且此前连续 3 个交易日的龙虎线差值绝对值，每一天都不大于 0.5。</p></div>
+        <div class="tier-title-row"><div><div class="tier-kicker"><span class="tier-index">01</span>优先查看</div><h2>第一梯队 <span id="first-count">0</span></h2></div><p class="tier-rule">近 3 个交易日出现可能见底，且此前连续 3 个交易日的龙虎线差值绝对值，每一天都不大于 0.5。</p></div>
         <div id="first-picks" class="pick-grid"></div>
       </section>
       <section class="tier-section second">
-        <div class="tier-title-row"><div><div class="tier-kicker"><span class="tier-index">02</span>继续留意</div><h2>第二梯队 <span id="second-count">0</span></h2></div><p class="tier-rule">近 2 个交易日出现可能见底，且当前价不高于黄线。</p></div>
+        <div class="tier-title-row"><div><div class="tier-kicker"><span class="tier-index">02</span>继续留意</div><h2>第二梯队 <span id="second-count">0</span></h2></div><p class="tier-rule">近 3 个交易日出现可能见底，且当前价不高于黄线。</p></div>
         <div id="second-picks" class="pick-grid"></div>
       </section>
       <section class="tier-section third">
-        <div class="tier-title-row"><div><div class="tier-kicker"><span class="tier-index">03</span>新近信号</div><h2>第三梯队 <span id="third-count">0</span></h2></div><p class="tier-rule">近 2 个交易日出现可能见底，且没有进入第一梯队或第二梯队。</p></div>
+        <div class="tier-title-row"><div><div class="tier-kicker"><span class="tier-index">03</span>新近信号</div><h2>第三梯队 <span id="third-count">0</span></h2></div><p class="tier-rule">近 3 个交易日出现可能见底，且没有进入第一梯队或第二梯队。</p></div>
         <div id="third-picks" class="pick-grid"></div>
       </section>
     </section>

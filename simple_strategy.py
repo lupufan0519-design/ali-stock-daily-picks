@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Iterable, Mapping
 
 
-STRATEGY_VERSION = "three_tier_confirmed_bottom_v4"
+STRATEGY_VERSION = "three_tier_confirmed_bottom3_v5"
 FIRST_TIER = "first"
 SECOND_TIER = "second"
 THIRD_TIER = "third"

@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "strategy_version": "three_tier_confirmed_bottom_v4",
+  "strategy_version": "three_tier_confirmed_bottom3_v5",
   "started_on": "2026-08-06",
-  "updated_at": "2026-08-06T19:55:24+08:00",
+  "updated_at": "2026-08-06T19:59:18+08:00",
   "dates": [
     {
       "trade_date": "2026-08-06",
