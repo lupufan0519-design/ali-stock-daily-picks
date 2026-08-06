@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Iterable, Mapping
 
 
-STRATEGY_VERSION = "two_tier_confirmed_bottom_lines_v2"
+STRATEGY_VERSION = "two_tier_confirmed_bottom_yellow_v3"
 FIRST_TIER = "first"
 SECOND_TIER = "second"
 
@@ -34,9 +34,6 @@ def classify_tier(row: Mapping[str, object], cfg: Mapping[str, object]) -> str:
     tiger = _number(row, "tiger_value", "tiger")
     yellow = _number(row, "yellow_line_value", "yellow_line")
     price = _number(row, "price", "close", "last_close")
-    if dragon <= 0 or tiger <= 0:
-        return ""
-
     max_gap = float(cfg.get("line_gap_max_abs", 0.5) or 0.5)
     prior_gaps = row.get("prior_three_gap_abs", [])
     if (
@@ -49,8 +46,6 @@ def classify_tier(row: Mapping[str, object], cfg: Mapping[str, object]) -> str:
     if (
         price > 0
         and yellow > 0
-        and price <= dragon + 1e-8
-        and price <= tiger + 1e-8
         and price <= yellow + 1e-8
     ):
         return SECOND_TIER
@@ -70,8 +65,7 @@ def decorate_row(row: Mapping[str, object], cfg: Mapping[str, object]) -> dict:
         else []
     )
     tier = classify_tier(row, cfg)
-    ceiling_values = [value for value in (dragon, tiger, yellow) if value > 0]
-    ceiling = min(ceiling_values) if len(ceiling_values) == 3 else 0.0
+    ceiling = yellow if yellow > 0 else 0.0
     decorated.update(
         {
             "strategy_version": STRATEGY_VERSION,

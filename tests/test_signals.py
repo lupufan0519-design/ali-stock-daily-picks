@@ -61,6 +61,16 @@ class SignalMathTests(unittest.TestCase):
         self.assertTrue(flags[-2])
         self.assertFalse(flags[-1])
 
+    def test_possible_bottom_uses_the_formula_strict_range_filter(self):
+        bars = [
+            Bar(f"2026-01-{index + 1:02d}", 100, 101, 99, 100, 1, 1)
+            for index in range(13)
+        ]
+        trough = Bar("2026-01-14", 80, 80.04, 80.0, 80, 1, 1)
+        rebound = Bar("2026-01-15", 92, 94, 91, 93, 1, 1)
+        flags = bottom_signal_flags([*bars, trough, rebound])
+        self.assertFalse(flags[-2])
+
     def test_xma_uses_centered_partial_windows(self):
         self.assertEqual(xma([1, 2, 3, 4, 5], 3), [1.5, 2.0, 3.0, 4.0, 4.5])
 

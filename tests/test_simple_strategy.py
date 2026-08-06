@@ -46,10 +46,22 @@ class SimpleStrategyTests(unittest.TestCase):
             FIRST_TIER,
         )
 
-    def test_second_tier_requires_price_below_all_three_lines(self):
+    def test_second_tier_only_requires_price_not_above_yellow_line(self):
         base = row(prior_three_gap_abs=[0.1, 0.6, 0.2])
         self.assertEqual(classify_tier(base, CFG), SECOND_TIER)
-        self.assertEqual(classify_tier({**base, "price": 10.1}, CFG), "")
+        self.assertEqual(
+            classify_tier(
+                {
+                    **base,
+                    "price": 10.1,
+                    "dragon_value": 9.5,
+                    "tiger_value": 9.6,
+                },
+                CFG,
+            ),
+            SECOND_TIER,
+        )
+        self.assertEqual(classify_tier({**base, "price": 10.5}, CFG), "")
 
     def test_first_tier_wins_when_both_rules_match(self):
         pools = split_tiers([row()], CFG)
