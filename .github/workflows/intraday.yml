@@ -32,7 +32,7 @@ jobs:
     timeout-minutes: 30
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment_retry.outputs.page_url || steps.deployment.outputs.page_url }}
     env:
       TZ: Asia/Shanghai
       PYTHONUTF8: "1"
@@ -94,5 +94,8 @@ jobs:
         if: steps.market.outputs.run == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          timeout: 1200000
+        continue-on-error: true
+      - name: Retry GitHub Pages deployment once
+        if: steps.market.outputs.run == 'true' && steps.deployment.outcome == 'failure'
+        id: deployment_retry
+        uses: actions/deploy-pages@v4
