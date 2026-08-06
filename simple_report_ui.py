@@ -161,7 +161,10 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
 .positive { color: var(--red); }
 .negative { color: var(--green); }
 .neutral { color: var(--muted); }
-.reason { margin: 18px 0 16px; color: #373c44; font-size: 13px; line-height: 1.55; }
+.reason { margin: 16px 0 13px; color: #373c44; font-size: 13px; line-height: 1.65; }
+.company-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+.company-tag { padding: 5px 8px; border: 1px solid #e2e4df; border-radius: 999px; background: #f8f8f5; color: #555b63; font-size: 11px; line-height: 1; }
+.company-tag.industry { border-color: #d5dce8; background: #f2f5fa; color: #315a91; }
 .line-values { display: flex; flex-wrap: wrap; gap: 7px; }
 .line-chip { padding: 5px 8px; border-radius: 7px; font: 11px/1 Consolas, monospace; }
 .line-chip.dragon { background: var(--red-soft); color: #9f2e27; }
@@ -336,10 +339,13 @@ SCRIPT = r"""
       price.append(node("strong", "", number(item.price || item.close)), node("span", "change " + tone(item.change_pct), signed(item.change_pct)));
       top.append(link, price);
       card.appendChild(top);
-      var reasonText = tier === "first"
-        ? "近两日出现可能见底 · 此前连续3日最大龙虎差 " + number(item.prior_three_gap_max, 3)
-        : "近两日出现可能见底 · 当前价不高于龙线、虎线和黄线";
-      card.appendChild(node("p", "reason", reasonText));
+      card.appendChild(node("p", "reason", item.company_intro || "公司业务简介暂缺。"));
+      var tags = node("div", "company-tags");
+      if (item.industry) tags.appendChild(node("span", "company-tag industry", "板块 · " + item.industry));
+      (Array.isArray(item.concepts) ? item.concepts : []).slice(0, 3).forEach(function (concept) {
+        tags.appendChild(node("span", "company-tag", "概念 · " + concept));
+      });
+      if (tags.childNodes.length) card.appendChild(tags);
       var values = node("div", "line-values");
       values.append(
         node("span", "line-chip dragon", "龙 " + number(item.dragon_value)),
@@ -612,7 +618,7 @@ def render_report(
         </section>
         <section id="history-detail" class="history-detail" aria-live="polite"></section>
       </div>
-      <p class="footnote">新规则自 {html.escape(str(history_payload.get('started_on') or trade_date or '首次发布日'))} 起独立记录，不把旧策略结果混入成功率。今日入选尚无后续行情，暂不计成功或失败；未计交易费用、滑点及涨跌停无法成交。</p>
+      <p class="footnote">“可能见底”按通达信当前完整历史图中的已确认波谷重算，未确认的新低不会提前入选。新规则自 {html.escape(str(history_payload.get('started_on') or trade_date or '首次发布日'))} 起独立记录，不把旧策略结果混入成功率。今日入选尚无后续行情，暂不计成功或失败；未计交易费用、滑点及涨跌停无法成交。</p>
     </section>
   </main>
   <noscript><p class="shell empty">需要启用 JavaScript 才能切换日历和自动刷新最新行情。</p></noscript>

@@ -80,7 +80,7 @@ def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
     """Decode the compact close-generated seed used by the intraday workflow."""
     if isinstance(item, dict):
         return item
-    if seed_format not in {1, 2, 3, 4, 5} or not isinstance(item, list) or len(item) < 19:
+    if seed_format not in {1, 2, 3, 4, 5, 6} or not isinstance(item, list) or len(item) < 19:
         return {}
 
     def triples(values: object) -> list[list[float]]:
@@ -188,6 +188,32 @@ def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
             [float(value) for value in item[30]]
             if seed_format >= 5 and len(item) > 30 and isinstance(item[30], list)
             else []
+        ),
+        "company_intro": (
+            str(item[31]) if seed_format >= 6 and len(item) > 31 else ""
+        ),
+        "industry": (
+            str(item[32]) if seed_format >= 6 and len(item) > 32 else ""
+        ),
+        "concepts": (
+            [str(value) for value in item[33]]
+            if seed_format >= 6 and len(item) > 33 and isinstance(item[33], list)
+            else []
+        ),
+        "zig16_state": (
+            int(item[34]) if seed_format >= 6 and len(item) > 34 else 0
+        ),
+        "zig16_candidate_value": (
+            float(item[35]) if seed_format >= 6 and len(item) > 35 else 0.0
+        ),
+        "zig16_candidate_age": (
+            int(item[36]) if seed_format >= 6 and len(item) > 36 else -1
+        ),
+        "zig16_candidate_date": (
+            str(item[37]) if seed_format >= 6 and len(item) > 37 else ""
+        ),
+        "zig16_candidate_signal_ok": (
+            bool(item[38]) if seed_format >= 6 and len(item) > 38 else False
         ),
     }
 
@@ -1126,6 +1152,9 @@ def _baseline_live_row(seed: dict, quote: dict, cfg: dict | None = None) -> dict
         "prior_three_gap_abs": [
             float(value) for value in seed.get("prior_three_gap_abs", [])
         ],
+        "company_intro": str(seed.get("company_intro", "")),
+        "industry": str(seed.get("industry", "")),
+        "concepts": [str(value) for value in seed.get("concepts", [])],
     }
     return decorate_row(row, cfg or {}) if "line_gap_max_abs" in (cfg or {}) else row
 
@@ -1194,20 +1223,25 @@ def evaluate_live_seed(
     prior_cross_age = int(seed.get("cross_age", -1))
     cross_age = prior_cross_age + 1 if prior_cross_age >= 0 else -1
 
-    new_bottom = bool(
-        price <= float(seed["min_close_15"]) + 1e-8
-        and high > low + 0.04
-        and current_cci(seed.get("typical_13", []), high, low, price) < -110
-    )
     bottom_age = int(seed.get("bottom_age", -1))
     prior_bottom = (
         bottom_age >= 0
         and bottom_age + 1 < int(cfg["bottom_lookback_days"])
     )
-    bottom_ok = new_bottom or prior_bottom
+    candidate_age = int(seed.get("zig16_candidate_age", -1))
+    candidate_value = float(seed.get("zig16_candidate_value", 0.0) or 0.0)
+    confirmed_candidate = bool(
+        int(seed.get("zig16_state", 0)) == 2
+        and candidate_value > 0
+        and price >= candidate_value * 1.16 - 1e-8
+        and bool(seed.get("zig16_candidate_signal_ok"))
+        and candidate_age >= 0
+        and candidate_age + 1 < int(cfg["bottom_lookback_days"])
+    )
+    bottom_ok = confirmed_candidate or prior_bottom
     bottom_date = (
-        live_date
-        if new_bottom
+        str(seed.get("zig16_candidate_date", ""))
+        if confirmed_candidate
         else str(seed.get("bottom_date", ""))
         if prior_bottom
         else ""
@@ -1381,6 +1415,9 @@ def evaluate_live_seed(
         "tiger_value": tiger,
         "yellow_line_value": yellow_line,
         "prior_three_gap_abs": prior_three_gap_abs,
+        "company_intro": str(seed.get("company_intro", "")),
+        "industry": str(seed.get("industry", "")),
+        "concepts": [str(value) for value in seed.get("concepts", [])],
         "date": live_date,
         "eligible": True,
         "selected": selected,

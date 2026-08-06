@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from screener import Bar, Stock, append_line_coefficients, cross_yellow_pair, ema, has_yellow_segment, is_intraday_snapshot, is_st_name, limit_up_price, line_series, load_config, make_sparkline, price_limit_rate, rolling_cci, xma
+from screener import Bar, Stock, append_line_coefficients, bottom_signal_flags, confirmed_zig_trough_flags, cross_yellow_pair, ema, has_yellow_segment, is_intraday_snapshot, is_st_name, limit_up_price, line_series, load_config, make_sparkline, price_limit_rate, rolling_cci, xma, zig_state
 
 
 class SignalMathTests(unittest.TestCase):
@@ -39,6 +39,27 @@ class SignalMathTests(unittest.TestCase):
         cci = rolling_cci(bars)
         self.assertTrue(all(math.isnan(x) for x in cci[:13]))
         self.assertTrue(all(math.isfinite(x) for x in cci[13:]))
+
+    def test_zig_trough_requires_a_confirming_rebound(self):
+        falling = [100.0, 90.0, 80.0, 79.0]
+        self.assertFalse(any(confirmed_zig_trough_flags(falling, 16.0)))
+        confirmed = [*falling, 93.0]
+        flags = confirmed_zig_trough_flags(confirmed, 16.0)
+        self.assertTrue(flags[3])
+        self.assertEqual(zig_state(falling, 16.0)["state"], 2)
+        self.assertEqual(zig_state(falling, 16.0)["candidate_age"], 0)
+
+    def test_possible_bottom_does_not_mark_an_unfinished_right_edge(self):
+        bars = [
+            Bar(f"2026-01-{index + 1:02d}", 100, 101, 99, 100, 1, 1)
+            for index in range(13)
+        ]
+        trough = Bar("2026-01-14", 81, 81, 79, 80, 1, 1)
+        self.assertFalse(bottom_signal_flags([*bars, trough])[-1])
+        rebound = Bar("2026-01-15", 92, 94, 91, 93, 1, 1)
+        flags = bottom_signal_flags([*bars, trough, rebound])
+        self.assertTrue(flags[-2])
+        self.assertFalse(flags[-1])
 
     def test_xma_uses_centered_partial_windows(self):
         self.assertEqual(xma([1, 2, 3, 4, 5], 3), [1.5, 2.0, 3.0, 4.0, 4.5])

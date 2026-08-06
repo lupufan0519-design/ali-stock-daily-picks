@@ -18,7 +18,7 @@ HISTORY_PATH = ROOT / "results" / "history.json"
 LATEST_PATH = ROOT / "results" / "latest.json"
 LATEST_HTML_PATH = ROOT / "results" / "latest.html"
 SNAPSHOT_PATH = ROOT / "cloud_snapshot.json"
-LIVE_SEED_FORMAT = 5
+LIVE_SEED_FORMAT = 6
 
 
 def snapshot_json(payload: dict) -> str:
@@ -110,6 +110,14 @@ def pack_live_seed(seed: dict) -> list:
         float(seed.get("yellow_line_value", 0.0)),
         str(seed.get("tier", "")),
         [float(value) for value in seed.get("prior_three_gap_abs", [])],
+        str(seed.get("company_intro", "")),
+        str(seed.get("industry", "")),
+        [str(value) for value in seed.get("concepts", [])],
+        int(seed.get("zig16_state", 0)),
+        float(seed.get("zig16_candidate_value", 0.0) or 0.0),
+        int(seed.get("zig16_candidate_age", -1)),
+        str(seed.get("zig16_candidate_date", "")),
+        bool(seed.get("zig16_candidate_signal_ok", False)),
     ]
 
 
@@ -152,6 +160,9 @@ def compact_snapshot(payload: dict) -> dict:
         "line_gap_abs",
         "prior_three_gap_abs",
         "prior_three_gap_max",
+        "company_intro",
+        "industry",
+        "concepts",
     )
     return {
         "trade_date": payload.get("trade_date"),
@@ -209,6 +220,9 @@ def bootstrap_live_snapshot() -> int:
     quality_error = screener.scan_quality_error(scanned, errors)
     if quality_error:
         raise RuntimeError(quality_error)
+    from company_metadata import enrich_evaluations
+
+    enrich_evaluations(evaluations, cfg["workers"])
     payload = bootstrap_payload(evaluations, cfg, scanned, errors, strategy)
     if payload["trade_date"] != base_date:
         raise RuntimeError(

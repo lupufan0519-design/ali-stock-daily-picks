@@ -102,6 +102,9 @@ class Evaluation:
     line_gap_abs: float = 0.0
     prior_three_gap_abs: list[float] = field(default_factory=list)
     prior_three_gap_max: float = 0.0
+    company_intro: str = ""
+    industry: str = ""
+    concepts: list[str] = field(default_factory=list)
 
 
 def load_config(path: Path) -> dict:
@@ -174,6 +177,108 @@ def rolling_cci(bars: Sequence[Bar], period: int = 14) -> list[float]:
         dev = sum(abs(x - mean) for x in window) / period
         out[i] = 0.0 if dev == 0 else (typical[i] - mean) / (0.015 * dev)
     return out
+
+
+def confirmed_zig_trough_flags(
+    values: Sequence[float],
+    threshold_pct: float = 16.0,
+) -> list[bool]:
+    """Return confirmed close-price ZIG troughs without treating the live edge as a trough.
+
+    This mirrors ``TROUGHBARS(3, N, 1)=0`` on the currently visible chart:
+    a falling candidate only becomes a historical trough after price rebounds by
+    ``N`` percent.  The unfinished right edge is deliberately not marked.
+    """
+    flags = [False] * len(values)
+    if len(values) < 2:
+        return flags
+    threshold = float(threshold_pct) / 100.0
+    start, rising, falling = 0, 1, 2
+    state = start
+    candidate = 0
+    for index in range(1, len(values)):
+        value = float(values[index])
+        candidate_value = float(values[candidate])
+        if candidate_value <= 0:
+            candidate = index
+            continue
+        if state == start:
+            if value >= candidate_value * (1.0 + threshold):
+                candidate = index
+                state = rising
+            elif value <= candidate_value * (1.0 - threshold):
+                candidate = index
+                state = falling
+        elif state == rising:
+            if value >= candidate_value:
+                candidate = index
+            elif value <= candidate_value * (1.0 - threshold):
+                candidate = index
+                state = falling
+        elif value <= candidate_value:
+            candidate = index
+        elif value >= candidate_value * (1.0 + threshold):
+            flags[candidate] = True
+            candidate = index
+            state = rising
+    return flags
+
+
+def zig_state(values: Sequence[float], threshold_pct: float = 16.0) -> dict:
+    """Compact the current ZIG leg so the next live bar can confirm a trough."""
+    if not values:
+        return {
+            "state": 0,
+            "candidate_value": 0.0,
+            "candidate_age": -1,
+        }
+    threshold = float(threshold_pct) / 100.0
+    state = 0
+    candidate = 0
+    for index in range(1, len(values)):
+        value = float(values[index])
+        candidate_value = float(values[candidate])
+        if candidate_value <= 0:
+            candidate = index
+            continue
+        if state == 0:
+            if value >= candidate_value * (1.0 + threshold):
+                candidate = index
+                state = 1
+            elif value <= candidate_value * (1.0 - threshold):
+                candidate = index
+                state = 2
+        elif state == 1:
+            if value >= candidate_value:
+                candidate = index
+            elif value <= candidate_value * (1.0 - threshold):
+                candidate = index
+                state = 2
+        elif value <= candidate_value:
+            candidate = index
+        elif value >= candidate_value * (1.0 + threshold):
+            candidate = index
+            state = 1
+    return {
+        "state": state,
+        "candidate_value": round(float(values[candidate]), 6),
+        "candidate_age": len(values) - 1 - candidate,
+    }
+
+
+def bottom_signal_flags(bars: Sequence[Bar]) -> list[bool]:
+    """Tongdaxin "可能见底": confirmed 16% trough, range and CCI filters."""
+    cci = rolling_cci(bars)
+    troughs = confirmed_zig_trough_flags([bar.close for bar in bars], 16.0)
+    return [
+        bool(
+            troughs[index]
+            and index >= 13
+            and bar.high > bar.low + 0.04
+            and cci[index] < -110
+        )
+        for index, bar in enumerate(bars)
+    ]
 
 
 def indicator_lines(
@@ -489,6 +594,11 @@ def make_live_seed(
         - 1,
     )
     history_tail_size = tail_size - 1
+    zig = zig_state([bar.close for bar in bars], 16.0)
+    candidate_age = int(zig["candidate_age"])
+    candidate_index = len(bars) - 1 - candidate_age if candidate_age >= 0 else -1
+    candidate_cci = rolling_cci(bars)[candidate_index] if candidate_index >= 0 else math.nan
+    candidate_bar = bars[candidate_index] if candidate_index >= 0 else None
     return {
         "code": stock.code,
         "name": stock.name,
@@ -505,6 +615,18 @@ def make_live_seed(
         ),
         "min_close_15": round(min(bar.close for bar in bars[-15:]), 4),
         "typical_13": [round(value, 6) for value in typical],
+        "zig16_state": int(zig["state"]),
+        "zig16_candidate_value": float(zig["candidate_value"]),
+        "zig16_candidate_age": candidate_age,
+        "zig16_candidate_date": (
+            candidate_bar.date if candidate_bar is not None else ""
+        ),
+        "zig16_candidate_signal_ok": bool(
+            candidate_bar is not None
+            and candidate_index >= 13
+            and candidate_bar.high > candidate_bar.low + 0.04
+            and candidate_cci < -110
+        ),
         "next_limit_price": round(
             limit_up_price(bars[-1].close, price_limit_rate(stock)),
             4,
@@ -562,16 +684,7 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
     eligible = bool(cfg["include_st"] or not is_st_name(stock.name))
 
     dragon, tiger, yellow_line = indicator_lines(bars)
-    cci = rolling_cci(bars)
-    close = [b.close for b in bars]
-
-    bottom_flags: list[bool] = []
-    for i, bar in enumerate(bars):
-        start = max(0, i - 15)
-        is_new_low = bar.close <= min(close[start : i + 1])
-        bottom_flags.append(
-            i >= 13 and is_new_low and bar.high > bar.low + 0.04 and cci[i] < -110
-        )
+    bottom_flags = bottom_signal_flags(bars)
 
     cross_flags = [is_cross_up(dragon, tiger, i) for i in range(len(bars))]
     rate = price_limit_rate(stock)
@@ -1446,6 +1559,14 @@ def main(argv: Iterable[str] | None = None) -> int:
         if quality_error:
             print(quality_error, file=sys.stderr)
             return 4
+        from company_metadata import enrich_evaluations
+
+        metadata_errors = enrich_evaluations(evaluations, cfg["workers"])
+        if metadata_errors:
+            print(
+                f"公司资料补充失败 {len(metadata_errors)} 只，页面已使用简洁兜底文案",
+                flush=True,
+            )
         trade_date = max(x.date for x in evaluations)
         if is_intraday_snapshot(trade_date):
             print(f"{trade_date} 尚未收盘：本次为盘中数据，未更新日报和策略跟踪池")
