@@ -27,7 +27,7 @@ class SignalMathTests(unittest.TestCase):
         self.assertFalse(is_st_name("普通股票"))
         config = load_config(ROOT / "config.json")
         self.assertFalse(config["include_st"])
-        self.assertEqual(config["bottom_lookback_days"], 3)
+        self.assertEqual(config["bottom_lookback_days"], 4)
         self.assertEqual(config["limit_up_lookback_days"], 42)
         self.assertEqual(config["yellow_consecutive_days"], 1)
         self.assertEqual(config["cross_lookback_days"], 8)
