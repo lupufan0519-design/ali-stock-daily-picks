@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Iterable, Mapping
 
-from simple_strategy import FIRST_TIER, SECOND_TIER, STRATEGY_VERSION
+from simple_strategy import FIRST_TIER, SECOND_TIER, STRATEGY_VERSION, THIRD_TIER
 
 
 SCHEMA_VERSION = 1
@@ -83,7 +83,7 @@ def _pick(row: Mapping[str, object], trade_date: str, tier: str) -> dict:
 def _all_records(dates: Iterable[Mapping[str, object]]) -> list[dict]:
     records: list[dict] = []
     for day in dates:
-        for key in (FIRST_TIER, SECOND_TIER):
+        for key in (FIRST_TIER, SECOND_TIER, THIRD_TIER):
             values = day.get(key, [])
             if isinstance(values, list):
                 records.extend(item for item in values if isinstance(item, dict))
@@ -109,6 +109,7 @@ def summarize(dates: Iterable[Mapping[str, object]]) -> dict:
         "selection_count": len(records),
         "first_tier_count": sum(item.get("tier") == FIRST_TIER for item in records),
         "second_tier_count": sum(item.get("tier") == SECOND_TIER for item in records),
+        "third_tier_count": sum(item.get("tier") == THIRD_TIER for item in records),
         "evaluated_count": len(settled),
         "success_count": len(successful),
         "success_rate_pct": len(successful) / len(settled) * 100.0 if settled else None,
@@ -171,6 +172,7 @@ def record_close(
         "trade_date": trade_date,
         FIRST_TIER: [_pick(item, trade_date, FIRST_TIER) for item in tiers.get(FIRST_TIER, [])],
         SECOND_TIER: [_pick(item, trade_date, SECOND_TIER) for item in tiers.get(SECOND_TIER, [])],
+        THIRD_TIER: [_pick(item, trade_date, THIRD_TIER) for item in tiers.get(THIRD_TIER, [])],
     }
     dates = [
         item

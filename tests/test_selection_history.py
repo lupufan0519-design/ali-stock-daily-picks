@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 from selection_history import empty_history, load_history, record_close, refresh_history, write_history
-from simple_strategy import FIRST_TIER, SECOND_TIER, STRATEGY_VERSION
+from simple_strategy import FIRST_TIER, SECOND_TIER, STRATEGY_VERSION, THIRD_TIER
 
 
 def pick(code="600001", price=10.0):
@@ -67,6 +67,17 @@ class SelectionHistoryTests(unittest.TestCase):
             loaded = load_history(path)
             self.assertEqual(loaded["strategy_version"], STRATEGY_VERSION)
             self.assertEqual(loaded["dates"], [])
+
+    def test_third_tier_is_recorded_in_history_and_summary(self):
+        history = record_close(
+            empty_history(),
+            "2026-08-06",
+            {FIRST_TIER: [], SECOND_TIER: [], THIRD_TIER: [pick()]},
+            [pick()],
+        )
+        self.assertEqual(history["summary"]["selection_count"], 1)
+        self.assertEqual(history["summary"]["third_tier_count"], 1)
+        self.assertEqual(len(history["dates"][0][THIRD_TIER]), 1)
 
 
 if __name__ == "__main__":

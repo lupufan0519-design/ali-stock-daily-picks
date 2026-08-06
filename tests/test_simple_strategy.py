@@ -1,6 +1,6 @@
 import unittest
 
-from simple_strategy import FIRST_TIER, SECOND_TIER, classify_tier, split_tiers
+from simple_strategy import FIRST_TIER, SECOND_TIER, THIRD_TIER, classify_tier, split_tiers
 
 
 CFG = {"line_gap_max_abs": 0.5}
@@ -37,7 +37,7 @@ class SimpleStrategyTests(unittest.TestCase):
                 ),
                 CFG,
             ),
-            "",
+            THIRD_TIER,
         )
 
     def test_current_day_gap_does_not_change_first_tier(self):
@@ -61,12 +61,20 @@ class SimpleStrategyTests(unittest.TestCase):
             ),
             SECOND_TIER,
         )
-        self.assertEqual(classify_tier({**base, "price": 10.5}, CFG), "")
+        self.assertEqual(classify_tier({**base, "price": 10.5}, CFG), THIRD_TIER)
+
+    def test_third_tier_collects_remaining_recent_bottom_signals(self):
+        candidate = row(
+            price=10.5,
+            prior_three_gap_abs=[0.1, 0.6, 0.2],
+        )
+        self.assertEqual(classify_tier(candidate, CFG), THIRD_TIER)
 
     def test_first_tier_wins_when_both_rules_match(self):
         pools = split_tiers([row()], CFG)
         self.assertEqual(len(pools[FIRST_TIER]), 1)
         self.assertEqual(len(pools[SECOND_TIER]), 0)
+        self.assertEqual(len(pools[THIRD_TIER]), 0)
 
     def test_bottom_and_st_filters_are_hard_requirements(self):
         self.assertEqual(classify_tier(row(bottom_ok=False), CFG), "")

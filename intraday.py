@@ -15,7 +15,7 @@ from zoneinfo import ZoneInfo
 from observation import OBSERVATION_LIMIT, visible_observations
 from selection_history import load_history, refresh_history
 from screener import cross_yellow_pair
-from simple_strategy import FIRST_TIER, SECOND_TIER, decorate_row, split_tiers
+from simple_strategy import FIRST_TIER, SECOND_TIER, THIRD_TIER, decorate_row, split_tiers
 from strategy_contract import (
     ENTRY_DELAY_BARS,
     ENTRY_EXECUTION_MAX_WAIT_BARS,
@@ -1435,7 +1435,14 @@ def build_live_pools(
 ) -> dict:
     seeds = live_seeds(payload)
     if not seeds:
-        return {"main": [], "secondary": [], "available": False}
+        return {
+            FIRST_TIER: [],
+            SECOND_TIER: [],
+            THIRD_TIER: [],
+            "main": [],
+            "secondary": [],
+            "available": False,
+        }
     cfg = payload.get("config", {})
     close_trade_date = str(payload.get("trade_date", ""))
     rows = []
@@ -1453,6 +1460,7 @@ def build_live_pools(
         return {
             FIRST_TIER: tiers[FIRST_TIER],
             SECOND_TIER: tiers[SECOND_TIER],
+            THIRD_TIER: tiers[THIRD_TIER],
             "main": tiers[FIRST_TIER],
             "secondary": tiers[SECOND_TIER],
             "available": True,
@@ -1525,6 +1533,7 @@ def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
         for item in (
             list(live_pools.get("main", []))
             + list(live_pools.get("secondary", []))
+            + list(live_pools.get(THIRD_TIER, []))
         )
     }
     display_codes.update(

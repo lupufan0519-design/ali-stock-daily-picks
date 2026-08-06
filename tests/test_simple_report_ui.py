@@ -18,7 +18,16 @@ class SimpleReportUiTests(unittest.TestCase):
         self.assertIn("此前连续 3 个交易日", page)
         self.assertIn("每一天都不大于 0.5", page)
         self.assertIn("当前价不高于黄线", page)
+        self.assertIn("近 2 个交易日出现可能见底，且没有进入第一梯队或第二梯队", page)
         self.assertNotIn("当前价不高于龙线、虎线和黄线", page)
+
+    def test_page_has_three_mutually_exclusive_tier_sections(self):
+        page = render_report([], {"line_gap_max_abs": 0.5}, 0, [])
+        self.assertIn("今天，只看三梯队", page)
+        self.assertIn('id="first-picks"', page)
+        self.assertIn('id="second-picks"', page)
+        self.assertIn('id="third-picks"', page)
+        self.assertIn('id="third-count"', page)
 
     def test_page_is_mobile_ready_and_has_the_three_line_visual(self):
         page = render_report([], {"line_gap_max_abs": 0.5}, 0, [])
