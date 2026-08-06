@@ -80,7 +80,7 @@ def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
     """Decode the compact close-generated seed used by the intraday workflow."""
     if isinstance(item, dict):
         return item
-    if seed_format not in {1, 2, 3, 4, 5, 6} or not isinstance(item, list) or len(item) < 19:
+    if seed_format not in {1, 2, 3, 4, 5, 6, 7} or not isinstance(item, list) or len(item) < 19:
         return {}
 
     def triples(values: object) -> list[list[float]]:
@@ -214,6 +214,9 @@ def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
         ),
         "zig16_candidate_signal_ok": (
             bool(item[38]) if seed_format >= 6 and len(item) > 38 else False
+        ),
+        "bottom_price": (
+            float(item[39]) if seed_format >= 7 and len(item) > 39 else 0.0
         ),
     }
 
@@ -1123,6 +1126,7 @@ def _baseline_live_row(seed: dict, quote: dict, cfg: dict | None = None) -> dict
         "limit_up_ok": bool(seed.get("limit_up_ok")),
         "yellow_ok": bool(seed.get("yellow_ok")),
         "bottom_date": str(seed.get("bottom_date", "")),
+        "bottom_price": float(seed.get("bottom_price", 0.0) or 0.0),
         "cross_date": str(seed.get("cross_date", "")),
         "limit_up_date": str(seed.get("limit_up_date", "")),
         "yellow_date": str(seed.get("yellow_date", "")),
@@ -1245,6 +1249,13 @@ def evaluate_live_seed(
         else str(seed.get("bottom_date", ""))
         if prior_bottom
         else ""
+    )
+    bottom_price = (
+        candidate_value
+        if confirmed_candidate
+        else float(seed.get("bottom_price", 0.0) or 0.0)
+        if prior_bottom
+        else 0.0
     )
 
     yellow = dragon > min(open_price, price)
@@ -1401,6 +1412,7 @@ def evaluate_live_seed(
         "limit_up_ok": limit_up_ok,
         "yellow_ok": yellow_ok,
         "bottom_date": bottom_date,
+        "bottom_price": bottom_price,
         "cross_date": cross_date,
         "limit_up_date": limit_up_date,
         "yellow_date": yellow_date,

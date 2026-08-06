@@ -50,6 +50,7 @@ class SimpleReportUiTests(unittest.TestCase):
                     "market": 1,
                     "date": "2026-08-06",
                     "close": 10.0,
+                    "bottom_price": 9.6,
                     "bottom_ok": True,
                     "prior_three_gap_abs": [0.2, 0.3, 0.4],
                     "dragon_value": 9.8,
@@ -69,6 +70,33 @@ class SimpleReportUiTests(unittest.TestCase):
         self.assertIn("专用设备", page)
         self.assertIn("机器人", page)
         self.assertNotIn("近两日出现可能见底 ·", page)
+
+
+    def test_cards_show_signal_price_today_price_and_absolute_gap(self):
+        page = render_report(
+            [
+                {
+                    "code": "600001",
+                    "name": "Example",
+                    "market": 1,
+                    "date": "2026-08-06",
+                    "close": 10.0,
+                    "bottom_price": 9.6,
+                    "bottom_ok": True,
+                    "prior_three_gap_abs": [0.2, 0.3, 0.4],
+                    "dragon_value": 9.8,
+                    "tiger_value": 9.7,
+                    "yellow_line_value": 10.2,
+                    "eligible": True,
+                }
+            ],
+            {"line_gap_max_abs": 0.5},
+            1,
+            [],
+        )
+        self.assertIn("见底日收盘", page)
+        self.assertIn("今日价", page)
+        self.assertIn("绝对差额", page)
 
 
 if __name__ == "__main__":

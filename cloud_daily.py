@@ -18,7 +18,7 @@ HISTORY_PATH = ROOT / "results" / "history.json"
 LATEST_PATH = ROOT / "results" / "latest.json"
 LATEST_HTML_PATH = ROOT / "results" / "latest.html"
 SNAPSHOT_PATH = ROOT / "cloud_snapshot.json"
-LIVE_SEED_FORMAT = 6
+LIVE_SEED_FORMAT = 7
 
 
 def snapshot_json(payload: dict) -> str:
@@ -118,6 +118,7 @@ def pack_live_seed(seed: dict) -> list:
         int(seed.get("zig16_candidate_age", -1)),
         str(seed.get("zig16_candidate_date", "")),
         bool(seed.get("zig16_candidate_signal_ok", False)),
+        float(seed.get("bottom_price", 0.0) or 0.0),
     ]
 
 
@@ -142,6 +143,9 @@ def compact_snapshot(payload: dict) -> dict:
         "close",
         "change_pct",
         "bottom_ok",
+        "bottom_date",
+        "bottom_price",
+        "bottom_price_gap_abs",
         "cross_ok",
         "limit_up_ok",
         "yellow_ok",

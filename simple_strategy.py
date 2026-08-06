@@ -27,7 +27,7 @@ def _eligible(row: Mapping[str, object]) -> bool:
 
 
 def classify_tier(row: Mapping[str, object], cfg: Mapping[str, object]) -> str:
-    """Classify one quote under the current, mutually exclusive two-tier rule."""
+    """Classify one quote under the current, mutually exclusive three-tier rule."""
     if not _eligible(row) or not bool(row.get("bottom_ok")):
         return ""
 
@@ -59,6 +59,7 @@ def decorate_row(row: Mapping[str, object], cfg: Mapping[str, object]) -> dict:
     tiger = _number(row, "tiger_value", "tiger")
     yellow = _number(row, "yellow_line_value", "yellow_line")
     price = _number(row, "price", "close", "last_close")
+    bottom_price = _number(row, "bottom_price", "bottom_close")
     prior_gaps_raw = row.get("prior_three_gap_abs", [])
     prior_gaps = (
         [float(value) for value in prior_gaps_raw[-3:]]
@@ -83,9 +84,25 @@ def decorate_row(row: Mapping[str, object], cfg: Mapping[str, object]) -> dict:
                 if ceiling > 0 and price > 0
                 else None
             ),
+            "bottom_price": bottom_price or None,
+            "bottom_price_gap_abs": (
+                abs(price - bottom_price)
+                if price > 0 and bottom_price > 0
+                else None
+            ),
         }
     )
     return decorated
+
+
+def _bottom_price_gap_key(item: Mapping[str, object]) -> tuple[float, str]:
+    """Put the smallest absolute signal-price gap first in every tier."""
+    gap = item.get("bottom_price_gap_abs")
+    try:
+        number = float(gap)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        number = float("inf")
+    return number, str(item.get("code", ""))
 
 
 def split_tiers(
@@ -104,25 +121,9 @@ def split_tiers(
         elif decorated["tier"] == THIRD_TIER:
             third.append(decorated)
 
-    first.sort(
-        key=lambda item: (
-            float(item.get("prior_three_gap_max") or 999999.0),
-            str(item.get("code", "")),
-        )
-    )
-    second.sort(
-        key=lambda item: (
-            -float(item.get("line_distance_pct") or 0.0),
-            str(item.get("code", "")),
-        )
-    )
-    third.sort(
-        key=lambda item: (
-            str(item.get("bottom_date", "")),
-            str(item.get("code", "")),
-        ),
-        reverse=True,
-    )
+    first.sort(key=_bottom_price_gap_key)
+    second.sort(key=_bottom_price_gap_key)
+    third.sort(key=_bottom_price_gap_key)
     return {FIRST_TIER: first, SECOND_TIER: second, THIRD_TIER: third}
 
 

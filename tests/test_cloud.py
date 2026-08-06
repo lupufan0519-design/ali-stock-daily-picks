@@ -86,6 +86,7 @@ class CloudWorkflowTests(unittest.TestCase):
                 "2026-07-30",
             ],
             "bottom_date": "2026-07-30" if bottom_age >= 0 else "",
+            "bottom_price": 9.8 if bottom_age >= 0 else 0.0,
             "cross_date": "",
             "limit_up_date": "2026-07-15" if limit_age >= 0 else "",
             "bottom_age": bottom_age,
@@ -479,7 +480,7 @@ class CloudWorkflowTests(unittest.TestCase):
             ],
         }
         snapshot = compact_snapshot(payload)
-        self.assertEqual(snapshot["live_seed_format"], 6)
+        self.assertEqual(snapshot["live_seed_format"], 7)
         self.assertEqual(
             [item[0] for item in snapshot["live_universe"]],
             ["600001"],
@@ -492,6 +493,7 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertTrue(seed["eligible"])
         self.assertEqual(seed["observation_matched_count"], 2)
         self.assertEqual(seed["next_breakout_high_5"], 10.4)
+        self.assertEqual(seed["bottom_price"], 9.8)
         legacy_seed = unpack_live_seed(
             snapshot["live_universe"][0][:-1],
             3,
@@ -829,6 +831,9 @@ class CloudWorkflowTests(unittest.TestCase):
                 "close",
                 "change_pct",
                 "bottom_ok",
+                "bottom_date",
+                "bottom_price",
+                "bottom_price_gap_abs",
                 "cross_ok",
                 "limit_up_ok",
                 "yellow_ok",
@@ -978,6 +983,7 @@ class CloudWorkflowTests(unittest.TestCase):
         )
         self.assertTrue(confirmed["bottom_ok"])
         self.assertEqual(confirmed["bottom_date"], "2026-07-30")
+        self.assertEqual(confirmed["bottom_price"], 8.0)
 
     def test_intraday_recent_bottom_falls_back_to_third_tier(self):
         cfg = {
