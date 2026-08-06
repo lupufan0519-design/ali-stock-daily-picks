@@ -29,7 +29,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -94,3 +94,5 @@ jobs:
         if: steps.market.outputs.run == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          timeout: 1200000

@@ -97,3 +97,5 @@ jobs:
         if: steps.screening.outputs.changed == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          timeout: 1200000
