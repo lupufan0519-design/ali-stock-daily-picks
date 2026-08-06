@@ -3,9 +3,10 @@ from __future__ import annotations
 from typing import Iterable, Mapping
 
 
-STRATEGY_VERSION = "two_tier_confirmed_bottom_yellow_v3"
+STRATEGY_VERSION = "three_tier_confirmed_bottom_v4"
 FIRST_TIER = "first"
 SECOND_TIER = "second"
+THIRD_TIER = "third"
 
 
 def _number(row: Mapping[str, object], *keys: str) -> float:
@@ -49,7 +50,7 @@ def classify_tier(row: Mapping[str, object], cfg: Mapping[str, object]) -> str:
         and price <= yellow + 1e-8
     ):
         return SECOND_TIER
-    return ""
+    return THIRD_TIER
 
 
 def decorate_row(row: Mapping[str, object], cfg: Mapping[str, object]) -> dict:
@@ -72,6 +73,7 @@ def decorate_row(row: Mapping[str, object], cfg: Mapping[str, object]) -> dict:
             "tier": tier,
             "first_tier": tier == FIRST_TIER,
             "second_tier": tier == SECOND_TIER,
+            "third_tier": tier == THIRD_TIER,
             "line_gap_abs": abs(dragon - tiger) if dragon and tiger else None,
             "prior_three_gap_abs": prior_gaps,
             "prior_three_gap_max": max(prior_gaps) if len(prior_gaps) == 3 else None,
@@ -92,12 +94,15 @@ def split_tiers(
 ) -> dict[str, list[dict]]:
     first: list[dict] = []
     second: list[dict] = []
+    third: list[dict] = []
     for row in rows:
         decorated = decorate_row(row, cfg)
         if decorated["tier"] == FIRST_TIER:
             first.append(decorated)
         elif decorated["tier"] == SECOND_TIER:
             second.append(decorated)
+        elif decorated["tier"] == THIRD_TIER:
+            third.append(decorated)
 
     first.sort(
         key=lambda item: (
@@ -111,10 +116,23 @@ def split_tiers(
             str(item.get("code", "")),
         )
     )
-    return {FIRST_TIER: first, SECOND_TIER: second}
+    third.sort(
+        key=lambda item: (
+            str(item.get("bottom_date", "")),
+            str(item.get("code", "")),
+        ),
+        reverse=True,
+    )
+    return {FIRST_TIER: first, SECOND_TIER: second, THIRD_TIER: third}
 
 
 def tier_counts(tiers: Mapping[str, list[dict]]) -> dict[str, int]:
     first = len(tiers.get(FIRST_TIER, []))
     second = len(tiers.get(SECOND_TIER, []))
-    return {FIRST_TIER: first, SECOND_TIER: second, "total": first + second}
+    third = len(tiers.get(THIRD_TIER, []))
+    return {
+        FIRST_TIER: first,
+        SECOND_TIER: second,
+        THIRD_TIER: third,
+        "total": first + second + third,
+    }

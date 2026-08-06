@@ -1,19 +1,21 @@
 {
   "schema_version": 1,
-  "strategy_version": "two_tier_confirmed_bottom_yellow_v3",
+  "strategy_version": "three_tier_confirmed_bottom_v4",
   "started_on": "2026-08-06",
-  "updated_at": "2026-08-06T19:18:51+08:00",
+  "updated_at": "2026-08-06T19:55:24+08:00",
   "dates": [
     {
       "trade_date": "2026-08-06",
       "first": [],
-      "second": []
+      "second": [],
+      "third": []
     }
   ],
   "summary": {
     "selection_count": 0,
     "first_tier_count": 0,
     "second_tier_count": 0,
+    "third_tier_count": 0,
     "evaluated_count": 0,
     "success_count": 0,
     "success_rate_pct": null,

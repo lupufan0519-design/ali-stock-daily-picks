@@ -25,7 +25,7 @@ from strategy_tracker import (
     update_state,
 )
 from selection_history import load_history, record_close, write_history
-from simple_strategy import FIRST_TIER, SECOND_TIER, decorate_row, split_tiers
+from simple_strategy import FIRST_TIER, SECOND_TIER, THIRD_TIER, decorate_row, split_tiers
 
 
 ROOT = Path(__file__).resolve().parent
@@ -1585,7 +1585,11 @@ def main(argv: Iterable[str] | None = None) -> int:
         )
         first_count = sum(x.tier == FIRST_TIER for x in evaluations)
         second_count = sum(x.tier == SECOND_TIER for x in evaluations)
-        print(f"完成：第一梯队 {first_count} 只；第二梯队 {second_count} 只；行情失败 {len(errors)} 只")
+        third_count = sum(x.tier == THIRD_TIER for x in evaluations)
+        print(
+            f"完成：第一梯队 {first_count} 只；第二梯队 {second_count} 只；"
+            f"第三梯队 {third_count} 只；行情失败 {len(errors)} 只"
+        )
         print(f"报告：{html_path}")
         print(f"表格：{csv_path}")
         return 0 if evaluations else 2

@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#f4f4ef">
-  <meta name="description" content="每日第一梯队、第二梯队选股与历史收益日历">
-  <title>每日两梯队选股 · 2026-08-06</title>
+  <meta name="description" content="每日第一梯队、第二梯队、第三梯队选股与历史收益日历">
+  <title>每日三梯队选股 · 2026-08-06</title>
   <style>
 :root {
   color-scheme: light;
@@ -121,6 +121,7 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
 .tier-index { display: inline-grid; place-items: center; min-width: 30px; height: 22px; border: 1px solid currentColor; border-radius: 99px; font-family: Consolas, monospace; letter-spacing: 0; }
 .tier-section.first .tier-kicker { color: var(--red); }
 .tier-section.second .tier-kicker { color: var(--blue); }
+.tier-section.third .tier-kicker { color: var(--yellow); }
 .tier-title-row h2 { margin-bottom: 0; font-size: clamp(24px, 3vw, 34px); letter-spacing: -.035em; }
 .tier-rule { max-width: 460px; margin: 0; color: var(--muted); font-size: 13px; text-align: right; }
 .pick-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
@@ -207,6 +208,7 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
 .calendar-day .dots i { width: 5px; height: 5px; border-radius: 50%; }
 .calendar-day .dots .f { background: var(--red); }
 .calendar-day .dots .s { background: var(--blue); }
+.calendar-day .dots .t { background: var(--yellow); }
 .history-detail { min-height: 410px; padding: 24px; }
 .detail-date { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
 .detail-date h2 { margin: 0; font: 700 22px Consolas, monospace; }
@@ -215,6 +217,7 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
 .history-group h3 { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 14px; }
 .history-group h3::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
 .history-group.second h3::before { background: var(--blue); }
+.history-group.third h3::before { background: var(--yellow); }
 .history-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 13px 0; border-top: 1px solid #eceeea; }
 .history-row:first-of-type { border-top: 0; }
 .history-stock strong { display: block; font-size: 14px; }
@@ -269,8 +272,8 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
 <body>
   <header class="topbar">
     <div class="shell topbar-inner">
-      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>每日两梯队选股</span></div>
-      <div class="market-state"><i class="market-dot" aria-hidden="true"></i><span id="market-label">收盘选股</span><span id="update-time">2026-08-06 19:18:54</span></div>
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>每日三梯队选股</span></div>
+      <div class="market-state"><i class="market-dot" aria-hidden="true"></i><span id="market-label">收盘选股</span><span id="update-time">2026-08-06 19:55:27</span></div>
     </div>
   </header>
   <div class="shell">
@@ -283,7 +286,7 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
     <section id="today-view" class="view-panel">
       <header class="day-head">
         <div class="date-seal" aria-label="交易日期"><span id="date-day" class="date-day">06</span><span id="date-month" class="date-month">2026 / 08</span></div>
-        <div><p class="eyebrow">TODAY / <span id="today-date-copy">2026-08-06</span></p><h1>今天，只看两梯队。</h1><p class="intro">第一梯队看龙虎线靠拢，第二梯队看当前价格是否处在黄线下方。页面只呈现两套规则和每日记录。</p></div>
+        <div><p class="eyebrow">TODAY / <span id="today-date-copy">2026-08-06</span></p><h1>今天，只看三梯队。</h1><p class="intro">第一梯队看龙虎线靠拢，第二梯队看当前价格是否处在黄线下方，第三梯队收纳其余近两日见底信号。</p></div>
         <div class="today-total"><strong id="today-total-value">0</strong><span>今日合计</span></div>
       </header>
       <section class="tier-section first">
@@ -293,6 +296,10 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
       <section class="tier-section second">
         <div class="tier-title-row"><div><div class="tier-kicker"><span class="tier-index">02</span>继续留意</div><h2>第二梯队 <span id="second-count">0</span></h2></div><p class="tier-rule">近 2 个交易日出现可能见底，且当前价不高于黄线。</p></div>
         <div id="second-picks" class="pick-grid"></div>
+      </section>
+      <section class="tier-section third">
+        <div class="tier-title-row"><div><div class="tier-kicker"><span class="tier-index">03</span>新近信号</div><h2>第三梯队 <span id="third-count">0</span></h2></div><p class="tier-rule">近 2 个交易日出现可能见底，且没有进入第一梯队或第二梯队。</p></div>
+        <div id="third-picks" class="pick-grid"></div>
       </section>
     </section>
     <section id="history-view" class="view-panel" hidden>
@@ -314,7 +321,7 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
     </section>
   </main>
   <noscript><p class="shell empty">需要启用 JavaScript 才能切换日历和自动刷新最新行情。</p></noscript>
-  <script id="initial-data" type="application/json">{"generated_at":"2026-08-06T19:18:54+08:00","generated_at_display":"2026-08-06 19:18:54","market_label":"收盘选股","close_trade_date":"2026-08-06","live_trade_date":"2026-08-06","live_pools":{"first":[],"second":[],"available":true},"history":{"schema_version":1,"strategy_version":"two_tier_confirmed_bottom_yellow_v3","started_on":"2026-08-06","updated_at":"2026-08-06T19:18:51+08:00","dates":[{"trade_date":"2026-08-06","first":[],"second":[]}],"summary":{"selection_count":0,"first_tier_count":0,"second_tier_count":0,"evaluated_count":0,"success_count":0,"success_rate_pct":null,"average_return_pct":null}},"target_count":5211,"quote_count":5211}</script>
+  <script id="initial-data" type="application/json">{"generated_at":"2026-08-06T19:55:27+08:00","generated_at_display":"2026-08-06 19:55:27","market_label":"收盘选股","close_trade_date":"2026-08-06","live_trade_date":"2026-08-06","live_pools":{"first":[],"second":[],"third":[],"available":true},"history":{"schema_version":1,"strategy_version":"three_tier_confirmed_bottom_v4","started_on":"2026-08-06","updated_at":"2026-08-06T19:55:24+08:00","dates":[{"trade_date":"2026-08-06","first":[],"second":[],"third":[]}],"summary":{"selection_count":0,"first_tier_count":0,"second_tier_count":0,"third_tier_count":0,"evaluated_count":0,"success_count":0,"success_rate_pct":null,"average_return_pct":null}},"target_count":5211,"quote_count":5211}</script>
   <script>
 (function () {
   "use strict";
@@ -352,14 +359,16 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
     var pools = state.live_pools || {};
     return {
       first: pools.first || pools.main || [],
-      second: pools.second || pools.secondary || []
+      second: pools.second || pools.secondary || [],
+      third: pools.third || []
     };
   }
   function renderCards(targetId, rows, tier) {
     var target = document.getElementById(targetId);
     target.replaceChildren();
     if (!rows.length) {
-      target.appendChild(node("div", "empty", tier === "first" ? "今天暂时没有第一梯队股票。" : "今天暂时没有第二梯队股票。"));
+      var emptyLabel = tier === "first" ? "第一梯队" : tier === "second" ? "第二梯队" : "第三梯队";
+      target.appendChild(node("div", "empty", "今天暂时没有" + emptyLabel + "股票。"));
       return;
     }
     rows.forEach(function (item) {
@@ -390,7 +399,7 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
         node("span", "line-chip dragon", "龙 " + number(item.dragon_value)),
         node("span", "line-chip tiger", "虎 " + number(item.tiger_value))
       );
-      if (tier === "second") values.appendChild(node("span", "line-chip yellow", "黄 " + number(item.yellow_line_value)));
+      if (tier !== "first") values.appendChild(node("span", "line-chip yellow", "黄 " + number(item.yellow_line_value)));
       card.appendChild(values);
       target.appendChild(card);
     });
@@ -399,9 +408,11 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
     var current = picks();
     renderCards("first-picks", current.first, "first");
     renderCards("second-picks", current.second, "second");
+    renderCards("third-picks", current.third, "third");
     document.getElementById("first-count").textContent = String(current.first.length);
     document.getElementById("second-count").textContent = String(current.second.length);
-    document.getElementById("today-total-value").textContent = String(current.first.length + current.second.length);
+    document.getElementById("third-count").textContent = String(current.third.length);
+    document.getElementById("today-total-value").textContent = String(current.first.length + current.second.length + current.third.length);
     var date = state.live_trade_date || state.close_trade_date || "";
     if (date) {
       var parts = date.split("-");
@@ -452,13 +463,14 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
     var detail = document.getElementById("history-detail");
     detail.replaceChildren();
     if (!day) {
-      detail.appendChild(node("div", "detail-empty", "选择一个有记录的日期，查看当天两梯队股票和它们的至今收益。"));
+      detail.appendChild(node("div", "detail-empty", "选择一个有记录的日期，查看当天三梯队股票和它们的至今收益。"));
       return;
     }
     var first = day.first || [];
     var second = day.second || [];
+    var third = day.third || [];
     var head = node("div", "detail-date");
-    head.append(node("h2", "", day.trade_date), node("span", "", "共 " + (first.length + second.length) + " 只"));
+    head.append(node("h2", "", day.trade_date), node("span", "", "共 " + (first.length + second.length + third.length) + " 只"));
     detail.appendChild(head);
     var groupFirst = node("section", "history-group first");
     groupFirst.appendChild(node("h3", "", "第一梯队"));
@@ -470,7 +482,12 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
     var secondRows = node("div");
     renderHistoryRows(secondRows, second, "second");
     groupSecond.appendChild(secondRows);
-    detail.append(groupFirst, groupSecond);
+    var groupThird = node("section", "history-group third");
+    groupThird.appendChild(node("h3", "", "第三梯队"));
+    var thirdRows = node("div");
+    renderHistoryRows(thirdRows, third, "third");
+    groupThird.appendChild(thirdRows);
+    detail.append(groupFirst, groupSecond, groupThird);
   }
   function renderCalendar() {
     var map = dateMap();
@@ -493,11 +510,13 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
       if (record) {
         var first = record.first || [];
         var second = record.second || [];
+        var third = record.third || [];
         var dots = node("span", "dots");
         if (first.length) dots.appendChild(node("i", "f"));
         if (second.length) dots.appendChild(node("i", "s"));
-        button.append(dots, node("span", "count", String(first.length + second.length)));
-        button.setAttribute("aria-label", key + "，共 " + (first.length + second.length) + " 只");
+        if (third.length) dots.appendChild(node("i", "t"));
+        button.append(dots, node("span", "count", String(first.length + second.length + third.length)));
+        button.setAttribute("aria-label", key + "，共 " + (first.length + second.length + third.length) + " 只");
         button.addEventListener("click", function (dateKey, dateRecord) {
           return function () {
             selectedDate = dateKey;

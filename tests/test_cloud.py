@@ -31,6 +31,7 @@ from report_ui import (
     render_report,
 )
 from screener import Bar, cross_yellow_pair, forward_adjust_bars
+from simple_strategy import THIRD_TIER
 from strategy_contract import ENTRY_LABEL, FROZEN_CANDIDATE_ID, LIVE_STRATEGY_ID
 
 
@@ -977,6 +978,29 @@ class CloudWorkflowTests(unittest.TestCase):
         )
         self.assertTrue(confirmed["bottom_ok"])
         self.assertEqual(confirmed["bottom_date"], "2026-07-30")
+
+    def test_intraday_recent_bottom_falls_back_to_third_tier(self):
+        cfg = {
+            "bottom_lookback_days": 2,
+            "cross_lookback_days": 8,
+            "limit_up_lookback_days": 42,
+            "yellow_consecutive_days": 1,
+            "yellow_before_cross_days": 2,
+            "yellow_after_cross_days": 7,
+            "line_gap_max_abs": 0.5,
+        }
+        seed = self.live_seed("600011", bottom_age=0, limit_age=-1)
+        pools = build_live_pools(
+            {
+                "trade_date": "2026-07-30",
+                "config": cfg,
+                "live_universe": [seed],
+            },
+            {"600011": self.live_quote("600011")},
+        )
+        self.assertEqual([row["code"] for row in pools[THIRD_TIER]], ["600011"])
+        self.assertEqual(pools["main"], [])
+        self.assertEqual(pools["secondary"], [])
 
     def test_live_cross_pairs_with_yellow_two_days_before(self):
         cfg = {
