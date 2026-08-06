@@ -27,6 +27,38 @@ class SimpleReportUiTests(unittest.TestCase):
         self.assertIn("line-rail", page)
         self.assertIn("累计入选记录", page)
         self.assertIn("总成功率", page)
+        self.assertIn("company-tags", page)
+        self.assertIn("板块 · ", page)
+        self.assertIn("公司业务简介暂缺", page)
+
+    def test_pick_payload_contains_company_intro_sector_and_concepts(self):
+        page = render_report(
+            [
+                {
+                    "code": "600001",
+                    "name": "示例公司",
+                    "market": 1,
+                    "date": "2026-08-06",
+                    "close": 10.0,
+                    "bottom_ok": True,
+                    "prior_three_gap_abs": [0.2, 0.3, 0.4],
+                    "dragon_value": 9.8,
+                    "tiger_value": 9.7,
+                    "yellow_line_value": 10.2,
+                    "eligible": True,
+                    "company_intro": "主营高端测试设备。",
+                    "industry": "专用设备",
+                    "concepts": ["机器人", "工业互联"],
+                }
+            ],
+            {"line_gap_max_abs": 0.5},
+            1,
+            [],
+        )
+        self.assertIn("主营高端测试设备", page)
+        self.assertIn("专用设备", page)
+        self.assertIn("机器人", page)
+        self.assertNotIn("近两日出现可能见底 ·", page)
 
 
 if __name__ == "__main__":

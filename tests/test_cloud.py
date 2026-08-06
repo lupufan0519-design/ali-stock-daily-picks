@@ -478,7 +478,7 @@ class CloudWorkflowTests(unittest.TestCase):
             ],
         }
         snapshot = compact_snapshot(payload)
-        self.assertEqual(snapshot["live_seed_format"], 5)
+        self.assertEqual(snapshot["live_seed_format"], 6)
         self.assertEqual(
             [item[0] for item in snapshot["live_universe"]],
             ["600001"],
@@ -846,6 +846,9 @@ class CloudWorkflowTests(unittest.TestCase):
                 "line_gap_abs",
                 "prior_three_gap_abs",
                 "prior_three_gap_max",
+                "company_intro",
+                "industry",
+                "concepts",
             ],
         )
         encoded = snapshot_json(snapshot)
@@ -936,6 +939,44 @@ class CloudWorkflowTests(unittest.TestCase):
             [row["code"] for row in pools["secondary"]],
             ["600002"],
         )
+
+    def test_intraday_bottom_waits_for_zig_rebound_confirmation(self):
+        cfg = {
+            "bottom_lookback_days": 2,
+            "cross_lookback_days": 5,
+            "limit_up_lookback_days": 42,
+            "yellow_consecutive_days": 1,
+        }
+        seed = self.live_seed("600010", bottom_age=-1, limit_age=-1)
+        seed.update(
+            {
+                "zig16_state": 2,
+                "zig16_candidate_value": 8.0,
+                "zig16_candidate_age": 0,
+                "zig16_candidate_date": "2026-07-30",
+                "zig16_candidate_signal_ok": True,
+            }
+        )
+        unconfirmed_quote = self.live_quote("600010")
+        unconfirmed_quote["price"] = 7.8
+        unconfirmed = evaluate_live_seed(
+            seed,
+            unconfirmed_quote,
+            cfg,
+            "2026-07-30",
+        )
+        self.assertFalse(unconfirmed["bottom_ok"])
+
+        confirmed_quote = self.live_quote("600010")
+        confirmed_quote["price"] = 9.3
+        confirmed = evaluate_live_seed(
+            seed,
+            confirmed_quote,
+            cfg,
+            "2026-07-30",
+        )
+        self.assertTrue(confirmed["bottom_ok"])
+        self.assertEqual(confirmed["bottom_date"], "2026-07-30")
 
     def test_live_cross_pairs_with_yellow_two_days_before(self):
         cfg = {
