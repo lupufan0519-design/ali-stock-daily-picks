@@ -1,54 +1,8 @@
 {
   "version": 1,
   "pool_name": "卢氏龙虎趋势池",
-  "last_trade_date": "2026-08-05",
-  "active": [
-    {
-      "position_id": "301516_2026-07-30",
-      "code": "301516",
-      "name": "中远通",
-      "market": 0,
-      "entry_date": "2026-07-30",
-      "entry_price": 14.43,
-      "last_date": "2026-08-05",
-      "last_close": 15.75,
-      "return_pct": 9.147609147609149,
-      "best_return_pct": 9.147609147609149,
-      "worst_return_pct": 0.0,
-      "holding_days": 5,
-      "missing_streak": 1,
-      "signal_lost_date": "2026-08-05",
-      "status": "待观察中",
-      "selected_dates": [
-        "2026-07-30",
-        "2026-07-31",
-        "2026-08-03",
-        "2026-08-04"
-      ],
-      "line_history": [
-        {
-          "date": "2026-08-03",
-          "dragon": 15.253171430491452,
-          "tiger": 15.189380460985321
-        },
-        {
-          "date": "2026-08-04",
-          "dragon": 15.172385492750784,
-          "tiger": 15.144866504476461
-        },
-        {
-          "date": "2026-08-05",
-          "dragon": 15.122612386807972,
-          "tiger": 15.118332564926412
-        }
-      ],
-      "peak_drawdown_pct": 0.0,
-      "status_detail": "龙虎差与龙线同步转弱",
-      "strategy_version": "legacy_before_break5_trail3_2",
-      "operation": "谨慎持有",
-      "setup_cross_date": "2026-07-31"
-    }
-  ],
+  "last_trade_date": "2026-08-06",
+  "active": [],
   "closed": [
     {
       "position_id": "603898_2026-07-20",
@@ -85,22 +39,17 @@
       "market": 1,
       "entry_date": "2026-07-24",
       "entry_price": 8.49,
-      "last_date": "2026-08-05",
-      "last_close": 9.1,
-      "return_pct": 7.184923439340385,
-      "best_return_pct": 7.773851590106018,
+      "last_date": "2026-08-06",
+      "last_close": 9.18,
+      "return_pct": 8.127208480565361,
+      "best_return_pct": 8.127208480565361,
       "worst_return_pct": 0.0,
-      "holding_days": 6,
+      "holding_days": 7,
       "status": "上升趋势中",
       "selected_dates": [
         "2026-07-24"
       ],
       "line_history": [
-        {
-          "date": "2026-08-03",
-          "dragon": 8.519991683030359,
-          "tiger": 8.507837099558495
-        },
         {
           "date": "2026-08-04",
           "dragon": 8.533732303441987,
@@ -110,9 +59,14 @@
           "date": "2026-08-05",
           "dragon": 8.543618525217301,
           "tiger": 8.525915203706134
+        },
+        {
+          "date": "2026-08-06",
+          "dragon": 8.549350651177328,
+          "tiger": 8.532768949449279
         }
       ],
-      "peak_drawdown_pct": -0.5464480874317057,
+      "peak_drawdown_pct": 0.0,
       "missing_streak": 0,
       "signal_lost_date": "",
       "status_detail": "趋势条件仍有效",
@@ -128,22 +82,17 @@
       "market": 1,
       "entry_date": "2026-07-31",
       "entry_price": 16.27,
-      "last_date": "2026-08-05",
-      "last_close": 16.18,
-      "return_pct": -0.5531653349723387,
+      "last_date": "2026-08-06",
+      "last_close": 16.0,
+      "return_pct": -1.659496004917027,
       "best_return_pct": 0.24585125998770607,
-      "worst_return_pct": -0.5531653349723387,
-      "holding_days": 4,
+      "worst_return_pct": -1.659496004917027,
+      "holding_days": 5,
       "status": "上升趋势中",
       "selected_dates": [
         "2026-07-31"
       ],
       "line_history": [
-        {
-          "date": "2026-08-03",
-          "dragon": 15.820748760609604,
-          "tiger": 15.748950015314136
-        },
         {
           "date": "2026-08-04",
           "dragon": 15.844053349046451,
@@ -153,56 +102,19 @@
           "date": "2026-08-05",
           "dragon": 15.852419266174472,
           "tiger": 15.774742399688316
+        },
+        {
+          "date": "2026-08-06",
+          "dragon": 15.840946440697138,
+          "tiger": 15.774465475026867
         }
       ],
-      "peak_drawdown_pct": -0.797057020232983,
+      "peak_drawdown_pct": -1.9006744328632696,
       "missing_streak": 0,
       "signal_lost_date": "",
       "status_detail": "趋势条件仍有效",
       "strategy_version": "legacy_before_break5_trail3_2",
       "operation": "继续持有",
-      "current_area": "secondary"
-    },
-    {
-      "position_id": "secondary_688443_2026-07-31",
-      "code": "688443",
-      "name": "智翔金泰",
-      "market": 1,
-      "entry_date": "2026-07-31",
-      "entry_price": 22.22,
-      "last_date": "2026-08-05",
-      "last_close": 23.42,
-      "return_pct": 5.400540054005409,
-      "best_return_pct": 5.400540054005409,
-      "worst_return_pct": 0.0,
-      "holding_days": 4,
-      "status": "待观察中",
-      "line_history": [
-        {
-          "date": "2026-08-03",
-          "dragon": 22.08164616296542,
-          "tiger": 21.97418246404674
-        },
-        {
-          "date": "2026-08-04",
-          "dragon": 22.070095463347993,
-          "tiger": 21.977292742934893
-        },
-        {
-          "date": "2026-08-05",
-          "dragon": 22.046710995961035,
-          "tiger": 21.972289765330736
-        }
-      ],
-      "selected_dates": [
-        "2026-07-31"
-      ],
-      "peak_drawdown_pct": 0.0,
-      "missing_streak": 1,
-      "signal_lost_date": "2026-08-05",
-      "status_detail": "龙虎差与龙线同步转弱",
-      "strategy_version": "legacy_before_break5_trail3_2",
-      "operation": "谨慎持有",
       "current_area": "secondary"
     }
   ],
@@ -237,17 +149,17 @@
   "pending_main": [],
   "pending_secondary": [
     {
-      "setup_id": "secondary_000428_2026-07-28",
-      "code": "000428",
-      "name": "华天酒店",
+      "setup_id": "secondary_000503_2026-07-29",
+      "code": "000503",
+      "name": "国新健康",
       "market": 0,
       "area": "secondary",
       "origin_area": "secondary",
-      "setup_date": "2026-08-05",
-      "setup_price": 4.1,
-      "last_date": "2026-08-05",
-      "last_close": 4.1,
-      "setup_cross_date": "2026-07-28",
+      "setup_date": "2026-08-06",
+      "setup_price": 7.56,
+      "last_date": "2026-08-06",
+      "last_close": 7.56,
+      "setup_cross_date": "2026-07-29",
       "setup_cross_age": 6,
       "setup_cross_lookback_days": 8,
       "setup_elapsed_bars": 0,
@@ -258,13 +170,106 @@
       "confirmation_d1_dragon": null,
       "line_history": [
         {
-          "date": "2026-08-05",
-          "dragon": 3.107964432270478,
-          "tiger": 3.0734176468080543
+          "date": "2026-08-06",
+          "dragon": 6.3633235506875,
+          "tiger": 6.29317037355392
         }
       ],
       "selected_dates": [
-        "2026-08-05"
+        "2026-08-06"
+      ]
+    },
+    {
+      "setup_id": "secondary_000517_2026-07-29",
+      "code": "000517",
+      "name": "荣安地产",
+      "market": 0,
+      "area": "secondary",
+      "origin_area": "secondary",
+      "setup_date": "2026-08-06",
+      "setup_price": 2.12,
+      "last_date": "2026-08-06",
+      "last_close": 2.12,
+      "setup_cross_date": "2026-07-29",
+      "setup_cross_age": 6,
+      "setup_cross_lookback_days": 8,
+      "setup_elapsed_bars": 0,
+      "status": "待观察中",
+      "operation": "等待D+2收盘确认",
+      "status_detail": "次选信号已形成；等待第二个完整交易日收盘确认信号、龙虎关系、龙线与最大3%回撤",
+      "strategy_version": "secondary_lowrisk2_hybrid1010_v3",
+      "confirmation_d1_dragon": null,
+      "line_history": [
+        {
+          "date": "2026-08-06",
+          "dragon": 1.6723159986071148,
+          "tiger": 1.6536643378483344
+        }
+      ],
+      "selected_dates": [
+        "2026-08-06"
+      ]
+    },
+    {
+      "setup_id": "secondary_002642_2026-07-29",
+      "code": "002642",
+      "name": "荣联科技",
+      "market": 0,
+      "area": "secondary",
+      "origin_area": "secondary",
+      "setup_date": "2026-08-06",
+      "setup_price": 7.45,
+      "last_date": "2026-08-06",
+      "last_close": 7.45,
+      "setup_cross_date": "2026-07-29",
+      "setup_cross_age": 6,
+      "setup_cross_lookback_days": 8,
+      "setup_elapsed_bars": 0,
+      "status": "待观察中",
+      "operation": "等待D+2收盘确认",
+      "status_detail": "次选信号已形成；等待第二个完整交易日收盘确认信号、龙虎关系、龙线与最大3%回撤",
+      "strategy_version": "secondary_lowrisk2_hybrid1010_v3",
+      "confirmation_d1_dragon": null,
+      "line_history": [
+        {
+          "date": "2026-08-06",
+          "dragon": 6.586509741743087,
+          "tiger": 6.500601360182494
+        }
+      ],
+      "selected_dates": [
+        "2026-08-06"
+      ]
+    },
+    {
+      "setup_id": "secondary_605300_2026-07-28",
+      "code": "605300",
+      "name": "佳禾食品",
+      "market": 1,
+      "area": "secondary",
+      "origin_area": "secondary",
+      "setup_date": "2026-08-06",
+      "setup_price": 9.67,
+      "last_date": "2026-08-06",
+      "last_close": 9.67,
+      "setup_cross_date": "2026-07-28",
+      "setup_cross_age": 7,
+      "setup_cross_lookback_days": 8,
+      "setup_elapsed_bars": 0,
+      "status": "待观察中",
+      "operation": "等待D+2收盘确认",
+      "status_detail": "次选信号已形成；等待第二个完整交易日收盘确认信号、龙虎关系、龙线与最大3%回撤",
+      "strategy_version": "secondary_lowrisk2_hybrid1010_v3",
+      "confirmation_d1_dragon": null,
+      "line_history": [
+        {
+          "date": "2026-08-06",
+          "dragon": 8.77113894989795,
+          "tiger": 8.726502154754273
+        }
+      ],
+      "selected_dates": [
+        "2026-08-06"
       ]
     }
   ],
@@ -279,6 +284,18 @@
     {
       "code": "000428",
       "cross_date": "2026-07-28"
+    },
+    {
+      "code": "000503",
+      "cross_date": "2026-07-29"
+    },
+    {
+      "code": "000517",
+      "cross_date": "2026-07-29"
+    },
+    {
+      "code": "002642",
+      "cross_date": "2026-07-29"
     },
     {
       "code": "300981",
@@ -299,22 +316,140 @@
     {
       "code": "605179",
       "cross_date": "2026-07-27"
+    },
+    {
+      "code": "605300",
+      "cross_date": "2026-07-28"
     }
   ],
   "pending_entry_execution": [],
-  "pending_exit_execution": [],
+  "pending_exit_execution": [
+    {
+      "position_id": "301516_2026-07-30",
+      "code": "301516",
+      "name": "中远通",
+      "market": 0,
+      "entry_date": "2026-07-30",
+      "entry_price": 14.43,
+      "last_date": "2026-08-06",
+      "last_close": 15.81,
+      "return_pct": 9.563409563409575,
+      "best_return_pct": 9.563409563409575,
+      "worst_return_pct": 0.0,
+      "holding_days": 6,
+      "missing_streak": 1,
+      "signal_lost_date": "2026-08-05",
+      "status": "卖点已确认",
+      "selected_dates": [
+        "2026-07-30",
+        "2026-07-31",
+        "2026-08-03",
+        "2026-08-04"
+      ],
+      "line_history": [
+        {
+          "date": "2026-08-04",
+          "dragon": 15.172385492750784,
+          "tiger": 15.144866504476461
+        },
+        {
+          "date": "2026-08-05",
+          "dragon": 15.122612386807972,
+          "tiger": 15.118332564926412
+        },
+        {
+          "date": "2026-08-06",
+          "dragon": 15.07949551813524,
+          "tiger": 15.096156397823929
+        }
+      ],
+      "peak_drawdown_pct": 0.0,
+      "status_detail": "收盘已确认卖点；下一交易日按开盘价模拟执行",
+      "strategy_version": "legacy_before_break5_trail3_2",
+      "operation": "下一交易日开盘卖出",
+      "setup_cross_date": "2026-07-31",
+      "execution_id": "exit_301516_2026-08-06",
+      "area": "main",
+      "exit_trigger_date": "2026-08-06",
+      "exit_trigger_close": 15.81,
+      "exit_trigger_return_pct": 9.563409563409575,
+      "exit_reason": "趋势结束：龙线不再高于虎线，龙腾跃虎多头关系消失",
+      "execution_wait_bars": 0,
+      "last_execution_attempt_date": "",
+      "execution_blocked_reason": ""
+    },
+    {
+      "position_id": "secondary_688443_2026-07-31",
+      "code": "688443",
+      "name": "智翔金泰",
+      "market": 1,
+      "entry_date": "2026-07-31",
+      "entry_price": 22.22,
+      "last_date": "2026-08-06",
+      "last_close": 22.94,
+      "return_pct": 3.240324032403241,
+      "best_return_pct": 5.400540054005409,
+      "worst_return_pct": 0.0,
+      "holding_days": 5,
+      "status": "卖点已确认",
+      "line_history": [
+        {
+          "date": "2026-08-04",
+          "dragon": 22.070095463347993,
+          "tiger": 21.977292742934893
+        },
+        {
+          "date": "2026-08-05",
+          "dragon": 22.046710995961035,
+          "tiger": 21.972289765330736
+        },
+        {
+          "date": "2026-08-06",
+          "dragon": 22.038424651433584,
+          "tiger": 21.977168941043306
+        }
+      ],
+      "selected_dates": [
+        "2026-07-31"
+      ],
+      "peak_drawdown_pct": -2.0495303159692613,
+      "missing_streak": 1,
+      "signal_lost_date": "2026-08-05",
+      "status_detail": "收盘已确认卖点；下一交易日按开盘价模拟执行",
+      "strategy_version": "legacy_before_break5_trail3_2",
+      "operation": "下一交易日开盘卖出",
+      "current_area": "secondary",
+      "execution_id": "exit_688443_2026-08-06",
+      "area": "secondary",
+      "exit_trigger_date": "2026-08-06",
+      "exit_trigger_close": 22.94,
+      "exit_trigger_return_pct": 3.240324032403241,
+      "exit_reason": "趋势结束：达到3%浮盈后较最高收盘回撤2%",
+      "execution_wait_bars": 0,
+      "last_execution_attempt_date": "",
+      "execution_blocked_reason": ""
+    }
+  ],
   "active_signal_lineages": [
     {
       "code": "000428",
       "original_cross_date": "2026-07-28"
     },
     {
-      "code": "300981",
-      "original_cross_date": "2026-07-24"
+      "code": "000503",
+      "original_cross_date": "2026-07-29"
     },
     {
-      "code": "301516",
-      "original_cross_date": "2026-07-31"
+      "code": "000517",
+      "original_cross_date": "2026-07-29"
+    },
+    {
+      "code": "002642",
+      "original_cross_date": "2026-07-29"
+    },
+    {
+      "code": "300981",
+      "original_cross_date": "2026-07-24"
     },
     {
       "code": "603648",
@@ -327,6 +462,10 @@
     {
       "code": "605179",
       "original_cross_date": "2026-07-27"
+    },
+    {
+      "code": "605300",
+      "original_cross_date": "2026-07-28"
     }
   ]
 }
