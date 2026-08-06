@@ -1,0 +1,73 @@
+import tempfile
+import unittest
+from pathlib import Path
+
+from selection_history import empty_history, load_history, record_close, refresh_history, write_history
+from simple_strategy import FIRST_TIER, SECOND_TIER, STRATEGY_VERSION
+
+
+def pick(code="600001", price=10.0):
+    return {
+        "code": code,
+        "name": "示例股票",
+        "market": 1,
+        "price": price,
+        "bottom_date": "2026-08-05",
+        "dragon_value": 10.2,
+        "tiger_value": 10.1,
+        "yellow_line_value": 10.3,
+        "line_gap_abs": 0.1,
+        "prior_three_gap_abs": [0.2, 0.3, 0.1],
+        "prior_three_gap_max": 0.3,
+    }
+
+
+class SelectionHistoryTests(unittest.TestCase):
+    def test_same_day_selection_waits_and_next_day_counts_success(self):
+        history = record_close(
+            empty_history(),
+            "2026-08-06",
+            {FIRST_TIER: [pick()], SECOND_TIER: []},
+            [pick()],
+        )
+        self.assertEqual(history["summary"]["selection_count"], 1)
+        self.assertEqual(history["summary"]["evaluated_count"], 0)
+        self.assertIsNone(history["summary"]["success_rate_pct"])
+
+        history = refresh_history(
+            history,
+            {"600001": {"price": 11.0}},
+            "2026-08-07",
+        )
+        self.assertEqual(history["summary"]["evaluated_count"], 1)
+        self.assertEqual(history["summary"]["success_count"], 1)
+        self.assertAlmostEqual(history["summary"]["success_rate_pct"], 100.0)
+        self.assertAlmostEqual(history["summary"]["average_return_pct"], 10.0)
+
+    def test_same_stock_on_different_dates_is_an_independent_selection(self):
+        history = record_close(
+            empty_history(),
+            "2026-08-06",
+            {FIRST_TIER: [pick()], SECOND_TIER: []},
+            [pick()],
+        )
+        history = record_close(
+            history,
+            "2026-08-07",
+            {FIRST_TIER: [], SECOND_TIER: [pick(price=11.0)]},
+            [pick(price=11.0)],
+        )
+        self.assertEqual(history["summary"]["selection_count"], 2)
+        self.assertEqual(history["summary"]["evaluated_count"], 1)
+
+    def test_load_resets_an_old_strategy_contract(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "history.json"
+            write_history(path, {**empty_history(), "strategy_version": "old"})
+            loaded = load_history(path)
+            self.assertEqual(loaded["strategy_version"], STRATEGY_VERSION)
+            self.assertEqual(loaded["dates"], [])
+
+
+if __name__ == "__main__":
+    unittest.main()

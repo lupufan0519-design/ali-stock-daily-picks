@@ -1,34 +1,39 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 
-from prepare_site import validate_strategy_artifacts
+from prepare_site import build_site
 
 
-class PrepareSiteValidationTests(unittest.TestCase):
-    def test_site_build_requires_the_shared_strong_validation_gate(self):
+class PrepareSiteTests(unittest.TestCase):
+    def test_build_site_copies_the_simple_page_and_data(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            expected = {"portfolio_checked": True}
-            with patch("prepare_site.validate_artifacts", return_value=expected) as gate:
-                self.assertEqual(validate_strategy_artifacts(root), expected)
-            gate.assert_called_once_with(
-                root / "results" / "strategy_grid_optimization.json",
-                root / "results" / "trend_case.json",
-                root / "results" / "strategy_portfolio_validation.json",
-                require_portfolio=True,
-            )
+            results = root / "results"
+            results.mkdir()
+            (results / "latest.html").write_text("<h1>今日选股</h1>", encoding="utf-8")
+            (results / "live.json").write_text(json.dumps({"ok": True}), encoding="utf-8")
+            (results / "history.json").write_text(json.dumps({"dates": []}), encoding="utf-8")
 
-    def test_strong_validation_failure_blocks_site_build(self):
+            target = build_site(root, root / "public")
+
+            self.assertEqual((root / "index.html").read_text(encoding="utf-8"), "<h1>今日选股</h1>")
+            self.assertEqual((target / "index.html").read_text(encoding="utf-8"), "<h1>今日选股</h1>")
+            self.assertTrue((target / "live.json").exists())
+            self.assertTrue((target / "history.json").exists())
+            self.assertTrue((target / ".nojekyll").exists())
+
+    def test_missing_history_blocks_site_build(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            with patch(
-                "prepare_site.validate_artifacts",
-                side_effect=ValueError("run_id 不一致"),
-            ):
-                with self.assertRaisesRegex(ValueError, "run_id"):
-                    validate_strategy_artifacts(root)
+            results = root / "results"
+            results.mkdir()
+            (results / "latest.html").write_text("<h1>今日选股</h1>", encoding="utf-8")
+            (results / "live.json").write_text("{}", encoding="utf-8")
+
+            with self.assertRaisesRegex(FileNotFoundError, "history.json"):
+                build_site(root, root / "public")
 
 
 if __name__ == "__main__":

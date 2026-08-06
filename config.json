@@ -1,5 +1,6 @@
 {
-  "bottom_lookback_days": 5,
+  "bottom_lookback_days": 2,
+  "line_gap_max_abs": 0.5,
   "cross_lookback_days": 8,
   "limit_up_lookback_days": 42,
   "yellow_consecutive_days": 1,

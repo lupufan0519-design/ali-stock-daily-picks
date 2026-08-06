@@ -14,10 +14,11 @@ from observation import visible_observations
 
 ROOT = Path(__file__).resolve().parent
 STATE_PATH = ROOT / "strategy" / "state.json"
+HISTORY_PATH = ROOT / "results" / "history.json"
 LATEST_PATH = ROOT / "results" / "latest.json"
 LATEST_HTML_PATH = ROOT / "results" / "latest.html"
 SNAPSHOT_PATH = ROOT / "cloud_snapshot.json"
-LIVE_SEED_FORMAT = 4
+LIVE_SEED_FORMAT = 5
 
 
 def snapshot_json(payload: dict) -> str:
@@ -26,6 +27,27 @@ def snapshot_json(payload: dict) -> str:
 
 
 def read_last_trade_date() -> str:
+    if HISTORY_PATH.exists():
+        try:
+            history = json.loads(HISTORY_PATH.read_text(encoding="utf-8"))
+            dates = [
+                str(item.get("trade_date", ""))
+                for item in history.get("dates", [])
+                if isinstance(item, dict) and item.get("trade_date")
+            ]
+            if dates:
+                return max(dates)
+        except (OSError, ValueError, TypeError):
+            pass
+    if SNAPSHOT_PATH.exists():
+        try:
+            return str(
+                json.loads(SNAPSHOT_PATH.read_text(encoding="utf-8")).get(
+                    "trade_date", ""
+                )
+            )
+        except (OSError, ValueError, TypeError):
+            pass
     if not STATE_PATH.exists():
         return ""
     return str(json.loads(STATE_PATH.read_text(encoding="utf-8")).get("last_trade_date", ""))
@@ -78,6 +100,16 @@ def pack_live_seed(seed: dict) -> list:
         int(seed.get("observation_yellow_count", 0)),
         str(seed.get("observation_yellow_date", "")),
         float(seed.get("next_breakout_high_5", 0.0)),
+        [
+            value
+            for parts in coefficients.get("yellow_tail", [])
+            for value in parts
+        ],
+        float(seed.get("dragon_value", 0.0)),
+        float(seed.get("tiger_value", 0.0)),
+        float(seed.get("yellow_line_value", 0.0)),
+        str(seed.get("tier", "")),
+        [float(value) for value in seed.get("prior_three_gap_abs", [])],
     ]
 
 
@@ -113,6 +145,13 @@ def compact_snapshot(payload: dict) -> dict:
         "eligible",
         "selected",
         "cross_date",
+        "dragon_value",
+        "tiger_value",
+        "yellow_line_value",
+        "tier",
+        "line_gap_abs",
+        "prior_three_gap_abs",
+        "prior_three_gap_max",
     )
     return {
         "trade_date": payload.get("trade_date"),
@@ -160,7 +199,7 @@ def bootstrap_payload(
 def bootstrap_live_snapshot() -> int:
     """Build live seeds from the last settled date without changing strategy state."""
     strategy = screener.load_state(STATE_PATH)
-    base_date = str(strategy.get("last_trade_date", ""))
+    base_date = read_last_trade_date()
     if not base_date:
         raise RuntimeError("策略状态没有可用于初始化的收盘交易日")
 
