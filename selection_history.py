@@ -71,6 +71,10 @@ def _pick(row: Mapping[str, object], trade_date: str, tier: str) -> dict:
         "return_pct": 0.0,
         "status": "待产生后续行情",
         "bottom_date": str(row.get("bottom_date", "")),
+        "bottom_price": float(row.get("bottom_price", 0.0) or 0.0),
+        "bottom_price_gap_abs": float(
+            row.get("bottom_price_gap_abs", 0.0) or 0.0
+        ),
         "dragon_value": float(row.get("dragon_value", 0.0) or 0.0),
         "tiger_value": float(row.get("tiger_value", 0.0) or 0.0),
         "yellow_line_value": float(row.get("yellow_line_value", 0.0) or 0.0),

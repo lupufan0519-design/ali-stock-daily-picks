@@ -81,5 +81,28 @@ class SimpleStrategyTests(unittest.TestCase):
         self.assertEqual(classify_tier(row(name="*ST示例"), CFG), "")
 
 
+    def test_every_tier_sorts_by_absolute_bottom_price_gap(self):
+        rows = [
+            row(code="600003", bottom_price=8.0, price=9.0),
+            row(code="600001", bottom_price=8.8, price=9.0),
+            row(code="600002", bottom_price=8.5, price=9.0),
+            row(code="600013", bottom_price=8.0, price=9.0, prior_three_gap_abs=[0.1, 0.6, 0.2]),
+            row(code="600011", bottom_price=8.8, price=9.0, prior_three_gap_abs=[0.1, 0.6, 0.2]),
+            row(code="600023", bottom_price=8.0, price=11.0, prior_three_gap_abs=[0.1, 0.6, 0.2]),
+            row(code="600021", bottom_price=10.8, price=11.0, prior_three_gap_abs=[0.1, 0.6, 0.2]),
+        ]
+        pools = split_tiers(rows, CFG)
+        self.assertEqual([item["code"] for item in pools[FIRST_TIER]], ["600001", "600002", "600003"])
+        self.assertEqual([item["code"] for item in pools[SECOND_TIER]], ["600011", "600013"])
+        self.assertEqual([item["code"] for item in pools[THIRD_TIER]], ["600021", "600023"])
+
+    def test_missing_bottom_price_sorts_after_computable_gap(self):
+        pools = split_tiers(
+            [row(code="600002", bottom_price=0.0), row(code="600001", bottom_price=8.9)],
+            CFG,
+        )
+        self.assertEqual([item["code"] for item in pools[FIRST_TIER]], ["600001", "600002"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -166,6 +166,22 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
 .company-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
 .company-tag { padding: 5px 8px; border: 1px solid #e2e4df; border-radius: 999px; background: #f8f8f5; color: #555b63; font-size: 11px; line-height: 1; }
 .company-tag.industry { border-color: #d5dce8; background: #f2f5fa; color: #315a91; }
+.signal-price {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin: 0 0 12px;
+}
+.signal-price span {
+  padding: 7px 8px;
+  border: 1px solid #e3e5e0;
+  border-radius: 8px;
+  background: #fafaf7;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.35;
+}
+.signal-price strong { display: block; margin-top: 2px; color: var(--ink); font: 700 12px/1.2 Consolas, monospace; }
 .line-values { display: flex; flex-wrap: wrap; gap: 7px; }
 .line-chip { padding: 5px 8px; border-radius: 7px; font: 11px/1 Consolas, monospace; }
 .line-chip.dragon { background: var(--red-soft); color: #9f2e27; }
@@ -351,6 +367,15 @@ SCRIPT = r"""
         tags.appendChild(node("span", "company-tag", "概念 · " + concept));
       });
       if (tags.childNodes.length) card.appendChild(tags);
+      var signalPrice = node("div", "signal-price");
+      var signalCell = node("span", "", "见底日收盘");
+      signalCell.appendChild(node("strong", "", number(item.bottom_price)));
+      var todayCell = node("span", "", "今日价");
+      todayCell.appendChild(node("strong", "", number(item.price || item.close)));
+      var gapCell = node("span", "", "绝对差额");
+      gapCell.appendChild(node("strong", "", number(item.bottom_price_gap_abs)));
+      signalPrice.append(signalCell, todayCell, gapCell);
+      card.appendChild(signalPrice);
       var values = node("div", "line-values");
       values.append(
         node("span", "line-chip dragon", "龙 " + number(item.dragon_value)),

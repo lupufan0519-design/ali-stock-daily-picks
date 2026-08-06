@@ -97,6 +97,7 @@ class Evaluation:
     selected: bool
     chart: str
     live_seed: dict = field(default_factory=dict)
+    bottom_price: float = 0.0
     yellow_line_value: float = 0.0
     tier: str = ""
     line_gap_abs: float = 0.0
@@ -565,6 +566,7 @@ def make_live_seed(
     yellow_flags: Sequence[bool],
     yellow_count: int,
     bottom_date: str,
+    bottom_price: float,
     cross_date: str,
     limit_date: str,
     yellow_date: str,
@@ -641,6 +643,7 @@ def make_live_seed(
             bar.date for bar in bars[-history_tail_size:]
         ],
         "bottom_date": bottom_date,
+        "bottom_price": float(bottom_price),
         "cross_date": cross_date,
         "limit_up_date": limit_date,
         "yellow_date": yellow_date,
@@ -706,6 +709,14 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
     bottom_date = latest_true_date(
         bottom_flags, bars, cfg["bottom_lookback_days"]
     )
+    bottom_price = next(
+        (
+            float(bar.close)
+            for bar in reversed(bars)
+            if bar.date == bottom_date
+        ),
+        0.0,
+    )
     cross_date = latest_true_date(cross_flags, bars, cfg["cross_lookback_days"])
     limit_date = latest_true_date(
         limit_flags, bars, cfg["limit_up_lookback_days"]
@@ -751,6 +762,7 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
             "close": bars[-1].close,
             "bottom_ok": bottom_ok,
             "bottom_date": bottom_date,
+            "bottom_price": bottom_price,
             "dragon_value": float(dragon[-1]),
             "tiger_value": float(tiger[-1]),
             "yellow_line_value": float(yellow_line[-1]),
@@ -771,6 +783,7 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
         yellow_flags=yellow_flags,
         yellow_count=yellow_count,
         bottom_date=bottom_date,
+        bottom_price=bottom_price,
         cross_date=cross_date,
         limit_date=limit_date,
         yellow_date=yellow_date,
@@ -818,6 +831,7 @@ def evaluate(stock: Stock, bars: Sequence[Bar], cfg: dict) -> Evaluation | None:
         limit_up_ok=limit_ok,
         yellow_ok=yellow_ok,
         bottom_date=bottom_date,
+        bottom_price=bottom_price,
         cross_date=cross_date,
         limit_up_date=limit_date,
         yellow_date=yellow_date,
