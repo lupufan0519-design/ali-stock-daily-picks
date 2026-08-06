@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "strategy_version": "three_tier_confirmed_bottom3_v5",
+  "started_on": "2026-08-06",
+  "updated_at": "2026-08-06T19:59:18+08:00",
+  "dates": [
+    {
+      "trade_date": "2026-08-06",
+      "first": [],
+      "second": [],
+      "third": []
+    }
+  ],
+  "summary": {
+    "selection_count": 0,
+    "first_tier_count": 0,
+    "second_tier_count": 0,
+    "third_tier_count": 0,
+    "evaluated_count": 0,
+    "success_count": 0,
+    "success_rate_pct": null,
+    "average_return_pct": null
+  }
+}
