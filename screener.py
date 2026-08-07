@@ -268,9 +268,13 @@ def zig_state(values: Sequence[float], threshold_pct: float = 16.0) -> dict:
 
 
 def bottom_signal_flags(bars: Sequence[Bar]) -> list[bool]:
-    """Tongdaxin "可能见底": confirmed 16% trough, range and CCI filters."""
+    """Tongdaxin possible-bottom marks, including the repainting right edge."""
     cci = rolling_cci(bars)
     troughs = confirmed_zig_trough_flags([bar.close for bar in bars], 16.0)
+    current = zig_state([bar.close for bar in bars], 16.0)
+    if int(current["state"]) == 2 and int(current["candidate_age"]) >= 0:
+        candidate_index = len(bars) - 1 - int(current["candidate_age"])
+        troughs[candidate_index] = True
     return [
         bool(
             troughs[index]
