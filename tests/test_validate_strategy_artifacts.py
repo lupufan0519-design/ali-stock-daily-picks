@@ -270,6 +270,18 @@ class ValidateStrategyArtifactsTests(unittest.TestCase):
         self.assertIn("results/latest.html", daily)
         self.assertIn("index.html", daily)
 
+    def test_intraday_refresh_runs_only_during_continuous_trading(self):
+        workflow = (
+            Path(__file__).resolve().parents[1]
+            / ".github"
+            / "workflows"
+            / "intraday.yml"
+        ).read_text(encoding="utf-8")
+        self.assertIn('cron: "30-55/5 1 * * 1-5"', workflow)
+        self.assertNotIn('cron: "15-55/5 1 * * 1-5"', workflow)
+        self.assertIn('"09:30" <= hhmm <= "11:30"', workflow)
+        self.assertIn('"13:00" <= hhmm <= "15:00"', workflow)
+
     def validate(self, mutate=None):
         grid, case, portfolio = valid_payloads()
         if mutate:
