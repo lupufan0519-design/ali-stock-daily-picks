@@ -281,6 +281,9 @@ class ValidateStrategyArtifactsTests(unittest.TestCase):
         self.assertNotIn('cron: "15-55/5 1 * * 1-5"', workflow)
         self.assertIn('"09:30" <= hhmm <= "11:30"', workflow)
         self.assertIn('"13:00" <= hhmm <= "15:00"', workflow)
+        self.assertIn("Check that the exchange is trading today", workflow)
+        self.assertIn("fetch_tencent_trade_date", workflow)
+        self.assertIn("quote_date == today", workflow)
 
     def validate(self, mutate=None):
         grid, case, portfolio = valid_payloads()
