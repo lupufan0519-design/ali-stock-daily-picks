@@ -2,7 +2,14 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from selection_history import empty_history, load_history, record_close, refresh_history, write_history
+from selection_history import (
+    empty_history,
+    load_history,
+    record_close,
+    record_intraday_pools,
+    refresh_history,
+    write_history,
+)
 from simple_strategy import FIRST_TIER, SECOND_TIER, STRATEGY_VERSION, THIRD_TIER
 
 
@@ -23,6 +30,108 @@ def pick(code="600001", price=10.0):
 
 
 class SelectionHistoryTests(unittest.TestCase):
+    def test_intraday_repaint_adds_removed_section_without_erasing_selection(self):
+        history, changed = record_intraday_pools(
+            empty_history(),
+            "2026-08-07",
+            {FIRST_TIER: [pick()], SECOND_TIER: [], THIRD_TIER: []},
+            {"600001"},
+            "2026-08-07T10:00:00+08:00",
+        )
+        self.assertTrue(changed)
+        self.assertEqual(history["dates"][0]["live_active_codes"], ["600001"])
+
+        history, changed = record_intraday_pools(
+            history,
+            "2026-08-07",
+            {FIRST_TIER: [], SECOND_TIER: [], THIRD_TIER: []},
+            {"600001"},
+            "2026-08-07T10:05:00+08:00",
+        )
+        day = history["dates"][0]
+        self.assertTrue(changed)
+        self.assertEqual(len(day[FIRST_TIER]), 1)
+        self.assertEqual(day["live_active_codes"], [])
+        self.assertEqual(len(day["removed"]), 1)
+        self.assertEqual(day["removed"][0]["code"], "600001")
+        self.assertEqual(day["removed"][0]["removal_reason"], "可能见底信号消失")
+        self.assertEqual(history["summary"]["selection_count"], 1)
+        self.assertEqual(history["summary"]["removed_count"], 1)
+
+    def test_missing_quote_does_not_create_a_false_removal(self):
+        history, _ = record_intraday_pools(
+            empty_history(),
+            "2026-08-07",
+            {FIRST_TIER: [pick()], SECOND_TIER: [], THIRD_TIER: []},
+            {"600001"},
+            "2026-08-07T10:00:00+08:00",
+        )
+        history, changed = record_intraday_pools(
+            history,
+            "2026-08-07",
+            {FIRST_TIER: [], SECOND_TIER: [], THIRD_TIER: []},
+            set(),
+            "2026-08-07T10:05:00+08:00",
+        )
+        day = history["dates"][0]
+        self.assertFalse(changed)
+        self.assertEqual(day["live_active_codes"], ["600001"])
+        self.assertEqual(day["removed"], [])
+
+    def test_reappearing_signal_keeps_removal_audit_and_marks_restored(self):
+        history, _ = record_intraday_pools(
+            empty_history(),
+            "2026-08-07",
+            {FIRST_TIER: [pick()], SECOND_TIER: [], THIRD_TIER: []},
+            {"600001"},
+            "2026-08-07T10:00:00+08:00",
+        )
+        history, _ = record_intraday_pools(
+            history,
+            "2026-08-07",
+            {FIRST_TIER: [], SECOND_TIER: [], THIRD_TIER: []},
+            {"600001"},
+            "2026-08-07T10:05:00+08:00",
+        )
+        history, changed = record_intraday_pools(
+            history,
+            "2026-08-07",
+            {FIRST_TIER: [], SECOND_TIER: [pick()], THIRD_TIER: []},
+            {"600001"},
+            "2026-08-07T10:10:00+08:00",
+        )
+        removed = history["dates"][0]["removed"][0]
+        self.assertTrue(changed)
+        self.assertTrue(removed["active_again"])
+        self.assertEqual(removed["restored_at"], "2026-08-07T10:10:00+08:00")
+        self.assertEqual(history["dates"][0]["live_active_codes"], ["600001"])
+
+    def test_close_record_preserves_intraday_removed_ledger(self):
+        history, _ = record_intraday_pools(
+            empty_history(),
+            "2026-08-07",
+            {FIRST_TIER: [pick()], SECOND_TIER: [], THIRD_TIER: []},
+            {"600001"},
+            "2026-08-07T10:00:00+08:00",
+        )
+        history, _ = record_intraday_pools(
+            history,
+            "2026-08-07",
+            {FIRST_TIER: [], SECOND_TIER: [], THIRD_TIER: []},
+            {"600001"},
+            "2026-08-07T10:05:00+08:00",
+        )
+        closed = record_close(
+            history,
+            "2026-08-07",
+            {FIRST_TIER: [], SECOND_TIER: [], THIRD_TIER: []},
+            [pick(price=9.8)],
+            "2026-08-07T15:40:00+08:00",
+        )
+        day = closed["dates"][0]
+        self.assertEqual(len(day[FIRST_TIER]), 1)
+        self.assertEqual(len(day["removed"]), 1)
+
     def test_same_day_selection_waits_and_next_day_counts_success(self):
         history = record_close(
             empty_history(),

@@ -13,7 +13,12 @@ from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
 from observation import OBSERVATION_LIMIT, visible_observations
-from selection_history import load_history, refresh_history
+from selection_history import (
+    load_history,
+    record_intraday_pools,
+    refresh_history,
+    write_history,
+)
 from screener import cross_yellow_pair
 from simple_strategy import FIRST_TIER, SECOND_TIER, THIRD_TIER, decorate_row, split_tiers
 from strategy_contract import (
@@ -1551,8 +1556,18 @@ def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
         live_trade_date=live_trade_date,
     )
     live_pools = build_live_pools(payload, quotes, set())
+    stored_history = load_history(HISTORY_PATH)
+    history_changed = False
+    if live_trade_date:
+        stored_history, history_changed = record_intraday_pools(
+            stored_history,
+            live_trade_date,
+            live_pools,
+            quotes,
+            local_now.isoformat(timespec="seconds"),
+        )
     history = refresh_history(
-        load_history(HISTORY_PATH),
+        stored_history,
         quotes,
         live_trade_date or str(payload.get("trade_date", "")),
         local_now.isoformat(timespec="seconds"),
@@ -1619,6 +1634,7 @@ def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
         "target_count": len(targets),
         "quote_count": len(quotes),
         "quotes": display_quotes,
+        "_history_changed": history_changed,
     }
 
 
@@ -1630,6 +1646,9 @@ def main(argv: Iterable[str] | None = None) -> int:
     try:
         payload = json.loads(args.result.read_text(encoding="utf-8"))
         live = build_live_payload(payload)
+        history_changed = bool(live.pop("_history_changed", False))
+        if history_changed:
+            write_history(HISTORY_PATH, live["history"])
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(
             json.dumps(live, ensure_ascii=False, indent=2),
