@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
     inputs:
       force:
-        description: "Run outside the Shanghai trading window"
+        description: "Compatibility input; refresh still runs only while the market is open"
         required: false
         type: boolean
         default: false
@@ -41,9 +41,6 @@ jobs:
 
       - name: Check Shanghai trading window
         id: market
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          FORCE_RUN: ${{ inputs.force || false }}
         run: |
           python - <<'PY'
           import os
@@ -59,10 +56,7 @@ jobs:
                   or "13:00" <= hhmm <= "15:00"
               )
           )
-          force_run = os.environ.get("FORCE_RUN", "").lower() == "true"
-          should_run = trading or (
-              os.environ["EVENT_NAME"] == "workflow_dispatch" and force_run
-          )
+          should_run = trading
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
               output.write(f"run={'true' if should_run else 'false'}\n")
           print(

@@ -284,6 +284,8 @@ class ValidateStrategyArtifactsTests(unittest.TestCase):
         self.assertIn("Check that the exchange is trading today", workflow)
         self.assertIn("fetch_tencent_trade_date", workflow)
         self.assertIn("quote_date == today", workflow)
+        self.assertIn("should_run = trading", workflow)
+        self.assertNotIn("should_run = trading or", workflow)
 
     def validate(self, mutate=None):
         grid, case, portfolio = valid_payloads()

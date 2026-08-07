@@ -946,7 +946,7 @@ class CloudWorkflowTests(unittest.TestCase):
             ["600002"],
         )
 
-    def test_intraday_bottom_waits_for_zig_rebound_confirmation(self):
+    def test_intraday_bottom_is_visible_before_and_after_rebound_confirmation(self):
         cfg = {
             "bottom_lookback_days": 2,
             "cross_lookback_days": 5,
@@ -971,7 +971,8 @@ class CloudWorkflowTests(unittest.TestCase):
             cfg,
             "2026-07-30",
         )
-        self.assertFalse(unconfirmed["bottom_ok"])
+        self.assertTrue(unconfirmed["bottom_ok"])
+        self.assertEqual(unconfirmed["bottom_date"], "2026-07-31")
 
         confirmed_quote = self.live_quote("600010")
         confirmed_quote["price"] = 9.3
@@ -984,6 +985,56 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertTrue(confirmed["bottom_ok"])
         self.assertEqual(confirmed["bottom_date"], "2026-07-30")
         self.assertEqual(confirmed["bottom_price"], 8.0)
+
+    def test_intraday_provisional_bottom_is_visible_before_sixteen_pct_rebound(self):
+        cfg = {
+            "bottom_lookback_days": 4,
+            "cross_lookback_days": 5,
+            "limit_up_lookback_days": 42,
+            "yellow_consecutive_days": 1,
+            "line_gap_max_abs": 0.5,
+        }
+        seed = self.live_seed("600013", bottom_age=-1, limit_age=-1)
+        seed.update(
+            {
+                "zig16_state": 2,
+                "zig16_candidate_value": 8.0,
+                "zig16_candidate_age": 0,
+                "zig16_candidate_date": "2026-07-30",
+                "zig16_candidate_signal_ok": True,
+            }
+        )
+        quote = self.live_quote("600013")
+        quote["price"] = 8.5
+        result = evaluate_live_seed(seed, quote, cfg, "2026-07-30")
+        self.assertTrue(result["bottom_ok"])
+        self.assertEqual(result["bottom_date"], "2026-07-30")
+        self.assertEqual(result["bottom_price"], 8.0)
+
+    def test_intraday_new_lower_candidate_uses_live_cci_and_signal_date(self):
+        cfg = {
+            "bottom_lookback_days": 4,
+            "cross_lookback_days": 5,
+            "limit_up_lookback_days": 42,
+            "yellow_consecutive_days": 1,
+            "line_gap_max_abs": 0.5,
+        }
+        seed = self.live_seed("600014", bottom_age=-1, limit_age=-1)
+        seed.update(
+            {
+                "zig16_state": 2,
+                "zig16_candidate_value": 8.0,
+                "zig16_candidate_age": 2,
+                "zig16_candidate_date": "2026-07-28",
+                "zig16_candidate_signal_ok": False,
+            }
+        )
+        quote = self.live_quote("600014")
+        quote.update({"price": 7.5, "open": 8.0, "high": 8.0, "low": 7.4})
+        result = evaluate_live_seed(seed, quote, cfg, "2026-07-30")
+        self.assertTrue(result["bottom_ok"])
+        self.assertEqual(result["bottom_date"], "2026-07-31")
+        self.assertEqual(result["bottom_price"], 7.5)
 
     def test_live_pool_adds_confirmed_bottom_and_removes_it_if_signal_repaints(self):
         cfg = {
@@ -1020,7 +1071,9 @@ class CloudWorkflowTests(unittest.TestCase):
         )
 
         repainted_quote = self.live_quote("600012")
-        repainted_quote["price"] = 7.8
+        repainted_quote.update(
+            {"price": 7.8, "open": 7.8, "high": 7.82, "low": 7.8}
+        )
         removed = build_live_pools(payload, {"600012": repainted_quote})
         self.assertEqual(removed["first"], [])
         self.assertEqual(removed["second"], [])

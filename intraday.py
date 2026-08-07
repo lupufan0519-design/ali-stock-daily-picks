@@ -1227,32 +1227,65 @@ def evaluate_live_seed(
     prior_cross_age = int(seed.get("cross_age", -1))
     cross_age = prior_cross_age + 1 if prior_cross_age >= 0 else -1
 
+    lookback_days = int(cfg["bottom_lookback_days"])
     bottom_age = int(seed.get("bottom_age", -1))
-    prior_bottom = (
-        bottom_age >= 0
-        and bottom_age + 1 < int(cfg["bottom_lookback_days"])
-    )
     candidate_age = int(seed.get("zig16_candidate_age", -1))
     candidate_value = float(seed.get("zig16_candidate_value", 0.0) or 0.0)
+    candidate_date = str(seed.get("zig16_candidate_date", ""))
+    candidate_state = int(seed.get("zig16_state", 0))
+    candidate_signal_ok = bool(seed.get("zig16_candidate_signal_ok"))
+    candidate_updated_today = bool(
+        candidate_state == 2
+        and candidate_value > 0
+        and price <= candidate_value + 1e-8
+    )
+    live_candidate_value = price if candidate_updated_today else candidate_value
+    live_candidate_date = live_date if candidate_updated_today else candidate_date
+    live_candidate_age = 0 if candidate_updated_today else candidate_age + 1
+    live_candidate_signal_ok = (
+        bool(
+            high > low + 0.04
+            and current_cci(seed.get("typical_13", []), high, low, price) < -110
+        )
+        if candidate_updated_today
+        else candidate_signal_ok
+    )
     confirmed_candidate = bool(
-        int(seed.get("zig16_state", 0)) == 2
+        candidate_state == 2
         and candidate_value > 0
         and price >= candidate_value * 1.16 - 1e-8
-        and bool(seed.get("zig16_candidate_signal_ok"))
+        and candidate_signal_ok
         and candidate_age >= 0
-        and candidate_age + 1 < int(cfg["bottom_lookback_days"])
+        and candidate_age + 1 < lookback_days
     )
-    bottom_ok = confirmed_candidate or prior_bottom
+    provisional_candidate = bool(
+        candidate_state == 2
+        and not confirmed_candidate
+        and live_candidate_value > 0
+        and live_candidate_signal_ok
+        and 0 <= live_candidate_age < lookback_days
+    )
+    seed_bottom_is_provisional = bool(
+        candidate_state == 2
+        and candidate_date
+        and str(seed.get("bottom_date", "")) == candidate_date
+    )
+    prior_bottom = bool(
+        bottom_age >= 0
+        and bottom_age + 1 < lookback_days
+        and not seed_bottom_is_provisional
+    )
+    bottom_ok = confirmed_candidate or provisional_candidate or prior_bottom
     bottom_date = (
-        str(seed.get("zig16_candidate_date", ""))
-        if confirmed_candidate
+        live_candidate_date
+        if confirmed_candidate or provisional_candidate
         else str(seed.get("bottom_date", ""))
         if prior_bottom
         else ""
     )
     bottom_price = (
-        candidate_value
-        if confirmed_candidate
+        live_candidate_value
+        if confirmed_candidate or provisional_candidate
         else float(seed.get("bottom_price", 0.0) or 0.0)
         if prior_bottom
         else 0.0
