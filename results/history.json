@@ -2,7 +2,7 @@
   "schema_version": 1,
   "strategy_version": "three_tier_confirmed_bottom4_v6",
   "started_on": "2026-08-06",
-  "updated_at": "2026-08-07T16:35:51+08:00",
+  "updated_at": "2026-08-07T18:53:00+08:00",
   "dates": [
     {
       "trade_date": "2026-08-06",
@@ -2957,7 +2957,16 @@
           "prior_three_gap_max": 4.314942249410535
         }
       ],
-      "third": []
+      "third": [],
+      "removed": [],
+      "live_active_codes": [
+        "300912",
+        "600350",
+        "688036",
+        "688213",
+        "688266",
+        "688382"
+      ]
     }
   ],
   "summary": {
@@ -2965,6 +2974,7 @@
     "first_tier_count": 2,
     "second_tier_count": 104,
     "third_tier_count": 7,
+    "removed_count": 0,
     "evaluated_count": 107,
     "success_count": 105,
     "success_rate_pct": 98.13084112149532,
