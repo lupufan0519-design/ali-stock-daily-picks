@@ -4,6 +4,38 @@ from simple_report_ui import render_report
 
 
 class SimpleReportUiTests(unittest.TestCase):
+    def test_history_calendar_has_a_removed_section_for_repainted_signals(self):
+        history = {
+            "schema_version": 1,
+            "strategy_version": "three_tier_confirmed_bottom4_v6",
+            "started_on": "2026-08-07",
+            "updated_at": "2026-08-07T10:05:00+08:00",
+            "dates": [
+                {
+                    "trade_date": "2026-08-07",
+                    "first": [],
+                    "second": [],
+                    "third": [],
+                    "removed": [
+                        {
+                            "code": "600001",
+                            "name": "示例股票",
+                            "selected_tier": "second",
+                            "removed_at": "2026-08-07T10:05:00+08:00",
+                            "removal_reason": "可能见底信号消失",
+                        }
+                    ],
+                }
+            ],
+            "summary": {"selection_count": 1},
+        }
+        page = render_report([], {"line_gap_max_abs": 0.5}, 0, [], history=history)
+        self.assertIn("history-group removed", page)
+        self.assertIn("盘中移除", page)
+        self.assertIn("可能见底信号消失", page)
+        self.assertIn('"removed":[', page)
+        self.assertIn("右侧临时信号出现即入选", page)
+
     def test_page_has_only_today_and_history_primary_views(self):
         page = render_report([], {"line_gap_max_abs": 0.5}, 0, [])
         self.assertEqual(page.count('class="view-button"'), 2)

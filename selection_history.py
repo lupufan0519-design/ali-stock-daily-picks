@@ -4,7 +4,7 @@ import copy
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable, Mapping
+from typing import Iterable, Mapping, Sequence
 
 from simple_strategy import FIRST_TIER, SECOND_TIER, STRATEGY_VERSION, THIRD_TIER
 
@@ -84,6 +84,175 @@ def _pick(row: Mapping[str, object], trade_date: str, tier: str) -> dict:
     }
 
 
+def _day_records(day: Mapping[str, object]) -> dict[str, tuple[str, dict]]:
+    records: dict[str, tuple[str, dict]] = {}
+    for tier in (FIRST_TIER, SECOND_TIER, THIRD_TIER):
+        values = day.get(tier, [])
+        if not isinstance(values, list):
+            continue
+        for item in values:
+            if not isinstance(item, dict):
+                continue
+            code = str(item.get("code", ""))
+            if code and code not in records:
+                records[code] = (tier, item)
+    return records
+
+
+def _find_or_create_day(dates: list[dict], trade_date: str) -> tuple[dict, bool]:
+    for item in dates:
+        if str(item.get("trade_date", "")) == trade_date:
+            for tier in (FIRST_TIER, SECOND_TIER, THIRD_TIER):
+                if not isinstance(item.get(tier), list):
+                    item[tier] = []
+            if not isinstance(item.get("removed"), list):
+                item["removed"] = []
+            return item, False
+    day = {
+        "trade_date": trade_date,
+        FIRST_TIER: [],
+        SECOND_TIER: [],
+        THIRD_TIER: [],
+        "removed": [],
+        "live_active_codes": [],
+    }
+    dates.append(day)
+    dates.sort(key=lambda item: str(item.get("trade_date", "")))
+    return day, True
+
+
+def record_intraday_pools(
+    history: Mapping[str, object],
+    trade_date: str,
+    tiers: Mapping[str, Sequence[Mapping[str, object]]],
+    observed_codes: Iterable[str],
+    generated_at: str = "",
+) -> tuple[dict, bool]:
+    """Persist intraday appearances and possible-bottom repaint removals.
+
+    Tier arrays are an append-only ledger of stocks that appeared at least once
+    during the day. ``live_active_codes`` stores only the previous refresh state,
+    allowing a later refresh to distinguish a repaint removal from a missing
+    quote. A removed stock remains in its original tier and is also copied into
+    the day's ``removed`` section so the historical record is not rewritten.
+    """
+    if not trade_date:
+        return copy.deepcopy(dict(history)), False
+    if history.get("strategy_version") != STRATEGY_VERSION:
+        working = empty_history(trade_date)
+    else:
+        working = copy.deepcopy(dict(history))
+    if not working.get("started_on"):
+        working["started_on"] = trade_date
+    dates = working.get("dates", [])
+    if not isinstance(dates, list):
+        dates = []
+    dates = [item for item in dates if isinstance(item, dict)]
+    working["dates"] = dates
+    has_day = any(
+        isinstance(item, dict) and str(item.get("trade_date", "")) == trade_date
+        for item in dates
+    )
+    has_current_selection = any(
+        isinstance(values, (list, tuple))
+        and any(isinstance(row, Mapping) and row.get("code") for row in values)
+        for values in (
+            tiers.get(FIRST_TIER, []),
+            tiers.get(SECOND_TIER, []),
+            tiers.get(THIRD_TIER, []),
+        )
+    )
+    if not has_day and not has_current_selection:
+        return working, False
+    day, created = _find_or_create_day(dates, trade_date)
+    changed = created
+
+    existing = _day_records(day)
+    current: dict[str, tuple[str, Mapping[str, object]]] = {}
+    for tier in (FIRST_TIER, SECOND_TIER, THIRD_TIER):
+        values = tiers.get(tier, [])
+        if not isinstance(values, (list, tuple)):
+            continue
+        for row in values:
+            if not isinstance(row, Mapping):
+                continue
+            code = str(row.get("code", ""))
+            if code and code not in current:
+                current[code] = (tier, row)
+            if code and code not in existing:
+                record = _pick(row, trade_date, tier)
+                record["first_seen_at"] = generated_at
+                day[tier].append(record)
+                existing[code] = (tier, record)
+                changed = True
+
+    if "live_active_codes" in day and isinstance(day.get("live_active_codes"), list):
+        previous_active = {
+            str(code) for code in day.get("live_active_codes", []) if str(code)
+        }
+    else:
+        previous_active = set(existing)
+    current_codes = set(current)
+    observed = {str(code) for code in observed_codes if str(code)}
+    disappeared = (previous_active - current_codes) & observed
+    reappeared = current_codes - previous_active
+
+    removed_values = day.get("removed", [])
+    removed_by_code = {
+        str(item.get("code", "")): item
+        for item in removed_values
+        if isinstance(item, dict) and item.get("code")
+    }
+    for code in sorted(disappeared):
+        original = existing.get(code)
+        if original is None:
+            continue
+        original_tier, original_record = original
+        removed = removed_by_code.get(code)
+        if removed is None:
+            removed = copy.deepcopy(original_record)
+            removed.update(
+                {
+                    "id": f"{trade_date}:removed:{code}",
+                    "selected_tier": original_tier,
+                    "removed_at": generated_at,
+                    "removal_reason": "可能见底信号消失",
+                    "removal_count": 1,
+                    "active_again": False,
+                    "restored_at": "",
+                }
+            )
+            removed_values.append(removed)
+            removed_by_code[code] = removed
+        else:
+            removed["removed_at"] = generated_at
+            removed["removal_reason"] = "可能见底信号消失"
+            removed["removal_count"] = int(removed.get("removal_count", 0) or 0) + 1
+            removed["active_again"] = False
+            removed["restored_at"] = ""
+        changed = True
+
+    for code in sorted(reappeared):
+        removed = removed_by_code.get(code)
+        if removed is not None and not bool(removed.get("active_again")):
+            removed["active_again"] = True
+            removed["restored_at"] = generated_at
+            changed = True
+
+    next_active = current_codes | (previous_active - observed)
+    active_list = sorted(next_active)
+    if active_list != sorted(
+        str(code) for code in day.get("live_active_codes", []) if str(code)
+    ):
+        day["live_active_codes"] = active_list
+        changed = True
+    day["removed"] = removed_values
+    if changed:
+        working["updated_at"] = generated_at or datetime.now().astimezone().isoformat(timespec="seconds")
+        working["summary"] = summarize(dates)
+    return working, changed
+
+
 def _all_records(dates: Iterable[Mapping[str, object]]) -> list[dict]:
     records: list[dict] = []
     for day in dates:
@@ -95,7 +264,8 @@ def _all_records(dates: Iterable[Mapping[str, object]]) -> list[dict]:
 
 
 def summarize(dates: Iterable[Mapping[str, object]]) -> dict:
-    records = _all_records(dates)
+    date_values = list(dates)
+    records = _all_records(date_values)
     settled = [
         item
         for item in records
@@ -114,6 +284,11 @@ def summarize(dates: Iterable[Mapping[str, object]]) -> dict:
         "first_tier_count": sum(item.get("tier") == FIRST_TIER for item in records),
         "second_tier_count": sum(item.get("tier") == SECOND_TIER for item in records),
         "third_tier_count": sum(item.get("tier") == THIRD_TIER for item in records),
+        "removed_count": sum(
+            len(day.get("removed", []))
+            for day in date_values
+            if isinstance(day, Mapping) and isinstance(day.get("removed"), list)
+        ),
         "evaluated_count": len(settled),
         "success_count": len(successful),
         "success_rate_pct": len(successful) / len(settled) * 100.0 if settled else None,
@@ -172,26 +347,18 @@ def record_close(
     if not working.get("started_on"):
         working["started_on"] = trade_date
 
-    day = {
-        "trade_date": trade_date,
-        FIRST_TIER: [_pick(item, trade_date, FIRST_TIER) for item in tiers.get(FIRST_TIER, [])],
-        SECOND_TIER: [_pick(item, trade_date, SECOND_TIER) for item in tiers.get(SECOND_TIER, [])],
-        THIRD_TIER: [_pick(item, trade_date, THIRD_TIER) for item in tiers.get(THIRD_TIER, [])],
-    }
-    dates = [
-        item
-        for item in working.get("dates", [])
-        if isinstance(item, dict) and str(item.get("trade_date", "")) != trade_date
-    ]
-    dates.append(day)
-    dates.sort(key=lambda item: str(item.get("trade_date", "")))
-    working["dates"] = dates
-
     prices = {
         str(item.get("code", "")): item
         for item in all_rows
         if item.get("code")
     }
+    working, _ = record_intraday_pools(
+        working,
+        trade_date,
+        tiers,
+        prices,
+        generated_at,
+    )
     return refresh_history(working, prices, trade_date, generated_at)
 
 

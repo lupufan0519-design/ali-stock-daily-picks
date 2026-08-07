@@ -234,6 +234,7 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
 .calendar-day .dots .f { background: var(--red); }
 .calendar-day .dots .s { background: var(--blue); }
 .calendar-day .dots .t { background: var(--yellow); }
+.calendar-day .dots .r { background: #8a8f98; }
 .history-detail { min-height: 410px; padding: 24px; }
 .detail-date { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
 .detail-date h2 { margin: 0; font: 700 22px Consolas, monospace; }
@@ -243,6 +244,12 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
 .history-group h3::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
 .history-group.second h3::before { background: var(--blue); }
 .history-group.third h3::before { background: var(--yellow); }
+.history-group.removed { margin-top: 8px; padding-top: 20px; border-top: 1px dashed #c9ccc6; }
+.history-group.removed h3::before { border-radius: 2px; background: #8a8f98; }
+.history-group.removed .history-row { color: #656a72; }
+.removal-status { text-align: right; }
+.removal-status strong { display: block; color: #656a72; font-size: 12px; }
+.removal-status small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }
 .history-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 13px 0; border-top: 1px solid #eceeea; }
 .history-row:first-of-type { border-top: 0; }
 .history-stock strong { display: block; font-size: 14px; }
@@ -441,6 +448,37 @@ SCRIPT = r"""
       container.appendChild(row);
     });
   }
+  function tierLabel(tier) {
+    return tier === "first" ? "第一梯队" : tier === "second" ? "第二梯队" : "第三梯队";
+  }
+  function shortTime(value) {
+    var text = String(value || "");
+    return text.length >= 16 ? text.slice(11, 16) : "";
+  }
+  function renderRemovedRows(container, rows) {
+    container.replaceChildren();
+    rows.forEach(function (item) {
+      var row = node("div", "history-row removed-row");
+      var stock = node("div", "history-stock");
+      stock.append(
+        node("strong", "", item.name || "未命名"),
+        node("small", "", item.code + " · 曾入选" + tierLabel(item.selected_tier || item.tier))
+      );
+      var result = node("div", "removal-status");
+      var restored = Boolean(item.active_again);
+      result.append(
+        node("strong", "", restored ? "曾移除，已重新入选" : "已移除"),
+        node(
+          "small",
+          "",
+          (item.removal_reason || "可能见底信号消失") +
+            (shortTime(item.removed_at) ? " · " + shortTime(item.removed_at) : "")
+        )
+      );
+      row.append(stock, result);
+      container.appendChild(row);
+    });
+  }
   function renderDayDetail(day) {
     var detail = document.getElementById("history-detail");
     detail.replaceChildren();
@@ -451,8 +489,11 @@ SCRIPT = r"""
     var first = day.first || [];
     var second = day.second || [];
     var third = day.third || [];
+    var removed = day.removed || [];
     var head = node("div", "detail-date");
-    head.append(node("h2", "", day.trade_date), node("span", "", "共 " + (first.length + second.length + third.length) + " 只"));
+    var countCopy = "共 " + (first.length + second.length + third.length) + " 只";
+    if (removed.length) countCopy += " · 移除 " + removed.length + " 只";
+    head.append(node("h2", "", day.trade_date), node("span", "", countCopy));
     detail.appendChild(head);
     var groupFirst = node("section", "history-group first");
     groupFirst.appendChild(node("h3", "", "第一梯队"));
@@ -470,6 +511,14 @@ SCRIPT = r"""
     renderHistoryRows(thirdRows, third, "third");
     groupThird.appendChild(thirdRows);
     detail.append(groupFirst, groupSecond, groupThird);
+    if (removed.length) {
+      var groupRemoved = node("section", "history-group removed");
+      groupRemoved.appendChild(node("h3", "", "盘中移除"));
+      var removedRows = node("div");
+      renderRemovedRows(removedRows, removed);
+      groupRemoved.appendChild(removedRows);
+      detail.appendChild(groupRemoved);
+    }
   }
   function renderCalendar() {
     var map = dateMap();
@@ -493,10 +542,12 @@ SCRIPT = r"""
         var first = record.first || [];
         var second = record.second || [];
         var third = record.third || [];
+        var removed = record.removed || [];
         var dots = node("span", "dots");
         if (first.length) dots.appendChild(node("i", "f"));
         if (second.length) dots.appendChild(node("i", "s"));
         if (third.length) dots.appendChild(node("i", "t"));
+        if (removed.length) dots.appendChild(node("i", "r"));
         button.append(dots, node("span", "count", String(first.length + second.length + third.length)));
         button.setAttribute("aria-label", key + "，共 " + (first.length + second.length + third.length) + " 只");
         button.addEventListener("click", function (dateKey, dateRecord) {
@@ -649,7 +700,7 @@ def render_report(
       </section>
     </section>
     <section id="history-view" class="view-panel" hidden>
-      <header class="history-head"><p class="eyebrow">HISTORY LEDGER</p><h1>每一天的选择，都留在日历里。</h1><p class="intro">点击有标记的日期查看当日股票、入选价、最新价和至今收益。成功率只统计已经产生后续交易日行情的记录。</p></header>
+      <header class="history-head"><p class="eyebrow">HISTORY LEDGER</p><h1>每一天的选择，都留在日历里。</h1><p class="intro">点击有标记的日期查看当日股票、入选价、最新价和至今收益。盘中曾入选但“可能见底”信号后来消失的股票，会保留在当日移除区。</p></header>
       <div class="metric-strip">
         <div class="metric"><span>累计入选记录</span><strong id="history-count">0</strong><small>同一股票不同日期入选，按独立记录计算</small></div>
         <div class="metric"><span>总成功率</span><strong id="success-rate">—</strong><small id="success-sample">已产生后续行情 0 条</small></div>
@@ -663,7 +714,7 @@ def render_report(
         </section>
         <section id="history-detail" class="history-detail" aria-live="polite"></section>
       </div>
-      <p class="footnote">“可能见底”按通达信当前完整历史图中的已确认波谷重算，未确认的新低不会提前入选。新规则自 {html.escape(str(history_payload.get('started_on') or trade_date or '首次发布日'))} 起独立记录，不把旧策略结果混入成功率。今日入选尚无后续行情，暂不计成功或失败；未计交易费用、滑点及涨跌停无法成交。</p>
+      <p class="footnote">“可能见底”按通达信公式逐次重算：右侧临时信号出现即入选；后续重绘消失时，股票会从今日梯队移除，并保留在历史日历的当日移除区。新规则自 {html.escape(str(history_payload.get('started_on') or trade_date or '首次发布日'))} 起独立记录，不把旧策略结果混入成功率。今日入选尚无后续行情，暂不计成功或失败；未计交易费用、滑点及涨跌停无法成交。</p>
     </section>
   </main>
   <noscript><p class="shell empty">需要启用 JavaScript 才能切换日历和自动刷新最新行情。</p></noscript>

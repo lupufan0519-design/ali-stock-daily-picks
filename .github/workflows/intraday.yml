@@ -18,7 +18,7 @@ on:
         default: false
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -101,6 +101,19 @@ jobs:
       - name: Build static site
         if: steps.market.outputs.run == 'true' && steps.trading_day.outputs.run == 'true'
         run: python prepare_site.py
+      - name: Persist intraday selection transitions
+        if: steps.market.outputs.run == 'true' && steps.trading_day.outputs.run == 'true'
+        shell: bash
+        run: |
+          if git diff --quiet -- results/history.json; then
+            echo "No selection appearance or removal transition to persist"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- results/history.json
+          git commit -m "Record intraday selection transitions"
+          git push origin main
       - uses: actions/configure-pages@v5
         if: steps.market.outputs.run == 'true' && steps.trading_day.outputs.run == 'true'
       - uses: actions/upload-pages-artifact@v4
