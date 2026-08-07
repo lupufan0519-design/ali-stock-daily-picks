@@ -985,6 +985,47 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertEqual(confirmed["bottom_date"], "2026-07-30")
         self.assertEqual(confirmed["bottom_price"], 8.0)
 
+    def test_live_pool_adds_confirmed_bottom_and_removes_it_if_signal_repaints(self):
+        cfg = {
+            "bottom_lookback_days": 4,
+            "cross_lookback_days": 8,
+            "limit_up_lookback_days": 42,
+            "yellow_consecutive_days": 1,
+            "yellow_before_cross_days": 2,
+            "yellow_after_cross_days": 7,
+            "line_gap_max_abs": 0.5,
+        }
+        seed = self.live_seed("600012", bottom_age=-1, limit_age=-1)
+        seed.update(
+            {
+                "zig16_state": 2,
+                "zig16_candidate_value": 8.0,
+                "zig16_candidate_age": 0,
+                "zig16_candidate_date": "2026-07-30",
+                "zig16_candidate_signal_ok": True,
+            }
+        )
+        payload = {
+            "trade_date": "2026-07-30",
+            "config": cfg,
+            "live_universe": [seed],
+        }
+
+        confirmed_quote = self.live_quote("600012")
+        confirmed_quote["price"] = 9.3
+        appeared = build_live_pools(payload, {"600012": confirmed_quote})
+        self.assertEqual(
+            [item["code"] for item in appeared[THIRD_TIER]],
+            ["600012"],
+        )
+
+        repainted_quote = self.live_quote("600012")
+        repainted_quote["price"] = 7.8
+        removed = build_live_pools(payload, {"600012": repainted_quote})
+        self.assertEqual(removed["first"], [])
+        self.assertEqual(removed["second"], [])
+        self.assertEqual(removed["third"], [])
+
     def test_intraday_recent_bottom_falls_back_to_third_tier(self):
         cfg = {
             "bottom_lookback_days": 2,
