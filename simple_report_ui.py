@@ -18,6 +18,8 @@ HISTORY_PATH = ROOT / "results" / "history.json"
 STYLES = r"""
 :root {
   color-scheme: light;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --topbar-height: calc(72px + var(--safe-top));
   --paper: #f4f4ef;
   --surface: #ffffff;
   --ink: #14171c;
@@ -48,8 +50,9 @@ a { color: inherit; }
 .shell { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
 .topbar {
   position: sticky;
-  z-index: 20;
+  z-index: 40;
   top: 0;
+  padding-top: var(--safe-top);
   border-bottom: 1px solid rgba(20, 23, 28, .1);
   background: rgba(244, 244, 239, .94);
   backdrop-filter: blur(18px);
@@ -80,26 +83,40 @@ a { color: inherit; }
 .brand-mark::after { right: 12px; background: var(--blue); }
 .market-state { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
 .market-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 5px rgba(23,123,85,.1); }
+.view-dock {
+  position: sticky;
+  z-index: 30;
+  top: var(--topbar-height);
+  padding: 12px 0 10px;
+  border-bottom: 1px solid rgba(20, 23, 28, .06);
+  background: linear-gradient(180deg, rgba(244,244,239,.96) 0%, rgba(244,244,239,.88) 76%, rgba(244,244,239,.72) 100%);
+  backdrop-filter: blur(18px) saturate(1.08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+}
 .view-switch {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   width: min(420px, 100%);
-  margin: 26px auto 0;
+  margin: 0 auto;
   padding: 4px;
   border: 1px solid var(--line);
-  border-radius: 14px;
-  background: rgba(255,255,255,.58);
+  border-radius: 16px;
+  background: rgba(255,255,255,.72);
+  box-shadow: 0 8px 28px rgba(20,23,28,.08);
 }
 .view-button {
-  min-height: 44px;
+  min-height: 48px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 12px;
   background: transparent;
   color: var(--muted);
   cursor: pointer;
   font-weight: 700;
+  touch-action: manipulation;
   transition: background .2s ease, color .2s ease, box-shadow .2s ease;
 }
+.view-button:hover { color: var(--ink); background: rgba(255,255,255,.58); }
+.view-button:active { background: rgba(20,23,28,.06); }
 .view-button[aria-selected="true"] { color: var(--ink); background: var(--surface); box-shadow: 0 4px 16px rgba(20,23,28,.08); }
 .view-button:focus-visible, .calendar-nav:focus-visible, .calendar-day:focus-visible, .stock-link:focus-visible { outline: 3px solid rgba(49,93,168,.28); outline-offset: 2px; }
 main { padding: 18px 0 80px; }
@@ -260,10 +277,11 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
 .detail-empty { display: grid; min-height: 310px; place-items: center; color: var(--muted); text-align: center; line-height: 1.7; }
 .footnote { margin: 34px 0 0; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; line-height: 1.7; }
 @media (max-width: 820px) {
+  :root { --topbar-height: calc(62px + var(--safe-top)); }
   .shell { width: min(100% - 28px, 680px); }
   .topbar-inner { min-height: 62px; }
   .market-state span:last-child { display: none; }
-  .view-switch { position: sticky; z-index: 15; top: 70px; margin-top: 16px; backdrop-filter: blur(14px); }
+  .view-dock { padding: 10px 0 8px; }
   .day-head { grid-template-columns: 112px 1fr; gap: 18px; padding: 38px 0 26px; }
   .date-day { font-size: 76px; }
   .today-total { grid-column: 1 / -1; display: flex; align-items: baseline; justify-content: flex-start; gap: 8px; text-align: left; }
@@ -279,7 +297,7 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
   .shell { width: calc(100% - 24px); }
   .brand { font-size: 14px; }
   .market-state { font-size: 11px; }
-  .view-switch { top: 66px; }
+  .view-switch { width: 100%; }
   main { padding-top: 8px; }
   .day-head { grid-template-columns: 1fr; gap: 16px; padding-top: 28px; }
   .date-seal { display: none; }
@@ -565,6 +583,8 @@ SCRIPT = r"""
     document.querySelectorAll(".view-button").forEach(function (button) {
       var active = button.dataset.view === view;
       button.setAttribute("aria-selected", active ? "true" : "false");
+      if (active) button.setAttribute("aria-current", "page");
+      else button.removeAttribute("aria-current");
     });
     document.getElementById("today-view").hidden = view !== "today";
     document.getElementById("history-view").hidden = view !== "history";
@@ -673,11 +693,13 @@ def render_report(
       <div class="market-state"><i class="market-dot" aria-hidden="true"></i><span id="market-label">收盘选股</span><span id="update-time">{html.escape(initial['generated_at_display'])}</span></div>
     </div>
   </header>
-  <div class="shell">
-    <nav class="view-switch" aria-label="页面功能">
-      <button class="view-button" type="button" data-view="today" aria-selected="true">今日选股</button>
-      <button class="view-button" type="button" data-view="history" aria-selected="false">历史日历</button>
-    </nav>
+  <div class="view-dock">
+    <div class="shell">
+      <nav class="view-switch" aria-label="页面功能">
+        <button class="view-button" type="button" data-view="today" aria-selected="true" aria-current="page">今日选股</button>
+        <button class="view-button" type="button" data-view="history" aria-selected="false">历史日历</button>
+      </nav>
+    </div>
   </div>
   <main class="shell">
     <section id="today-view" class="view-panel">

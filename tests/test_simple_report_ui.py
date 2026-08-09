@@ -4,6 +4,17 @@ from simple_report_ui import render_report
 
 
 class SimpleReportUiTests(unittest.TestCase):
+    def test_primary_view_switch_stays_visible_while_scrolling(self):
+        page = render_report([], {"line_gap_max_abs": 0.5}, 0, [])
+        self.assertIn('class="view-dock"', page)
+        self.assertIn(".view-dock {\n  position: sticky;", page)
+        self.assertIn("top: var(--topbar-height);", page)
+        self.assertIn("z-index: 30;", page)
+        self.assertIn("--safe-top: env(safe-area-inset-top, 0px);", page)
+        self.assertIn("min-height: 48px;", page)
+        self.assertIn('aria-current="page"', page)
+        self.assertIn('button.setAttribute("aria-current", "page")', page)
+
     def test_history_calendar_has_a_removed_section_for_repainted_signals(self):
         history = {
             "schema_version": 1,
