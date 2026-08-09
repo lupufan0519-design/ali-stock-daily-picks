@@ -16,6 +16,11 @@ on:
         required: false
         type: boolean
         default: false
+      ui_only:
+        description: "Rebuild and deploy the UI from the committed market snapshot"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -44,8 +49,9 @@ jobs:
         env:
           FORCE_RUN: ${{ inputs.force || false }}
           BOOTSTRAP_LIVE: ${{ inputs.bootstrap_live || false }}
+          UI_ONLY: ${{ inputs.ui_only || false }}
         run: |
-          if [ "$FORCE_RUN" = "true" ] || [ "$BOOTSTRAP_LIVE" = "true" ]; then
+          if [ "$FORCE_RUN" = "true" ] || [ "$BOOTSTRAP_LIVE" = "true" ] || [ "$UI_ONLY" = "true" ]; then
             python cloud_gate.py --force
           else
             python cloud_gate.py
@@ -63,8 +69,12 @@ jobs:
         env:
           BOOTSTRAP_LIVE: ${{ inputs.bootstrap_live || false }}
           FORCE_RUN: ${{ inputs.force || false }}
+          UI_ONLY: ${{ inputs.ui_only || false }}
         run: |
-          if [ "$BOOTSTRAP_LIVE" = "true" ]; then
+          if [ "$UI_ONLY" = "true" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "trade_date=$(python -c 'import json; print(json.load(open("cloud_snapshot.json", encoding="utf-8"))["trade_date"])')" >> "$GITHUB_OUTPUT"
+          elif [ "$BOOTSTRAP_LIVE" = "true" ]; then
             python cloud_daily.py --bootstrap-live
           else
             python cloud_daily.py
@@ -75,6 +85,9 @@ jobs:
       - name: Refresh closing quotes
         if: steps.screening.outputs.changed == 'true'
         run: python intraday.py --result cloud_snapshot.json
+      - name: Rebuild report UI from current snapshot
+        if: steps.screening.outputs.changed == 'true' && inputs.ui_only == true
+        run: python rebuild_ui.py
       - name: Build static site
         if: steps.screening.outputs.changed == 'true'
         run: python prepare_site.py

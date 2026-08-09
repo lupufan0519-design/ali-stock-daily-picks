@@ -653,10 +653,14 @@ def render_report(
     strategy_state: Mapping[str, object] | None = None,
     events: Sequence[Mapping[str, object]] | None = None,
     history: Mapping[str, object] | None = None,
+    trade_date_override: str = "",
 ) -> str:
     rows = [_row(item) for item in evaluations]
     tiers = split_tiers(rows, cfg)
-    trade_date = max((str(item.get("date", "")) for item in rows), default="")
+    trade_date = trade_date_override or max(
+        (str(item.get("date", "")) for item in rows),
+        default="",
+    )
     generated_at = datetime.now().astimezone().isoformat(timespec="seconds")
     history_payload = dict(history or load_history(HISTORY_PATH) or empty_history(trade_date))
     initial = {

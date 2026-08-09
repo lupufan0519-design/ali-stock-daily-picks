@@ -269,6 +269,9 @@ class ValidateStrategyArtifactsTests(unittest.TestCase):
         self.assertIn("results/history.json", daily)
         self.assertIn("results/latest.html", daily)
         self.assertIn("index.html", daily)
+        self.assertIn("ui_only:", daily)
+        self.assertIn("python rebuild_ui.py", daily)
+        self.assertIn('if [ "$UI_ONLY" = "true" ]', daily)
 
     def test_intraday_refresh_runs_only_during_continuous_trading(self):
         workflow = (
