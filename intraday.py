@@ -85,7 +85,7 @@ def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
     """Decode the compact close-generated seed used by the intraday workflow."""
     if isinstance(item, dict):
         return item
-    if seed_format not in {1, 2, 3, 4, 5, 6, 7} or not isinstance(item, list) or len(item) < 19:
+    if seed_format not in {1, 2, 3, 4, 5, 6, 7, 8} or not isinstance(item, list) or len(item) < 19:
         return {}
 
     def triples(values: object) -> list[list[float]]:
@@ -222,6 +222,9 @@ def unpack_live_seed(item: object, seed_format: int = 0) -> dict:
         ),
         "bottom_price": (
             float(item[39]) if seed_format >= 7 and len(item) > 39 else 0.0
+        ),
+        "customer_summary": (
+            str(item[40]) if seed_format >= 8 and len(item) > 40 else ""
         ),
     }
 
@@ -1164,6 +1167,7 @@ def _baseline_live_row(seed: dict, quote: dict, cfg: dict | None = None) -> dict
         "company_intro": str(seed.get("company_intro", "")),
         "industry": str(seed.get("industry", "")),
         "concepts": [str(value) for value in seed.get("concepts", [])],
+        "customer_summary": str(seed.get("customer_summary", "")),
     }
     return decorate_row(row, cfg or {}) if "line_gap_max_abs" in (cfg or {}) else row
 
@@ -1468,6 +1472,7 @@ def evaluate_live_seed(
         "company_intro": str(seed.get("company_intro", "")),
         "industry": str(seed.get("industry", "")),
         "concepts": [str(value) for value in seed.get("concepts", [])],
+        "customer_summary": str(seed.get("customer_summary", "")),
         "date": live_date,
         "eligible": True,
         "selected": selected,

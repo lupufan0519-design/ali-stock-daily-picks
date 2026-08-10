@@ -106,6 +106,7 @@ class Evaluation:
     company_intro: str = ""
     industry: str = ""
     concepts: list[str] = field(default_factory=list)
+    customer_summary: str = ""
 
 
 def load_config(path: Path) -> dict:

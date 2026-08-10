@@ -1,64 +1,74 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "stocks": {
     "300912": {
-      "company_intro": "研发车辆、工程机械及船舶尾气后处理系统、催化剂和传感器。",
+      "company_intro": "主营车辆、工程机械和船舶尾气后处理系统，同时覆盖催化剂、尿素供给、热管理、传感器与检验检测等业务。",
       "concepts": [
         "尾气治理",
         "商用车",
         "环保催化剂"
       ],
       "industry": "汽车零部件",
+      "customer_summary": "主要直供发动机、商用车及非道路机械厂，为其配套尾气后处理系统和相关零部件。",
       "market": 0,
       "source_url": "https://www.kailongtec.com/pages_8/",
+      "customer_source_url": "https://reportdocs.static.szse.cn/UpFiles/rasinfodisc/RAS_00017458E5CCD03FE4E2C82BCFEF7C3F.pdf",
       "updated_at": "2026-08-10T18:01:00+08:00"
     },
     "600363": {
-      "company_intro": "研发销售智能控制器、背光源、激光器件装备及光电线缆。",
+      "company_intro": "主营激光及LED、智能控制器、背光源和光电线缆等业务，产品服务特种装备、家电、汽车电子、工控与显示领域。",
       "concepts": [
         "激光装备",
         "智能控制器",
         "高温超导（参股）"
       ],
       "industry": "光学光电子",
+      "customer_summary": "客户覆盖家电厨电、工控、汽车和光储；控股子公司华联电子服务伊莱克斯、海尔、美的等品牌。",
       "market": 1,
       "source_url": "https://lianovation.com.cn/aboutus/7.html",
+      "customer_source_url": "http://static.cninfo.com.cn/finalpage/2026-04-30/1225267898.PDF",
       "updated_at": "2026-08-10T18:01:00+08:00"
     },
     "688036": {
-      "company_intro": "主营TECNO、itel、Infinix手机，并经营数码配件、家电及移动互联网服务。",
+      "company_intro": "面向非洲、南亚等全球新兴市场经营TECNO、itel、Infinix手机，并布局数码配件、家电和移动互联网服务。",
       "concepts": [
         "AI手机",
         "AI眼镜",
         "一带一路"
       ],
       "industry": "消费电子",
+      "customer_summary": "手机主要销给海外经销商，少量直供当地运营商；最终面向非洲、南亚等新兴市场消费者。",
       "market": 1,
       "source_url": "https://www.transsion.com/zh-CN/about",
+      "customer_source_url": "https://static.cninfo.com.cn/finalpage/2026-03-28/1225047544.PDF",
       "updated_at": "2026-08-10T18:01:00+08:00"
     },
     "688608": {
-      "company_intro": "设计低功耗无线SoC，应用于耳机、手表、眼镜等智能硬件。",
+      "company_intro": "专注低功耗无线SoC芯片设计，产品覆盖无线音频、智能穿戴和智能家居，应用于耳机、手表、AI眼镜及各类智能终端。",
       "concepts": [
         "TWS耳机",
         "智能穿戴",
         "AI眼镜"
       ],
       "industry": "半导体",
+      "customer_summary": "直接客户多为终端厂商、方案商或模组厂，并通过分销商供货；终端品牌覆盖三星、OPPO、小米、哈曼等。",
       "market": 1,
       "source_url": "https://www.bestechnic.com/content/2.html",
+      "customer_source_url": "https://static.cninfo.com.cn/finalpage/2026-03-27/1225037702.PDF",
       "updated_at": "2026-08-10T18:01:00+08:00"
     },
     "688679": {
-      "company_intro": "提供固废资源化、污水与水环境治理、土壤及地下水修复整体解决方案。",
+      "company_intro": "提供固废污染治理、污水及水环境治理、土壤与地下水修复的一站式方案，业务覆盖设计咨询、装备集成、工程建设和运营。",
       "concepts": [
         "固废治理",
         "污水处理",
         "土壤修复"
       ],
       "industry": "环境治理",
+      "customer_summary": "主要服务地方政府及下属单位、城投环投平台和大型企业，承接固废治理、水环境修复及运营项目。",
       "market": 1,
       "source_url": "http://www.ahtongyuan.com/about.html",
+      "customer_source_url": "https://static.cninfo.com.cn/finalpage/2026-04-11/1225094571.PDF",
       "updated_at": "2026-08-10T18:01:00+08:00"
     }
   },

@@ -18,7 +18,12 @@ DEFAULT_CACHE_PATH = ROOT / "cache" / "company_metadata.json"
 CACHE_MAX_AGE_DAYS = 30
 CACHE_RETRY_DELAY_HOURS = 2
 INTRO_PLACEHOLDER = "公司主营业务资料正在自动补全。"
-PUBLIC_METADATA_KEYS = ("company_intro", "industry", "concepts")
+PUBLIC_METADATA_KEYS = (
+    "company_intro",
+    "industry",
+    "concepts",
+    "customer_summary",
+)
 
 
 def _get_json(url: str, timeout: float = 8.0) -> dict:
@@ -95,8 +100,36 @@ def concise_company_intro(profile: object, industry: object = "") -> str:
     return result.rstrip("，。；;！!") + "。"
 
 
+def concise_customer_summary(profile: object) -> str:
+    """Extract only customer wording that the company profile actually discloses."""
+    text = re.sub(r"\s+", "", str(profile or "")).replace(",", "，")
+    sentences = [
+        value.strip("，。；;！!")
+        for value in re.split(r"[。！!]", text)
+        if value.strip("，。；;！!")
+    ]
+    customer_terms = (
+        "主要客户",
+        "核心客户",
+        "客户包括",
+        "客户覆盖",
+        "客户群体",
+        "服务客户",
+        "服务于",
+        "供应商",
+        "合作伙伴",
+    )
+    selected = next(
+        (sentence for sentence in sentences if any(term in sentence for term in customer_terms)),
+        "",
+    )
+    if not selected:
+        return ""
+    return selected[:96].rstrip("，。；;！!") + "。"
+
+
 def _empty_cache() -> dict:
-    return {"schema_version": 1, "stocks": {}}
+    return {"schema_version": 2, "stocks": {}}
 
 
 def _load_cache(path: Path | None) -> dict:
@@ -132,11 +165,17 @@ def _cached_metadata(entry: object) -> dict:
         "concepts": [str(item).strip() for item in concepts if str(item).strip()][:3]
         if isinstance(concepts, list)
         else [],
+        "customer_summary": str(value.get("customer_summary") or "").strip(),
     }
 
 
 def _cache_is_fresh(entry: object, now: datetime) -> bool:
     if not isinstance(entry, dict):
+        return False
+    # Refresh schema-v1 rows once so the newly added customer field is not
+    # suppressed by an otherwise fresh 30-day cache entry. An explicit empty
+    # string is valid when the company does not disclose customer information.
+    if "customer_summary" not in entry:
         return False
     try:
         retry_after = datetime.fromisoformat(
@@ -166,12 +205,14 @@ def _merge_metadata(fetched: object, cached: object, industry: object = "") -> d
         intro = old["company_intro"]
     sector = fresh["industry"] or old["industry"] or str(industry or "").strip()
     concepts = fresh["concepts"] or old["concepts"]
+    customer_summary = fresh["customer_summary"] or old["customer_summary"]
     if not intro:
         intro = f"主要提供{sector}相关产品与服务。" if sector else INTRO_PLACEHOLDER
     return {
         "company_intro": intro,
         "industry": sector,
         "concepts": concepts[:3],
+        "customer_summary": customer_summary,
     }
 
 
@@ -255,6 +296,7 @@ def fetch_company_metadata(code: str, market: int) -> dict:
         ),
         "industry": industry,
         "concepts": concepts,
+        "customer_summary": concise_customer_summary(basics.get("ORG_PROFILE", "")),
     }
 
 
@@ -336,6 +378,7 @@ def enrich_evaluations(
                 cache_changed = True
             _apply_metadata(item, metadata)
     if cache_changed:
+        cache["schema_version"] = 2
         cache["updated_at"] = now.isoformat(timespec="seconds")
         _save_cache(cache_path, cache)
     return errors
@@ -370,6 +413,7 @@ def enrich_live_pools(
                 company_intro=str(representative.get("company_intro", "")),
                 industry=str(representative.get("industry", "")),
                 concepts=list(representative.get("concepts", []) or []),
+                customer_summary=str(representative.get("customer_summary", "")),
             )
         )
     errors = enrich_evaluations(proxies, max_workers, cache_path)
