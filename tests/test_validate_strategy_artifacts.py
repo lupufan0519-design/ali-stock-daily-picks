@@ -259,13 +259,15 @@ class ValidateStrategyArtifactsTests(unittest.TestCase):
         )
         self.assertFalse(workflow.exists())
 
-    def test_publish_workflows_share_one_non_cancelling_concurrency_group(self):
+    def test_publish_workflows_keep_close_and_intraday_queues_independent(self):
         workflows = Path(__file__).resolve().parents[1] / ".github" / "workflows"
-        for filename in ("daily.yml", "intraday.yml"):
-            workflow = (workflows / filename).read_text(encoding="utf-8")
-            self.assertIn("group: stock-pages-publish", workflow)
-            self.assertIn("cancel-in-progress: false", workflow)
         daily = (workflows / "daily.yml").read_text(encoding="utf-8")
+        intraday = (workflows / "intraday.yml").read_text(encoding="utf-8")
+        self.assertIn("group: stock-pages-publish", daily)
+        self.assertIn("cancel-in-progress: false", daily)
+        self.assertIn("group: stock-pages-intraday", intraday)
+        self.assertIn("cancel-in-progress: true", intraday)
+        self.assertNotIn("group: stock-pages-publish", intraday)
         self.assertIn("results/history.json", daily)
         self.assertIn("results/latest.html", daily)
         self.assertIn("index.html", daily)

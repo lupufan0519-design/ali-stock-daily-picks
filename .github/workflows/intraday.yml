@@ -23,8 +23,10 @@ permissions:
   id-token: write
 
 concurrency:
-  group: stock-pages-publish
-  cancel-in-progress: false
+  # A stale runner allocation must not block every later five-minute refresh
+  # or the independent close settlement. Keep only the newest intraday run.
+  group: stock-pages-intraday
+  cancel-in-progress: true
 
 jobs:
   refresh:
