@@ -385,7 +385,8 @@ SCRIPT = r"""
       price.append(node("strong", "", number(item.price || item.close)), node("span", "change " + tone(item.change_pct), signed(item.change_pct)));
       top.append(link, price);
       card.appendChild(top);
-      card.appendChild(node("p", "reason", item.company_intro || "公司业务简介暂缺。"));
+      var intro = item.company_intro || (item.industry ? "主要提供" + item.industry + "相关产品与服务。" : "公司主营业务资料正在自动补全。");
+      card.appendChild(node("p", "reason", intro));
       var tags = node("div", "company-tags");
       if (item.industry) tags.appendChild(node("span", "company-tag industry", "板块 · " + item.industry));
       (Array.isArray(item.concepts) ? item.concepts : []).slice(0, 3).forEach(function (concept) {

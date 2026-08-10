@@ -1646,6 +1646,14 @@ def main(argv: Iterable[str] | None = None) -> int:
     try:
         payload = json.loads(args.result.read_text(encoding="utf-8"))
         live = build_live_payload(payload)
+        from company_metadata import enrich_live_pools
+
+        metadata_errors = enrich_live_pools(live.get("live_pools", {}))
+        if metadata_errors:
+            print(
+                f"公司资料补充失败 {len(metadata_errors)} 只，已优先使用本地缓存",
+                flush=True,
+            )
         history_changed = bool(live.pop("_history_changed", False))
         if history_changed:
             write_history(HISTORY_PATH, live["history"])
