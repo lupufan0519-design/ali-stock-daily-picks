@@ -180,6 +180,21 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
 .negative { color: var(--green); }
 .neutral { color: var(--muted); }
 .reason { margin: 16px 0 13px; color: #373c44; font-size: 13px; line-height: 1.65; }
+.customer-summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  margin: -2px 0 14px;
+  padding: 10px 12px;
+  border-left: 2px solid #c6a84a;
+  background: #faf8f0;
+  color: #4b4f55;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.customer-summary span { color: #806013; font-weight: 700; white-space: nowrap; }
+.customer-summary p { margin: 0; }
 .company-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
 .company-tag { padding: 5px 8px; border: 1px solid #e2e4df; border-radius: 999px; background: #f8f8f5; color: #555b63; font-size: 11px; line-height: 1; }
 .company-tag.industry { border-color: #d5dce8; background: #f2f5fa; color: #315a91; }
@@ -387,6 +402,12 @@ SCRIPT = r"""
       card.appendChild(top);
       var intro = item.company_intro || (item.industry ? "主要提供" + item.industry + "相关产品与服务。" : "公司主营业务资料正在自动补全。");
       card.appendChild(node("p", "reason", intro));
+      var customer = node("div", "customer-summary");
+      customer.append(
+        node("span", "", "主要客户"),
+        node("p", "", item.customer_summary || "公司未公开具体客户名称。")
+      );
+      card.appendChild(customer);
       var tags = node("div", "company-tags");
       if (item.industry) tags.appendChild(node("span", "company-tag industry", "板块 · " + item.industry));
       (Array.isArray(item.concepts) ? item.concepts : []).slice(0, 3).forEach(function (concept) {

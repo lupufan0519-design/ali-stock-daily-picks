@@ -103,6 +103,7 @@ class SimpleReportUiTests(unittest.TestCase):
                     "company_intro": "主营高端测试设备。",
                     "industry": "专用设备",
                     "concepts": ["机器人", "工业互联"],
+                    "customer_summary": "头部制造企业与科研院所。",
                 }
             ],
             {"line_gap_max_abs": 0.5},
@@ -112,6 +113,8 @@ class SimpleReportUiTests(unittest.TestCase):
         self.assertIn("主营高端测试设备", page)
         self.assertIn("专用设备", page)
         self.assertIn("机器人", page)
+        self.assertIn("主要客户", page)
+        self.assertIn("头部制造企业与科研院所", page)
         self.assertNotIn("近两日出现可能见底 ·", page)
 
 
@@ -140,6 +143,7 @@ class SimpleReportUiTests(unittest.TestCase):
         self.assertIn("见底日收盘", page)
         self.assertIn("今日价", page)
         self.assertIn("绝对差额", page)
+        self.assertIn("公司未公开具体客户名称", page)
 
 
 if __name__ == "__main__":

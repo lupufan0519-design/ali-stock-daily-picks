@@ -102,6 +102,7 @@ class CloudWorkflowTests(unittest.TestCase):
             "dragon_above_tiger": False,
             "eligible": "ST" not in name.upper(),
             "selected": False,
+            "customer_summary": "大型制造企业与科研院所。",
         }
 
     @staticmethod
@@ -480,7 +481,7 @@ class CloudWorkflowTests(unittest.TestCase):
             ],
         }
         snapshot = compact_snapshot(payload)
-        self.assertEqual(snapshot["live_seed_format"], 7)
+        self.assertEqual(snapshot["live_seed_format"], 8)
         self.assertEqual(
             [item[0] for item in snapshot["live_universe"]],
             ["600001"],
@@ -494,6 +495,13 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertEqual(seed["observation_matched_count"], 2)
         self.assertEqual(seed["next_breakout_high_5"], 10.4)
         self.assertEqual(seed["bottom_price"], 9.8)
+        self.assertEqual(seed["customer_summary"], "大型制造企业与科研院所。")
+        format_seven_seed = unpack_live_seed(
+            snapshot["live_universe"][0][:-1],
+            7,
+        )
+        self.assertEqual(format_seven_seed["bottom_price"], 9.8)
+        self.assertEqual(format_seven_seed["customer_summary"], "")
         legacy_seed = unpack_live_seed(
             snapshot["live_universe"][0][:-1],
             3,
@@ -855,6 +863,7 @@ class CloudWorkflowTests(unittest.TestCase):
                 "company_intro",
                 "industry",
                 "concepts",
+                "customer_summary",
             ],
         )
         encoded = snapshot_json(snapshot)

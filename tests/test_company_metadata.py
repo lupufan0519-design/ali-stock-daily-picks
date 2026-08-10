@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 from company_metadata import (
     concise_company_intro,
+    concise_customer_summary,
     enrich_evaluations,
     enrich_live_pools,
     fetch_company_metadata,
@@ -15,6 +16,17 @@ from company_metadata import (
 
 
 class CompanyMetadataTests(unittest.TestCase):
+    def test_customer_summary_uses_only_explicit_customer_wording(self):
+        profile = (
+            "公司主营低功耗芯片设计。"
+            "核心客户覆盖手机品牌、专业音频厂商及智能硬件企业。"
+        )
+        self.assertEqual(
+            concise_customer_summary(profile),
+            "核心客户覆盖手机品牌、专业音频厂商及智能硬件企业。",
+        )
+        self.assertEqual(concise_customer_summary("公司主营低功耗芯片设计。"), "")
+
     def test_intro_prefers_the_actual_main_business(self):
         profile = (
             "凯龙高科技股份有限公司成立于2001年，是集研发、生产、销售为一体的高新技术企业。"
@@ -72,6 +84,7 @@ class CompanyMetadataTests(unittest.TestCase):
             "company_intro": "主营测试业务。",
             "industry": "测试板块",
             "concepts": ["概念甲"],
+            "customer_summary": "大型制造企业。",
         }
         item = SimpleNamespace(
             code="600001",
@@ -85,6 +98,8 @@ class CompanyMetadataTests(unittest.TestCase):
             self.assertEqual(enrich_evaluations([item], 1, cache_path), [])
             self.assertEqual(item.industry, "测试板块")
             self.assertEqual(item.live_seed["concepts"], ["概念甲"])
+            self.assertEqual(item.customer_summary, "大型制造企业。")
+            self.assertEqual(item.live_seed["customer_summary"], "大型制造企业。")
             cache = json.loads(cache_path.read_text(encoding="utf-8"))
             self.assertEqual(cache["stocks"]["600001"]["company_intro"], "主营测试业务。")
 
@@ -101,6 +116,7 @@ class CompanyMetadataTests(unittest.TestCase):
                                 "company_intro": "主营缓存产品。",
                                 "industry": "缓存板块",
                                 "concepts": ["缓存概念"],
+                                "customer_summary": "政府与大型企业。",
                                 "market": 1,
                                 "updated_at": datetime.now(timezone.utc).isoformat(),
                             }
@@ -117,6 +133,49 @@ class CompanyMetadataTests(unittest.TestCase):
             fetch.assert_not_called()
             self.assertEqual(first["company_intro"], "主营缓存产品。")
             self.assertEqual(main_alias["concepts"], ["缓存概念"])
+            self.assertEqual(first["customer_summary"], "政府与大型企业。")
+            self.assertEqual(main_alias["customer_summary"], "政府与大型企业。")
+
+    @patch("company_metadata.fetch_company_metadata")
+    def test_fresh_legacy_cache_without_customer_field_refreshes_once(self, fetch):
+        fetch.return_value = {
+            "company_intro": "主营新产品。",
+            "industry": "测试板块",
+            "concepts": ["测试概念"],
+            "customer_summary": "科研院所与制造企业。",
+        }
+        with TemporaryDirectory() as directory:
+            cache_path = Path(directory) / "company_metadata.json"
+            cache_path.write_text(
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "stocks": {
+                            "600001": {
+                                "company_intro": "主营旧产品。",
+                                "industry": "测试板块",
+                                "concepts": ["测试概念"],
+                                "market": 1,
+                                "updated_at": datetime.now(timezone.utc).isoformat(),
+                            }
+                        },
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+            item = SimpleNamespace(
+                code="600001",
+                market=1,
+                bottom_ok=True,
+                eligible=True,
+                live_seed={},
+            )
+            self.assertEqual(enrich_evaluations([item], 1, cache_path), [])
+            fetch.assert_called_once()
+            self.assertEqual(item.customer_summary, "科研院所与制造企业。")
+            saved = json.loads(cache_path.read_text(encoding="utf-8"))
+            self.assertEqual(saved["schema_version"], 2)
 
     @patch("company_metadata.fetch_company_metadata")
     def test_stale_cache_survives_fetch_failure_and_delays_retry(self, fetch):
