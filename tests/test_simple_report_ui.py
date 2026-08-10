@@ -82,7 +82,7 @@ class SimpleReportUiTests(unittest.TestCase):
         self.assertIn("总成功率", page)
         self.assertIn("company-tags", page)
         self.assertIn("板块 · ", page)
-        self.assertIn("公司业务简介暂缺", page)
+        self.assertIn("公司主营业务资料正在自动补全", page)
 
     def test_pick_payload_contains_company_intro_sector_and_concepts(self):
         page = render_report(

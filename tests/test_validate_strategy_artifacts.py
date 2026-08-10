@@ -271,6 +271,7 @@ class ValidateStrategyArtifactsTests(unittest.TestCase):
         self.assertIn("results/history.json", daily)
         self.assertIn("results/latest.html", daily)
         self.assertIn("index.html", daily)
+        self.assertIn("cache/company_metadata.json", daily)
         self.assertIn("ui_only:", daily)
         self.assertIn("python rebuild_ui.py", daily)
         self.assertIn('if [ "$UI_ONLY" = "true" ]', daily)
@@ -293,8 +294,8 @@ class ValidateStrategyArtifactsTests(unittest.TestCase):
         self.assertNotIn("should_run = trading or", workflow)
         self.assertIn("contents: write", workflow)
         self.assertIn("Persist intraday selection transitions", workflow)
-        self.assertIn("git diff --quiet -- results/history.json", workflow)
-        self.assertIn("git add -- results/history.json", workflow)
+        self.assertIn("git diff --quiet -- results/history.json cache/company_metadata.json", workflow)
+        self.assertIn("git add -- results/history.json cache/company_metadata.json", workflow)
 
     def validate(self, mutate=None):
         grid, case, portfolio = valid_payloads()

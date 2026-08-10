@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "stocks": {
+    "300912": {
+      "company_intro": "研发车辆、工程机械及船舶尾气后处理系统、催化剂和传感器。",
+      "concepts": [
+        "尾气治理",
+        "商用车",
+        "环保催化剂"
+      ],
+      "industry": "汽车零部件",
+      "market": 0,
+      "source_url": "https://www.kailongtec.com/pages_8/",
+      "updated_at": "2026-08-10T18:01:00+08:00"
+    },
+    "600363": {
+      "company_intro": "研发销售智能控制器、背光源、激光器件装备及光电线缆。",
+      "concepts": [
+        "激光装备",
+        "智能控制器",
+        "高温超导（参股）"
+      ],
+      "industry": "光学光电子",
+      "market": 1,
+      "source_url": "https://lianovation.com.cn/aboutus/7.html",
+      "updated_at": "2026-08-10T18:01:00+08:00"
+    },
+    "688036": {
+      "company_intro": "主营TECNO、itel、Infinix手机，并经营数码配件、家电及移动互联网服务。",
+      "concepts": [
+        "AI手机",
+        "AI眼镜",
+        "一带一路"
+      ],
+      "industry": "消费电子",
+      "market": 1,
+      "source_url": "https://www.transsion.com/zh-CN/about",
+      "updated_at": "2026-08-10T18:01:00+08:00"
+    },
+    "688608": {
+      "company_intro": "设计低功耗无线SoC，应用于耳机、手表、眼镜等智能硬件。",
+      "concepts": [
+        "TWS耳机",
+        "智能穿戴",
+        "AI眼镜"
+      ],
+      "industry": "半导体",
+      "market": 1,
+      "source_url": "https://www.bestechnic.com/content/2.html",
+      "updated_at": "2026-08-10T18:01:00+08:00"
+    },
+    "688679": {
+      "company_intro": "提供固废资源化、污水与水环境治理、土壤及地下水修复整体解决方案。",
+      "concepts": [
+        "固废治理",
+        "污水处理",
+        "土壤修复"
+      ],
+      "industry": "环境治理",
+      "market": 1,
+      "source_url": "http://www.ahtongyuan.com/about.html",
+      "updated_at": "2026-08-10T18:01:00+08:00"
+    }
+  },
+  "updated_at": "2026-08-10T18:01:00+08:00"
+}

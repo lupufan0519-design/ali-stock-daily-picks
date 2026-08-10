@@ -107,13 +107,13 @@ jobs:
         if: steps.market.outputs.run == 'true' && steps.trading_day.outputs.run == 'true'
         shell: bash
         run: |
-          if git diff --quiet -- results/history.json; then
-            echo "No selection appearance or removal transition to persist"
+          if git diff --quiet -- results/history.json cache/company_metadata.json; then
+            echo "No selection transition or company metadata change to persist"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- results/history.json
+          git add -- results/history.json cache/company_metadata.json
           git commit -m "Record intraday selection transitions"
           git push origin main
       - uses: actions/configure-pages@v5

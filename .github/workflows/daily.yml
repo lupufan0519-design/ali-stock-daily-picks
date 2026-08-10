@@ -97,7 +97,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- results/latest.html results/history.json index.html cloud_snapshot.json cache/universe.json
+          git add -- results/latest.html results/history.json index.html cloud_snapshot.json cache/universe.json cache/company_metadata.json
           git commit -m "Update daily report ${{ steps.screening.outputs.trade_date }}"
           git push origin main
       - if: steps.screening.outputs.changed == 'true'
