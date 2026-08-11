@@ -126,6 +126,138 @@ class SelectionHistoryTests(unittest.TestCase):
         self.assertTrue(day["removed"][0]["active_again"])
         self.assertEqual(day["live_active_codes"], ["600001"])
 
+    def test_history_correction_preserves_an_existing_removal_event(self):
+        history = empty_history("2026-08-07")
+        history.pop("visible_bottom_migration_version")
+        prior_removal = {
+            "id": "2026-08-07:removed:600001",
+            "code": "600001",
+            "name": "示例股票",
+            "selected_tier": FIRST_TIER,
+            "removed_at": "2026-08-07T10:05:00+08:00",
+            "removal_reason": "可能见底信号消失",
+            "removal_count": 1,
+            "active_again": True,
+            "restored_at": "2026-08-07T10:10:00+08:00",
+        }
+        history["dates"] = [
+            {
+                "trade_date": "2026-08-07",
+                FIRST_TIER: [
+                    {
+                        **pick(),
+                        "trade_date": "2026-08-07",
+                        "tier": FIRST_TIER,
+                        "bottom_date": "2026-08-07",
+                    }
+                ],
+                SECOND_TIER: [],
+                THIRD_TIER: [],
+                "removed": [prior_removal],
+                "live_active_codes": ["600001"],
+            }
+        ]
+
+        history, changed = record_intraday_pools(
+            history,
+            "2026-08-08",
+            {FIRST_TIER: [], SECOND_TIER: [], THIRD_TIER: []},
+            set(),
+            "2026-08-08T10:00:00+08:00",
+        )
+
+        removed = history["dates"][0]["removed"]
+        self.assertTrue(changed)
+        self.assertEqual(len(removed), 2)
+        self.assertEqual(removed[0], prior_removal)
+        self.assertEqual(
+            removed[1]["id"],
+            "2026-08-07:removed-correction:600001",
+        )
+        self.assertTrue(removed[1]["invalid_signal"])
+        self.assertEqual(
+            removed[1]["removed_at"],
+            "2026-08-08T10:00:00+08:00",
+        )
+
+    def test_correction_and_normal_removal_have_independent_lifecycles(self):
+        history = empty_history("2026-08-07")
+        history.pop("visible_bottom_migration_version")
+        history["dates"] = [
+            {
+                "trade_date": "2026-08-07",
+                FIRST_TIER: [
+                    {
+                        **pick(),
+                        "trade_date": "2026-08-07",
+                        "tier": FIRST_TIER,
+                        "bottom_date": "2026-08-07",
+                    }
+                ],
+                SECOND_TIER: [],
+                THIRD_TIER: [],
+                "removed": [
+                    {
+                        "id": "2026-08-07:removed:600001",
+                        "code": "600001",
+                        "name": "示例股票",
+                        "selected_tier": FIRST_TIER,
+                        "removed_at": "2026-08-07T10:05:00+08:00",
+                        "removal_reason": "可能见底信号消失",
+                        "removal_count": 1,
+                        "active_again": False,
+                        "restored_at": "",
+                    }
+                ],
+                "live_active_codes": ["600001"],
+            }
+        ]
+        valid = pick()
+        valid["bottom_date"] = "2026-08-06"
+
+        history, _ = record_intraday_pools(
+            history,
+            "2026-08-07",
+            {FIRST_TIER: [], SECOND_TIER: [valid], THIRD_TIER: []},
+            {"600001"},
+            "2026-08-07T10:10:00+08:00",
+        )
+        removed = history["dates"][0]["removed"]
+        normal = next(item for item in removed if not item.get("invalid_signal"))
+        correction = next(item for item in removed if item.get("invalid_signal"))
+        self.assertTrue(normal["active_again"])
+        self.assertEqual(normal["restored_at"], "2026-08-07T10:10:00+08:00")
+        self.assertTrue(correction["active_again"])
+        self.assertEqual(
+            correction["restored_at"],
+            "2026-08-07T10:10:00+08:00",
+        )
+
+        history, _ = record_intraday_pools(
+            history,
+            "2026-08-07",
+            {FIRST_TIER: [], SECOND_TIER: [], THIRD_TIER: []},
+            {"600001"},
+            "2026-08-07T10:15:00+08:00",
+        )
+        removed = history["dates"][0]["removed"]
+        normal = next(item for item in removed if not item.get("invalid_signal"))
+        correction = next(item for item in removed if item.get("invalid_signal"))
+        self.assertEqual(normal["removed_at"], "2026-08-07T10:15:00+08:00")
+        self.assertEqual(normal["removal_count"], 2)
+        self.assertFalse(normal["active_again"])
+        self.assertEqual(
+            correction["removal_reason"],
+            "可能见底信号当日尚未形成（历史纠正）",
+        )
+        self.assertEqual(correction["removed_at"], "2026-08-07T10:10:00+08:00")
+        self.assertEqual(correction["removal_count"], 1)
+        self.assertTrue(correction["active_again"])
+        self.assertEqual(
+            correction["restored_at"],
+            "2026-08-07T10:10:00+08:00",
+        )
+
     def test_intraday_repaint_adds_removed_section_without_erasing_selection(self):
         history, changed = record_intraday_pools(
             empty_history(),

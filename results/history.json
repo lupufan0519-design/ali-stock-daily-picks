@@ -2793,7 +2793,8 @@
           ],
           "prior_three_gap_max": 5.501022171530693
         }
-      ]
+      ],
+      "removed": []
     },
     {
       "trade_date": "2026-08-07",
@@ -3090,6 +3091,39 @@
           "prior_three_gap_max": 2.8221485244199975,
           "first_seen_at": "2026-08-10T10:00:45+08:00",
           "selected_tier": "second",
+          "removed_at": "2026-08-10T10:15:29+08:00",
+          "removal_reason": "可能见底信号消失",
+          "removal_count": 1,
+          "active_again": true,
+          "restored_at": "2026-08-10T10:20:33+08:00"
+        },
+        {
+          "id": "2026-08-10:removed-correction:688679",
+          "trade_date": "2026-08-10",
+          "tier": "second",
+          "code": "688679",
+          "name": "通源环境",
+          "market": 1,
+          "selected_price": 33.71,
+          "current_price": 33.71,
+          "current_date": "2026-08-10",
+          "return_pct": 0.0,
+          "status": "待产生后续行情",
+          "bottom_date": "2026-08-10",
+          "bottom_price": 33.71,
+          "bottom_price_gap_abs": 0.0,
+          "dragon_value": 29.929908731645003,
+          "tiger_value": 32.161000273683996,
+          "yellow_line_value": 36.62706064812,
+          "line_gap_abs": 2.2310915420389925,
+          "prior_three_gap_abs": [
+            2.8221485244199975,
+            2.6154739748820006,
+            2.4197236052540028
+          ],
+          "prior_three_gap_max": 2.8221485244199975,
+          "first_seen_at": "2026-08-10T10:00:45+08:00",
+          "selected_tier": "second",
           "removed_at": "2026-08-11T11:15:43+08:00",
           "removal_reason": "可能见底信号当日尚未形成（历史纠正）",
           "removal_count": 1,
@@ -3124,6 +3158,39 @@
           "prior_three_gap_max": 0.4440899506999969,
           "first_seen_at": "2026-08-10T09:30:38+08:00",
           "selected_tier": "first",
+          "removed_at": "2026-08-10T17:44:59+08:00",
+          "removal_reason": "可能见底信号消失",
+          "removal_count": 1,
+          "active_again": false,
+          "restored_at": ""
+        },
+        {
+          "id": "2026-08-10:removed-correction:603093",
+          "trade_date": "2026-08-10",
+          "tier": "first",
+          "code": "603093",
+          "name": "南华期货",
+          "market": 1,
+          "selected_price": 12.45,
+          "current_price": 12.46,
+          "current_date": "2026-08-10",
+          "return_pct": 0.08032128514057213,
+          "status": "待产生后续行情",
+          "bottom_date": "2026-08-10",
+          "bottom_price": 12.45,
+          "bottom_price_gap_abs": 0.0,
+          "dragon_value": 16.100997762273,
+          "tiger_value": 16.486273771340002,
+          "yellow_line_value": 17.162371182222,
+          "line_gap_abs": 0.38527600906700243,
+          "prior_three_gap_abs": [
+            0.4440899506999969,
+            0.42170699096600117,
+            0.4029393267400039
+          ],
+          "prior_three_gap_max": 0.4440899506999969,
+          "first_seen_at": "2026-08-10T09:30:38+08:00",
+          "selected_tier": "first",
           "removed_at": "2026-08-11T11:15:43+08:00",
           "removal_reason": "可能见底信号当日尚未形成（历史纠正）",
           "removal_count": 1,
@@ -3132,7 +3199,7 @@
           "invalid_signal": true
         },
         {
-          "id": "2026-08-10:removed:600363",
+          "id": "2026-08-10:removed-correction:600363",
           "trade_date": "2026-08-10",
           "tier": "second",
           "code": "600363",
@@ -3166,7 +3233,7 @@
           "invalid_signal": true
         },
         {
-          "id": "2026-08-10:removed:688036",
+          "id": "2026-08-10:removed-correction:688036",
           "trade_date": "2026-08-10",
           "tier": "second",
           "code": "688036",
@@ -3200,7 +3267,7 @@
           "invalid_signal": true
         },
         {
-          "id": "2026-08-10:removed:688608",
+          "id": "2026-08-10:removed-correction:688608",
           "trade_date": "2026-08-10",
           "tier": "second",
           "code": "688608",
@@ -3353,6 +3420,39 @@
           "prior_three_gap_max": 0.03452232806000133,
           "first_seen_at": "2026-08-11T09:30:35+08:00",
           "selected_tier": "first",
+          "removed_at": "2026-08-11T09:35:35+08:00",
+          "removal_reason": "可能见底信号消失",
+          "removal_count": 1,
+          "active_again": false,
+          "restored_at": ""
+        },
+        {
+          "id": "2026-08-11:removed-correction:600350",
+          "trade_date": "2026-08-11",
+          "tier": "first",
+          "code": "600350",
+          "name": "山东高速",
+          "market": 1,
+          "selected_price": 10.66,
+          "current_price": 10.66,
+          "current_date": "2026-08-11",
+          "return_pct": 0.0,
+          "status": "待产生后续行情",
+          "bottom_date": "2026-08-11",
+          "bottom_price": 10.66,
+          "bottom_price_gap_abs": 0.0,
+          "dragon_value": 10.596879563678,
+          "tiger_value": 10.586940987808001,
+          "yellow_line_value": 11.552267875197,
+          "line_gap_abs": 0.0099385758699988,
+          "prior_three_gap_abs": [
+            0.03452232806000133,
+            0.025241510489999897,
+            0.016703964177002817
+          ],
+          "prior_three_gap_max": 0.03452232806000133,
+          "first_seen_at": "2026-08-11T09:30:35+08:00",
+          "selected_tier": "first",
           "removed_at": "2026-08-11T11:15:43+08:00",
           "removal_reason": "可能见底信号当日尚未形成（历史纠正）",
           "removal_count": 1,
@@ -3361,7 +3461,7 @@
           "invalid_signal": true
         },
         {
-          "id": "2026-08-11:removed:300506",
+          "id": "2026-08-11:removed-correction:300506",
           "trade_date": "2026-08-11",
           "tier": "first",
           "code": "300506",
@@ -3395,7 +3495,7 @@
           "invalid_signal": true
         },
         {
-          "id": "2026-08-11:removed:600363",
+          "id": "2026-08-11:removed-correction:600363",
           "trade_date": "2026-08-11",
           "tier": "second",
           "code": "600363",
@@ -3429,7 +3529,7 @@
           "invalid_signal": true
         },
         {
-          "id": "2026-08-11:removed:688608",
+          "id": "2026-08-11:removed-correction:688608",
           "trade_date": "2026-08-11",
           "tier": "second",
           "code": "688608",
@@ -3463,7 +3563,7 @@
           "invalid_signal": true
         },
         {
-          "id": "2026-08-11:removed:688679",
+          "id": "2026-08-11:removed-correction:688679",
           "trade_date": "2026-08-11",
           "tier": "second",
           "code": "688679",
@@ -3509,7 +3609,7 @@
     "first_tier_count": 3,
     "second_tier_count": 108,
     "third_tier_count": 7,
-    "removed_count": 11,
+    "removed_count": 14,
     "evaluated_count": 115,
     "success_count": 111,
     "success_rate_pct": 96.52173913043478,
