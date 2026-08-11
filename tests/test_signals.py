@@ -50,17 +50,27 @@ class SignalMathTests(unittest.TestCase):
         self.assertEqual(zig_state(falling, 16.0)["state"], 2)
         self.assertEqual(zig_state(falling, 16.0)["candidate_age"], 0)
 
-    def test_possible_bottom_marks_and_repaints_the_unfinished_right_edge(self):
+    def test_possible_bottom_waits_for_a_later_bar_and_can_repaint(self):
         bars = [
             Bar(f"2026-01-{index + 1:02d}", 100, 101, 99, 100, 1, 1)
             for index in range(13)
         ]
         trough = Bar("2026-01-14", 81, 81, 79, 80, 1, 1)
-        self.assertTrue(bottom_signal_flags([*bars, trough])[-1])
+        self.assertFalse(bottom_signal_flags([*bars, trough])[-1])
         lower = Bar("2026-01-15", 79, 79, 77, 78, 1, 1)
         repainted = bottom_signal_flags([*bars, trough, lower])
         self.assertFalse(repainted[-2])
-        self.assertTrue(repainted[-1])
+        self.assertFalse(repainted[-1])
+        small_rebound = Bar("2026-01-15", 82, 83, 81, 82, 1, 1)
+        provisional = bottom_signal_flags([*bars, trough, small_rebound])
+        self.assertTrue(provisional[-2])
+        self.assertFalse(provisional[-1])
+        new_low = Bar("2026-01-16", 78, 79, 77, 78, 1, 1)
+        repainted_again = bottom_signal_flags(
+            [*bars, trough, small_rebound, new_low]
+        )
+        self.assertFalse(repainted_again[-3])
+        self.assertFalse(repainted_again[-1])
         rebound = Bar("2026-01-15", 92, 94, 91, 93, 1, 1)
         flags = bottom_signal_flags([*bars, trough, rebound])
         self.assertTrue(flags[-2])

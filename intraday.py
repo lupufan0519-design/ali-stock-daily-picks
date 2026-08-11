@@ -1272,7 +1272,7 @@ def evaluate_live_seed(
         and not confirmed_candidate
         and live_candidate_value > 0
         and live_candidate_signal_ok
-        and 0 <= live_candidate_age < lookback_days
+        and 0 < live_candidate_age < lookback_days
     )
     seed_bottom_is_provisional = bool(
         candidate_state == 2

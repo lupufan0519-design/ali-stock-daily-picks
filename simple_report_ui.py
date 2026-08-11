@@ -762,7 +762,7 @@ def render_report(
         </section>
         <section id="history-detail" class="history-detail" aria-live="polite"></section>
       </div>
-      <p class="footnote">“可能见底”按通达信公式逐次重算：右侧临时信号出现即入选；后续重绘消失时，股票会从今日梯队移除，并保留在历史日历的当日移除区。新规则自 {html.escape(str(history_payload.get('started_on') or trade_date or '首次发布日'))} 起独立记录，不把旧策略结果混入成功率。今日入选尚无后续行情，暂不计成功或失败；未计交易费用、滑点及涨跌停无法成交。</p>
+      <p class="footnote">“可能见底”按公式逐次重算：当天仍在形成低点、文字标记尚未出现时不入选；低点经过至少一个后续交易日且文字标记已经出现后，才进入梯队。后续重绘消失时，股票会从今日梯队移除，并保留在历史日历的当日移除区。新规则自 {html.escape(str(history_payload.get('started_on') or trade_date or '首次发布日'))} 起独立记录，不把旧策略结果混入成功率。今日入选尚无后续行情，暂不计成功或失败；未计交易费用、滑点及涨跌停无法成交。</p>
     </section>
   </main>
   <noscript><p class="shell empty">需要启用 JavaScript 才能切换日历和自动刷新最新行情。</p></noscript>
