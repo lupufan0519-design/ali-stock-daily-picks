@@ -252,11 +252,44 @@ class SelectionHistoryTests(unittest.TestCase):
         )
         self.assertEqual(correction["removed_at"], "2026-08-07T10:10:00+08:00")
         self.assertEqual(correction["removal_count"], 1)
-        self.assertTrue(correction["active_again"])
-        self.assertEqual(
-            correction["restored_at"],
-            "2026-08-07T10:10:00+08:00",
+        self.assertFalse(correction["active_again"])
+        self.assertEqual(correction["restored_at"], "")
+        self.assertEqual(history["summary"]["removed_count"], 1)
+
+    def test_intraday_refresh_repairs_a_duplicated_removed_count(self):
+        history = empty_history("2026-08-07")
+        history["dates"] = [
+            {
+                "trade_date": "2026-08-07",
+                FIRST_TIER: [],
+                SECOND_TIER: [],
+                THIRD_TIER: [],
+                "removed": [
+                    {
+                        "id": "2026-08-07:removed:600001",
+                        "code": "600001",
+                    },
+                    {
+                        "id": "2026-08-07:removed-correction:600001",
+                        "code": "600001",
+                        "invalid_signal": True,
+                    },
+                ],
+                "live_active_codes": [],
+            }
+        ]
+        history["summary"]["removed_count"] = 2
+
+        history, changed = record_intraday_pools(
+            history,
+            "2026-08-08",
+            {FIRST_TIER: [], SECOND_TIER: [], THIRD_TIER: []},
+            set(),
+            "2026-08-08T10:00:00+08:00",
         )
+
+        self.assertTrue(changed)
+        self.assertEqual(history["summary"]["removed_count"], 1)
 
     def test_intraday_repaint_adds_removed_section_without_erasing_selection(self):
         history, changed = record_intraday_pools(

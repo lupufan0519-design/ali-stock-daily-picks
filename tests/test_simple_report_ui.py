@@ -45,6 +45,8 @@ class SimpleReportUiTests(unittest.TestCase):
         self.assertIn("盘中移除", page)
         self.assertIn("可能见底信号消失", page)
         self.assertIn('"removed":[', page)
+        self.assertIn("function uniqueRemovedRows(rows)", page)
+        self.assertIn("var removed = uniqueRemovedRows(day.removed || []);", page)
         self.assertIn("至少一个后续交易日", page)
         self.assertIn("文字标记已经出现后", page)
         self.assertNotIn("一辰波段", page)
