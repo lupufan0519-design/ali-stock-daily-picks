@@ -143,10 +143,14 @@ def _move_unformed_same_day_records(
         removed_values = day.get("removed", [])
         if not isinstance(removed_values, list):
             removed_values = []
-        removed_by_code = {
+        correction_by_code = {
             str(item.get("code", "")): item
             for item in removed_values
-            if isinstance(item, dict) and item.get("code")
+            if (
+                isinstance(item, dict)
+                and item.get("code")
+                and bool(item.get("invalid_signal"))
+            )
         }
         invalid_codes: set[str] = set()
         for tier in (FIRST_TIER, SECOND_TIER, THIRD_TIER):
@@ -166,25 +170,25 @@ def _move_unformed_same_day_records(
                     kept.append(item)
                     continue
                 invalid_codes.add(code)
-                removed = removed_by_code.get(code)
-                if removed is None:
-                    removed = copy.deepcopy(item)
-                    removed_values.append(removed)
-                    removed_by_code[code] = removed
+                correction = correction_by_code.get(code)
+                if correction is None:
+                    correction = copy.deepcopy(item)
+                    removed_values.append(correction)
+                    correction_by_code[code] = correction
                 selected_tier = (
-                    str(removed.get("selected_tier", ""))
+                    str(correction.get("selected_tier", ""))
                     or str(item.get("tier", ""))
                     or tier
                 )
-                removed.update(
+                correction.update(
                     {
-                        "id": f"{trade_date}:removed:{code}",
+                        "id": f"{trade_date}:removed-correction:{code}",
                         "selected_tier": selected_tier,
                         "removed_at": generated_at,
                         "removal_reason": "可能见底信号当日尚未形成（历史纠正）",
                         "removal_count": max(
                             1,
-                            int(removed.get("removal_count", 0) or 0),
+                            int(correction.get("removal_count", 0) or 0),
                         ),
                         "active_again": False,
                         "restored_at": "",
@@ -303,7 +307,20 @@ def record_intraday_pools(
     removed_by_code = {
         str(item.get("code", "")): item
         for item in removed_values
-        if isinstance(item, dict) and item.get("code")
+        if (
+            isinstance(item, dict)
+            and item.get("code")
+            and not bool(item.get("invalid_signal"))
+        )
+    }
+    correction_by_code = {
+        str(item.get("code", "")): item
+        for item in removed_values
+        if (
+            isinstance(item, dict)
+            and item.get("code")
+            and bool(item.get("invalid_signal"))
+        )
     }
     for code in sorted(disappeared):
         original = existing.get(code)
@@ -339,6 +356,11 @@ def record_intraday_pools(
         if removed is not None and not bool(removed.get("active_again")):
             removed["active_again"] = True
             removed["restored_at"] = generated_at
+            changed = True
+        correction = correction_by_code.get(code)
+        if correction is not None and not bool(correction.get("active_again")):
+            correction["active_again"] = True
+            correction["restored_at"] = generated_at
             changed = True
 
     next_active = current_codes | (previous_active - observed)
