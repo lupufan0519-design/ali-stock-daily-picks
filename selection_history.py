@@ -10,12 +10,14 @@ from simple_strategy import FIRST_TIER, SECOND_TIER, STRATEGY_VERSION, THIRD_TIE
 
 
 SCHEMA_VERSION = 1
+VISIBLE_BOTTOM_MIGRATION_VERSION = 1
 
 
 def empty_history(started_on: str = "") -> dict:
     return {
         "schema_version": SCHEMA_VERSION,
         "strategy_version": STRATEGY_VERSION,
+        "visible_bottom_migration_version": VISIBLE_BOTTOM_MIGRATION_VERSION,
         "started_on": started_on,
         "updated_at": "",
         "dates": [],
@@ -234,7 +236,16 @@ def record_intraday_pools(
         dates = []
     dates = [item for item in dates if isinstance(item, dict)]
     working["dates"] = dates
-    history_corrected = _move_unformed_same_day_records(dates, generated_at)
+    history_migrated = False
+    if (
+        int(working.get("visible_bottom_migration_version", 0) or 0)
+        < VISIBLE_BOTTOM_MIGRATION_VERSION
+    ):
+        _move_unformed_same_day_records(dates, generated_at)
+        working["visible_bottom_migration_version"] = (
+            VISIBLE_BOTTOM_MIGRATION_VERSION
+        )
+        history_migrated = True
     has_day = any(
         isinstance(item, dict) and str(item.get("trade_date", "")) == trade_date
         for item in dates
@@ -249,14 +260,14 @@ def record_intraday_pools(
         )
     )
     if not has_day and not has_current_selection:
-        if history_corrected:
+        if history_migrated:
             working["updated_at"] = generated_at or (
                 datetime.now().astimezone().isoformat(timespec="seconds")
             )
             working["summary"] = summarize(dates)
-        return working, history_corrected
+        return working, history_migrated
     day, created = _find_or_create_day(dates, trade_date)
-    changed = created or history_corrected
+    changed = created or history_migrated
 
     existing = _day_records(day)
     current: dict[str, tuple[str, Mapping[str, object]]] = {}

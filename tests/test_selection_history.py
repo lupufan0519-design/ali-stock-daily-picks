@@ -32,6 +32,7 @@ def pick(code="600001", price=10.0):
 class SelectionHistoryTests(unittest.TestCase):
     def test_legacy_same_day_candidate_moves_to_history_removal_audit(self):
         history = empty_history("2026-08-07")
+        history.pop("visible_bottom_migration_version")
         invalid_record = {
             **pick(),
             "id": "2026-08-07:first:600001",
@@ -74,6 +75,7 @@ class SelectionHistoryTests(unittest.TestCase):
         )
         self.assertEqual(history["summary"]["selection_count"], 0)
         self.assertEqual(history["summary"]["evaluated_count"], 0)
+        self.assertEqual(history["visible_bottom_migration_version"], 1)
 
         repeated, changed_again = record_intraday_pools(
             history,
@@ -87,6 +89,7 @@ class SelectionHistoryTests(unittest.TestCase):
 
     def test_corrected_signal_can_reappear_after_a_later_bar(self):
         history = empty_history("2026-08-07")
+        history.pop("visible_bottom_migration_version")
         history["dates"] = [
             {
                 "trade_date": "2026-08-07",
