@@ -75,6 +75,16 @@ class SelectionHistoryTests(unittest.TestCase):
         self.assertEqual(history["summary"]["selection_count"], 0)
         self.assertEqual(history["summary"]["evaluated_count"], 0)
 
+        repeated, changed_again = record_intraday_pools(
+            history,
+            "2026-08-08",
+            {FIRST_TIER: [], SECOND_TIER: [], THIRD_TIER: []},
+            set(),
+            "2026-08-08T10:00:00+08:00",
+        )
+        self.assertFalse(changed_again)
+        self.assertEqual(repeated, history)
+
     def test_corrected_signal_can_reappear_after_a_later_bar(self):
         history = empty_history("2026-08-07")
         history["dates"] = [
