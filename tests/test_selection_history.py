@@ -30,6 +30,102 @@ def pick(code="600001", price=10.0):
 
 
 class SelectionHistoryTests(unittest.TestCase):
+    def test_legacy_same_day_candidate_moves_to_history_removal_audit(self):
+        history = empty_history("2026-08-07")
+        history.pop("visible_bottom_migration_version")
+        invalid_record = {
+            **pick(),
+            "id": "2026-08-07:first:600001",
+            "trade_date": "2026-08-07",
+            "tier": FIRST_TIER,
+            "bottom_date": "2026-08-07",
+            "selected_price": 10.0,
+            "current_price": 10.2,
+            "current_date": "2026-08-08",
+            "return_pct": 2.0,
+        }
+        history["dates"] = [
+            {
+                "trade_date": "2026-08-07",
+                FIRST_TIER: [invalid_record],
+                SECOND_TIER: [],
+                THIRD_TIER: [],
+                "removed": [],
+                "live_active_codes": ["600001"],
+            }
+        ]
+
+        history, changed = record_intraday_pools(
+            history,
+            "2026-08-08",
+            {FIRST_TIER: [], SECOND_TIER: [], THIRD_TIER: []},
+            set(),
+            "2026-08-08T10:00:00+08:00",
+        )
+
+        day = history["dates"][0]
+        self.assertTrue(changed)
+        self.assertEqual(day[FIRST_TIER], [])
+        self.assertEqual(day["live_active_codes"], [])
+        self.assertEqual(len(day["removed"]), 1)
+        self.assertTrue(day["removed"][0]["invalid_signal"])
+        self.assertEqual(
+            day["removed"][0]["removal_reason"],
+            "可能见底信号当日尚未形成（历史纠正）",
+        )
+        self.assertEqual(history["summary"]["selection_count"], 0)
+        self.assertEqual(history["summary"]["evaluated_count"], 0)
+        self.assertEqual(history["visible_bottom_migration_version"], 1)
+
+        repeated, changed_again = record_intraday_pools(
+            history,
+            "2026-08-08",
+            {FIRST_TIER: [], SECOND_TIER: [], THIRD_TIER: []},
+            set(),
+            "2026-08-08T10:00:00+08:00",
+        )
+        self.assertFalse(changed_again)
+        self.assertEqual(repeated, history)
+
+    def test_corrected_signal_can_reappear_after_a_later_bar(self):
+        history = empty_history("2026-08-07")
+        history.pop("visible_bottom_migration_version")
+        history["dates"] = [
+            {
+                "trade_date": "2026-08-07",
+                FIRST_TIER: [
+                    {
+                        **pick(),
+                        "trade_date": "2026-08-07",
+                        "tier": FIRST_TIER,
+                        "bottom_date": "2026-08-07",
+                    }
+                ],
+                SECOND_TIER: [],
+                THIRD_TIER: [],
+                "removed": [],
+                "live_active_codes": ["600001"],
+            }
+        ]
+        valid = pick()
+        valid["bottom_date"] = "2026-08-06"
+
+        history, changed = record_intraday_pools(
+            history,
+            "2026-08-07",
+            {FIRST_TIER: [], SECOND_TIER: [valid], THIRD_TIER: []},
+            {"600001"},
+            "2026-08-07T10:05:00+08:00",
+        )
+
+        day = history["dates"][0]
+        self.assertTrue(changed)
+        self.assertEqual(day[FIRST_TIER], [])
+        self.assertEqual(len(day[SECOND_TIER]), 1)
+        self.assertEqual(day[SECOND_TIER][0]["bottom_date"], "2026-08-06")
+        self.assertTrue(day["removed"][0]["active_again"])
+        self.assertEqual(day["live_active_codes"], ["600001"])
+
     def test_intraday_repaint_adds_removed_section_without_erasing_selection(self):
         history, changed = record_intraday_pools(
             empty_history(),

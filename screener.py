@@ -269,11 +269,17 @@ def zig_state(values: Sequence[float], threshold_pct: float = 16.0) -> dict:
 
 
 def bottom_signal_flags(bars: Sequence[Bar]) -> list[bool]:
-    """Tongdaxin possible-bottom marks, including the repainting right edge."""
+    """Return currently visible Tongdaxin possible-bottom text marks.
+
+    A falling ZIG candidate is not visible as a text signal on the same bar that
+    creates or refreshes the low.  It becomes provisionally visible only after
+    at least one later trading bar exists, and may still repaint away until the
+    rebound confirms the trough.
+    """
     cci = rolling_cci(bars)
     troughs = confirmed_zig_trough_flags([bar.close for bar in bars], 16.0)
     current = zig_state([bar.close for bar in bars], 16.0)
-    if int(current["state"]) == 2 and int(current["candidate_age"]) >= 0:
+    if int(current["state"]) == 2 and int(current["candidate_age"]) > 0:
         candidate_index = len(bars) - 1 - int(current["candidate_age"])
         troughs[candidate_index] = True
     return [

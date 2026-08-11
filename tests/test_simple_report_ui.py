@@ -45,7 +45,9 @@ class SimpleReportUiTests(unittest.TestCase):
         self.assertIn("盘中移除", page)
         self.assertIn("可能见底信号消失", page)
         self.assertIn('"removed":[', page)
-        self.assertIn("右侧临时信号出现即入选", page)
+        self.assertIn("至少一个后续交易日", page)
+        self.assertIn("文字标记已经出现后", page)
+        self.assertNotIn("一辰波段", page)
 
     def test_page_has_only_today_and_history_primary_views(self):
         page = render_report([], {"line_gap_max_abs": 0.5}, 0, [])

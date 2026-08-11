@@ -10,12 +10,14 @@ from simple_strategy import FIRST_TIER, SECOND_TIER, STRATEGY_VERSION, THIRD_TIE
 
 
 SCHEMA_VERSION = 1
+VISIBLE_BOTTOM_MIGRATION_VERSION = 1
 
 
 def empty_history(started_on: str = "") -> dict:
     return {
         "schema_version": SCHEMA_VERSION,
         "strategy_version": STRATEGY_VERSION,
+        "visible_bottom_migration_version": VISIBLE_BOTTOM_MIGRATION_VERSION,
         "started_on": started_on,
         "updated_at": "",
         "dates": [],
@@ -121,6 +123,89 @@ def _find_or_create_day(dates: list[dict], trade_date: str) -> tuple[dict, bool]
     return day, True
 
 
+def _move_unformed_same_day_records(
+    dates: list[dict],
+    generated_at: str,
+) -> bool:
+    """Move legacy same-day ZIG candidates out of the selected-tier ledger.
+
+    The corrected signal contract requires at least one later trading bar before
+    a falling ZIG candidate can display the possible-bottom text.  Older runs
+    briefly stored the still-forming low on its own date.  Keep those rows in the
+    day's removal audit instead of letting them affect selection or success
+    statistics.
+    """
+    changed = False
+    for day in dates:
+        trade_date = str(day.get("trade_date", ""))
+        if not trade_date:
+            continue
+        removed_values = day.get("removed", [])
+        if not isinstance(removed_values, list):
+            removed_values = []
+        removed_by_code = {
+            str(item.get("code", "")): item
+            for item in removed_values
+            if isinstance(item, dict) and item.get("code")
+        }
+        invalid_codes: set[str] = set()
+        for tier in (FIRST_TIER, SECOND_TIER, THIRD_TIER):
+            values = day.get(tier, [])
+            if not isinstance(values, list):
+                continue
+            kept: list[object] = []
+            for item in values:
+                if not isinstance(item, dict):
+                    kept.append(item)
+                    continue
+                code = str(item.get("code", ""))
+                is_unformed = bool(
+                    code and str(item.get("bottom_date", "")) == trade_date
+                )
+                if not is_unformed:
+                    kept.append(item)
+                    continue
+                invalid_codes.add(code)
+                removed = removed_by_code.get(code)
+                if removed is None:
+                    removed = copy.deepcopy(item)
+                    removed_values.append(removed)
+                    removed_by_code[code] = removed
+                selected_tier = (
+                    str(removed.get("selected_tier", ""))
+                    or str(item.get("tier", ""))
+                    or tier
+                )
+                removed.update(
+                    {
+                        "id": f"{trade_date}:removed:{code}",
+                        "selected_tier": selected_tier,
+                        "removed_at": generated_at,
+                        "removal_reason": "可能见底信号当日尚未形成（历史纠正）",
+                        "removal_count": max(
+                            1,
+                            int(removed.get("removal_count", 0) or 0),
+                        ),
+                        "active_again": False,
+                        "restored_at": "",
+                        "invalid_signal": True,
+                    }
+                )
+                changed = True
+            if len(kept) != len(values):
+                day[tier] = kept
+        if invalid_codes:
+            active_codes = day.get("live_active_codes", [])
+            if isinstance(active_codes, list):
+                day["live_active_codes"] = [
+                    str(code)
+                    for code in active_codes
+                    if str(code) and str(code) not in invalid_codes
+                ]
+            day["removed"] = removed_values
+    return changed
+
+
 def record_intraday_pools(
     history: Mapping[str, object],
     trade_date: str,
@@ -134,7 +219,9 @@ def record_intraday_pools(
     during the day. ``live_active_codes`` stores only the previous refresh state,
     allowing a later refresh to distinguish a repaint removal from a missing
     quote. A removed stock remains in its original tier and is also copied into
-    the day's ``removed`` section so the historical record is not rewritten.
+    the day's ``removed`` section. The sole cleanup exception is a legacy row
+    whose signal date equals its selection date: that still-forming candidate is
+    moved into the removal audit so it cannot affect performance statistics.
     """
     if not trade_date:
         return copy.deepcopy(dict(history)), False
@@ -149,6 +236,16 @@ def record_intraday_pools(
         dates = []
     dates = [item for item in dates if isinstance(item, dict)]
     working["dates"] = dates
+    history_migrated = False
+    if (
+        int(working.get("visible_bottom_migration_version", 0) or 0)
+        < VISIBLE_BOTTOM_MIGRATION_VERSION
+    ):
+        _move_unformed_same_day_records(dates, generated_at)
+        working["visible_bottom_migration_version"] = (
+            VISIBLE_BOTTOM_MIGRATION_VERSION
+        )
+        history_migrated = True
     has_day = any(
         isinstance(item, dict) and str(item.get("trade_date", "")) == trade_date
         for item in dates
@@ -163,9 +260,14 @@ def record_intraday_pools(
         )
     )
     if not has_day and not has_current_selection:
-        return working, False
+        if history_migrated:
+            working["updated_at"] = generated_at or (
+                datetime.now().astimezone().isoformat(timespec="seconds")
+            )
+            working["summary"] = summarize(dates)
+        return working, history_migrated
     day, created = _find_or_create_day(dates, trade_date)
-    changed = created
+    changed = created or history_migrated
 
     existing = _day_records(day)
     current: dict[str, tuple[str, Mapping[str, object]]] = {}
