@@ -1,6 +1,18 @@
 {
   "schema_version": 2,
   "stocks": {
+    "300506": {
+      "company_intro": "为客户提供差异化、定制化、智能化、艺术化的城市资产经营规划、投资、建设、运营一体化综合性服务。",
+      "concepts": [
+        "节能环保",
+        "深圳特区",
+        "LED概念"
+      ],
+      "customer_summary": "",
+      "industry": "装修装饰Ⅱ",
+      "market": 0,
+      "updated_at": "2026-08-11T01:30:44+00:00"
+    },
     "300912": {
       "company_intro": "主营车辆、工程机械和船舶尾气后处理系统，同时覆盖催化剂、尿素供给、热管理、传感器与检验检测等业务。",
       "concepts": [
@@ -8,12 +20,23 @@
         "商用车",
         "环保催化剂"
       ],
-      "industry": "汽车零部件",
+      "customer_source_url": "https://reportdocs.static.szse.cn/UpFiles/rasinfodisc/RAS_00017458E5CCD03FE4E2C82BCFEF7C3F.pdf",
       "customer_summary": "主要直供发动机、商用车及非道路机械厂，为其配套尾气后处理系统和相关零部件。",
+      "industry": "汽车零部件",
       "market": 0,
       "source_url": "https://www.kailongtec.com/pages_8/",
-      "customer_source_url": "https://reportdocs.static.szse.cn/UpFiles/rasinfodisc/RAS_00017458E5CCD03FE4E2C82BCFEF7C3F.pdf",
       "updated_at": "2026-08-10T18:01:00+08:00"
+    },
+    "600350": {
+      "company_intro": "公司主要从事对交通基础设施的投资运营、以及高速公路产业链上下游相关行业等领域的股权投资。",
+      "concepts": [
+        "参股银行",
+        "央国企改革"
+      ],
+      "customer_summary": "",
+      "industry": "铁路公路",
+      "market": 1,
+      "updated_at": "2026-08-11T01:30:44+00:00"
     },
     "600363": {
       "company_intro": "主营激光及LED、智能控制器、背光源和光电线缆等业务，产品服务特种装备、家电、汽车电子、工控与显示领域。",
@@ -22,11 +45,11 @@
         "智能控制器",
         "高温超导（参股）"
       ],
-      "industry": "光学光电子",
+      "customer_source_url": "http://static.cninfo.com.cn/finalpage/2026-04-30/1225267898.PDF",
       "customer_summary": "客户覆盖家电厨电、工控、汽车和光储；控股子公司华联电子服务伊莱克斯、海尔、美的等品牌。",
+      "industry": "光学光电子",
       "market": 1,
       "source_url": "https://lianovation.com.cn/aboutus/7.html",
-      "customer_source_url": "http://static.cninfo.com.cn/finalpage/2026-04-30/1225267898.PDF",
       "updated_at": "2026-08-10T18:01:00+08:00"
     },
     "688036": {
@@ -36,11 +59,11 @@
         "AI眼镜",
         "一带一路"
       ],
-      "industry": "消费电子",
+      "customer_source_url": "https://static.cninfo.com.cn/finalpage/2026-03-28/1225047544.PDF",
       "customer_summary": "手机主要销给海外经销商，少量直供当地运营商；最终面向非洲、南亚等新兴市场消费者。",
+      "industry": "消费电子",
       "market": 1,
       "source_url": "https://www.transsion.com/zh-CN/about",
-      "customer_source_url": "https://static.cninfo.com.cn/finalpage/2026-03-28/1225047544.PDF",
       "updated_at": "2026-08-10T18:01:00+08:00"
     },
     "688608": {
@@ -50,11 +73,11 @@
         "智能穿戴",
         "AI眼镜"
       ],
-      "industry": "半导体",
+      "customer_source_url": "https://static.cninfo.com.cn/finalpage/2026-03-27/1225037702.PDF",
       "customer_summary": "直接客户多为终端厂商、方案商或模组厂，并通过分销商供货；终端品牌覆盖三星、OPPO、小米、哈曼等。",
+      "industry": "半导体",
       "market": 1,
       "source_url": "https://www.bestechnic.com/content/2.html",
-      "customer_source_url": "https://static.cninfo.com.cn/finalpage/2026-03-27/1225037702.PDF",
       "updated_at": "2026-08-10T18:01:00+08:00"
     },
     "688679": {
@@ -64,13 +87,13 @@
         "污水处理",
         "土壤修复"
       ],
-      "industry": "环境治理",
+      "customer_source_url": "https://static.cninfo.com.cn/finalpage/2026-04-11/1225094571.PDF",
       "customer_summary": "主要服务地方政府及下属单位、城投环投平台和大型企业，承接固废治理、水环境修复及运营项目。",
+      "industry": "环境治理",
       "market": 1,
       "source_url": "http://www.ahtongyuan.com/about.html",
-      "customer_source_url": "https://static.cninfo.com.cn/finalpage/2026-04-11/1225094571.PDF",
       "updated_at": "2026-08-10T18:01:00+08:00"
     }
   },
-  "updated_at": "2026-08-10T18:01:00+08:00"
+  "updated_at": "2026-08-11T01:30:44+00:00"
 }
