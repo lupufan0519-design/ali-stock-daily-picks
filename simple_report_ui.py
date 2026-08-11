@@ -495,6 +495,16 @@ SCRIPT = r"""
     var text = String(value || "");
     return text.length >= 16 ? text.slice(11, 16) : "";
   }
+  function uniqueRemovedRows(rows) {
+    var byCode = new Map();
+    rows.forEach(function (item) {
+      var code = String(item.code || "");
+      if (!code) return;
+      var current = byCode.get(code);
+      if (!current || (current.invalid_signal && !item.invalid_signal)) byCode.set(code, item);
+    });
+    return Array.from(byCode.values());
+  }
   function renderRemovedRows(container, rows) {
     container.replaceChildren();
     rows.forEach(function (item) {
@@ -529,7 +539,7 @@ SCRIPT = r"""
     var first = day.first || [];
     var second = day.second || [];
     var third = day.third || [];
-    var removed = day.removed || [];
+    var removed = uniqueRemovedRows(day.removed || []);
     var head = node("div", "detail-date");
     var countCopy = "共 " + (first.length + second.length + third.length) + " 只";
     if (removed.length) countCopy += " · 移除 " + removed.length + " 只";

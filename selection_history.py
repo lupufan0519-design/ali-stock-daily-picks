@@ -250,6 +250,7 @@ def record_intraday_pools(
             VISIBLE_BOTTOM_MIGRATION_VERSION
         )
         history_migrated = True
+    summary_changed = working.get("summary") != summarize(dates)
     has_day = any(
         isinstance(item, dict) and str(item.get("trade_date", "")) == trade_date
         for item in dates
@@ -264,14 +265,14 @@ def record_intraday_pools(
         )
     )
     if not has_day and not has_current_selection:
-        if history_migrated:
+        if history_migrated or summary_changed:
             working["updated_at"] = generated_at or (
                 datetime.now().astimezone().isoformat(timespec="seconds")
             )
             working["summary"] = summarize(dates)
-        return working, history_migrated
+        return working, history_migrated or summary_changed
     day, created = _find_or_create_day(dates, trade_date)
-    changed = created or history_migrated
+    changed = created or history_migrated or summary_changed
 
     existing = _day_records(day)
     current: dict[str, tuple[str, Mapping[str, object]]] = {}
@@ -349,6 +350,10 @@ def record_intraday_pools(
             removed["removal_count"] = int(removed.get("removal_count", 0) or 0) + 1
             removed["active_again"] = False
             removed["restored_at"] = ""
+        correction = correction_by_code.get(code)
+        if correction is not None:
+            correction["active_again"] = False
+            correction["restored_at"] = ""
         changed = True
 
     for code in sorted(reappeared):
@@ -408,10 +413,14 @@ def summarize(dates: Iterable[Mapping[str, object]]) -> dict:
         "first_tier_count": sum(item.get("tier") == FIRST_TIER for item in records),
         "second_tier_count": sum(item.get("tier") == SECOND_TIER for item in records),
         "third_tier_count": sum(item.get("tier") == THIRD_TIER for item in records),
-        "removed_count": sum(
-            len(day.get("removed", []))
-            for day in date_values
-            if isinstance(day, Mapping) and isinstance(day.get("removed"), list)
+        "removed_count": len(
+            {
+                (str(day.get("trade_date", "")), str(item.get("code", "")))
+                for day in date_values
+                if isinstance(day, Mapping) and isinstance(day.get("removed"), list)
+                for item in day.get("removed", [])
+                if isinstance(item, Mapping) and item.get("code")
+            }
         ),
         "evaluated_count": len(settled),
         "success_count": len(successful),
