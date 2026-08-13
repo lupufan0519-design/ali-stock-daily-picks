@@ -1,14 +1,22 @@
 import json
+import tempfile
 import unittest
-from unittest.mock import patch
 from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
-from cloud_gate import parse_tencent_trade_date, should_screen
+from cloud_gate import (
+    parse_tencent_trade_date,
+    read_last_trade_date as read_gate_trade_date,
+    should_screen,
+)
 from cloud_daily import (
+    bootstrap_live_snapshot,
     bootstrap_payload,
     compact_snapshot,
+    read_bootstrap_trade_date,
+    read_last_trade_date,
     should_publish_close,
     snapshot_json,
 )
@@ -43,6 +51,258 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertTrue(
             should_publish_close("2026-07-31", "2026-07-31", True)
         )
+
+    def test_close_gate_uses_snapshot_instead_of_newer_intraday_history(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            snapshot = root / "cloud_snapshot.json"
+            history = root / "history.json"
+            state = root / "state.json"
+            snapshot.write_text(
+                json.dumps({"trade_date": "2026-08-10"}),
+                encoding="utf-8",
+            )
+            history.write_text(
+                json.dumps(
+                    {
+                        "last_close_trade_date": "2026-08-10",
+                        "dates": [{"trade_date": "2026-08-12"}],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            state.write_text(
+                json.dumps({"last_trade_date": "2026-08-06"}),
+                encoding="utf-8",
+            )
+            with (
+                patch("cloud_daily.SNAPSHOT_PATH", snapshot),
+                patch("cloud_daily.HISTORY_PATH", history),
+                patch("cloud_daily.STATE_PATH", state),
+            ):
+                before = read_last_trade_date()
+
+        self.assertEqual(before, "2026-08-10")
+        self.assertTrue(should_publish_close("2026-08-12", before, False))
+
+    def test_preflight_gate_uses_published_snapshot_instead_of_legacy_state(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            snapshot = root / "cloud_snapshot.json"
+            history = root / "history.json"
+            state = root / "state.json"
+            snapshot.write_text(
+                json.dumps({"trade_date": "2026-08-12"}),
+                encoding="utf-8",
+            )
+            history.write_text(
+                json.dumps({"last_close_trade_date": "2026-08-12"}),
+                encoding="utf-8",
+            )
+            state.write_text(
+                json.dumps({"last_trade_date": "2026-08-06"}),
+                encoding="utf-8",
+            )
+            with (
+                patch("cloud_gate.SNAPSHOT_PATH", snapshot),
+                patch("cloud_gate.HISTORY_PATH", history),
+                patch("cloud_gate.STATE_PATH", state),
+            ):
+                trade_date = read_gate_trade_date()
+
+        self.assertEqual(trade_date, "2026-08-12")
+
+    def test_preflight_gate_fails_open_for_an_invalid_published_snapshot(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            snapshot = root / "cloud_snapshot.json"
+            history = root / "history.json"
+            state = root / "state.json"
+            snapshot.write_text("null", encoding="utf-8")
+            history.write_text(
+                json.dumps({"last_close_trade_date": "2026-08-12"}),
+                encoding="utf-8",
+            )
+            state.write_text(
+                json.dumps({"last_trade_date": "2026-08-12"}),
+                encoding="utf-8",
+            )
+            with (
+                patch("cloud_gate.SNAPSHOT_PATH", snapshot),
+                patch("cloud_gate.HISTORY_PATH", history),
+                patch("cloud_gate.STATE_PATH", state),
+            ):
+                trade_date = read_gate_trade_date()
+
+        self.assertEqual(trade_date, "")
+
+    def test_close_gate_falls_back_to_explicit_close_marker_only(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            snapshot = root / "missing-snapshot.json"
+            history = root / "history.json"
+            state = root / "state.json"
+            history.write_text(
+                json.dumps(
+                    {
+                        "last_close_trade_date": "2026-08-11",
+                        "dates": [{"trade_date": "2026-08-12"}],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            state.write_text(
+                json.dumps({"last_trade_date": "2026-08-06"}),
+                encoding="utf-8",
+            )
+            with (
+                patch("cloud_daily.SNAPSHOT_PATH", snapshot),
+                patch("cloud_daily.HISTORY_PATH", history),
+                patch("cloud_daily.STATE_PATH", state),
+            ):
+                before = read_last_trade_date()
+
+        self.assertEqual(before, "2026-08-11")
+
+    def test_close_gate_fails_open_when_snapshot_is_corrupt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            snapshot = root / "broken-snapshot.json"
+            history = root / "history.json"
+            state = root / "state.json"
+            snapshot.write_text("not-json", encoding="utf-8")
+            history.write_text(
+                json.dumps({"dates": [{"trade_date": "2026-08-12"}]}),
+                encoding="utf-8",
+            )
+            state.write_text(
+                json.dumps({"last_trade_date": "2026-08-10"}),
+                encoding="utf-8",
+            )
+            with (
+                patch("cloud_daily.SNAPSHOT_PATH", snapshot),
+                patch("cloud_daily.HISTORY_PATH", history),
+                patch("cloud_daily.STATE_PATH", state),
+            ):
+                before = read_last_trade_date()
+
+        self.assertEqual(before, "")
+        self.assertTrue(should_publish_close("2026-08-12", before, False))
+
+    def test_close_gate_fails_open_for_invalid_snapshot_dates(self):
+        invalid_payloads = (
+            None,
+            [],
+            {},
+            {"trade_date": None},
+            {"trade_date": []},
+            {"trade_date": {}},
+            {"trade_date": "garbage"},
+            {"trade_date": "20260810"},
+            {"trade_date": "2026-8-10"},
+        )
+        for payload in invalid_payloads:
+            with self.subTest(payload=payload), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                snapshot = root / "cloud_snapshot.json"
+                history = root / "history.json"
+                state = root / "state.json"
+                snapshot.write_text(json.dumps(payload), encoding="utf-8")
+                history.write_text(
+                    json.dumps({"last_close_trade_date": "2026-08-12"}),
+                    encoding="utf-8",
+                )
+                state.write_text(
+                    json.dumps({"last_trade_date": "2026-08-12"}),
+                    encoding="utf-8",
+                )
+                with (
+                    patch("cloud_daily.SNAPSHOT_PATH", snapshot),
+                    patch("cloud_daily.HISTORY_PATH", history),
+                    patch("cloud_daily.STATE_PATH", state),
+                ):
+                    before = read_last_trade_date()
+
+            self.assertEqual(before, "")
+            self.assertTrue(should_publish_close("2026-08-12", before, False))
+
+    def test_bootstrap_prefers_explicit_close_marker_over_stale_snapshot(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            snapshot = root / "cloud_snapshot.json"
+            history = root / "history.json"
+            state = root / "state.json"
+            snapshot.write_text(
+                json.dumps({"trade_date": "2026-08-10"}),
+                encoding="utf-8",
+            )
+            history.write_text(
+                json.dumps({"last_close_trade_date": "2026-08-12"}),
+                encoding="utf-8",
+            )
+            state.write_text(
+                json.dumps({"last_trade_date": "2026-08-06"}),
+                encoding="utf-8",
+            )
+            with (
+                patch("cloud_daily.SNAPSHOT_PATH", snapshot),
+                patch("cloud_daily.HISTORY_PATH", history),
+                patch("cloud_daily.STATE_PATH", state),
+            ):
+                base_date = read_bootstrap_trade_date()
+
+        self.assertEqual(base_date, "2026-08-12")
+
+    def test_bootstrap_prefers_snapshot_over_older_legacy_state(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            snapshot = root / "cloud_snapshot.json"
+            history = root / "history.json"
+            state = root / "state.json"
+            snapshot.write_text(
+                json.dumps({"trade_date": "2026-08-10"}),
+                encoding="utf-8",
+            )
+            history.write_text(json.dumps({"dates": []}), encoding="utf-8")
+            state.write_text(
+                json.dumps({"last_trade_date": "2026-08-06"}),
+                encoding="utf-8",
+            )
+            with (
+                patch("cloud_daily.SNAPSHOT_PATH", snapshot),
+                patch("cloud_daily.HISTORY_PATH", history),
+                patch("cloud_daily.STATE_PATH", state),
+            ):
+                base_date = read_bootstrap_trade_date()
+
+        self.assertEqual(base_date, "2026-08-10")
+
+    def test_bootstrap_rejects_intraday_date_without_overwriting_snapshot(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            snapshot = root / "cloud_snapshot.json"
+            latest_html = root / "latest.html"
+            snapshot.write_text("settled-snapshot", encoding="utf-8")
+            latest_html.write_text("settled-page", encoding="utf-8")
+            evaluation = SimpleNamespace(date="2026-08-13")
+            with (
+                patch("cloud_daily.SNAPSHOT_PATH", snapshot),
+                patch("cloud_daily.LATEST_HTML_PATH", latest_html),
+                patch("cloud_daily.screener.load_state", return_value={}),
+                patch("cloud_daily.screener.load_config", return_value={"workers": 1}),
+                patch(
+                    "cloud_daily.screener.scan_market",
+                    return_value=([evaluation], [], 1),
+                ),
+                patch("cloud_daily.screener.scan_quality_error", return_value=""),
+                patch("company_metadata.enrich_evaluations", return_value=[]),
+                patch("cloud_daily.screener.is_intraday_snapshot", return_value=True),
+            ):
+                with self.assertRaisesRegex(RuntimeError, "拒绝把盘中数据"):
+                    bootstrap_live_snapshot("2026-08-13")
+
+            self.assertEqual(snapshot.read_text(encoding="utf-8"), "settled-snapshot")
+            self.assertEqual(latest_html.read_text(encoding="utf-8"), "settled-page")
 
     @staticmethod
     def live_seed(code="600001", bottom_age=0, limit_age=0, name="实时示例"):

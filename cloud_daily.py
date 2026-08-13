@@ -26,31 +26,56 @@ def snapshot_json(payload: dict) -> str:
     return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
 
 
-def read_last_trade_date() -> str:
-    if HISTORY_PATH.exists():
-        try:
-            history = json.loads(HISTORY_PATH.read_text(encoding="utf-8"))
-            dates = [
-                str(item.get("trade_date", ""))
-                for item in history.get("dates", [])
-                if isinstance(item, dict) and item.get("trade_date")
-            ]
-            if dates:
-                return max(dates)
-        except (OSError, ValueError, TypeError):
-            pass
-    if SNAPSHOT_PATH.exists():
-        try:
-            return str(
-                json.loads(SNAPSHOT_PATH.read_text(encoding="utf-8")).get(
-                    "trade_date", ""
-                )
-            )
-        except (OSError, ValueError, TypeError):
-            pass
-    if not STATE_PATH.exists():
+def normalized_trade_date(value: object) -> str:
+    if not isinstance(value, str):
         return ""
-    return str(json.loads(STATE_PATH.read_text(encoding="utf-8")).get("last_trade_date", ""))
+    try:
+        parsed = datetime.strptime(value, "%Y-%m-%d")
+    except ValueError:
+        return ""
+    return value if parsed.strftime("%Y-%m-%d") == value else ""
+
+
+def read_json_trade_date(path: Path, key: str) -> str:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, TypeError):
+        return ""
+    if not isinstance(payload, dict):
+        return ""
+    return normalized_trade_date(payload.get(key))
+
+
+def read_last_trade_date() -> str:
+    # The compact snapshot is the authoritative settled base for intraday
+    # calculations.  History may already contain today's provisional intraday
+    # selections, so its maximum date must never be used as a close marker.
+    if SNAPSHOT_PATH.exists():
+        trade_date = read_json_trade_date(SNAPSHOT_PATH, "trade_date")
+        if trade_date:
+            return trade_date
+        # A snapshot file without a valid settled date is not a usable publish
+        # base.  Fail open so the next close run repairs it instead of being
+        # suppressed by a newer provisional history entry.
+        return ""
+    if HISTORY_PATH.exists():
+        close_date = read_json_trade_date(HISTORY_PATH, "last_close_trade_date")
+        if close_date:
+            return close_date
+    return read_json_trade_date(STATE_PATH, "last_trade_date")
+
+
+def read_bootstrap_trade_date() -> str:
+    """Choose a settled close date for manual seed reconstruction."""
+    for path, key in (
+        (HISTORY_PATH, "last_close_trade_date"),
+        (SNAPSHOT_PATH, "trade_date"),
+        (STATE_PATH, "last_trade_date"),
+    ):
+        trade_date = read_json_trade_date(path, key)
+        if trade_date:
+            return trade_date
+    return ""
 
 
 def pack_live_seed(seed: dict) -> list:
@@ -213,10 +238,12 @@ def bootstrap_payload(
     }
 
 
-def bootstrap_live_snapshot() -> int:
+def bootstrap_live_snapshot(as_of: str | None = None) -> int:
     """Build live seeds from the last settled date without changing strategy state."""
     strategy = screener.load_state(STATE_PATH)
-    base_date = read_last_trade_date()
+    base_date = normalized_trade_date(as_of) if as_of else read_bootstrap_trade_date()
+    if as_of and not base_date:
+        raise ValueError("--as-of 必须是 YYYY-MM-DD")
     if not base_date:
         raise RuntimeError("策略状态没有可用于初始化的收盘交易日")
 
@@ -233,6 +260,10 @@ def bootstrap_live_snapshot() -> int:
     if payload["trade_date"] != base_date:
         raise RuntimeError(
             f"初始化交易日不一致：策略状态 {base_date}，行情 {payload['trade_date']}"
+        )
+    if screener.is_intraday_snapshot(payload["trade_date"]):
+        raise RuntimeError(
+            f"{payload['trade_date']} 尚未收盘：拒绝把盘中数据写入收盘快照"
         )
 
     SNAPSHOT_PATH.write_text(
@@ -283,9 +314,15 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="按最近结算日生成盘中数值种子，不修改策略状态",
     )
+    parser.add_argument(
+        "--as-of",
+        help="配合 --bootstrap-live 指定要重建的 YYYY-MM-DD 收盘日",
+    )
     args = parser.parse_args(argv)
+    if args.as_of and not args.bootstrap_live:
+        parser.error("--as-of 只能与 --bootstrap-live 一起使用")
     if args.bootstrap_live:
-        return bootstrap_live_snapshot()
+        return bootstrap_live_snapshot(args.as_of)
     if args.snapshot_only:
         payload = json.loads(LATEST_PATH.read_text(encoding="utf-8"))
         SNAPSHOT_PATH.write_text(

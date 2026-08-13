@@ -414,6 +414,25 @@ class SelectionHistoryTests(unittest.TestCase):
         self.assertAlmostEqual(history["summary"]["success_rate_pct"], 100.0)
         self.assertAlmostEqual(history["summary"]["average_return_pct"], 10.0)
 
+    def test_only_close_record_advances_the_explicit_close_marker(self):
+        history, _ = record_intraday_pools(
+            empty_history("2026-08-11"),
+            "2026-08-12",
+            {FIRST_TIER: [pick()], SECOND_TIER: [], THIRD_TIER: []},
+            {"600001"},
+            "2026-08-12T10:00:00+08:00",
+        )
+        self.assertEqual(history["last_close_trade_date"], "")
+
+        history = record_close(
+            history,
+            "2026-08-12",
+            {FIRST_TIER: [pick()], SECOND_TIER: [], THIRD_TIER: []},
+            [pick()],
+            "2026-08-12T15:40:00+08:00",
+        )
+        self.assertEqual(history["last_close_trade_date"], "2026-08-12")
+
     def test_same_stock_on_different_dates_is_an_independent_selection(self):
         history = record_close(
             empty_history(),
