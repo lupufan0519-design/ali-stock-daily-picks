@@ -19,6 +19,7 @@ def empty_history(started_on: str = "") -> dict:
         "strategy_version": STRATEGY_VERSION,
         "visible_bottom_migration_version": VISIBLE_BOTTOM_MIGRATION_VERSION,
         "started_on": started_on,
+        "last_close_trade_date": "",
         "updated_at": "",
         "dates": [],
         "summary": summarize([]),
@@ -38,6 +39,7 @@ def load_history(path: Path) -> dict:
         or not isinstance(payload.get("dates"), list)
     ):
         return empty_history()
+    payload.setdefault("last_close_trade_date", "")
     return payload
 
 
@@ -492,7 +494,9 @@ def record_close(
         prices,
         generated_at,
     )
-    return refresh_history(working, prices, trade_date, generated_at)
+    updated = refresh_history(working, prices, trade_date, generated_at)
+    updated["last_close_trade_date"] = trade_date
+    return updated
 
 
 def write_history(path: Path, history: Mapping[str, object]) -> None:

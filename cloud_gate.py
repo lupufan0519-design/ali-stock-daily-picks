@@ -13,17 +13,44 @@ from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parent
 STATE_PATH = ROOT / "strategy" / "state.json"
+SNAPSHOT_PATH = ROOT / "cloud_snapshot.json"
+HISTORY_PATH = ROOT / "results" / "history.json"
 SHANGHAI = ZoneInfo("Asia/Shanghai")
 SCREENING_START = "15:35"
 
 
-def read_last_trade_date(path: Path = STATE_PATH) -> str:
-    if not path.exists():
-        return ""
+def read_json_trade_date(path: Path, key: str) -> str:
     try:
-        return str(json.loads(path.read_text(encoding="utf-8")).get("last_trade_date", ""))
+        payload = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError, TypeError):
         return ""
+    if not isinstance(payload, dict):
+        return ""
+    value = payload.get(key)
+    if not isinstance(value, str):
+        return ""
+    try:
+        parsed = datetime.strptime(value, "%Y-%m-%d")
+    except ValueError:
+        return ""
+    return value if parsed.strftime("%Y-%m-%d") == value else ""
+
+
+def read_last_trade_date(path: Path | None = None) -> str:
+    if path is not None:
+        return read_json_trade_date(path, "last_trade_date")
+    if SNAPSHOT_PATH.exists():
+        # A present but invalid published snapshot must trigger a repair run.
+        # Falling through to history/state could otherwise hide the damage.
+        return read_json_trade_date(SNAPSHOT_PATH, "trade_date")
+    for candidate, key in (
+        (HISTORY_PATH, "last_close_trade_date"),
+        (STATE_PATH, "last_trade_date"),
+    ):
+        trade_date = read_json_trade_date(candidate, key)
+        if trade_date:
+            return trade_date
+    return ""
 
 
 def parse_tencent_trade_date(raw: str) -> str:
