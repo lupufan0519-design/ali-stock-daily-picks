@@ -64,6 +64,18 @@
       "source_url": "https://lianovation.com.cn/aboutus/7.html",
       "updated_at": "2026-08-10T18:01:00+08:00"
     },
+    "603668": {
+      "company_intro": "主要提供饲料相关产品与服务。",
+      "concepts": [
+        "新零售",
+        "鸡肉概念",
+        "C2M概念"
+      ],
+      "customer_summary": "",
+      "industry": "饲料",
+      "market": 1,
+      "updated_at": "2026-08-14T01:35:36+00:00"
+    },
     "688036": {
       "company_intro": "面向非洲、南亚等全球新兴市场经营TECNO、itel、Infinix手机，并布局数码配件、家电和移动互联网服务。",
       "concepts": [
@@ -107,5 +119,5 @@
       "updated_at": "2026-08-10T18:01:00+08:00"
     }
   },
-  "updated_at": "2026-08-14T01:30:44+00:00"
+  "updated_at": "2026-08-14T01:35:36+00:00"
 }
