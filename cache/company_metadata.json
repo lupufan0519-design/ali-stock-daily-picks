@@ -136,6 +136,17 @@
       "source_url": "https://lianovation.com.cn/aboutus/7.html",
       "updated_at": "2026-08-10T18:01:00+08:00"
     },
+    "603262": {
+      "company_intro": "不断为全球膳食营养补充行业提供原创性和定制化的营养原料及制剂产品。",
+      "concepts": [
+        "AI智能体",
+        "贬值受益"
+      ],
+      "customer_summary": "",
+      "industry": "食品加工",
+      "market": 1,
+      "updated_at": "2026-08-17T06:15:37+00:00"
+    },
     "603668": {
       "company_intro": "主要提供饲料相关产品与服务。",
       "concepts": [
@@ -202,5 +213,5 @@
       "updated_at": "2026-08-10T18:01:00+08:00"
     }
   },
-  "updated_at": "2026-08-17T05:50:38+00:00"
+  "updated_at": "2026-08-17T06:15:37+00:00"
 }
