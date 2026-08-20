@@ -2,7 +2,7 @@
   "schema_version": 1,
   "strategy_version": "three_tier_confirmed_bottom4_v6",
   "started_on": "2026-08-06",
-  "updated_at": "2026-08-20T15:00:44+08:00",
+  "updated_at": "2026-08-20T16:00:15+08:00",
   "dates": [
     {
       "trade_date": "2026-08-06",
@@ -11373,5 +11373,5 @@
     "average_return_pct": 3.8931894404035967
   },
   "visible_bottom_migration_version": 1,
-  "last_close_trade_date": "2026-08-19"
+  "last_close_trade_date": "2026-08-20"
 }
