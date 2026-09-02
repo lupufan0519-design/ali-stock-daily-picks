@@ -403,6 +403,9 @@ class SelectionHistoryTests(unittest.TestCase):
         self.assertEqual(history["summary"]["selection_count"], 1)
         self.assertEqual(history["summary"]["evaluated_count"], 0)
         self.assertIsNone(history["summary"]["success_rate_pct"])
+        self.assertEqual(history["summary"]["current_month"]["month"], "2026-08")
+        self.assertEqual(history["summary"]["current_month"]["evaluated_count"], 0)
+        self.assertIsNone(history["summary"]["current_month"]["success_rate_pct"])
 
         history = refresh_history(
             history,
@@ -413,6 +416,67 @@ class SelectionHistoryTests(unittest.TestCase):
         self.assertEqual(history["summary"]["success_count"], 1)
         self.assertAlmostEqual(history["summary"]["success_rate_pct"], 100.0)
         self.assertAlmostEqual(history["summary"]["average_return_pct"], 10.0)
+        self.assertEqual(history["summary"]["current_month"]["month"], "2026-08")
+        self.assertEqual(history["summary"]["current_month"]["evaluated_count"], 1)
+        self.assertAlmostEqual(
+            history["summary"]["current_month"]["success_rate_pct"], 100.0
+        )
+
+    def test_current_month_success_rate_uses_selection_month(self):
+        history = record_close(
+            empty_history(),
+            "2026-08-31",
+            {FIRST_TIER: [pick(code="600001", price=10.0)], SECOND_TIER: []},
+            [pick(code="600001", price=10.0)],
+        )
+        history = record_close(
+            history,
+            "2026-09-01",
+            {FIRST_TIER: [], SECOND_TIER: [pick(code="600002", price=20.0)]},
+            [
+                pick(code="600001", price=11.0),
+                pick(code="600002", price=20.0),
+            ],
+        )
+        history = refresh_history(
+            history,
+            {
+                "600001": {"price": 12.0},
+                "600002": {"price": 18.0},
+            },
+            "2026-09-02",
+        )
+
+        summary = history["summary"]
+        self.assertEqual(summary["selection_count"], 2)
+        self.assertEqual(summary["evaluated_count"], 2)
+        self.assertEqual(summary["success_count"], 1)
+        self.assertAlmostEqual(summary["success_rate_pct"], 50.0)
+        self.assertEqual(summary["current_month"]["month"], "2026-09")
+        self.assertEqual(summary["current_month"]["selection_count"], 1)
+        self.assertEqual(summary["current_month"]["evaluated_count"], 1)
+        self.assertEqual(summary["current_month"]["success_count"], 0)
+        self.assertAlmostEqual(summary["current_month"]["success_rate_pct"], 0.0)
+
+    def test_new_month_without_selections_does_not_fall_back_to_prior_month(self):
+        history = record_close(
+            empty_history(),
+            "2026-08-31",
+            {FIRST_TIER: [pick(price=10.0)], SECOND_TIER: []},
+            [pick(price=10.0)],
+        )
+        history = refresh_history(
+            history,
+            {"600001": {"price": 11.0}},
+            "2026-09-01",
+        )
+
+        summary = history["summary"]
+        self.assertAlmostEqual(summary["success_rate_pct"], 100.0)
+        self.assertEqual(summary["current_month"]["month"], "2026-09")
+        self.assertEqual(summary["current_month"]["selection_count"], 0)
+        self.assertEqual(summary["current_month"]["evaluated_count"], 0)
+        self.assertIsNone(summary["current_month"]["success_rate_pct"])
 
     def test_only_close_record_advances_the_explicit_close_marker(self):
         history, _ = record_intraday_pools(
