@@ -252,7 +252,7 @@ def record_intraday_pools(
             VISIBLE_BOTTOM_MIGRATION_VERSION
         )
         history_migrated = True
-    summary_changed = working.get("summary") != summarize(dates)
+    summary_changed = working.get("summary") != summarize(dates, trade_date)
     has_day = any(
         isinstance(item, dict) and str(item.get("trade_date", "")) == trade_date
         for item in dates
@@ -271,7 +271,7 @@ def record_intraday_pools(
             working["updated_at"] = generated_at or (
                 datetime.now().astimezone().isoformat(timespec="seconds")
             )
-            working["summary"] = summarize(dates)
+            working["summary"] = summarize(dates, trade_date)
         return working, history_migrated or summary_changed
     day, created = _find_or_create_day(dates, trade_date)
     changed = created or history_migrated or summary_changed
@@ -380,7 +380,7 @@ def record_intraday_pools(
     day["removed"] = removed_values
     if changed:
         working["updated_at"] = generated_at or datetime.now().astimezone().isoformat(timespec="seconds")
-        working["summary"] = summarize(dates)
+        working["summary"] = summarize(dates, trade_date)
     return working, changed
 
 
@@ -394,7 +394,10 @@ def _all_records(dates: Iterable[Mapping[str, object]]) -> list[dict]:
     return records
 
 
-def summarize(dates: Iterable[Mapping[str, object]]) -> dict:
+def summarize(
+    dates: Iterable[Mapping[str, object]],
+    reference_date: str = "",
+) -> dict:
     date_values = list(dates)
     records = _all_records(date_values)
     settled = [
@@ -410,6 +413,25 @@ def summarize(dates: Iterable[Mapping[str, object]]) -> dict:
         if settled
         else None
     )
+    statistics_month = reference_date[:7] if len(reference_date) >= 7 else ""
+    monthly_records = [
+        item
+        for item in records
+        if statistics_month
+        and str(item.get("trade_date", "")).startswith(f"{statistics_month}-")
+    ]
+    monthly_settled = [
+        item
+        for item in monthly_records
+        if str(item.get("current_date", "")) > str(item.get("trade_date", ""))
+        and float(item.get("selected_price", 0.0) or 0.0) > 0
+        and float(item.get("current_price", 0.0) or 0.0) > 0
+    ]
+    monthly_successful = [
+        item
+        for item in monthly_settled
+        if float(item.get("return_pct", 0.0)) > 0
+    ]
     return {
         "selection_count": len(records),
         "first_tier_count": sum(item.get("tier") == FIRST_TIER for item in records),
@@ -428,6 +450,17 @@ def summarize(dates: Iterable[Mapping[str, object]]) -> dict:
         "success_count": len(successful),
         "success_rate_pct": len(successful) / len(settled) * 100.0 if settled else None,
         "average_return_pct": average,
+        "current_month": {
+            "month": statistics_month,
+            "selection_count": len(monthly_records),
+            "evaluated_count": len(monthly_settled),
+            "success_count": len(monthly_successful),
+            "success_rate_pct": (
+                len(monthly_successful) / len(monthly_settled) * 100.0
+                if monthly_settled
+                else None
+            ),
+        },
     }
 
 
@@ -464,7 +497,7 @@ def refresh_history(
         else:
             record["status"] = "暂未上涨"
     updated["updated_at"] = generated_at or datetime.now().astimezone().isoformat(timespec="seconds")
-    updated["summary"] = summarize(dates)
+    updated["summary"] = summarize(dates, current_date)
     return updated
 
 

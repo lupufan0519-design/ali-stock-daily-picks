@@ -456,12 +456,41 @@ SCRIPT = r"""
     var history = state.history || {};
     return Array.isArray(history.dates) ? history.dates : [];
   }
-  function updateMetrics() {
+  function monthlySummary(year, month) {
+    var prefix = year + "-" + String(month + 1).padStart(2, "0") + "-";
+    var records = [];
+    historyDates().forEach(function (day) {
+      if (!String(day.trade_date || "").startsWith(prefix)) return;
+      ["first", "second", "third"].forEach(function (tier) {
+        var values = day[tier];
+        if (Array.isArray(values)) records = records.concat(values);
+      });
+    });
+    var evaluated = records.filter(function (item) {
+      return String(item.current_date || "") > String(item.trade_date || "") &&
+        Number(item.selected_price || 0) > 0 && Number(item.current_price || 0) > 0;
+    });
+    var successful = evaluated.filter(function (item) {
+      return Number(item.return_pct || 0) > 0;
+    });
+    return {
+      label: year + "年" + String(month + 1) + "月",
+      evaluatedCount: evaluated.length,
+      successRate: evaluated.length ? successful.length / evaluated.length * 100 : null
+    };
+  }
+  function updateMetrics(year, month) {
     var summary = (state.history || {}).summary || {};
+    if (year === undefined || month === undefined) {
+      var parts = defaultCalendarDate().split("-");
+      year = Number(parts[0]);
+      month = Number(parts[1]) - 1;
+    }
+    var monthly = monthlySummary(year, month);
     document.getElementById("history-count").textContent = String(summary.selection_count || 0);
-    document.getElementById("success-rate").textContent = summary.success_rate_pct === null || summary.success_rate_pct === undefined ? "—" : number(summary.success_rate_pct) + "%";
+    document.getElementById("success-rate").textContent = monthly.successRate === null ? "—" : number(monthly.successRate) + "%";
     document.getElementById("average-return").textContent = summary.average_return_pct === null || summary.average_return_pct === undefined ? "—" : signed(summary.average_return_pct);
-    document.getElementById("success-sample").textContent = "已产生后续行情 " + String(summary.evaluated_count || 0) + " 条";
+    document.getElementById("success-sample").textContent = monthly.label + " · 已产生后续行情 " + String(monthly.evaluatedCount) + " 条";
   }
   function dateMap() {
     var map = new Map();
@@ -471,6 +500,23 @@ SCRIPT = r"""
   function latestHistoryDate() {
     var dates = historyDates().map(function (item) { return item.trade_date; }).filter(Boolean).sort();
     return dates.length ? dates[dates.length - 1] : (state.close_trade_date || new Date().toISOString().slice(0, 10));
+  }
+  function defaultCalendarDate() {
+    var summary = (state.history || {}).summary || {};
+    var summaryMonth = (summary.current_month || {}).month || "";
+    var candidates = [
+      state.live_trade_date || "",
+      state.close_trade_date || "",
+      summaryMonth ? summaryMonth + "-01" : "",
+      latestHistoryDate()
+    ].filter(Boolean).sort();
+    return candidates.length ? candidates[candidates.length - 1] : new Date().toISOString().slice(0, 10);
+  }
+  function latestHistoryDateInMonth(monthPrefix) {
+    var dates = historyDates().map(function (item) { return item.trade_date; })
+      .filter(function (value) { return String(value || "").startsWith(monthPrefix + "-"); })
+      .sort();
+    return dates.length ? dates[dates.length - 1] : "";
   }
   function renderHistoryRows(container, rows, tier) {
     container.replaceChildren();
@@ -572,9 +618,10 @@ SCRIPT = r"""
   }
   function renderCalendar() {
     var map = dateMap();
-    if (!calendarCursor) calendarCursor = new Date(latestHistoryDate() + "T00:00:00");
+    if (!calendarCursor) calendarCursor = new Date(defaultCalendarDate() + "T00:00:00");
     var year = calendarCursor.getFullYear();
     var month = calendarCursor.getMonth();
+    updateMetrics(year, month);
     document.getElementById("calendar-label").textContent = year + " / " + String(month + 1).padStart(2, "0");
     var grid = document.getElementById("calendar-grid");
     grid.replaceChildren();
@@ -621,8 +668,11 @@ SCRIPT = r"""
     document.getElementById("today-view").hidden = view !== "today";
     document.getElementById("history-view").hidden = view !== "history";
     if (view === "history") {
-      if (!selectedDate) selectedDate = latestHistoryDate();
-      calendarCursor = new Date(selectedDate + "T00:00:00");
+      if (!calendarCursor) {
+        var defaultDate = defaultCalendarDate();
+        calendarCursor = new Date(defaultDate + "T00:00:00");
+        selectedDate = latestHistoryDateInMonth(defaultDate.slice(0, 7));
+      }
       renderCalendar();
       renderDayDetail(dateMap().get(selectedDate));
     }
@@ -761,8 +811,8 @@ def render_report(
       <header class="history-head"><p class="eyebrow">HISTORY LEDGER</p><h1>每一天的选择，都留在日历里。</h1><p class="intro">点击有标记的日期查看当日股票、入选价、最新价和至今收益。盘中曾入选但“可能见底”信号后来消失的股票，会保留在当日移除区。</p></header>
       <div class="metric-strip">
         <div class="metric"><span>累计入选记录</span><strong id="history-count">0</strong><small>同一股票不同日期入选，按独立记录计算</small></div>
-        <div class="metric"><span>总成功率</span><strong id="success-rate">—</strong><small id="success-sample">已产生后续行情 0 条</small></div>
-        <div class="metric"><span>平均至今收益</span><strong id="average-return">—</strong><small>当前价相对当日收盘入选价</small></div>
+        <div class="metric"><span>当月胜率</span><strong id="success-rate">—</strong><small id="success-sample">当月已产生后续行情 0 条</small></div>
+        <div class="metric"><span>累计平均至今收益</span><strong id="average-return">—</strong><small>全部记录的当前价相对当日收盘入选价</small></div>
       </div>
       <div class="calendar-layout">
         <section class="calendar-panel" aria-label="历史选股日历">
@@ -772,7 +822,7 @@ def render_report(
         </section>
         <section id="history-detail" class="history-detail" aria-live="polite"></section>
       </div>
-      <p class="footnote">“可能见底”按公式逐次重算：当天仍在形成低点、文字标记尚未出现时不入选；低点经过至少一个后续交易日且文字标记已经出现后，才进入梯队。后续重绘消失时，股票会从今日梯队移除，并保留在历史日历的当日移除区。新规则自 {html.escape(str(history_payload.get('started_on') or trade_date or '首次发布日'))} 起独立记录，不把旧策略结果混入成功率。今日入选尚无后续行情，暂不计成功或失败；未计交易费用、滑点及涨跌停无法成交。</p>
+      <p class="footnote">“可能见底”按公式逐次重算：当天仍在形成低点、文字标记尚未出现时不入选；低点经过至少一个后续交易日且文字标记已经出现后，才进入梯队。后续重绘消失时，股票会从今日梯队移除，并保留在历史日历的当日移除区。当月胜率按入选日归入日历当前显示的月份，切换月份会同步重算；今日入选尚无后续行情，暂不计成功或失败。新规则自 {html.escape(str(history_payload.get('started_on') or trade_date or '首次发布日'))} 起独立记录，未计交易费用、滑点及涨跌停无法成交。</p>
     </section>
   </main>
   <noscript><p class="shell empty">需要启用 JavaScript 才能切换日历和自动刷新最新行情。</p></noscript>
