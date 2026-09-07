@@ -6901,13 +6901,16 @@
       "updated_at": "2026-08-25T01:35:37+00:00"
     },
     "688126": {
-      "company_intro": "公司主营业务资料正在自动补全。",
-      "concepts": [],
+      "company_intro": "上海硅产业集团股份有限公司专注于半导体硅材料产业及其生态系统发展。",
+      "concepts": [
+        "国产芯片",
+        "半导体概念",
+        "中芯概念"
+      ],
       "customer_summary": "",
-      "industry": "",
-      "last_error": "RuntimeError: company metadata endpoints returned no data",
+      "industry": "半导体",
       "market": 1,
-      "retry_after": "2026-09-07T03:30:45+00:00"
+      "updated_at": "2026-09-07T03:30:49+00:00"
     },
     "688133": {
       "company_intro": "公司通过自主研发、品牌运营、品牌代理、集成打包服务等方式为生物医药、新材料、新能源、化工化学、精细化工、食品日化、分析检测等领域的实验室。",
@@ -8536,5 +8539,5 @@
       "updated_at": "2026-08-26T01:35:35+00:00"
     }
   },
-  "updated_at": "2026-09-07T02:40:37+00:00"
+  "updated_at": "2026-09-07T03:30:49+00:00"
 }
