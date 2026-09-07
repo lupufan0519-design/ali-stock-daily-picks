@@ -2,7 +2,7 @@
   "schema_version": 1,
   "strategy_version": "three_tier_confirmed_bottom4_v6",
   "started_on": "2026-08-06",
-  "updated_at": "2026-09-07T15:00:47+08:00",
+  "updated_at": "2026-09-07T15:54:40+08:00",
   "dates": [
     {
       "trade_date": "2026-08-06",
@@ -103831,11 +103831,11 @@
           "prior_three_gap_max": 0.10482162286000829,
           "first_seen_at": "2026-09-07T09:30:38+08:00",
           "selected_tier": "first",
-          "removed_at": "2026-09-07T10:20:29+08:00",
+          "removed_at": "2026-09-07T15:54:40+08:00",
           "removal_reason": "可能见底信号消失",
-          "removal_count": 3,
-          "active_again": true,
-          "restored_at": "2026-09-07T10:30:38+08:00"
+          "removal_count": 4,
+          "active_again": false,
+          "restored_at": ""
         },
         {
           "id": "2026-09-07:removed:002149",
@@ -104725,8 +104725,8 @@
           "removed_at": "2026-09-07T14:40:34+08:00",
           "removal_reason": "可能见底信号消失",
           "removal_count": 3,
-          "active_again": false,
-          "restored_at": ""
+          "active_again": true,
+          "restored_at": "2026-09-07T15:54:40+08:00"
         },
         {
           "id": "2026-09-07:removed:688148",
@@ -104764,7 +104764,6 @@
       ],
       "live_active_codes": [
         "000021",
-        "000063",
         "000157",
         "000545",
         "000620",
@@ -104776,6 +104775,7 @@
         "000960",
         "000973",
         "001229",
+        "001230",
         "001258",
         "001267",
         "001289",
@@ -105043,5 +105043,5 @@
     }
   },
   "visible_bottom_migration_version": 1,
-  "last_close_trade_date": "2026-09-04"
+  "last_close_trade_date": "2026-09-07"
 }
