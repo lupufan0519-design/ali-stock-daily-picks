@@ -7108,18 +7108,18 @@
       "updated_at": "2026-08-25T02:05:42+00:00"
     },
     "688036": {
-      "company_intro": "面向非洲、南亚等全球新兴市场经营TECNO、itel、Infinix手机，并布局数码配件、家电和移动互联网服务。",
+      "company_intro": "深圳传音控股股份有限公司(以下简称“传音控股”或“传音”)致力于成为新兴市场消费者最喜爱的智能终端产品和移动互联服务提供商。",
       "concepts": [
-        "AI手机",
-        "AI眼镜",
-        "一带一路"
+        "深圳特区",
+        "一带一路",
+        "AI智能体"
       ],
       "customer_source_url": "https://static.cninfo.com.cn/finalpage/2026-03-28/1225047544.PDF",
       "customer_summary": "手机主要销给海外经销商，少量直供当地运营商；最终面向非洲、南亚等新兴市场消费者。",
       "industry": "消费电子",
       "market": 1,
       "source_url": "https://www.transsion.com/zh-CN/about",
-      "updated_at": "2026-08-10T18:01:00+08:00"
+      "updated_at": "2026-09-10T02:20:44+00:00"
     },
     "688041": {
       "company_intro": "主要提供半导体相关产品与服务。",
@@ -9106,5 +9106,5 @@
       "updated_at": "2026-08-26T01:35:35+00:00"
     }
   },
-  "updated_at": "2026-09-10T01:50:39+00:00"
+  "updated_at": "2026-09-10T02:20:44+00:00"
 }
