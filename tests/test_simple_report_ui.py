@@ -95,7 +95,11 @@ class SimpleReportUiTests(unittest.TestCase):
         self.assertIn("(summary.current_month || {}).month", page)
         self.assertIn("latestHistoryDateInMonth(defaultDate.slice(0, 7))", page)
         self.assertIn("按入选日归入日历当前显示的月份", page)
-        self.assertIn("累计平均至今收益", page)
+        self.assertIn("当月入选平均至今收益", page)
+        self.assertIn('id="return-sample"', page)
+        self.assertIn("收益按该月入选记录等权计算至今", page)
+        self.assertIn("入选当日尚无后续行情的记录不计胜负或平均收益", page)
+        self.assertNotIn("summary.average_return_pct", page)
         self.assertIn("company-tags", page)
         self.assertIn("板块 · ", page)
         self.assertIn("公司主营业务资料正在自动补全", page)
@@ -174,6 +178,159 @@ class SimpleReportUiTests(unittest.TestCase):
         self.assertIn("绝对差额", page)
         self.assertIn("财务指标", page)
         self.assertNotIn("公司未公开具体客户名称", page)
+
+
+@unittest.skipUnless(shutil.which("node"), "Node.js is required to exercise monthly returns")
+class MonthlyReturnBehaviorTests(unittest.TestCase):
+    HARNESS = r"""
+const {script, initial, actions} = JSON.parse(require('fs').readFileSync(0, 'utf8'));
+class Element {
+  constructor(tag) { this.tag = tag; this.childNodes = []; this.attributes = {}; this.dataset = {}; this.events = {}; this._text = ''; }
+  set textContent(value) { this._text = String(value); this.childNodes = []; }
+  get textContent() { return this._text + this.childNodes.map(child => child.textContent).join(''); }
+  appendChild(child) { this.childNodes.push(child); return child; }
+  append(...children) { children.forEach(child => this.appendChild(child)); }
+  replaceChildren(...children) { this._text = ''; this.childNodes = children; }
+  setAttribute(name, value) { this.attributes[name] = String(value); }
+  removeAttribute(name) { delete this.attributes[name]; }
+  addEventListener(name, handler) { this.events[name] = handler; }
+  click() { if (this.events.click) this.events.click(); }
+}
+const elements = new Map();
+const views = ['today', 'history'].map(view => { const el = new Element('button'); el.dataset.view = view; return el; });
+global.document = {
+  createElement: tag => new Element(tag),
+  getElementById: id => {
+    if (!elements.has(id)) elements.set(id, new Element('div'));
+    return elements.get(id);
+  },
+  querySelectorAll: selector => selector === '.view-button' ? views : []
+};
+document.getElementById('initial-data').textContent = JSON.stringify(initial);
+let interval, nextLive;
+global.window = {setInterval(callback) { interval = callback; }};
+global.fetch = async () => nextLive ? {ok: true, json: async () => nextLive} : {ok: false, status: 503};
+const readMetrics = () => Object.fromEntries(['history-count', 'success-rate', 'average-return', 'success-sample', 'return-sample', 'calendar-label'].map(id => [id, document.getElementById(id).textContent]));
+(async () => {
+  eval(script);
+  await new Promise(resolve => setImmediate(resolve));
+  const snapshots = [readMetrics()];
+  for (const action of actions) {
+    if (action.type === 'view') views.find(view => view.dataset.view === action.view).click();
+    if (action.type === 'month') document.getElementById(action.direction === 'next' ? 'calendar-next' : 'calendar-prev').click();
+    if (action.type === 'refresh') { nextLive = action.live; await interval(); }
+    snapshots.push(readMetrics());
+  }
+  process.stdout.write(JSON.stringify(snapshots));
+})().catch(error => { console.error(error); process.exitCode = 1; });
+"""
+
+    @staticmethod
+    def record(trade_date, return_pct, **overrides):
+        record = {
+            "code": "600001", "name": "示例公司", "trade_date": trade_date,
+            "current_date": "2026-09-20", "selected_price": 10,
+            "current_price": 12, "return_pct": return_pct,
+        }
+        record.update(overrides)
+        return record
+
+    def monthly_state(self, august_returns=(20, -10, 0)):
+        return {
+            "live_trade_date": "2026-09-20", "close_trade_date": "2026-09-18",
+            "live_pools": {"first": [], "second": [], "third": []},
+            "history": {
+                "summary": {"selection_count": 99, "average_return_pct": 999},
+                "dates": [
+                    {"trade_date": "2026-07-10", "first": [self.record("2026-07-10", 100)]},
+                    {"trade_date": "2026-08-01", "first": [self.record("2026-08-01", august_returns[0])]},
+                    {"trade_date": "2026-08-02", "second": [self.record("2026-08-02", august_returns[1])]},
+                    {"trade_date": "2026-08-03", "third": [self.record("2026-08-03", august_returns[2])],
+                     "removed": [self.record("2026-08-03", 1000)]},
+                    {"trade_date": "2026-09-01", "first": [self.record("2026-09-01", 50)]},
+                ],
+            },
+        }
+
+    def run_monthly_view(self, initial, actions=()):
+        result = subprocess.run(
+            [shutil.which("node"), "-e", self.HARNESS],
+            input=json.dumps({"script": SCRIPT, "initial": initial, "actions": actions}, ensure_ascii=False),
+            capture_output=True, text=True, encoding="utf-8", timeout=10, check=True,
+        )
+        return json.loads(result.stdout)
+
+    def test_month_navigation_averages_only_that_months_entry_records_to_today(self):
+        snapshots = self.run_monthly_view(self.monthly_state(), [
+            {"type": "view", "view": "history"},
+            {"type": "month", "direction": "prev"},
+            {"type": "month", "direction": "prev"},
+            {"type": "month", "direction": "prev"},
+        ])
+        self.assertEqual(snapshots[0]["average-return"], "+50.00%")
+        august = snapshots[2]
+        self.assertEqual(august["calendar-label"], "2026 / 08")
+        self.assertEqual(august["average-return"], "+3.33%")
+        self.assertEqual(august["success-rate"], "33.33%")
+        self.assertEqual(august["return-sample"], "2026年8月入选 · 收益至今 · 有效样本 3 条")
+        self.assertEqual(snapshots[3]["average-return"], "+100.00%")
+        self.assertEqual(snapshots[4]["average-return"], "—")
+        self.assertEqual(snapshots[4]["success-rate"], "—")
+        self.assertTrue(all(snapshot["history-count"] == "99" for snapshot in snapshots))
+
+    def test_invalid_values_and_entry_day_records_do_not_dilute_month_average(self):
+        state = self.monthly_state()
+        records = [
+            self.record("2026-09-01", 20),
+            self.record("2026-09-01", "-10", selected_price="10", current_price="9"),
+            self.record("2026-09-01", 0),
+            self.record("2026-09-01", 1000, current_date="2026-09-01"),
+            self.record("2026-09-01", 1000, current_date="2026-08-31"),
+        ]
+        for invalid in (None, "", " ", False, True, "NaN", "Infinity", "-Infinity"):
+            records.append(self.record("2026-09-01", invalid))
+            records.append(self.record("2026-09-01", 1000, selected_price=invalid))
+            records.append(self.record("2026-09-01", 1000, current_price=invalid))
+        records.extend([
+            self.record("2026-09-01", 1000, selected_price=0),
+            self.record("2026-09-01", 1000, current_price=-1),
+        ])
+        state["history"]["dates"] = [{"trade_date": "2026-09-01", "first": records}]
+        snapshot = self.run_monthly_view(state)[0]
+        self.assertEqual(snapshot["average-return"], "+3.33%")
+        self.assertEqual(snapshot["return-sample"], "2026年9月入选 · 收益至今 · 有效样本 3 条")
+
+    def test_zero_return_is_valid_but_missing_return_displays_unavailable(self):
+        for value, expected, count in ((0, "0.00%", 1), (None, "—", 0)):
+            with self.subTest(value=value):
+                state = self.monthly_state()
+                state["history"]["dates"] = [{
+                    "trade_date": "2026-09-01", "first": [self.record("2026-09-01", value)]
+                }]
+                snapshot = self.run_monthly_view(state)[0]
+                self.assertEqual(snapshot["average-return"], expected)
+                self.assertIn("有效样本 " + str(count) + " 条", snapshot["return-sample"])
+
+    def test_live_refresh_and_view_switch_preserve_selected_month(self):
+        live = self.monthly_state((60, -30, 0))
+        live["live_trade_date"] = "2026-10-01"
+        next_live = self.monthly_state((-30, 0, 0))
+        next_live["live_trade_date"] = "2026-10-02"
+        snapshots = self.run_monthly_view(self.monthly_state(), [
+            {"type": "view", "view": "history"},
+            {"type": "month", "direction": "prev"},
+            {"type": "refresh", "live": live},
+            {"type": "view", "view": "today"},
+            {"type": "refresh", "live": next_live},
+            {"type": "view", "view": "history"},
+        ])
+        self.assertEqual(snapshots[3]["average-return"], "+10.00%")
+        self.assertEqual(snapshots[5]["average-return"], "-10.00%")
+        self.assertEqual(snapshots[6]["average-return"], "-10.00%")
+        for index in (3, 5, 6):
+            self.assertEqual(snapshots[index]["calendar-label"], "2026 / 08")
+            self.assertTrue(snapshots[index]["return-sample"].startswith("2026年8月入选"))
+            self.assertEqual(snapshots[index]["history-count"], "99")
 
 
 @unittest.skipUnless(shutil.which("node"), "Node.js is required to exercise the card renderer")
