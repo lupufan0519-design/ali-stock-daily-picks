@@ -1,6 +1,9 @@
+import json
+import shutil
+import subprocess
 import unittest
 
-from simple_report_ui import render_report
+from simple_report_ui import SCRIPT, render_report
 
 
 class SimpleReportUiTests(unittest.TestCase):
@@ -116,7 +119,14 @@ class SimpleReportUiTests(unittest.TestCase):
                     "company_intro": "主营高端测试设备。",
                     "industry": "专用设备",
                     "concepts": ["机器人", "工业互联"],
-                    "customer_summary": "头部制造企业与科研院所。",
+                    "financials": {
+                        "report_label": "2026年中报",
+                        "revenue_yoy_pct": 0,
+                        "parent_profit_yoy_pct": 12.34,
+                        "adjusted_profit_yoy_pct": -4.56,
+                        "operating_cash_to_parent_profit": 1.2,
+                        "cash_ratio_status": "ok",
+                    },
                 }
             ],
             {"line_gap_max_abs": 0.5},
@@ -126,8 +136,14 @@ class SimpleReportUiTests(unittest.TestCase):
         self.assertIn("主营高端测试设备", page)
         self.assertIn("专用设备", page)
         self.assertIn("机器人", page)
-        self.assertIn("主要客户", page)
-        self.assertIn("头部制造企业与科研院所", page)
+        self.assertIn("2026年中报", page)
+        self.assertIn('"revenue_yoy_pct":0', page)
+        self.assertIn("总营收同比", page)
+        self.assertIn("归母净利润同比", page)
+        self.assertIn("扣非净利润同比", page)
+        self.assertIn("经营现金流 / 归母净利", page)
+        self.assertNotIn("主要客户", page)
+        self.assertNotIn("customer-summary", page)
         self.assertNotIn("近两日出现可能见底 ·", page)
 
 
@@ -156,7 +172,166 @@ class SimpleReportUiTests(unittest.TestCase):
         self.assertIn("见底日收盘", page)
         self.assertIn("今日价", page)
         self.assertIn("绝对差额", page)
-        self.assertIn("公司未公开具体客户名称", page)
+        self.assertIn("财务指标", page)
+        self.assertNotIn("公司未公开具体客户名称", page)
+
+
+@unittest.skipUnless(shutil.which("node"), "Node.js is required to exercise the card renderer")
+class FinancialCardBehaviorTests(unittest.TestCase):
+    """Run the shipped JavaScript with a small DOM double, without network access."""
+
+    HARNESS = r"""
+const {script, rows} = JSON.parse(require('fs').readFileSync(0, 'utf8'));
+class Element {
+  constructor(tag) { this.tag = tag; this.className = ''; this.childNodes = []; this.attributes = {}; this.dataset = {}; this._text = ''; }
+  set textContent(value) { this._text = String(value); this.childNodes = []; }
+  get textContent() { return this._text + this.childNodes.map(child => child.textContent).join(''); }
+  appendChild(child) { this.childNodes.push(child); return child; }
+  append(...children) { children.forEach(child => this.appendChild(child)); }
+  replaceChildren(...children) { this._text = ''; this.childNodes = children; }
+  setAttribute(name, value) { this.attributes[name] = String(value); }
+  removeAttribute(name) { delete this.attributes[name]; }
+  addEventListener() {}
+  toJSON() { return {tag: this.tag, className: this.className, text: this.textContent, attributes: this.attributes, href: this.href, target: this.target, rel: this.rel, children: this.childNodes}; }
+}
+const elements = new Map();
+global.document = {
+  createElement: tag => new Element(tag),
+  getElementById: id => {
+    if (!elements.has(id)) elements.set(id, new Element('div'));
+    return elements.get(id);
+  },
+  querySelectorAll: () => []
+};
+document.getElementById('initial-data').textContent = JSON.stringify({live_trade_date: '2026-09-18', live_pools: {first: rows}});
+global.window = {setInterval() {}};
+global.fetch = async () => ({ok: false, status: 503});
+eval(script);
+process.stdout.write(JSON.stringify(document.getElementById('first-picks').childNodes));
+"""
+
+    def render_card(self, financials=None):
+        row = {
+            "code": "600001",
+            "name": "示例公司",
+            "market": 1,
+            "close": 10,
+            "company_intro": "主营高端测试设备。",
+            "industry": "专用设备",
+            "concepts": ["机器人"],
+            "customer_summary": "不应展示的旧客户数据",
+        }
+        if financials is not None:
+            row["financials"] = financials
+        result = subprocess.run(
+            [shutil.which("node"), "-e", self.HARNESS],
+            input=json.dumps({"script": SCRIPT, "rows": [row]}, ensure_ascii=False),
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=10,
+            check=True,
+        )
+        return json.loads(result.stdout)[0]
+
+    def nodes_with_class(self, root, class_name):
+        found = [root] if class_name in root["className"].split() else []
+        for child in root["children"]:
+            found.extend(self.nodes_with_class(child, class_name))
+        return found
+
+    def test_financial_grid_replaces_customer_display_after_company_intro(self):
+        card = self.render_card({
+            "report_label": "2026年中报",
+            "revenue_yoy_pct": 0,
+            "parent_profit_yoy_pct": 12.34,
+            "adjusted_profit_yoy_pct": -4.56,
+            "operating_cash_to_parent_profit": 1.2,
+            "cash_ratio_status": "ok",
+        })
+        classes = [child["className"] for child in card["children"]]
+        self.assertEqual(classes[classes.index("reason") + 1], "financial-summary")
+        self.assertEqual(len(self.nodes_with_class(card, "financial-cell")), 4)
+        values = self.nodes_with_class(card, "financial-value")
+        self.assertEqual([value["text"] for value in values], ["0.00%", "+12.34%", "-4.56%", "1.20 倍"])
+        self.assertIn("neutral", values[0]["className"])
+        self.assertIn("positive", values[1]["className"])
+        self.assertIn("negative", values[2]["className"])
+        self.assertNotIn("positive", values[3]["className"])
+        self.assertNotIn("negative", values[3]["className"])
+        self.assertNotIn("主要客户", card["text"])
+        self.assertNotIn("不应展示的旧客户数据", card["text"])
+        self.assertIn("板块 · 专用设备", card["text"])
+        self.assertIn("见底日收盘", card["text"])
+
+    def test_absent_financials_and_null_values_never_become_zero(self):
+        for data in [None, {}, {"revenue_yoy_pct": None, "parent_profit_yoy_pct": "", "adjusted_profit_yoy_pct": False}]:
+            with self.subTest(data=data):
+                values = self.nodes_with_class(self.render_card(data), "financial-value")
+                self.assertEqual([value["text"] for value in values], ["暂无"] * 4)
+
+    def test_malformed_growth_values_are_unavailable(self):
+        card = self.render_card({"revenue_yoy_pct": "12.3", "parent_profit_yoy_pct": [], "adjusted_profit_yoy_pct": {}})
+        values = self.nodes_with_class(card, "financial-value")
+        self.assertEqual([value["text"] for value in values[:3]], ["暂无"] * 3)
+
+    def test_cash_ratio_distinguishes_nonpositive_profit_from_missing(self):
+        for status, value, expected in [
+            ("nonpositive_profit", -1.5, "不适用"),
+            ("nonpositive_profit", None, "不适用"),
+            ("missing", 1.5, "暂无"),
+            ("ok", None, "暂无"),
+            ("ok", 0, "0.00 倍"),
+            ("ok", -0.25, "-0.25 倍"),
+        ]:
+            with self.subTest(status=status, value=value):
+                card = self.render_card({"cash_ratio_status": status, "operating_cash_to_parent_profit": value})
+                ratio = self.nodes_with_class(card, "cash-ratio")[0]
+                self.assertEqual(ratio["text"], expected)
+                self.assertNotIn("positive", ratio["className"])
+                self.assertNotIn("negative", ratio["className"])
+
+    def test_period_source_and_touch_accessible_explanation(self):
+        source_url = "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?type=web&code=SH600001"
+        card = self.render_card({"report_label": "2026年中报", "notice_date": "2026-08-20", "source_url": source_url, "stale": True})
+        self.assertIn("2026年中报 · 年初至报告期末 · 待更新", card["text"])
+        source = self.nodes_with_class(card, "financial-source")[0]
+        self.assertEqual(source["href"], source_url)
+        self.assertEqual(source["rel"], "noopener noreferrer")
+        self.assertEqual(source["target"], "_blank")
+        self.assertIn("新窗口", source["attributes"]["aria-label"])
+        note = self.nodes_with_class(card, "financial-note")[0]
+        self.assertEqual(note["tag"], "details")
+        self.assertEqual(note["children"][0]["tag"], "summary")
+        self.assertIn("上年同期", note["text"])
+        self.assertIn("经营活动产生的现金流量净额 ÷ 归属于母公司股东的净利润", note["text"])
+        self.assertIn("并非越高越好", note["text"])
+        self.assertIn("公告日期：2026-08-20", note["text"])
+        self.assertIn("最近一次缓存", note["text"])
+
+    def test_source_link_rejects_untrusted_urls(self):
+        for value in [
+            "javascript:alert(1)",
+            "http://emweb.securities.eastmoney.com/",
+            "https://eastmoney.com.evil.example/",
+            "https://fakeeastmoney.com/",
+            "https://eastmoney.com@evil.example/",
+            "https://user:password@emweb.securities.eastmoney.com/",
+            "https://emweb.securities.eastmoney.com:8443/",
+            "//emweb.securities.eastmoney.com/",
+            {},
+        ]:
+            with self.subTest(value=value):
+                card = self.render_card({"source_url": value})
+                self.assertEqual(self.nodes_with_class(card, "financial-source"), [])
+
+    def test_report_date_fallback_and_untrusted_text_remain_text(self):
+        card = self.render_card({"report_date": "2026-06-30", "notice_date": "<img src=x onerror=alert(1)>"})
+        self.assertIn("2026-06-30", self.nodes_with_class(card, "financial-period")[0]["text"])
+        note = self.nodes_with_class(card, "financial-note")[0]
+        self.assertEqual(note["children"][-1]["tag"], "p")
+        self.assertEqual(note["children"][-1]["children"], [])
+        self.assertIn("<img src=x onerror=alert(1)>", note["children"][-1]["text"])
 
 
 if __name__ == "__main__":

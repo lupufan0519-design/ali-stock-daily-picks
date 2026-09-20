@@ -107,6 +107,7 @@ class Evaluation:
     industry: str = ""
     concepts: list[str] = field(default_factory=list)
     customer_summary: str = ""
+    financials: dict = field(default_factory=dict)
 
 
 def load_config(path: Path) -> dict:
@@ -1585,8 +1586,14 @@ def main(argv: Iterable[str] | None = None) -> int:
             print(quality_error, file=sys.stderr)
             return 4
         from company_metadata import enrich_evaluations
+        from financial_metrics import enrich_financial_evaluations
 
         metadata_errors = enrich_evaluations(evaluations, cfg["workers"])
+        financial_errors = enrich_financial_evaluations(
+            evaluations, cfg["workers"], as_of=args.as_of or ""
+        )
+        if financial_errors:
+            print(f"财报补充失败 {len(financial_errors)} 只，保留缓存或显示暂无", flush=True)
         if metadata_errors:
             print(
                 f"公司资料补充失败 {len(metadata_errors)} 只，页面已使用简洁兜底文案",

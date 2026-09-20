@@ -1124,6 +1124,7 @@ class CloudWorkflowTests(unittest.TestCase):
                 "industry",
                 "concepts",
                 "customer_summary",
+                "financials",
             ],
         )
         encoded = snapshot_json(snapshot)
