@@ -141,6 +141,15 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
 .today-total { text-align: right; font-family: "SFMono-Regular", Consolas, monospace; }
 .today-total strong { display: block; font-size: 38px; line-height: 1; }
 .today-total span { color: var(--muted); font-size: 12px; }
+.sort-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 24px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+.sort-controls { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.sort-label { flex-shrink: 0; font-size: 13px; font-weight: 700; }
+.sort-select, .sort-direction { min-height: 44px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--ink); font: inherit; font-size: 13px; }
+.sort-select { min-width: 0; width: 210px; padding: 9px 10px; cursor: pointer; }
+.sort-direction { flex-shrink: 0; padding: 9px 12px; cursor: pointer; touch-action: manipulation; }
+.sort-direction:hover { border-color: var(--blue); background: var(--blue-soft); }
+.sort-select:focus-visible, .sort-direction:focus-visible { outline: 3px solid rgba(49,93,168,.28); outline-offset: 2px; }
+.sort-hint { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
 .tier-section { padding: 38px 0 12px; }
 .tier-title-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 16px; }
 .tier-kicker { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; color: var(--muted); font-size: 12px; font-weight: 750; letter-spacing: .1em; }
@@ -321,6 +330,10 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
   .date-seal { display: none; }
   h1 { font-size: 34px; }
   .tier-section { padding-top: 30px; }
+  .sort-toolbar { gap: 8px; padding: 14px 0; }
+  .sort-controls { width: 100%; gap: 8px; }
+  .sort-select { flex: 1; width: 0; }
+  .sort-direction { padding: 9px 10px; }
   .pick-card { min-height: 0; padding: 19px 17px 17px 28px; }
   .financial-cell { padding: 9px 10px; }
   .financial-value { font-size: 19px; }
@@ -347,6 +360,91 @@ SCRIPT = r"""
   var state = JSON.parse(initialNode.textContent || "{}");
   var selectedDate = "";
   var calendarCursor = null;
+  var SORT_OPTIONS = {
+    gap: { label: "见底后差额（绝对值）", direction: "asc" },
+    change: { label: "今日涨跌幅", direction: "desc" },
+    revenue: { label: "总营收同比", direction: "desc" },
+    parent: { label: "归母净利润同比", direction: "desc" },
+    adjusted: { label: "扣非净利润同比", direction: "desc" },
+    cash: { label: "经营现金流 / 归母净利", direction: "desc" }
+  };
+  var sortPreference = readSortPreference();
+
+  function validSortKey(key) {
+    return Object.prototype.hasOwnProperty.call(SORT_OPTIONS, key);
+  }
+  function readSortPreference() {
+    try {
+      var saved = JSON.parse(localStorage.getItem("stock-card-sort-v1") || "null");
+      if (saved && validSortKey(saved.key)) {
+        return { key: saved.key, direction: saved.direction === "asc" || saved.direction === "desc" ? saved.direction : SORT_OPTIONS[saved.key].direction };
+      }
+    } catch (error) { /* Storage may be disabled; keep sorting available. */ }
+    return { key: "gap", direction: "asc" };
+  }
+  function saveSortPreference(preference) {
+    try { localStorage.setItem("stock-card-sort-v1", JSON.stringify(preference)); }
+    catch (error) { /* This page still retains the selection until it is closed. */ }
+  }
+  function sortValue(item, key) {
+    if (!validSortKey(key)) return null;
+    item = item || {};
+    if (key === "gap") {
+      var gap = financialNumber(item.bottom_price_gap_abs);
+      if (gap !== null && gap >= 0) return gap;
+      var price = financialNumber(item.price);
+      if (price === null || price <= 0) price = financialNumber(item.close);
+      var bottom = financialNumber(item.bottom_price);
+      return price !== null && price > 0 && bottom !== null && bottom > 0 ? Math.abs(price - bottom) : null;
+    }
+    if (key === "change") return financialNumber(item.change_pct);
+    var data = item.financials || {};
+    var fields = { revenue: "revenue_yoy_pct", parent: "parent_profit_yoy_pct", adjusted: "adjusted_profit_yoy_pct", cash: "operating_cash_to_parent_profit" };
+    if (key === "cash" && data.cash_ratio_status !== "ok") return null;
+    return financialNumber(data[fields[key]]);
+  }
+  function sortedRows(rows, key, direction) {
+    key = validSortKey(key) ? key : "gap";
+    direction = direction === "asc" || direction === "desc" ? direction : SORT_OPTIONS[key].direction;
+    return rows.map(function (item, index) {
+      return { item: item, index: index, value: sortValue(item, key) };
+    }).sort(function (a, b) {
+      if (a.value === null && b.value === null) return a.index - b.index;
+      if (a.value === null) return 1;
+      if (b.value === null) return -1;
+      if (a.value === b.value) return a.index - b.index;
+      return direction === "asc" ? a.value - b.value : b.value - a.value;
+    }).map(function (entry) { return entry.item; });
+  }
+  function syncSortControls() {
+    document.getElementById("sort-key").value = sortPreference.key;
+    var ascending = sortPreference.direction === "asc";
+    var button = document.getElementById("sort-direction");
+    button.textContent = ascending ? "从小到大 ↑" : "从大到小 ↓";
+    button.setAttribute("aria-label", "当前" + (ascending ? "从小到大，点击改为从大到小" : "从大到小，点击改为从小到大"));
+  }
+  function initSortControls() {
+    var select = document.getElementById("sort-key");
+    Object.keys(SORT_OPTIONS).forEach(function (key) {
+      var option = node("option", "", SORT_OPTIONS[key].label);
+      option.value = key;
+      select.appendChild(option);
+    });
+    select.addEventListener("change", function () {
+      if (!validSortKey(select.value)) return;
+      sortPreference = { key: select.value, direction: SORT_OPTIONS[select.value].direction };
+      saveSortPreference(sortPreference);
+      syncSortControls();
+      updateToday();
+    });
+    document.getElementById("sort-direction").addEventListener("click", function () {
+      sortPreference.direction = sortPreference.direction === "asc" ? "desc" : "asc";
+      saveSortPreference(sortPreference);
+      syncSortControls();
+      updateToday();
+    });
+    syncSortControls();
+  }
 
   function node(tag, className, text) {
     var item = document.createElement(tag);
@@ -494,9 +592,9 @@ SCRIPT = r"""
   }
   function updateToday() {
     var current = picks();
-    renderCards("first-picks", current.first, "first");
-    renderCards("second-picks", current.second, "second");
-    renderCards("third-picks", current.third, "third");
+    renderCards("first-picks", sortedRows(current.first, sortPreference.key, sortPreference.direction), "first");
+    renderCards("second-picks", sortedRows(current.second, sortPreference.key, sortPreference.direction), "second");
+    renderCards("third-picks", sortedRows(current.third, sortPreference.key, sortPreference.direction), "third");
     document.getElementById("first-count").textContent = String(current.first.length);
     document.getElementById("second-count").textContent = String(current.second.length);
     document.getElementById("third-count").textContent = String(current.third.length);
@@ -532,24 +630,44 @@ SCRIPT = r"""
     var successful = evaluated.filter(function (item) {
       return Number(item.return_pct || 0) > 0;
     });
+    function finiteValue(value) {
+      if (typeof value !== "number" && typeof value !== "string") return null;
+      if (typeof value === "string" && !value.trim()) return null;
+      var parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+    var returns = evaluated.filter(function (item) {
+      var selectedPrice = finiteValue(item.selected_price);
+      var currentPrice = finiteValue(item.current_price);
+      return selectedPrice !== null && selectedPrice > 0 &&
+        currentPrice !== null && currentPrice > 0 && finiteValue(item.return_pct) !== null;
+    }).map(function (item) { return finiteValue(item.return_pct); });
     return {
       label: year + "年" + String(month + 1) + "月",
       evaluatedCount: evaluated.length,
-      successRate: evaluated.length ? successful.length / evaluated.length * 100 : null
+      successRate: evaluated.length ? successful.length / evaluated.length * 100 : null,
+      returnCount: returns.length,
+      averageReturn: returns.length ? returns.reduce(function (sum, value) { return sum + value; }, 0) / returns.length : null
     };
   }
   function updateMetrics(year, month) {
     var summary = (state.history || {}).summary || {};
     if (year === undefined || month === undefined) {
-      var parts = defaultCalendarDate().split("-");
-      year = Number(parts[0]);
-      month = Number(parts[1]) - 1;
+      if (calendarCursor) {
+        year = calendarCursor.getFullYear();
+        month = calendarCursor.getMonth();
+      } else {
+        var parts = defaultCalendarDate().split("-");
+        year = Number(parts[0]);
+        month = Number(parts[1]) - 1;
+      }
     }
     var monthly = monthlySummary(year, month);
     document.getElementById("history-count").textContent = String(summary.selection_count || 0);
     document.getElementById("success-rate").textContent = monthly.successRate === null ? "—" : number(monthly.successRate) + "%";
-    document.getElementById("average-return").textContent = summary.average_return_pct === null || summary.average_return_pct === undefined ? "—" : signed(summary.average_return_pct);
+    document.getElementById("average-return").textContent = monthly.averageReturn === null ? "—" : signed(monthly.averageReturn);
     document.getElementById("success-sample").textContent = monthly.label + " · 已产生后续行情 " + String(monthly.evaluatedCount) + " 条";
+    document.getElementById("return-sample").textContent = monthly.label + "入选 · 收益至今 · 有效样本 " + String(monthly.returnCount) + " 条";
   }
   function dateMap() {
     var map = new Map();
@@ -765,6 +883,7 @@ SCRIPT = r"""
       document.getElementById("market-label").textContent = "使用最近一次数据";
     }
   }
+  initSortControls();
   updateToday();
   updateMetrics();
   setView("today");
@@ -853,6 +972,14 @@ def render_report(
         <div><p class="eyebrow">TODAY / <span id="today-date-copy">{html.escape(trade_date)}</span></p><h1>今天，只看三梯队。</h1><p class="intro">第一梯队看龙虎线靠拢，第二梯队看当前价格是否处在黄线下方，第三梯队收纳其余近三个交易日见底信号。</p></div>
         <div class="today-total"><strong id="today-total-value">0</strong><span>今日合计</span></div>
       </header>
+      <div class="sort-toolbar" aria-label="今日选股排序">
+        <div class="sort-controls">
+          <label class="sort-label" for="sort-key">排序</label>
+          <select id="sort-key" class="sort-select" aria-describedby="sort-hint"></select>
+          <button id="sort-direction" class="sort-direction" type="button">从小到大 ↑</button>
+        </div>
+        <p id="sort-hint" class="sort-hint">仅改变各梯队的显示顺序，暂无或不适用排末。</p>
+      </div>
       <section class="tier-section first">
         <div class="tier-title-row"><div><div class="tier-kicker"><span class="tier-index">01</span>优先查看</div><h2>第一梯队 <span id="first-count">0</span></h2></div><p class="tier-rule">近 4 个交易日出现可能见底，且此前连续 3 个交易日的龙虎线差值绝对值，每一天都不大于 0.5。</p></div>
         <div id="first-picks" class="pick-grid"></div>
@@ -871,7 +998,7 @@ def render_report(
       <div class="metric-strip">
         <div class="metric"><span>累计入选记录</span><strong id="history-count">0</strong><small>同一股票不同日期入选，按独立记录计算</small></div>
         <div class="metric"><span>当月胜率</span><strong id="success-rate">—</strong><small id="success-sample">当月已产生后续行情 0 条</small></div>
-        <div class="metric"><span>累计平均至今收益</span><strong id="average-return">—</strong><small>全部记录的当前价相对当日收盘入选价</small></div>
+        <div class="metric"><span>当月入选平均至今收益</span><strong id="average-return">—</strong><small id="return-sample">当月入选 · 收益至今 · 有效样本 0 条</small></div>
       </div>
       <div class="calendar-layout">
         <section class="calendar-panel" aria-label="历史选股日历">
@@ -881,7 +1008,7 @@ def render_report(
         </section>
         <section id="history-detail" class="history-detail" aria-live="polite"></section>
       </div>
-      <p class="footnote">“可能见底”按公式逐次重算：当天仍在形成低点、文字标记尚未出现时不入选；低点经过至少一个后续交易日且文字标记已经出现后，才进入梯队。后续重绘消失时，股票会从今日梯队移除，并保留在历史日历的当日移除区。当月胜率按入选日归入日历当前显示的月份，切换月份会同步重算；今日入选尚无后续行情，暂不计成功或失败。新规则自 {html.escape(str(history_payload.get('started_on') or trade_date or '首次发布日'))} 起独立记录，未计交易费用、滑点及涨跌停无法成交。</p>
+      <p class="footnote">“可能见底”按公式逐次重算：当天仍在形成低点、文字标记尚未出现时不入选；低点经过至少一个后续交易日且文字标记已经出现后，才进入梯队。后续重绘消失时，股票会从今日梯队移除，并保留在历史日历的当日移除区。当月胜率与平均至今收益按入选日归入日历当前显示的月份，切换月份会同步重算；收益按该月入选记录等权计算至今。入选当日尚无后续行情的记录不计胜负或平均收益，价格或收益缺失的记录不计平均收益。新规则自 {html.escape(str(history_payload.get('started_on') or trade_date or '首次发布日'))} 起独立记录，未计交易费用、滑点及涨跌停无法成交。</p>
     </section>
   </main>
   <noscript><p class="shell empty">需要启用 JavaScript 才能切换日历和自动刷新最新行情。</p></noscript>
