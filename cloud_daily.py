@@ -194,6 +194,7 @@ def compact_snapshot(payload: dict) -> dict:
         "industry",
         "concepts",
         "customer_summary",
+        "financials",
     )
     return {
         "trade_date": payload.get("trade_date"),
@@ -254,8 +255,10 @@ def bootstrap_live_snapshot(as_of: str | None = None) -> int:
     if quality_error:
         raise RuntimeError(quality_error)
     from company_metadata import enrich_evaluations
+    from financial_metrics import enrich_financial_evaluations
 
     enrich_evaluations(evaluations, cfg["workers"])
+    enrich_financial_evaluations(evaluations, cfg["workers"], as_of=base_date)
     payload = bootstrap_payload(evaluations, cfg, scanned, errors, strategy)
     if payload["trade_date"] != base_date:
         raise RuntimeError(

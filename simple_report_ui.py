@@ -180,21 +180,24 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
 .negative { color: var(--green); }
 .neutral { color: var(--muted); }
 .reason { margin: 16px 0 13px; color: #373c44; font-size: 13px; line-height: 1.65; }
-.customer-summary {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 10px;
-  align-items: start;
-  margin: -2px 0 14px;
-  padding: 10px 12px;
-  border-left: 2px solid #c6a84a;
-  background: #faf8f0;
-  color: #4b4f55;
-  font-size: 12px;
-  line-height: 1.55;
-}
-.customer-summary span { color: #806013; font-weight: 700; white-space: nowrap; }
-.customer-summary p { margin: 0; }
+.financial-summary { margin: 0 0 16px; }
+.financial-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 8px; font-size: 11px; line-height: 1.5; }
+.financial-period { color: var(--muted); }
+.financial-source { color: var(--blue); text-decoration: underline; text-decoration-color: #c3cfe3; text-underline-offset: 3px; }
+.financial-source:hover { text-decoration-color: currentColor; }
+.financial-source:focus-visible, .financial-note summary:focus-visible { outline: 3px solid rgba(49,93,168,.28); outline-offset: 3px; border-radius: 3px; }
+.financial-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; border: 1px solid #e2e4df; border-radius: 10px; background: #f8f8f5; overflow: hidden; }
+.financial-cell { min-width: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 12px; }
+.financial-cell:nth-child(even) { border-left: 1px solid #e2e4df; }
+.financial-cell:nth-child(n+3) { border-top: 1px solid #e2e4df; }
+.financial-label { margin: 0; color: #555b63; font-size: 11px; line-height: 1.5; }
+.financial-value { margin: 5px 0 0; font: 700 20px/1.2 Consolas, monospace; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.financial-value.unavailable { font-family: inherit; font-size: 15px; font-weight: 500; }
+.financial-value.cash-ratio { color: var(--ink); }
+.financial-value.cash-ratio.unavailable { color: var(--muted); }
+.financial-note { margin-top: 7px; color: var(--muted); font-size: 11px; line-height: 1.65; }
+.financial-note summary { width: fit-content; max-width: 100%; cursor: pointer; padding: 3px 0; }
+.financial-note p { margin: 5px 0 0; }
 .company-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
 .company-tag { padding: 5px 8px; border: 1px solid #e2e4df; border-radius: 999px; background: #f8f8f5; color: #555b63; font-size: 11px; line-height: 1; }
 .company-tag.industry { border-color: #d5dce8; background: #f2f5fa; color: #315a91; }
@@ -319,6 +322,8 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
   h1 { font-size: 34px; }
   .tier-section { padding-top: 30px; }
   .pick-card { min-height: 0; padding: 19px 17px 17px 28px; }
+  .financial-cell { padding: 9px 10px; }
+  .financial-value { font-size: 19px; }
   .metric-strip { grid-template-columns: 1fr 1fr; }
   .metric:last-child { grid-column: 1 / -1; border-top: 1px solid var(--line); border-left: 0; padding-left: 0; }
   .calendar-panel, .history-detail { border-radius: 16px; }
@@ -368,6 +373,65 @@ SCRIPT = r"""
   function quoteUrl(item) {
     return "https://quote.eastmoney.com/" + marketPrefix(item) + item.code + ".html";
   }
+  function financialNumber(value) {
+    return typeof value === "number" && Number.isFinite(value) ? value : null;
+  }
+  function financialSourceUrl(value) {
+    if (typeof value !== "string") return "";
+    try {
+      var url = new URL(value);
+      var allowedHost = url.hostname === "eastmoney.com" || url.hostname.endsWith(".eastmoney.com");
+      return url.protocol === "https:" && allowedHost && !url.username && !url.password && !url.port ? url.href : "";
+    } catch (error) {
+      return "";
+    }
+  }
+  function financialSummary(item) {
+    var data = item.financials && typeof item.financials === "object" ? item.financials : {};
+    var section = node("section", "financial-summary");
+    section.setAttribute("aria-label", "财务指标");
+    var heading = node("div", "financial-heading");
+    var period = data.report_label || data.report_date || "报告期暂无";
+    heading.appendChild(node("span", "financial-period", period + " · 年初至报告期末" + (data.stale ? " · 待更新" : "")));
+    var sourceUrl = financialSourceUrl(data.source_url);
+    if (sourceUrl) {
+      var source = node("a", "financial-source", "东方财富 ↗");
+      source.href = sourceUrl;
+      source.target = "_blank";
+      source.rel = "noopener noreferrer";
+      source.setAttribute("aria-label", "在新窗口查看东方财富财务数据");
+      heading.appendChild(source);
+    }
+    section.appendChild(heading);
+    var grid = node("dl", "financial-grid");
+    [
+      ["总营收同比", "revenue_yoy_pct"],
+      ["归母净利润同比", "parent_profit_yoy_pct"],
+      ["扣非净利润同比", "adjusted_profit_yoy_pct"]
+    ].forEach(function (metric) {
+      var value = financialNumber(data[metric[1]]);
+      var cell = node("div", "financial-cell");
+      cell.append(node("dt", "financial-label", metric[0]), node("dd", "financial-value " + (value === null ? "neutral unavailable" : tone(value)), value === null ? "暂无" : signed(value)));
+      grid.appendChild(cell);
+    });
+    var cashValue = financialNumber(data.operating_cash_to_parent_profit);
+    var cashAvailable = data.cash_ratio_status === "ok" && cashValue !== null;
+    var cashText = data.cash_ratio_status === "nonpositive_profit" ? "不适用" : cashAvailable ? number(cashValue) + " 倍" : "暂无";
+    var cashCell = node("div", "financial-cell");
+    cashCell.append(node("dt", "financial-label", "经营现金流 / 归母净利"), node("dd", "financial-value cash-ratio" + (cashAvailable ? "" : " unavailable"), cashText));
+    grid.appendChild(cashCell);
+    section.appendChild(grid);
+    var note = node("details", "financial-note");
+    note.append(
+      node("summary", "", "指标口径与现金流比值"),
+      node("p", "", "同比均为年初至报告期末累计值，与上年同期比较。现金流比值 = 同期经营活动产生的现金流量净额 ÷ 归属于母公司股东的净利润，单位为倍。"),
+      node("p", "", "归母净利润为零或负数时标为“不适用”，缺失数据标为“暂无”。该比值受回款和营运资金变化影响，并非越高越好。")
+    );
+    if (data.notice_date) note.appendChild(node("p", "", "公告日期：" + data.notice_date));
+    if (data.stale) note.appendChild(node("p", "", "本次更新未取得新数据，暂用最近一次缓存，请以最新公告为准。"));
+    section.appendChild(note);
+    return section;
+  }
   function picks() {
     var pools = state.live_pools || {};
     return {
@@ -402,12 +466,7 @@ SCRIPT = r"""
       card.appendChild(top);
       var intro = item.company_intro || (item.industry ? "主要提供" + item.industry + "相关产品与服务。" : "公司主营业务资料正在自动补全。");
       card.appendChild(node("p", "reason", intro));
-      var customer = node("div", "customer-summary");
-      customer.append(
-        node("span", "", "主要客户"),
-        node("p", "", item.customer_summary || "公司未公开具体客户名称。")
-      );
-      card.appendChild(customer);
+      card.appendChild(financialSummary(item));
       var tags = node("div", "company-tags");
       if (item.industry) tags.appendChild(node("span", "company-tag industry", "板块 · " + item.industry));
       (Array.isArray(item.concepts) ? item.concepts : []).slice(0, 3).forEach(function (concept) {

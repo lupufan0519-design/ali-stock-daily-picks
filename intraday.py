@@ -1652,8 +1652,12 @@ def main(argv: Iterable[str] | None = None) -> int:
         payload = json.loads(args.result.read_text(encoding="utf-8"))
         live = build_live_payload(payload)
         from company_metadata import enrich_live_pools
+        from financial_metrics import enrich_financial_pools
 
         metadata_errors = enrich_live_pools(live.get("live_pools", {}))
+        financial_errors = enrich_financial_pools(live.get("live_pools", {}))
+        if financial_errors:
+            print(f"财报补充失败 {len(financial_errors)} 只，保留缓存或显示暂无", flush=True)
         if metadata_errors:
             print(
                 f"公司资料补充失败 {len(metadata_errors)} 只，已优先使用本地缓存",
