@@ -5694,6 +5694,37 @@
       "market": 0,
       "updated_at": "2026-09-03T01:30:44+00:00"
     },
+    "301622": {
+      "company_intro": "主要产品是磁组件器件和单磁体器件，产品广泛用于3C(笔记本电脑、平板电脑、手机、智能穿戴)、新能源汽车、智能家居、风力发电等领域。",
+      "concepts": [
+        "稀土永磁",
+        "西部大开发",
+        "苹果概念"
+      ],
+      "customer_summary": "已经成为多家国际消费电子品牌商的稀土永磁材料应用器件供应商。",
+      "financial_as_of": "2026-09-21",
+      "financials": {
+        "adjusted_profit_yoy_pct": -148.817288902065,
+        "as_of": "2026-09-21",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-21T01:45:48+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 83818197.99,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -26164280.68,
+        "parent_profit_yoy_pct": -133.986504730373,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 11.431393484607,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ301622&type=web",
+        "stale": false
+      },
+      "industry": "金属新材料",
+      "market": 0,
+      "updated_at": "2026-09-21T01:45:43+00:00"
+    },
     "301632": {
       "company_intro": "主要从事建设工程领域的科学技术研究，并提供相关技术服务。",
       "concepts": [
@@ -9781,9 +9812,28 @@
         "大飞机"
       ],
       "customer_summary": "我们始终秉持“价值创新、服务客户”的理念，长期深耕汽车与智能运输领域，专注于为全球客户提供覆盖汽车电子产品、高端研发服务、智能运输系统、大总成及特种载具的一站式解决方案。",
+      "financial_as_of": "2026-09-21",
+      "financials": {
+        "adjusted_profit_yoy_pct": -243.551483090907,
+        "as_of": "2026-09-21",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-21T01:45:48+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": -656595619.24,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -381992695.69,
+        "parent_profit_yoy_pct": -339.251685234078,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -9.805688452742,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688326&type=web",
+        "stale": false
+      },
       "industry": "软件开发",
       "market": 1,
-      "updated_at": "2026-08-20T01:35:34+00:00"
+      "updated_at": "2026-09-21T01:45:43+00:00"
     },
     "688327": {
       "company_intro": "为智慧金融、智慧城市、智慧治理、智慧商业、AIGC等领域提供信息化、数字化和智能化的人工智能服务与行业解决方案。",
@@ -10248,6 +10298,25 @@
         "智慧城市"
       ],
       "customer_summary": "在商业应用方面，公司服务于通信、汽车、消费品、家电、科技、金融、医疗、媒体、烟草、文旅、工业品等多个垂直行业;在政府应用方面，服务于各类政府大数据平台开发以及智慧城市项目等，为政府提供及时高效。",
+      "financial_as_of": "2026-09-21",
+      "financials": {
+        "adjusted_profit_yoy_pct": -84.802152254729,
+        "as_of": "2026-09-21",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-21T01:45:48+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 4753213.5,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -59833602.44,
+        "parent_profit_yoy_pct": -86.833684737811,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 2.569053186442,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688500&type=web",
+        "stale": false
+      },
       "industry": "IT服务Ⅱ",
       "market": 1,
       "updated_at": "2026-09-10T01:35:39+00:00"
@@ -11290,5 +11359,5 @@
       "updated_at": "2026-08-26T01:35:35+00:00"
     }
   },
-  "updated_at": "2026-09-20T08:34:41+00:00"
+  "updated_at": "2026-09-21T01:45:43+00:00"
 }
