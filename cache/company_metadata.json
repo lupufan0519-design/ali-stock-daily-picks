@@ -2768,6 +2768,25 @@
         "创新药"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-21",
+      "financials": {
+        "adjusted_profit_yoy_pct": -36.580185698746,
+        "as_of": "2026-09-21",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-21T01:55:36+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": -38631963.54,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -36767469.06,
+        "parent_profit_yoy_pct": -49.245560045173,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -26.034370330465,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300204&type=web",
+        "stale": false
+      },
       "industry": "化学制药",
       "market": 0,
       "updated_at": "2026-08-25T01:55:40+00:00"
@@ -3114,6 +3133,25 @@
         "化妆品概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-21",
+      "financials": {
+        "adjusted_profit_yoy_pct": 6.050916397352,
+        "as_of": "2026-09-21",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-21T01:55:36+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 189507848.34,
+        "operating_cash_to_parent_profit": 0.8878251014097083,
+        "parent_profit": 213451780.13,
+        "parent_profit_yoy_pct": 20.588284105106,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 6.180531176336,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300357&type=web",
+        "stale": false
+      },
       "industry": "生物制品",
       "market": 0,
       "updated_at": "2026-09-08T01:35:34+00:00"
@@ -4828,6 +4866,25 @@
         "并购重组概念"
       ],
       "customer_summary": "目前，公司与国内外众多知名整车厂商建立了长期稳定的合作关系，成为欧洲Stellantis、现代起亚、一汽股份、一汽轿车、一汽-大众、上汽通用、上汽乘用车、长安福特、长安马自达、吉利汽车、长城汽。",
+      "financial_as_of": "2026-09-21",
+      "financials": {
+        "adjusted_profit_yoy_pct": -248.115664054845,
+        "as_of": "2026-09-21",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-21T01:55:36+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": -16571405.29,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -34291449.75,
+        "parent_profit_yoy_pct": -241.428601592014,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 10.028731497202,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ301133&type=web",
+        "stale": false
+      },
       "industry": "汽车零部件",
       "market": 0,
       "updated_at": "2026-09-17T02:25:35+00:00"
@@ -8185,6 +8242,35 @@
       "market": 1,
       "updated_at": "2026-08-21T01:30:44+00:00"
     },
+    "603958": {
+      "company_intro": "公司主要从事中高端皮鞋的品牌运营﹑产品设计和销售。",
+      "concepts": [
+        "并购重组概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-21",
+      "financials": {
+        "adjusted_profit_yoy_pct": 736.796085018462,
+        "as_of": "2026-09-21",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-21T01:55:36+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 121913743.89,
+        "operating_cash_to_parent_profit": 4.850771776464279,
+        "parent_profit": 25132855.04,
+        "parent_profit_yoy_pct": 1569.43177751633,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 12.944579627123,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603958&type=web",
+        "stale": false
+      },
+      "industry": "服装家纺",
+      "market": 1,
+      "updated_at": "2026-09-21T01:55:32+00:00"
+    },
     "603983": {
       "company_intro": "主要提供化妆品相关产品与服务。",
       "concepts": [
@@ -9087,6 +9173,25 @@
         "电池技术"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-21",
+      "financials": {
+        "adjusted_profit_yoy_pct": 132.72266988427,
+        "as_of": "2026-09-21",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-21T01:55:36+00:00",
+        "notice_date": "2026-08-11",
+        "operating_cash_flow": 37691034.13,
+        "operating_cash_to_parent_profit": 0.8354984184610702,
+        "parent_profit": 45112035.28,
+        "parent_profit_yoy_pct": 130.310253480875,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 62.872930167638,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688148&type=web",
+        "stale": false
+      },
       "industry": "电池",
       "market": 1,
       "updated_at": "2026-09-07T01:30:45+00:00"
@@ -11359,5 +11464,5 @@
       "updated_at": "2026-08-26T01:35:35+00:00"
     }
   },
-  "updated_at": "2026-09-21T01:45:43+00:00"
+  "updated_at": "2026-09-21T01:55:32+00:00"
 }
