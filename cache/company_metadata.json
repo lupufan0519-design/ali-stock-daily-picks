@@ -1590,6 +1590,25 @@
         "创新药"
       ],
       "customer_summary": "未来，誉衡将秉承“服务大众，创造价值，通过产品、人才驱动，成为具有国际化视野的中国领先制药企业”的战略愿景继续开拓进取，全力服务于公众的健康事业。",
+      "financial_as_of": "2026-09-21",
+      "financials": {
+        "adjusted_profit_yoy_pct": 22.242753723025,
+        "as_of": "2026-09-21",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-21T02:20:43+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 182160657.63,
+        "operating_cash_to_parent_profit": 1.145772564937504,
+        "parent_profit": 158985005.58,
+        "parent_profit_yoy_pct": 18.273053804766,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -8.407423022793,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002437&type=web",
+        "stale": false
+      },
       "industry": "化学制药",
       "market": 0,
       "updated_at": "2026-09-07T02:25:35+00:00"
@@ -5671,6 +5690,37 @@
       "market": 0,
       "updated_at": "2026-08-24T01:35:33+00:00"
     },
+    "301584": {
+      "company_intro": "建发致新主要从事医疗器械直销及分销业务，并为医院提供医用物资集约化运营(SPD运营管理&GPO集中供应)等服务。",
+      "concepts": [
+        "次新股",
+        "医疗器械概念",
+        "央国企改革"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-21",
+      "financials": {
+        "adjusted_profit_yoy_pct": 8.596870320337,
+        "as_of": "2026-09-21",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-21T02:20:43+00:00",
+        "notice_date": "2026-08-17",
+        "operating_cash_flow": 76458772.32,
+        "operating_cash_to_parent_profit": 0.516693432401896,
+        "parent_profit": 147977054.72,
+        "parent_profit_yoy_pct": 7.984210561678,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 1.785311057415,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ301584&type=web",
+        "stale": false
+      },
+      "industry": "医药商业",
+      "market": 0,
+      "updated_at": "2026-09-21T02:20:40+00:00"
+    },
     "301588": {
       "company_intro": "致力于满足国内外市场的多样需求并提供高质量的绿色新型材料产品。",
       "concepts": [
@@ -6362,6 +6412,25 @@
         "化妆品概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-21",
+      "financials": {
+        "adjusted_profit_yoy_pct": -55.140661047614,
+        "as_of": "2026-09-21",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-21T02:20:43+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -84616611.89,
+        "operating_cash_to_parent_profit": -8.042025805523819,
+        "parent_profit": 10521803.08,
+        "parent_profit_yoy_pct": 126.285873998782,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 22.209788992072,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600513&type=web",
+        "stale": false
+      },
       "industry": "化学制药",
       "market": 1,
       "updated_at": "2026-09-08T01:35:34+00:00"
@@ -11482,5 +11551,5 @@
       "updated_at": "2026-08-26T01:35:35+00:00"
     }
   },
-  "updated_at": "2026-09-21T02:01:57+00:00"
+  "updated_at": "2026-09-21T02:20:40+00:00"
 }
