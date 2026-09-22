@@ -9277,6 +9277,25 @@
         "信创"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 241.991802297021,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-22T02:30:47+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 642693273.51,
+        "operating_cash_to_parent_profit": 0.25528071207269876,
+        "parent_profit": 2517594330.93,
+        "parent_profit_yoy_pct": 236.935106222423,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 24.693669735414,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688111&type=web",
+        "stale": false
+      },
       "industry": "软件开发",
       "market": 1,
       "updated_at": "2026-08-25T01:35:37+00:00"
