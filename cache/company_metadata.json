@@ -4039,9 +4039,28 @@
         "光伏概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -1714.18862608165,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-22T01:40:44+00:00",
+        "notice_date": "2026-08-17",
+        "operating_cash_flow": -353990852.08,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -180485266.39,
+        "parent_profit_yoy_pct": -730.229511224222,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -3.893481450442,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300682&type=web",
+        "stale": false
+      },
       "industry": "IT服务Ⅱ",
       "market": 0,
-      "updated_at": "2026-08-20T02:35:33+00:00"
+      "updated_at": "2026-09-22T01:40:40+00:00"
     },
     "300699": {
       "company_intro": "可为客户提供“原丝-碳纤维-织物-树脂-预浸料-复合材料制品-装备制造-检测分析-技术设计”的一体化全产业链服务。",
@@ -6171,6 +6190,25 @@
         "光伏概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 14.685277093905,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-22T01:40:44+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 2168309771.73,
+        "operating_cash_to_parent_profit": 3.165618151507144,
+        "parent_profit": 684956197.48,
+        "parent_profit_yoy_pct": 17.017134562415,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 7.845708160782,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600143&type=web",
+        "stale": false
+      },
       "industry": "塑料",
       "market": 1,
       "updated_at": "2026-09-10T02:45:39+00:00"
@@ -8259,13 +8297,13 @@
         "电池技术"
       ],
       "customer_summary": "公司推行全程供应链管理的物流运营模式，物流服务与制造业企业深度联动，通过运用VMI、MILKRUN、直送、甩挂运输等物流管理技术，实现JIT物流配送，集成供应链的各个环节，在不同客户和零部件供。",
-      "financial_as_of": "2026-09-21",
+      "financial_as_of": "2026-09-22",
       "financials": {
         "adjusted_profit_yoy_pct": -41.69947536434,
-        "as_of": "2026-09-21",
+        "as_of": "2026-09-22",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-09-21T01:30:44+00:00",
+        "fetched_at": "2026-09-22T01:40:44+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 14472545.09,
         "operating_cash_to_parent_profit": null,
@@ -11627,5 +11665,5 @@
       "updated_at": "2026-08-26T01:35:35+00:00"
     }
   },
-  "updated_at": "2026-09-21T02:20:40+00:00"
+  "updated_at": "2026-09-22T01:40:40+00:00"
 }
