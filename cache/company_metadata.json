@@ -6507,13 +6507,13 @@
         "化妆品概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-21",
+      "financial_as_of": "2026-09-22",
       "financials": {
         "adjusted_profit_yoy_pct": -55.140661047614,
-        "as_of": "2026-09-21",
+        "as_of": "2026-09-22",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-21T02:20:43+00:00",
+        "fetched_at": "2026-09-22T01:50:47+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": -84616611.89,
         "operating_cash_to_parent_profit": -8.042025805523819,
@@ -6629,6 +6629,25 @@
         "云计算"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 6.337339458866,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-22T01:50:47+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": -1001195830.0,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -928495291.0,
+        "parent_profit_yoy_pct": 1.696585885103,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 4.078271571752,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600588&type=web",
+        "stale": false
+      },
       "industry": "软件开发",
       "market": 1,
       "updated_at": "2026-08-27T01:30:46+00:00"
@@ -6790,9 +6809,28 @@
         "央国企改革"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 31.984878989064,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-22T01:50:47+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 191897336.92,
+        "operating_cash_to_parent_profit": 0.32433429136417646,
+        "parent_profit": 591665272.62,
+        "parent_profit_yoy_pct": 29.155575370936,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -3.025520376895,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600726&type=web",
+        "stale": false
+      },
       "industry": "电力",
       "market": 1,
-      "updated_at": "2026-08-20T01:40:38+00:00"
+      "updated_at": "2026-09-22T01:50:41+00:00"
     },
     "600732": {
       "company_intro": "公司专注于光伏发电核心产品的研发与制造，并提供覆盖“光-储-用”一体化的整体解决方案。",
@@ -11684,5 +11722,5 @@
       "updated_at": "2026-08-26T01:35:35+00:00"
     }
   },
-  "updated_at": "2026-09-22T01:40:40+00:00"
+  "updated_at": "2026-09-22T01:50:41+00:00"
 }
