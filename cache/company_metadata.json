@@ -96,6 +96,25 @@
         "央国企改革"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 104.915801964857,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-22T03:10:41+00:00",
+        "notice_date": "2026-08-11",
+        "operating_cash_flow": 984157915.1,
+        "operating_cash_to_parent_profit": 0.2705156413492957,
+        "parent_profit": 3638081370.05,
+        "parent_profit_yoy_pct": 102.09258937442,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 23.045493561899,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000408&type=web",
+        "stale": false
+      },
       "industry": "农化制品",
       "market": 0,
       "updated_at": "2026-09-08T01:30:44+00:00"
