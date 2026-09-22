@@ -294,9 +294,28 @@
         "央国企改革"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 167.768331879737,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-22T05:50:45+00:00",
+        "notice_date": "2026-08-15",
+        "operating_cash_flow": 355569084.16,
+        "operating_cash_to_parent_profit": 12.329074212117337,
+        "parent_profit": 28839885.14,
+        "parent_profit_yoy_pct": -74.395136463299,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 20.686175712029,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000595&type=web",
+        "stale": false
+      },
       "industry": "电力",
       "market": 0,
-      "updated_at": "2026-08-20T01:35:34+00:00"
+      "updated_at": "2026-09-22T05:50:41+00:00"
     },
     "000600": {
       "company_intro": "主营业务为投资、建设、运营管理以电力生产为主的能源项目，公司电力业务以燃煤火力发电和供热为主。",
@@ -11836,5 +11855,5 @@
       "updated_at": "2026-08-26T01:35:35+00:00"
     }
   },
-  "updated_at": "2026-09-22T01:50:41+00:00"
+  "updated_at": "2026-09-22T05:50:41+00:00"
 }
