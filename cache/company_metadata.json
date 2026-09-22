@@ -7342,6 +7342,25 @@
         "腾讯云"
       ],
       "customer_summary": "获得腾讯战略投资、是企业微信战略合作伙伴。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 74.683789796955,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-22T01:45:39+00:00",
+        "notice_date": "2026-08-21",
+        "operating_cash_flow": -31791764.23,
+        "operating_cash_to_parent_profit": -0.2770431355102277,
+        "parent_profit": 114753842.11,
+        "parent_profit_yoy_pct": 74.67762133114,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 5.044380767419,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603039&type=web",
+        "stale": false
+      },
       "industry": "软件开发",
       "market": 1,
       "updated_at": "2026-08-26T01:35:35+00:00"
@@ -10099,13 +10118,13 @@
         "大飞机"
       ],
       "customer_summary": "我们始终秉持“价值创新、服务客户”的理念，长期深耕汽车与智能运输领域，专注于为全球客户提供覆盖汽车电子产品、高端研发服务、智能运输系统、大总成及特种载具的一站式解决方案。",
-      "financial_as_of": "2026-09-21",
+      "financial_as_of": "2026-09-22",
       "financials": {
         "adjusted_profit_yoy_pct": -243.551483090907,
-        "as_of": "2026-09-21",
+        "as_of": "2026-09-22",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-09-21T01:45:48+00:00",
+        "fetched_at": "2026-09-22T01:45:39+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": -656595619.24,
         "operating_cash_to_parent_profit": null,
