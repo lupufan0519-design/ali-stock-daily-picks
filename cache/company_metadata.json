@@ -1087,13 +1087,13 @@
         "黄金概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-22",
+      "financial_as_of": "2026-09-23",
       "financials": {
         "adjusted_profit_yoy_pct": 1790.87160239312,
-        "as_of": "2026-09-22",
+        "as_of": "2026-09-23",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-22T01:30:47+00:00",
+        "fetched_at": "2026-09-23T01:35:49+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": 319200612.1,
         "operating_cash_to_parent_profit": 3.7954077731967137,
@@ -5111,7 +5111,7 @@
       },
       "industry": "风电设备",
       "market": 0,
-      "updated_at": "2026-08-24T01:35:33+00:00"
+      "updated_at": "2026-09-23T01:35:37+00:00"
     },
     "301165": {
       "company_intro": "始终致力于将技术与应用充分融合，创造性地解决客户问题。",
@@ -10630,13 +10630,13 @@
         "机器人概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-22",
+      "financial_as_of": "2026-09-23",
       "financials": {
         "adjusted_profit_yoy_pct": -249.551132666565,
-        "as_of": "2026-09-22",
+        "as_of": "2026-09-23",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-09-22T01:30:47+00:00",
+        "fetched_at": "2026-09-23T01:35:49+00:00",
         "notice_date": "2026-08-31",
         "operating_cash_flow": -550903431.9,
         "operating_cash_to_parent_profit": null,
@@ -11028,6 +11028,35 @@
       "industry": "IT服务Ⅱ",
       "market": 1,
       "updated_at": "2026-08-25T02:00:50+00:00"
+    },
+    "688578": {
+      "company_intro": "专注于肿瘤治疗领域，以开发出首创药物(First-in-class)和同类最佳药物(Best-in-class)为目标。",
+      "concepts": [
+        "创新药"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": 50.993004385803,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T01:35:49+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 1444581425.62,
+        "operating_cash_to_parent_profit": 0.9375586308162894,
+        "parent_profit": 1540790493.67,
+        "parent_profit_yoy_pct": 46.569510456975,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 39.85341717406,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688578&type=web",
+        "stale": false
+      },
+      "industry": "化学制药",
+      "market": 1,
+      "updated_at": "2026-09-23T01:35:37+00:00"
     },
     "688580": {
       "company_intro": "发展医美和泌尿为新兴业务展开:为康复医学提供高品质产品和解决方案，以盆底及产后康复、精神心理康复、神经康复等为优势和特色。",
@@ -11855,5 +11884,5 @@
       "updated_at": "2026-08-26T01:35:35+00:00"
     }
   },
-  "updated_at": "2026-09-23T01:30:50+00:00"
+  "updated_at": "2026-09-23T01:35:37+00:00"
 }
