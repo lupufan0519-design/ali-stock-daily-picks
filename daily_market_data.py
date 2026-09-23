@@ -121,7 +121,7 @@ def parse_daily_payload(payload: dict, symbol: str, *, through_date: str = "") -
 
 
 def fetch_daily_prices(symbol: str, count: int = 180, *, through_date: str = "",
-                       attempts: int = 2) -> dict:
+                       attempts: int = 3) -> dict:
     if not re.fullmatch(r"(?:sh|sz)\d{6}", symbol):
         raise ValueError("Invalid market symbol")
     end = _date(through_date) if through_date else ""
@@ -133,7 +133,8 @@ def fetch_daily_prices(symbol: str, count: int = 180, *, through_date: str = "",
     last_error = None
     for attempt in range(max(1, attempts)):
         try:
-            url = ENDPOINTS[attempt % len(ENDPOINTS)] + "?" + query
+            endpoint = ENDPOINTS[0] if (attempt == 0 or (attempts >= 3 and attempt == 1)) else ENDPOINTS[1]
+            url = endpoint + "?" + query
             return parse_daily_payload(_get_json(url), symbol, through_date=end)
         except Exception as exc:
             last_error = exc
@@ -193,6 +194,10 @@ def load_daily_cache(symbol: str, expected_date: str, cache_root: Path = CACHE_R
         )
         if data.get("symbol") != symbol or data.get("adjustment") != "qfq" or not complete:
             return None
+        if (data.get("exclusion_reason") == "st_excluded"
+                and "ST" in str(data.get("quote_name", "")).upper()
+                and data.get("quote_date", "") >= expected_date):
+            return data
         validate_freshness(data, expected_date)
         return data
     except (OSError, ValueError, KeyError, TypeError):

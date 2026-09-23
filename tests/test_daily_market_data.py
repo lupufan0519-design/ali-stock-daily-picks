@@ -110,6 +110,11 @@ class DailyPricesTests(unittest.TestCase):
 class ScreenerHttpRecoveryTests(unittest.TestCase):
     def setUp(self):
         self.cfg = {"_expected_trade_date": "2026-09-22", "workers": 5, "history_bars": 180}
+        folder = tempfile.TemporaryDirectory()
+        self.addCleanup(folder.cleanup)
+        output_patch = patch.object(screener, "OUTPUT_DIR", Path(folder.name))
+        output_patch.start()
+        self.addCleanup(output_patch.stop)
 
     def test_source_outage_fast_fails_after_initial_12_not_all_5000(self):
         universe = [screener.Stock(0, f"{n:06d}", "示例") for n in range(50)]
@@ -128,8 +133,10 @@ class ScreenerHttpRecoveryTests(unittest.TestCase):
              patch.object(daily, "save_daily_cache"), patch.object(screener, "evaluate", return_value=item) as evaluate:
             results, errors = screener.scan_http_daily([screener.Stock(0, "002132", "旧公司名")], self.cfg)
         self.assertEqual(errors, [])
-        self.assertEqual(evaluate.call_args.args[0].name, "*ST示例")
-        self.assertEqual(results[0].live_seed["daily_price_source"], "Tencent HTTPS qfq")
+        evaluate.assert_not_called()
+        self.assertEqual(results, [])
+        self.assertEqual(self.cfg["_excluded_reason_counts"]["st_excluded"], 1)
+        data["quote_name"] = "示例公司"
         data["bars_end_date"] = "2026-09-09"
         with patch.object(daily, "fetch_daily_prices", return_value=data), patch.object(screener, "evaluate") as evaluate:
             results, errors = screener.scan_http_daily([screener.Stock(0, "002132", "旧公司名")], self.cfg)
