@@ -20,6 +20,12 @@ from selection_history import (
     write_history,
 )
 from screener import cross_yellow_pair
+from signal_freshness import (
+    normalized_sessions,
+    seed_transition_allowed,
+    signal_within_window,
+    valid_trade_date,
+)
 from simple_strategy import FIRST_TIER, SECOND_TIER, THIRD_TIER, decorate_row, split_tiers
 from strategy_contract import (
     ENTRY_DELAY_BARS,
@@ -389,6 +395,7 @@ def build_live_tracking(
     quotes: dict[str, dict],
     *,
     live_trade_date: str = "",
+    trading_sessions: Sequence[str] | None = None,
 ) -> dict[str, list[dict]]:
     """Project settled positions onto live prices without settling strategy state."""
     strategy = payload.get("strategy", {})
@@ -401,7 +408,11 @@ def build_live_tracking(
         if not code or quote is None:
             continue
         try:
-            evaluated = evaluate_live_seed(seed, quote, cfg, close_trade_date)
+            evaluated = evaluate_live_seed(
+                seed, quote, cfg, close_trade_date,
+                trading_sessions=trading_sessions,
+                expected_trade_date=live_trade_date,
+            )
         except (KeyError, TypeError, ValueError):
             evaluated = None
         if evaluated is not None:
@@ -1177,6 +1188,9 @@ def evaluate_live_seed(
     quote: dict,
     cfg: dict,
     close_trade_date: str,
+    *,
+    trading_sessions: Sequence[str] | None = None,
+    expected_trade_date: str = "",
 ) -> dict | None:
     """Re-evaluate one stock from today's OHLC without mutating settled state."""
     if (
@@ -1190,15 +1204,21 @@ def evaluate_live_seed(
     high = float(quote.get("high", 0.0))
     low = float(quote.get("low", 0.0))
     server_time = str(quote.get("server_time", ""))
-    live_date = server_time[:10] if len(server_time) >= 10 else ""
+    live_date = valid_trade_date(server_time[:10])
+    base_date = valid_trade_date(seed.get("base_date"))
     if (
         not live_date
-        or live_date <= close_trade_date
-        or live_date <= str(seed.get("base_date", ""))
+        or (expected_trade_date and live_date != expected_trade_date)
+        or not seed_transition_allowed(close_trade_date, live_date, trading_sessions)
+        or not seed_transition_allowed(base_date, live_date, trading_sessions)
     ):
-        return _baseline_live_row(seed, quote, cfg)
+        return None
     if min(price, open_price, high, low) <= 0:
         return None
+    if live_date == base_date:
+        return _validate_bottom_window(
+            _baseline_live_row(seed, quote, cfg), cfg, live_date, trading_sessions,
+        )
 
     coefficients = seed["line_coefficients"]
     dragon_tail_coefficients = coefficients.get("dragon_tail")
@@ -1480,6 +1500,22 @@ def evaluate_live_seed(
             seed.get("next_breakout_high_5", 0.0) or 0.0
         ),
     }
+    return _validate_bottom_window(row, cfg, live_date, trading_sessions)
+
+
+def _validate_bottom_window(
+    row: dict, cfg: dict, live_date: str, trading_sessions: Sequence[str] | None,
+) -> dict:
+    """Never let a cached age override the actual date of the displayed signal."""
+    if row.get("bottom_ok") and not signal_within_window(
+        row.get("bottom_date"), live_date,
+        int(cfg.get("bottom_lookback_days", 4)), trading_sessions,
+    ):
+        row = dict(row)
+        row.update(bottom_ok=False, bottom_date="", bottom_price=0.0, selected=False)
+        for key in ("matched_count", "observation_matched_count"):
+            if key in row:
+                row[key] = max(0, int(row[key]) - 1)
     return decorate_row(row, cfg) if "line_gap_max_abs" in cfg else row
 
 
@@ -1487,6 +1523,9 @@ def build_live_pools(
     payload: dict,
     quotes: dict[str, dict],
     excluded_codes: set[str] | None = None,
+    *,
+    trading_sessions: Sequence[str] | None = None,
+    expected_trade_date: str = "",
 ) -> dict:
     seeds = live_seeds(payload)
     if not seeds:
@@ -1501,13 +1540,26 @@ def build_live_pools(
     cfg = payload.get("config", {})
     close_trade_date = str(payload.get("trade_date", ""))
     rows = []
+    evaluated_codes = []
+    expected_trade_date = expected_trade_date or max(
+        (valid_trade_date(str(quote.get("server_time", ""))[:10])
+         for quote in quotes.values()), default="",
+    )
     for seed in seeds:
         quote = quotes.get(str(seed.get("code", "")))
         if quote is None:
             continue
-        row = evaluate_live_seed(seed, quote, cfg, close_trade_date)
+        try:
+            row = evaluate_live_seed(
+                seed, quote, cfg, close_trade_date,
+                trading_sessions=trading_sessions,
+                expected_trade_date=expected_trade_date,
+            )
+        except (KeyError, TypeError, ValueError, OverflowError):
+            row = None
         if row is not None:
             rows.append(row)
+            evaluated_codes.append(str(seed.get("code", "")))
     excluded = excluded_codes or set()
     rows = [row for row in rows if row["code"] not in excluded]
     if "line_gap_max_abs" in cfg:
@@ -1518,7 +1570,8 @@ def build_live_pools(
             THIRD_TIER: tiers[THIRD_TIER],
             "main": tiers[FIRST_TIER],
             "secondary": tiers[SECOND_TIER],
-            "available": True,
+            "available": bool(evaluated_codes),
+            "evaluated_codes": evaluated_codes,
         }
     main = [row for row in rows if row["selected"]]
     secondary = [
@@ -1539,59 +1592,129 @@ def build_live_pools(
     )
     main.sort(key=sort_key, reverse=True)
     secondary.sort(key=sort_key, reverse=True)
-    return {"main": main, "secondary": secondary, "available": True}
+    return {
+        "main": main, "secondary": secondary, "available": bool(evaluated_codes),
+        "evaluated_codes": evaluated_codes,
+    }
 
 
-def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
+def _quote_timestamp(quote: dict) -> datetime | None:
+    try:
+        timestamp = datetime.fromisoformat(str(quote.get("server_time", "")))
+    except (TypeError, ValueError):
+        return None
+    if timestamp.tzinfo is None:
+        timestamp = timestamp.replace(tzinfo=SHANGHAI)
+    return timestamp.astimezone(SHANGHAI)
+
+
+def _unavailable_pools() -> dict:
+    return {
+        FIRST_TIER: [], SECOND_TIER: [], THIRD_TIER: [],
+        "main": [], "secondary": [], "available": False, "evaluated_codes": [],
+    }
+
+
+def build_live_payload(
+    payload: dict, now: datetime | None = None, *,
+    trading_sessions: Sequence[str] | None = None,
+    reference_trade_date: str = "",
+) -> dict:
     local_now = now or datetime.now(SHANGHAI)
+    local_now = (
+        local_now.replace(tzinfo=SHANGHAI)
+        if local_now.tzinfo is None else local_now.astimezone(SHANGHAI)
+    )
+    sessions = normalized_sessions(trading_sessions)
     targets = collect_targets(payload)
     label, note = market_state(local_now)
     quotes, source, host = fetch_quotes(targets)
+    quote_times = [time for item in quotes.values() if (time := _quote_timestamp(item))]
+    latest_quote_time = max(quote_times) if quote_times else None
+    quote_age_seconds = (
+        max(0, int((local_now - latest_quote_time).total_seconds()))
+        if latest_quote_time else None
+    )
     live_dates = sorted(
         {
-            str(item.get("server_time", ""))[:10]
+            valid_trade_date(str(item.get("server_time", ""))[:10])
             for item in quotes.values()
-            if len(str(item.get("server_time", ""))) >= 10
+            if valid_trade_date(str(item.get("server_time", ""))[:10])
         }
     )
-    live_trade_date = live_dates[-1] if live_dates else ""
+    live_trade_date = (
+        valid_trade_date(reference_trade_date)
+        or (sessions[-1] if sessions else "")
+        or (live_dates[-1] if live_dates else "")
+    )
+    close_trade_date = valid_trade_date(payload.get("trade_date"))
+    strategy_is_stale = not seed_transition_allowed(
+        close_trade_date, live_trade_date, sessions,
+    )
+    fresh_quotes = {}
+    for code, quote in quotes.items():
+        timestamp = _quote_timestamp(quote)
+        if timestamp is None or timestamp.strftime("%Y-%m-%d") != live_trade_date:
+            continue
+        age = (local_now - timestamp).total_seconds()
+        if age < -60 or (label == "盘中行情" and (
+            age > 600 or live_trade_date != local_now.strftime("%Y-%m-%d")
+        )):
+            continue
+        fresh_quotes[code] = quote
+    stale = not bool(fresh_quotes)
+    selection_status = "ready"
+    selection_note = "指标基准有效，已按当日行情重新检查选股条件。"
+    if strategy_is_stale:
+        selection_status = "blocked"
+        selection_note = (
+            f"选股暂停：策略基准日为 {close_trade_date or '未知'}，"
+            f"不能直接计算 {live_trade_date or '未知日期'} 的信号；"
+            "需要补齐交易日行情。报价与历史收益仍可更新，不把本次暂停记为信号消失。"
+        )
+    elif stale:
+        selection_status = "blocked"
+        selection_note = "选股暂停：缺少有效的当日行情，暂不新增或移除股票。"
+    live_pools = (
+        _unavailable_pools() if selection_status == "blocked" else
+        build_live_pools(
+            payload, fresh_quotes, set(), trading_sessions=sessions,
+            expected_trade_date=live_trade_date,
+        )
+    )
+    if not live_pools.get("evaluated_codes") and selection_status != "blocked":
+        selection_status = "blocked"
+        selection_note = "选股暂停：没有可安全重算的股票指标数据，暂不新增或移除股票。"
+        live_pools = _unavailable_pools()
+    elif selection_status == "ready" and len(live_pools["evaluated_codes"]) < len(live_seeds(payload)):
+        selection_status = "partial"
+        selection_note = (
+            "部分股票停牌、行情缺失或指标基准过期；仅更新数据完整的股票，"
+            "未验证股票不记为信号消失。"
+        )
     live_tracking = build_live_tracking(
         payload,
-        quotes,
+        fresh_quotes,
         live_trade_date=live_trade_date,
+        trading_sessions=sessions,
     )
-    live_pools = build_live_pools(payload, quotes, set())
     stored_history = load_history(HISTORY_PATH)
     history_changed = False
-    if live_trade_date:
+    if live_trade_date == local_now.strftime("%Y-%m-%d") and live_pools.get("available"):
         stored_history, history_changed = record_intraday_pools(
             stored_history,
             live_trade_date,
             live_pools,
-            quotes,
+            live_pools.get("evaluated_codes", []),
             local_now.isoformat(timespec="seconds"),
+            signal_base_date=close_trade_date,
+            trading_dates=sessions,
         )
     history = refresh_history(
         stored_history,
-        quotes,
+        fresh_quotes,
         live_trade_date or str(payload.get("trade_date", "")),
         local_now.isoformat(timespec="seconds"),
-    )
-    quote_times = [
-        datetime.fromisoformat(str(item["server_time"]))
-        for item in quotes.values()
-        if "T" in str(item.get("server_time", ""))
-    ]
-    latest_quote_time = max(quote_times) if quote_times else None
-    quote_age_seconds = (
-        max(0, int((local_now - latest_quote_time).total_seconds()))
-        if latest_quote_time
-        else None
-    )
-    stale = not bool(quotes) or (
-        label == "盘中行情"
-        and quote_age_seconds is not None
-        and quote_age_seconds > 600
     )
     display_codes = {
         item["code"]
@@ -1621,6 +1744,11 @@ def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
         "market_label": label,
         "note": note,
         "is_stale": stale,
+        "strategy_is_stale": strategy_is_stale,
+        "selection_status": selection_status,
+        "selection_note": selection_note,
+        "signal_base_date": close_trade_date,
+        "strategy_base_date": close_trade_date,
         "source": source,
         "source_host": host,
         "latest_quote_time": (
@@ -1628,6 +1756,7 @@ def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
             if latest_quote_time
             else ""
         ),
+        "quote_timestamp": latest_quote_time.isoformat(timespec="seconds") if latest_quote_time else "",
         "quote_age_seconds": quote_age_seconds,
         "close_trade_date": str(payload.get("trade_date", "")),
         "live_trade_date": live_trade_date,
@@ -1638,6 +1767,7 @@ def build_live_payload(payload: dict, now: datetime | None = None) -> dict:
         "tracking_codes": collect_tracking_codes(payload, live_tracking),
         "target_count": len(targets),
         "quote_count": len(quotes),
+        "evaluated_count": len(live_pools.get("evaluated_codes", [])),
         "quotes": display_quotes,
         "_history_changed": history_changed,
     }
@@ -1650,7 +1780,22 @@ def main(argv: Iterable[str] | None = None) -> int:
     args = parser.parse_args(list(argv) if argv is not None else None)
     try:
         payload = json.loads(args.result.read_text(encoding="utf-8"))
-        live = build_live_payload(payload)
+        try:
+            from daily_market_data import fetch_market_sessions
+
+            reference = fetch_market_sessions()
+        except Exception as exc:
+            reference = {}
+            print(
+                f"交易日历暂不可用：{type(exc).__name__}: {exc}；"
+                "仅允许同日或紧接下一工作日的指标种子。",
+                flush=True,
+            )
+        live = build_live_payload(
+            payload,
+            trading_sessions=reference.get("sessions", []),
+            reference_trade_date=str(reference.get("latest_session", "")),
+        )
         from company_metadata import enrich_live_pools
         from financial_metrics import enrich_financial_pools
 
@@ -1674,6 +1819,11 @@ def main(argv: Iterable[str] | None = None) -> int:
         print(
             f"盘中行情完成：目标 {live['target_count']} 只，"
             f"成功 {live['quote_count']} 只，时间 {live['generated_at_display']}"
+        )
+        print(
+            f"选股状态 {live['selection_status']}；策略基准 {live['signal_base_date']}；"
+            f"行情交易日 {live['live_trade_date']}；有效重算 {live['evaluated_count']} 只；"
+            f"{live['selection_note']}"
         )
         return 0
     except Exception as exc:

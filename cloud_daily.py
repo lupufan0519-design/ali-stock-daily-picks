@@ -67,15 +67,11 @@ def read_last_trade_date() -> str:
 
 def read_bootstrap_trade_date() -> str:
     """Choose a settled close date for manual seed reconstruction."""
-    for path, key in (
+    settled = [read_json_trade_date(path, key) for path, key in (
         (HISTORY_PATH, "last_close_trade_date"),
         (SNAPSHOT_PATH, "trade_date"),
-        (STATE_PATH, "last_trade_date"),
-    ):
-        trade_date = read_json_trade_date(path, key)
-        if trade_date:
-            return trade_date
-    return ""
+    )]
+    return max(settled) or read_json_trade_date(STATE_PATH, "last_trade_date")
 
 
 def pack_live_seed(seed: dict) -> list:
@@ -199,6 +195,10 @@ def compact_snapshot(payload: dict) -> dict:
     return {
         "trade_date": payload.get("trade_date"),
         "generated_at": payload.get("generated_at"),
+        "scanned": payload.get("scanned", 0),
+        "error_count": len(payload.get("errors", [])),
+        "daily_scan_diagnostics": payload.get("daily_scan_diagnostics", {}),
+        "trading_dates": payload.get("trading_dates", []),
         "config": payload.get("config", {}),
         "strategy": payload.get("strategy", {}),
         "results": [{key: row.get(key) for key in keep} for row in rows],
@@ -220,6 +220,8 @@ def bootstrap_payload(
         "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
         "scanned": scanned,
         "errors": list(errors),
+        "daily_scan_diagnostics": cfg.get("_daily_scan_diagnostics", {}),
+        "trading_dates": cfg.get("_trading_dates", []),
         "config": {
             key: value
             for key, value in cfg.items()
@@ -321,7 +323,15 @@ def main(argv: list[str] | None = None) -> int:
         "--as-of",
         help="配合 --bootstrap-live 指定要重建的 YYYY-MM-DD 收盘日",
     )
+    parser.add_argument(
+        "--close-as-of",
+        help="收盘任务的明确截止交易日，用于开盘前补跑上一完整交易日",
+    )
     args = parser.parse_args(argv)
+    if args.close_as_of and (args.bootstrap_live or args.snapshot_only or args.as_of):
+        parser.error("--close-as-of 只能用于正常收盘任务")
+    if args.close_as_of and not normalized_trade_date(args.close_as_of):
+        parser.error("--close-as-of 必须为有效 YYYY-MM-DD 日期")
     if args.as_of and not args.bootstrap_live:
         parser.error("--as-of 只能与 --bootstrap-live 一起使用")
     if args.bootstrap_live:
@@ -335,8 +345,14 @@ def main(argv: list[str] | None = None) -> int:
         print(f"云端快照已生成：{SNAPSHOT_PATH}")
         return 0
 
+    if args.close_as_of and args.close_as_of < datetime.now().astimezone().strftime("%Y-%m-%d"):
+        # A next-morning recovery restores today's indicator base, not yesterday's
+        # supposedly observed recommendations or their performance entry prices.
+        print("跨日补跑只修复收盘指标基准，不追加入选历史。")
+        return bootstrap_live_snapshot(args.close_as_of)
+
     before = read_last_trade_date()
-    exit_code = screener.main([])
+    exit_code = screener.main(["--as-of", args.close_as_of] if args.close_as_of else [])
     if exit_code != 0:
         return exit_code
     payload = json.loads(LATEST_PATH.read_text(encoding="utf-8"))

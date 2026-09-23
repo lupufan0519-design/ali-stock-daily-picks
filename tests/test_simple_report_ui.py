@@ -1,4 +1,5 @@
 import json
+import re
 import shutil
 import subprocess
 import unittest
@@ -7,6 +8,18 @@ from simple_report_ui import SCRIPT, render_report
 
 
 class SimpleReportUiTests(unittest.TestCase):
+    def test_static_initial_payload_preserves_blocked_live_state(self):
+        live = {"selection_status": "blocked", "selection_note": "策略计算数据过期",
+                "signal_base_date": "2026-09-09", "close_trade_date": "2026-09-09",
+                "live_trade_date": "2026-09-22", "quote_timestamp": "2026-09-22 15:00:00",
+                "live_pools": {"available": False, "first": [{"code": "002132"}]}}
+        page = render_report([], {}, 0, [], trade_date_override="2026-09-22", live_state=live)
+        initial = json.loads(re.search(r'<script id="initial-data" type="application/json">(.*?)</script>', page).group(1))
+        self.assertEqual(initial["signal_base_date"], "2026-09-09")
+        self.assertEqual(initial["selection_status"], "blocked")
+        self.assertFalse(initial["live_pools"]["available"])
+        self.assertEqual(initial["live_pools"]["first"], [])
+
     def test_primary_view_switch_stays_visible_while_scrolling(self):
         page = render_report([], {"line_gap_max_abs": 0.5}, 0, [])
         self.assertIn('class="view-dock"', page)
@@ -49,7 +62,8 @@ class SimpleReportUiTests(unittest.TestCase):
         self.assertIn("可能见底信号消失", page)
         self.assertIn('"removed":[', page)
         self.assertIn("function uniqueRemovedRows(rows)", page)
-        self.assertIn("var removed = uniqueRemovedRows(day.removed || []);", page)
+        self.assertIn("var allRemoved = uniqueRemovedRows(day.removed || []);", page)
+        self.assertIn("历史纠错", page)
         self.assertIn("至少一个后续交易日", page)
         self.assertIn("文字标记已经出现后", page)
         self.assertNotIn("一辰波段", page)
@@ -210,7 +224,7 @@ document.getElementById('initial-data').textContent = JSON.stringify(initial);
 let interval, nextLive;
 global.window = {setInterval(callback) { interval = callback; }};
 global.fetch = async () => nextLive ? {ok: true, json: async () => nextLive} : {ok: false, status: 503};
-const readMetrics = () => Object.fromEntries(['history-count', 'success-rate', 'average-return', 'success-sample', 'return-sample', 'calendar-label'].map(id => [id, document.getElementById(id).textContent]));
+const readMetrics = () => Object.fromEntries(['history-count', 'success-rate', 'average-return', 'success-sample', 'return-sample', 'calendar-label', 'history-detail', 'first-picks', 'selection-note', 'selection-notice-title', 'quote-time', 'signal-base-time', 'today-total-value', 'market-label'].map(id => [id, document.getElementById(id).textContent]));
 (async () => {
   eval(script);
   await new Promise(resolve => setImmediate(resolve));
@@ -310,6 +324,58 @@ const readMetrics = () => Object.fromEntries(['history-count', 'success-rate', '
                 snapshot = self.run_monthly_view(state)[0]
                 self.assertEqual(snapshot["average-return"], expected)
                 self.assertIn("有效样本 " + str(count) + " 条", snapshot["return-sample"])
+
+    def test_corrections_are_excluded_from_monthly_success_and_returns(self):
+        state = self.monthly_state()
+        state["history"]["dates"] = [{"trade_date": "2026-09-01", "first": [
+            self.record("2026-09-01", 20),
+            self.record("2026-09-01", -90, invalid_signal=True),
+            self.record("2026-09-01", 100, performance_eligible=False),
+            self.record("2026-09-01", None),
+        ]}]
+        snapshot = self.run_monthly_view(state)[0]
+        self.assertEqual(snapshot["average-return"], "+20.00%")
+        self.assertEqual(snapshot["success-rate"], "100.00%")
+        self.assertIn("后续行情 1 条", snapshot["success-sample"])
+
+    def test_blocked_selection_does_not_look_like_zero_matches(self):
+        state = self.monthly_state()
+        state.update(selection_status="blocked", selection_note="策略基准已过期", signal_base_date="2026-09-09", quote_timestamp="2026-09-22 15:00:00")
+        state["live_pools"] = {"available": False, "first": [{"code": "002132", "name": "不应显示的旧股"}]}
+        snapshot = self.run_monthly_view(state)[0]
+        self.assertEqual(snapshot["today-total-value"], "—")
+        self.assertIn("暂停", snapshot["first-picks"])
+        self.assertNotIn("不应显示的旧股", snapshot["first-picks"])
+        self.assertNotIn("没有第一梯队", snapshot["first-picks"])
+        self.assertIn("9-09", snapshot["signal-base-time"])
+        self.assertIn("9-22", snapshot["quote-time"])
+        self.assertIn("暂停", snapshot["market-label"])
+
+    def test_partial_scan_keeps_valid_cards_with_explicit_note(self):
+        state = self.monthly_state()
+        state.update(selection_status="partial", selection_note="2只行情待补齐")
+        state["live_pools"]["first"] = [{"code": "600001", "name": "可信股票", "price": 10}]
+        snapshot = self.run_monthly_view(state)[0]
+        self.assertIn("可信股票", snapshot["first-picks"])
+        self.assertEqual(snapshot["today-total-value"], "1")
+        self.assertEqual(snapshot["selection-note"], "2只行情待补齐")
+
+    def test_correction_and_repaint_are_shown_in_separate_groups(self):
+        state = self.monthly_state()
+        state["history"]["dates"] = [{"trade_date": "2026-09-01", "first": [], "removed": [
+            {"code": "600001", "name": "真实移除", "removal_reason": "可能见底信号消失"},
+            {"code": "600001", "name": "同股历史纠错", "invalid_signal": True, "removal_reason": "日期超出窗口"},
+        ]}]
+        snapshot = self.run_monthly_view(state, [{"type": "view", "view": "history"}])[-1]
+        for text in ("盘中移除", "历史纠错", "真实移除", "同股历史纠错", "不计绩效"):
+            self.assertIn(text, snapshot["history-detail"])
+
+    def test_missing_history_return_is_shown_as_unknown_not_zero(self):
+        state = self.monthly_state()
+        state["history"]["dates"] = [{"trade_date": "2026-09-01", "first": [self.record("2026-09-01", None)]}]
+        snapshot = self.run_monthly_view(state, [{"type": "view", "view": "history"}])[-1]
+        self.assertIn("—", snapshot["history-detail"])
+        self.assertNotIn("0.00%", snapshot["history-detail"])
 
     def test_live_refresh_and_view_switch_preserve_selected_month(self):
         live = self.monthly_state((60, -30, 0))

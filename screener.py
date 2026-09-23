@@ -1020,9 +1020,18 @@ def fetch_chunk(host: str, stocks: Sequence[Stock], cfg: dict) -> tuple[list[Eva
                         Market(stock.market),
                         stock.code,
                     )
+                    bars = forward_adjust_bars(convert_bars(raw), xdxr)
+                    expected_date = cfg.get("_expected_trade_date")
+                    if expected_date:
+                        bars = [bar for bar in bars if bar.date <= expected_date]
+                    if expected_date and (not bars or bars[-1].date != expected_date):
+                        raise ValueError(
+                            f"StaleDailyData: candles end {bars[-1].date if bars else 'empty'}, "
+                            f"expected {expected_date}"
+                        )
                     item = evaluate(
                         stock,
-                        forward_adjust_bars(convert_bars(raw), xdxr),
+                        bars,
                         cfg,
                     )
                     if item is not None:
@@ -1034,6 +1043,7 @@ def fetch_chunk(host: str, stocks: Sequence[Stock], cfg: dict) -> tuple[list[Eva
                     if isinstance(exc, (ConnectionError, TimeoutError, OSError)) or (
                         "connection" in type(exc).__name__.lower()
                         or "timeout" in type(exc).__name__.lower()
+                        or "decode" in type(exc).__name__.lower()
                     ):
                         remaining = stocks[index + 1 :]
                         errors.extend(
@@ -1141,18 +1151,154 @@ def chunks(items: Sequence[Stock], count: int) -> list[list[Stock]]:
     return [list(items[i::count]) for i in range(count)]
 
 
-def scan_market(cfg: dict, codes: set[str] | None = None) -> tuple[list[Evaluation], list[str], int]:
-    from xmtdx import TdxClient
+def probe_daily_hosts(hosts: Sequence[str], cfg: dict) -> list[str]:
+    """A TCP ping is not a daily-data health check. Probe decoding and date too."""
+    from xmtdx import KlineCategory, Market, TdxClient
 
-    ranked = TdxClient.ping_all(timeout=2.5)
-    if not ranked:
-        raise RuntimeError("无法连接通达信行情服务器")
+    expected = cfg.get("_expected_trade_date", "")
+
+    def probe(host: str) -> str:
+        try:
+            with TdxClient(host, timeout=4, auto_reconnect=False) as client:
+                raw = client.get_security_bars(Market.SH, "600519", KlineCategory.DAY, 0, 3)
+                bars = convert_bars(raw)
+                client.get_xdxr_info(Market.SH, "600519")
+                if not bars or (expected and bars[-1].date < expected):
+                    raise ValueError(f"daily candles stale; expected {expected}")
+            return host
+        except Exception as exc:
+            print(f"日线预检失败 {host}: {type(exc).__name__}: {exc}", flush=True)
+            return ""
+
+    candidates = list(hosts[:3])
+    if not candidates:
+        return []
+    with ThreadPoolExecutor(max_workers=len(candidates)) as pool:
+        return [host for host in pool.map(probe, candidates) if host]
+
+
+def scan_http_daily(universe: Sequence[Stock], cfg: dict) -> tuple[list[Evaluation], list[str]]:
+    """Bounded HTTPS fallback, explicit qfq basis, with per-symbol raw cache."""
+    from daily_market_data import (
+        fetch_daily_prices, load_daily_cache, save_daily_cache, validate_freshness,
+    )
+
+    expected = cfg["_expected_trade_date"]
+    workers = min(max(int(cfg["workers"]) * 2, 6), 12, len(universe))
+    if not workers:
+        return [], []
+    started = time.monotonic()
+    print(f"切换腾讯 HTTPS 前复权日线；目标交易日 {expected}；{workers} 路并发", flush=True)
+
+    def fetch_one(stock: Stock):
+        symbol = ("sh" if stock.market == 1 else "sz") + stock.code
+        try:
+            data = load_daily_cache(symbol, expected) if cfg.get("_use_daily_cache") else None
+            if data is None:
+                if cfg.get("_daily_cache_only"):
+                    raise ValueError(f"No settled daily cache for {symbol} {expected}")
+                data = fetch_daily_prices(symbol, cfg["history_bars"], through_date=expected)
+            tradable = validate_freshness(data, expected)
+            save_daily_cache(data, expected)
+            if not tradable:
+                return None, "", "suspended_confirmed"
+            # A company can become ST after the universe cache was written.
+            current_stock = replace(stock, name=data.get("quote_name") or stock.name)
+            item = evaluate(current_stock, [Bar(**bar) for bar in data["bars"]], cfg)
+            if item is not None:
+                item.live_seed["daily_price_source"] = "Tencent HTTPS qfq"
+            reason = "" if item is not None else (
+                "insufficient_history" if len(data["bars"]) < cfg.get("minimum_history_bars", 100)
+                else "no_trading_volume"
+            )
+            return item, "", reason
+        except Exception as exc:
+            return None, f"{stock.code} {type(exc).__name__}: {exc}", "data_error"
+
+    results, errors = [], []
+    excluded = cfg.setdefault("_excluded_reason_counts", {})
+    processed = set()
+
+    def collect(stock, result):
+        item, error, reason = result
+        processed.add(stock.code)
+        if item is not None:
+            results.append(item)
+        if error:
+            errors.append(error)
+        if reason:
+            excluded[reason] = excluded.get(reason, 0) + 1
+        return bool(error)
+
+    # A complete source outage should cost a small probe batch, not 5,000 retries.
+    first_batch = list(universe[: min(12, len(universe))])
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        first = list(pool.map(fetch_one, first_batch))
+        if first and all(error for _item, error, _reason in first):
+            detail = first[0][1]
+            print(f"HTTPS 日线小批量预检全部失败：{detail}", flush=True)
+            excluded["data_error"] = excluded.get("data_error", 0) + len(universe)
+            return [], [error for _item, error, _reason in first] + [
+                f"{stock.code} DailySourceUnavailable: initial HTTP probe batch failed"
+                for stock in universe[len(first_batch):]
+            ]
+        for stock, result in zip(first_batch, first):
+            collect(stock, result)
+        futures = {pool.submit(fetch_one, stock): stock for stock in universe[len(first_batch):]}
+        consecutive_errors = 0
+        for finished, future in enumerate(as_completed(futures), start=len(first_batch) + 1):
+            failed = collect(futures[future], future.result())
+            consecutive_errors = consecutive_errors + 1 if failed else 0
+            if consecutive_errors >= 30:
+                print("HTTPS 日线连续 30 只失败，停止新请求并保留已成功缓存", flush=True)
+                for pending in futures:
+                    pending.cancel()
+                unprocessed = [stock for stock in universe if stock.code not in processed]
+                errors.extend(f"{stock.code} DailySourceUnavailable: HTTP circuit breaker" for stock in unprocessed)
+                excluded["data_error"] = excluded.get("data_error", 0) + len(unprocessed)
+                break
+            if finished % 500 == 0 or finished == len(universe):
+                print(f"HTTPS 日线进度 {finished}/{len(universe)}；失败 {len(errors)}", flush=True)
+    print(f"HTTPS 日线完成，用时 {time.monotonic() - started:.1f} 秒；失败 {len(errors)}", flush=True)
+    for error in errors[:10]:
+        print(f"行情错误样例: {error}", flush=True)
+    return results, errors
+
+
+def _scan_market_impl(cfg: dict, codes: set[str] | None = None) -> tuple[list[Evaluation], list[str], int]:
+    from xmtdx import TdxClient
+    from daily_market_data import fetch_market_sessions
+
+    reference = fetch_market_sessions()
+    as_of = cfg.get("_as_of_date") or reference["latest_session"]
+    if cfg.get("_as_of_date") and reference["latest_session"] < as_of:
+        raise RuntimeError(f"指数日线仅到 {reference['latest_session']}，未覆盖明确请求日期 {as_of}")
+    sessions = [day for day in reference["sessions"] if day <= as_of]
+    if not sessions:
+        raise RuntimeError(f"实际交易日数据未覆盖目标日期 {as_of}")
+    cfg["_expected_trade_date"] = sessions[-1]
+    cfg["_trading_dates"] = list(reference["sessions"])
+    try:
+        ranked = TdxClient.ping_all(timeout=2.5)
+    except Exception as exc:
+        print(f"TDX 服务器发现失败: {type(exc).__name__}: {exc}", flush=True)
+        ranked = []
     hosts = [host for host, _ in ranked]
     universe = reliable_universe(hosts, cfg["workers"])
     if codes:
         universe = [s for s in universe if s.code in codes]
     if not universe:
         raise RuntimeError("股票范围为空，请检查代码")
+    cfg["_scan_universe_count"] = len(universe)
+
+    usable_hosts = probe_daily_hosts(hosts, cfg) if cfg.get("_daily_source") != "http" else []
+    if not usable_hosts:
+        cfg["_daily_price_source"] = "Tencent HTTPS qfq"
+        evaluations, errors = scan_http_daily(universe, cfg)
+        evaluations.sort(key=lambda x: (x.selected, x.matched_count, x.yellow_count, x.change_pct), reverse=True)
+        return evaluations, errors, len(universe)
+    hosts = usable_hosts
+    cfg["_daily_price_source"] = "TDX forward-adjusted daily"
 
     worker_count = min(cfg["workers"], len(hosts), len(universe))
     print(f"行情服务器 {worker_count} 个；待扫描 {len(universe)} 只沪深A股", flush=True)
@@ -1176,69 +1322,92 @@ def scan_market(cfg: dict, codes: set[str] | None = None) -> tuple[list[Evaluati
         f"失败 {len(errors)} 只",
         flush=True,
     )
-
-    # 某台公共服务器偶发整批超时时，换服务器只重试失败股票。
-    for attempt in range(1, 4):
-        if not errors:
-            break
-        failed_codes = {line.split(" ", 1)[0] for line in errors}
-        retry_stocks = [s for s in universe if s.code in failed_codes]
-        print(f"第 {attempt} 次补扫 {len(retry_stocks)} 只失败股票", flush=True)
-        errors = []
-        retry_workers = min(worker_count, len(retry_stocks))
-        retry_started = time.monotonic()
-        with ThreadPoolExecutor(max_workers=retry_workers) as pool:
-            futures = [
-                pool.submit(
-                    fetch_chunk,
-                    hosts[(i + attempt) % len(hosts)],
-                    part,
-                    cfg,
-                )
-                for i, part in enumerate(chunks(retry_stocks, retry_workers))
-            ]
-            for future in as_completed(futures):
-                part_results, part_errors = future.result()
-                evaluations.extend(part_results)
-                errors.extend(part_errors)
-        print(
-            f"第 {attempt} 次补扫完成，用时 {time.monotonic() - retry_started:.1f} 秒；"
-            f"仍失败 {len(errors)} 只",
-            flush=True,
-        )
     if errors:
+        cfg["_daily_price_source"] = "TDX forward-adjusted daily + Tencent HTTPS qfq fallback"
+        for error in errors[:5]:
+            print(f"TDX 行情错误样例: {error}", flush=True)
         failed_codes = {line.split(" ", 1)[0] for line in errors}
-        retry_stocks = [s for s in universe if s.code in failed_codes]
-        if len(retry_stocks) <= FINAL_INDIVIDUAL_RETRY_LIMIT:
-            print(
-                f"逐只并发换服务器补扫 {len(retry_stocks)} 只（{worker_count} 路）",
-                flush=True,
-            )
-            final_started = time.monotonic()
-            part_results, final_errors = retry_failed_individually(
-                retry_stocks,
-                hosts,
-                cfg,
-                worker_count,
-            )
-            evaluations.extend(part_results)
-            errors = final_errors
-            print(
-                f"逐只并发补扫完成，用时 {time.monotonic() - final_started:.1f} 秒；"
-                f"仍失败 {len(errors)} 只",
-                flush=True,
-            )
-        else:
-            print(
-                f"仍有 {len(retry_stocks)} 只失败，超过逐只补扫上限 "
-                f"{FINAL_INDIVIDUAL_RETRY_LIMIT}；保留错误并结束本轮，避免工作流超时",
-                flush=True,
-            )
+        retry_stocks = [stock for stock in universe if stock.code in failed_codes]
+        http_results, errors = scan_http_daily(retry_stocks, cfg)
+        evaluations.extend(http_results)
+
+    # HTTPS already retries each request twice. Do not feed a source-wide decode
+    # outage back into three more full-market TDX passes.
     evaluations.sort(
         key=lambda x: (x.selected, x.matched_count, x.yellow_count, x.change_pct),
         reverse=True,
     )
     return evaluations, errors, len(universe)
+
+
+def audit_evaluation_windows(evaluations: Sequence[Evaluation], cfg: dict) -> int:
+    """Use exchange sessions, not a suspended stock's last four candle slots."""
+    from signal_freshness import signal_within_window, session_distance
+
+    sessions = cfg.get("_trading_dates", [])
+    lookback = int(cfg.get("bottom_lookback_days", 4))
+    rejected = 0
+    for item in evaluations:
+        seed = item.live_seed
+        if seed.get("zig16_candidate_date") and not signal_within_window(
+            seed["zig16_candidate_date"], item.date, lookback, sessions
+        ):
+            seed["zig16_candidate_signal_ok"] = False
+        if item.bottom_ok and not signal_within_window(item.bottom_date, item.date, lookback, sessions):
+            rejected += 1
+            item.bottom_ok = False
+            item.bottom_date = ""
+            item.bottom_price = 0.0
+            item.tier = ""
+            item.selected = False
+            item.matched_count = sum((item.cross_ok, item.limit_up_ok, item.yellow_ok))
+            item.observation_matched_count = sum((item.cross_ok, item.limit_up_ok, item.observation_yellow_ok))
+            seed.update(bottom_ok=False, bottom_date="", bottom_price=0.0, bottom_age=-1,
+                        tier="", selected=False, matched_count=item.matched_count,
+                        observation_matched_count=item.observation_matched_count)
+        elif item.bottom_ok:
+            seed["bottom_age"] = session_distance(item.bottom_date, item.date, sessions)
+        elif not item.bottom_ok:
+            seed["bottom_age"] = -1
+    return rejected
+
+
+def write_scan_diagnostics(cfg: dict, evaluations: Sequence[Evaluation], errors: Sequence[str], scanned: int) -> dict:
+    excluded = dict(cfg.get("_excluded_reason_counts", {}))
+    excluded["st_excluded"] = sum(not item.eligible or is_st_name(item.name) for item in evaluations)
+    excluded["no_recent_bottom"] = sum(item.eligible and not item.bottom_ok for item in evaluations)
+    diagnostics = {
+        "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "requested_trade_date": cfg.get("_as_of_date", ""),
+        "trade_date": cfg.get("_expected_trade_date", ""),
+        "source": cfg.get("_daily_price_source", "reference index / source preflight"),
+        "scanned": scanned, "evaluated": len(evaluations), "error_count": len(errors),
+        "errors": list(errors), "excluded_reason_counts": excluded,
+        "trading_dates": cfg.get("_trading_dates", []),
+        "tier_counts": {tier: sum(item.tier == tier for item in evaluations)
+                        for tier in (FIRST_TIER, SECOND_TIER, THIRD_TIER)},
+    }
+    cfg["_daily_scan_diagnostics"] = diagnostics
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    (OUTPUT_DIR / "daily_scan_diagnostics.json").write_text(
+        json.dumps(diagnostics, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    return diagnostics
+
+
+def scan_market(cfg: dict, codes: set[str] | None = None) -> tuple[list[Evaluation], list[str], int]:
+    # Return only private audit fields through cfg; public strategy parameters
+    # remain unchanged and bootstrap/write_outputs receive the same calendar.
+    cfg["_excluded_reason_counts"] = {}
+    try:
+        evaluations, errors, scanned = _scan_market_impl(cfg, codes)
+        rejected = audit_evaluation_windows(evaluations, cfg)
+        cfg["_excluded_reason_counts"]["bottom_outside_exchange_window"] = rejected
+        write_scan_diagnostics(cfg, evaluations, errors, scanned)
+        return evaluations, errors, scanned
+    except Exception as exc:
+        write_scan_diagnostics(cfg, [], [f"{type(exc).__name__}: {exc}"], cfg.get("_scan_universe_count", 0))
+        raise
 
 
 def scan_quality_error(scanned: int, errors: Sequence[str]) -> str:
@@ -1512,6 +1681,7 @@ def write_outputs(
     publish_latest: bool = True,
 ) -> tuple[Path, Path, Path]:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    audit_evaluation_windows(evaluations, cfg)
     trade_date = max((x.date for x in evaluations), default=datetime.now().strftime("%Y-%m-%d"))
     csv_path = OUTPUT_DIR / f"选股结果_{trade_date}.csv"
     html_path = OUTPUT_DIR / f"选股报告_{trade_date}.html"
@@ -1534,6 +1704,7 @@ def write_outputs(
             tiers,
             result_rows,
             generated_at,
+            trading_dates=cfg.get("_trading_dates", []),
         )
         write_history(SELECTION_HISTORY_PATH, history)
     payload = {
@@ -1541,6 +1712,8 @@ def write_outputs(
         "generated_at": generated_at,
         "scanned": scanned,
         "errors": list(errors),
+        "daily_scan_diagnostics": cfg.get("_daily_scan_diagnostics", {}),
+        "trading_dates": cfg.get("_trading_dates", []),
         "config": {k: v for k, v in cfg.items() if not k.startswith("_")},
         "results": result_rows,
         "tiers": tiers,

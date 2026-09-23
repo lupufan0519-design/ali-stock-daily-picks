@@ -94,6 +94,15 @@ def should_screen(
     if local_now.weekday() >= 5:
         return False, "weekend"
     if local_now.strftime("%H:%M") < SCREENING_START:
+        # A scheduled evening job can start after midnight. Before the next
+        # opening, repair the latest completed session instead of reporting a
+        # green skip while its close snapshot is still stale.
+        if (
+            local_now.strftime("%H:%M") < "09:30"
+            and re.fullmatch(r"\d{4}-\d{2}-\d{2}", quote_trade_date or "")
+            and last_trade_date < quote_trade_date < today
+        ):
+            return True, f"catch up completed trading day {quote_trade_date}"
         return False, f"before {SCREENING_START} Asia/Shanghai"
     if last_trade_date == today:
         return False, f"{today} already published"
@@ -119,7 +128,6 @@ def main() -> int:
     if (
         not args.force
         and now.weekday() < 5
-        and now.strftime("%H:%M") >= SCREENING_START
         and last_trade_date != now.strftime("%Y-%m-%d")
     ):
         try:
@@ -136,6 +144,12 @@ def main() -> int:
     )
     write_github_output("run", "true" if run else "false")
     write_github_output("reason", reason)
+    target_date = (
+        quote_trade_date
+        if run and quote_trade_date and quote_trade_date < now.strftime("%Y-%m-%d")
+        else now.strftime("%Y-%m-%d")
+    )
+    write_github_output("trade_date", target_date)
     print(
         f"Close-screening gate: run={run}; reason={reason}; "
         f"last={last_trade_date or '-'}; quote={quote_trade_date or '-'}; "

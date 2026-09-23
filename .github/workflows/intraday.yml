@@ -100,6 +100,9 @@ jobs:
       - name: Recalculate live pools and refresh quotes
         if: steps.market.outputs.run == 'true' && steps.trading_day.outputs.run == 'true'
         run: python intraday.py --result cloud_snapshot.json
+      - name: Rebuild first paint with current signal status
+        if: steps.market.outputs.run == 'true' && steps.trading_day.outputs.run == 'true'
+        run: python rebuild_ui.py
       - name: Build static site
         if: steps.market.outputs.run == 'true' && steps.trading_day.outputs.run == 'true'
         run: python prepare_site.py

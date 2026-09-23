@@ -40,6 +40,7 @@ def rebuild_ui(root: Path = ROOT) -> Path:
             [],
             history=history,
             trade_date_override=trade_date,
+            live_state=live,
         ),
         encoding="utf-8",
     )

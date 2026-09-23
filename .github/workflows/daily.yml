@@ -4,6 +4,8 @@ on:
   schedule:
     # 17:40 China Standard Time fallback. External triggers run at 15:40/16:40.
     - cron: "40 9 * * 1-5"
+    # 09:00 CST: recover the previous completed session if the evening failed.
+    - cron: "0 1 * * 1-5"
   workflow_dispatch:
     inputs:
       force:
@@ -21,6 +23,11 @@ on:
         required: false
         type: boolean
         default: false
+      as_of:
+        description: "Explicit completed YYYY-MM-DD date for bootstrap_live only"
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -70,14 +77,20 @@ jobs:
           BOOTSTRAP_LIVE: ${{ inputs.bootstrap_live || false }}
           FORCE_RUN: ${{ inputs.force || false }}
           UI_ONLY: ${{ inputs.ui_only || false }}
+          BOOTSTRAP_DATE: ${{ inputs.as_of || '' }}
+          CLOSE_DATE: ${{ steps.gate.outputs.trade_date }}
         run: |
           if [ "$UI_ONLY" = "true" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "trade_date=$(python -c 'import json; print(json.load(open("cloud_snapshot.json", encoding="utf-8"))["trade_date"])')" >> "$GITHUB_OUTPUT"
           elif [ "$BOOTSTRAP_LIVE" = "true" ]; then
-            python cloud_daily.py --bootstrap-live
+            if [ -n "$BOOTSTRAP_DATE" ]; then
+              python cloud_daily.py --bootstrap-live --as-of "$BOOTSTRAP_DATE"
+            else
+              python cloud_daily.py --bootstrap-live
+            fi
           else
-            python cloud_daily.py
+            python cloud_daily.py --close-as-of "$CLOSE_DATE"
           fi
           if [ "$FORCE_RUN" = "true" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -86,7 +99,7 @@ jobs:
         if: steps.screening.outputs.changed == 'true'
         run: python intraday.py --result cloud_snapshot.json
       - name: Rebuild report UI from current snapshot
-        if: steps.screening.outputs.changed == 'true' && inputs.ui_only == true
+        if: steps.screening.outputs.changed == 'true'
         run: python rebuild_ui.py
       - name: Build static site
         if: steps.screening.outputs.changed == 'true'
@@ -98,8 +111,19 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- results/latest.html results/history.json index.html cloud_snapshot.json cache/universe.json cache/company_metadata.json
+          if git diff --cached --quiet; then
+            echo "No persistent close changes"
+            exit 0
+          fi
           git commit -m "Update daily report ${{ steps.screening.outputs.trade_date }}"
           git push origin main
+      - name: Preserve screening diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screening-diagnostics-${{ github.run_id }}
+          path: results/*diagnostic*.json
+          if-no-files-found: ignore
       - if: steps.screening.outputs.changed == 'true'
         uses: actions/configure-pages@v5
       - if: steps.screening.outputs.changed == 'true'
