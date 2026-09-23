@@ -10865,6 +10865,25 @@
         "昨日高振幅"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": -29.26147727013,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T05:10:47+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": -53939017.84,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -37086411.07,
+        "parent_profit_yoy_pct": -31.774933714951,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -30.423484471273,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603226&type=web",
+        "stale": false
+      },
       "industry": "家居用品",
       "market": 1,
       "updated_at": "2026-08-26T01:35:35+00:00"
