@@ -160,6 +160,97 @@ def fetch_reference_sessions(through_date: str = "", count: int = 240) -> list[s
     return [day for day in result["sessions"] if not end or day <= end]
 
 
+def _datacenter_rows(report: str, filters: str, columns: str = "ALL") -> tuple[list[dict], str]:
+    rows = []
+    page = 1
+    while True:
+        url = "https://datacenter-web.eastmoney.com/api/data/v1/get?" + urlencode({
+            "reportName": report, "columns": columns, "filter": filters,
+            "pageSize": 500, "pageNumber": page, "source": "WEB", "client": "WEB",
+        })
+        payload = _get_json(url)
+        result = payload.get("result")
+        if payload.get("success") is not True or not isinstance(result, dict):
+            raise DailyDataError(f"{report}: {payload.get('message', 'missing result')}")
+        batch = result.get("data")
+        if not isinstance(batch, list):
+            raise DailyDataError(f"{report}: invalid records")
+        rows.extend(batch)
+        pages = int(result.get("pages", 1))
+        if page >= pages:
+            return rows, url
+        if pages > 20:
+            raise DailyDataError(f"{report}: unbounded page count")
+        page += 1
+
+
+def parse_full_day_suspensions(rows: list[dict], trade_date: str) -> dict[str, dict]:
+    day = _date(trade_date)
+    result = {}
+    for row in rows:
+        code = str(row.get("SECURITY_CODE", ""))
+        start = str(row.get("SUSPEND_START_TIME") or "")
+        end = str(row.get("SUSPEND_END_TIME") or "")
+        resume = str(row.get("PREDICT_RESUME_DATE") or "")[:10]
+        try:
+            datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+            if end:
+                datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
+            if resume:
+                _date(resume)
+        except ValueError:
+            continue
+        # Intraday 10-minute halts must never make a full daily candle optional.
+        if (not re.fullmatch(r"\d{6}", code)
+                or str(row.get("SECUCODE", "")) not in (code + ".SZ", code + ".SH")
+                or str(row.get("SECURITY_TYPE_CODE", "")) != "058001001"
+                or len(start) < 19 or start > day + " 09:30:00"
+                or (end and end < day + " 15:00:00")
+                or (resume and resume <= day)):
+            continue
+        if not end and row.get("SUSPEND_EXPIRE") != "连续停牌":
+            continue
+        result[code] = dict(row)
+    return result
+
+
+def fetch_nontrading_evidence(trade_date: str) -> dict:
+    """Date-specific, full-day suspensions; preserve source evidence for audit."""
+    day = _date(trade_date)
+    rows, url = _datacenter_rows(
+        "RPT_CUSTOM_SUSPEND_DATA_INTERFACE", f'(MARKET="全部")(DATETIME=\'{day}\')'
+    )
+    return {"trade_date": day, "source_url": url,
+            "fetched_at": datetime.now(CHINA).isoformat(timespec="seconds"),
+            "stocks": parse_full_day_suspensions(rows, day)}
+
+
+def parse_prelisting_stocks(rows: list[dict], trade_date: str) -> dict[str, dict]:
+    day = _date(trade_date)
+    result = {}
+    for row in rows:
+        code = str(row.get("SECURITY_CODE", ""))
+        listing = str(row.get("LISTING_DATE") or "")[:10]
+        if not re.fullmatch(r"\d{6}", code) or not str(row.get("SECUCODE", "")).endswith((".SZ", ".SH")):
+            continue
+        if ((listing and _date(listing) > day)
+                or (not listing and row.get("CONTINUOUS_1WORD_NUM") == "待上市")):
+            result[code] = dict(row)
+    return result
+
+
+def fetch_prelisting_evidence(trade_date: str) -> dict:
+    day = _date(trade_date)
+    cutoff = (datetime.strptime(day, "%Y-%m-%d") - timedelta(days=365)).strftime("%Y-%m-%d")
+    rows, url = _datacenter_rows(
+        "RPTA_APP_IPOAPPLY", f"(APPLY_DATE>='{cutoff}')",
+        "SECURITY_CODE,SECUCODE,SECURITY_NAME_ABBR,APPLY_DATE,LISTING_DATE,CONTINUOUS_1WORD_NUM",
+    )
+    return {"trade_date": day, "source_url": url,
+            "fetched_at": datetime.now(CHINA).isoformat(timespec="seconds"),
+            "stocks": parse_prelisting_stocks(rows, day)}
+
+
 def validate_freshness(data: dict, expected_date: str) -> bool:
     """Return False only for quote-confirmed suspension; otherwise fail closed."""
     expected = _date(expected_date)

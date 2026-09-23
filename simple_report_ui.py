@@ -83,6 +83,7 @@ a { color: inherit; }
 .brand-mark::after { right: 12px; background: var(--blue); }
 .market-state { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
 .market-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 5px rgba(23,123,85,.1); }
+.market-dot.paused { background: var(--yellow); box-shadow: 0 0 0 5px rgba(201,154,36,.14); }
 .selection-notice { margin: 0 0 22px; padding: 16px 18px; border-left: 4px solid var(--yellow); background: var(--yellow-soft); color: var(--ink); border-radius: 4px 12px 12px 4px; }
 .selection-notice[hidden] { display: none; }
 .selection-notice strong { display: block; margin-bottom: 6px; }
@@ -608,6 +609,7 @@ SCRIPT = r"""
   }
   function updateToday() {
     var blocked = selectionBlocked();
+    document.getElementById("market-dot").className = "market-dot" + (blocked ? " paused" : "");
     var notice = document.getElementById("selection-notice");
     notice.hidden = !blocked && state.selection_status !== "partial";
     document.getElementById("selection-notice-title").textContent = blocked ? "选股暂停：计算数据待更新" : "部分股票数据待补齐";
@@ -618,9 +620,9 @@ SCRIPT = r"""
     renderCards("first-picks", sortedRows(current.first, sortPreference.key, sortPreference.direction), "first");
     renderCards("second-picks", sortedRows(current.second, sortPreference.key, sortPreference.direction), "second");
     renderCards("third-picks", sortedRows(current.third, sortPreference.key, sortPreference.direction), "third");
-    document.getElementById("first-count").textContent = String(current.first.length);
-    document.getElementById("second-count").textContent = String(current.second.length);
-    document.getElementById("third-count").textContent = String(current.third.length);
+    document.getElementById("first-count").textContent = blocked ? "—" : String(current.first.length);
+    document.getElementById("second-count").textContent = blocked ? "—" : String(current.second.length);
+    document.getElementById("third-count").textContent = blocked ? "—" : String(current.third.length);
     document.getElementById("today-total-value").textContent = blocked ? "—" : String(current.first.length + current.second.length + current.third.length);
     var date = state.live_trade_date || state.close_trade_date || "";
     if (date) {
@@ -1011,7 +1013,7 @@ def render_report(
   <header class="topbar">
     <div class="shell topbar-inner">
       <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>每日三梯队选股</span></div>
-      <div class="market-state"><i class="market-dot" aria-hidden="true"></i><span id="market-label">收盘选股</span><span id="update-time">{html.escape(initial['generated_at_display'])}</span></div>
+      <div class="market-state"><i id="market-dot" class="market-dot" aria-hidden="true"></i><span id="market-label">收盘选股</span><span id="update-time">{html.escape(initial['generated_at_display'])}</span></div>
     </div>
   </header>
   <div class="view-dock">

@@ -1193,6 +1193,12 @@ def scan_http_daily(universe: Sequence[Stock], cfg: dict) -> tuple[list[Evaluati
     def fetch_one(stock: Stock):
         symbol = ("sh" if stock.market == 1 else "sz") + stock.code
         try:
+            if stock.code in cfg.get("_confirmed_prelisting", {}):
+                return None, "", "not_yet_listed"
+            suspension = cfg.get("_confirmed_suspensions", {}).get(stock.code)
+            if suspension is not None:
+                reason = "st_excluded" if is_st_name(suspension.get("SECURITY_NAME_ABBR", "")) else "suspended_confirmed"
+                return None, "", reason
             data = load_daily_cache(symbol, expected) if cfg.get("_use_daily_cache") else None
             if data is None:
                 if cfg.get("_daily_cache_only"):
@@ -1274,7 +1280,7 @@ def scan_http_daily(universe: Sequence[Stock], cfg: dict) -> tuple[list[Evaluati
 
 def _scan_market_impl(cfg: dict, codes: set[str] | None = None) -> tuple[list[Evaluation], list[str], int]:
     from xmtdx import TdxClient
-    from daily_market_data import fetch_market_sessions
+    from daily_market_data import fetch_market_sessions, fetch_nontrading_evidence, fetch_prelisting_evidence
 
     reference = fetch_market_sessions()
     as_of = cfg.get("_as_of_date") or reference["latest_session"]
@@ -1285,6 +1291,16 @@ def _scan_market_impl(cfg: dict, codes: set[str] | None = None) -> tuple[list[Ev
         raise RuntimeError(f"实际交易日数据未覆盖目标日期 {as_of}")
     cfg["_expected_trade_date"] = sessions[-1]
     cfg["_trading_dates"] = list(reference["sessions"])
+    for key, fetcher in (("suspensions", fetch_nontrading_evidence), ("prelisting", fetch_prelisting_evidence)):
+        try:
+            evidence = fetcher(sessions[-1])
+            cfg[f"_confirmed_{key}"] = evidence["stocks"]
+            cfg[f"_{key}_evidence"] = evidence
+        except Exception as exc:
+            # Unavailable exclusion evidence never relaxes candle freshness.
+            cfg[f"_confirmed_{key}"] = {}
+            cfg[f"_{key}_evidence"] = {"error": f"{type(exc).__name__}: {exc}"}
+            print(f"交易状态核验暂不可用 {key}: {type(exc).__name__}: {exc}", flush=True)
     try:
         ranked = TdxClient.ping_all(timeout=2.5)
     except Exception as exc:
@@ -1395,6 +1411,8 @@ def write_scan_diagnostics(cfg: dict, evaluations: Sequence[Evaluation], errors:
         "trading_dates": cfg.get("_trading_dates", []),
         "tier_counts": {tier: sum(item.tier == tier for item in evaluations)
                         for tier in (FIRST_TIER, SECOND_TIER, THIRD_TIER)},
+        "suspension_evidence": cfg.get("_suspensions_evidence", {}),
+        "prelisting_evidence": cfg.get("_prelisting_evidence", {}),
     }
     cfg["_daily_scan_diagnostics"] = diagnostics
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)

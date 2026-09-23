@@ -224,7 +224,7 @@ document.getElementById('initial-data').textContent = JSON.stringify(initial);
 let interval, nextLive;
 global.window = {setInterval(callback) { interval = callback; }};
 global.fetch = async () => nextLive ? {ok: true, json: async () => nextLive} : {ok: false, status: 503};
-const readMetrics = () => Object.fromEntries(['history-count', 'success-rate', 'average-return', 'success-sample', 'return-sample', 'calendar-label', 'history-detail', 'first-picks', 'selection-note', 'selection-notice-title', 'quote-time', 'signal-base-time', 'today-total-value', 'market-label'].map(id => [id, document.getElementById(id).textContent]));
+const readMetrics = () => ({...Object.fromEntries(['history-count', 'success-rate', 'average-return', 'success-sample', 'return-sample', 'calendar-label', 'history-detail', 'first-picks', 'selection-note', 'selection-notice-title', 'quote-time', 'signal-base-time', 'today-total-value', 'market-label', 'first-count', 'second-count', 'third-count'].map(id => [id, document.getElementById(id).textContent])), marketDotClass: document.getElementById('market-dot').className});
 (async () => {
   eval(script);
   await new Promise(resolve => setImmediate(resolve));
@@ -350,6 +350,15 @@ const readMetrics = () => Object.fromEntries(['history-count', 'success-rate', '
         self.assertIn("9-09", snapshot["signal-base-time"])
         self.assertIn("9-22", snapshot["quote-time"])
         self.assertIn("暂停", snapshot["market-label"])
+        self.assertEqual(snapshot["marketDotClass"], "market-dot paused")
+        for tier in ("first", "second", "third"):
+            self.assertEqual(snapshot[tier + "-count"], "—")
+
+    def test_ready_empty_tiers_are_real_zero_and_have_normal_market_light(self):
+        snapshot = self.run_monthly_view(self.monthly_state())[0]
+        for tier in ("first", "second", "third"):
+            self.assertEqual(snapshot[tier + "-count"], "0")
+        self.assertEqual(snapshot["marketDotClass"], "market-dot")
 
     def test_partial_scan_keeps_valid_cards_with_explicit_note(self):
         state = self.monthly_state()

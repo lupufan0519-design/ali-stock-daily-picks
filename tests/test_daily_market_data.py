@@ -20,6 +20,26 @@ def payload(rows=None, *, key="qfqday", symbol="sz002132", quote_date="202609221
 
 
 class DailyPricesTests(unittest.TestCase):
+    def test_historical_suspension_requires_full_day_coverage(self):
+        row = {"SECURITY_CODE": "002860", "SECUCODE": "002860.SZ", "SECURITY_TYPE_CODE": "058001001",
+               "SUSPEND_START_TIME": "2026-09-22 09:30:00", "SUSPEND_END_TIME": "2026-10-13 15:00:00",
+               "SUSPEND_EXPIRE": "连续停牌", "PREDICT_RESUME_DATE": "2026-10-14 00:00:00"}
+        self.assertIn("002860", daily.parse_full_day_suspensions([row], "2026-09-22"))
+        self.assertEqual(daily.parse_full_day_suspensions([row], "2026-09-21"), {})
+        self.assertEqual(daily.parse_full_day_suspensions([row], "2026-10-14"), {})
+        row.update(SUSPEND_START_TIME="2026-09-22 13:20:00", SUSPEND_END_TIME="2026-09-22 13:30:00")
+        self.assertEqual(daily.parse_full_day_suspensions([row], "2026-09-22"), {})
+
+    def test_prelisting_requires_explicit_status_or_future_listing_date(self):
+        row = {"SECURITY_CODE": "001246", "SECUCODE": "001246.SZ", "LISTING_DATE": None,
+               "CONTINUOUS_1WORD_NUM": "待上市"}
+        self.assertIn("001246", daily.parse_prelisting_stocks([row], "2026-09-22"))
+        row["CONTINUOUS_1WORD_NUM"] = None
+        self.assertEqual(daily.parse_prelisting_stocks([row], "2026-09-22"), {})
+        row["LISTING_DATE"] = "2026-09-23 00:00:00"
+        self.assertIn("001246", daily.parse_prelisting_stocks([row], "2026-09-22"))
+        self.assertEqual(daily.parse_prelisting_stocks([row], "2026-09-23"), {})
+
     def test_qfq_ohlc_mapping_is_not_stock_kline_column_order(self):
         data = daily.parse_daily_payload(payload(), "sz002132")
         self.assertEqual(data["bars"][-1], dict(date="2026-09-22", open=4.31, close=4.21,
@@ -115,6 +135,21 @@ class ScreenerHttpRecoveryTests(unittest.TestCase):
         output_patch = patch.object(screener, "OUTPUT_DIR", Path(folder.name))
         output_patch.start()
         self.addCleanup(output_patch.stop)
+        for name in ("fetch_nontrading_evidence", "fetch_prelisting_evidence"):
+            source_patch = patch.object(daily, name, return_value={"stocks": {}})
+            source_patch.start()
+            self.addCleanup(source_patch.stop)
+
+    def test_confirmed_nontrading_records_do_not_request_or_evaluate_old_prices(self):
+        self.cfg["_confirmed_suspensions"] = {"002860": {"SECURITY_NAME_ABBR": "星帅尔"}}
+        self.cfg["_confirmed_prelisting"] = {"001246": {"CONTINUOUS_1WORD_NUM": "待上市"}}
+        stocks = [screener.Stock(0, "002860", "星帅尔"), screener.Stock(0, "001246", "力勤资源")]
+        with patch.object(daily, "fetch_daily_prices") as fetch, patch.object(screener, "evaluate") as evaluate:
+            results, errors = screener.scan_http_daily(stocks, self.cfg)
+        fetch.assert_not_called()
+        evaluate.assert_not_called()
+        self.assertEqual((results, errors), ([], []))
+        self.assertEqual(self.cfg["_excluded_reason_counts"], {"suspended_confirmed": 1, "not_yet_listed": 1})
 
     def test_source_outage_fast_fails_after_initial_12_not_all_5000(self):
         universe = [screener.Stock(0, f"{n:06d}", "示例") for n in range(50)]
