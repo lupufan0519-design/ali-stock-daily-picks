@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import copy
 import json
-from datetime import datetime
+from datetime import date, datetime
+import math
 from pathlib import Path
 from typing import Iterable, Mapping, Sequence
 
@@ -11,6 +12,169 @@ from simple_strategy import FIRST_TIER, SECOND_TIER, STRATEGY_VERSION, THIRD_TIE
 
 SCHEMA_VERSION = 1
 VISIBLE_BOTTOM_MIGRATION_VERSION = 1
+SIGNAL_INTEGRITY_VERSION = 1
+
+
+def _iso_date(value: object) -> str:
+    text = str(value or "")[:10]
+    try:
+        return date.fromisoformat(text).isoformat()
+    except ValueError:
+        return ""
+
+
+def _valid_record(item: Mapping[str, object]) -> bool:
+    return not item.get("invalid_signal") and item.get("performance_eligible") is not False
+
+
+def _finite_number(value: object) -> float | None:
+    if value is None or isinstance(value, bool) or not str(value).strip():
+        return None
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError):
+        return None
+    return parsed if math.isfinite(parsed) else None
+
+
+def _settled_record(item: Mapping[str, object]) -> bool:
+    selected = _finite_number(item.get("selected_price"))
+    current = _finite_number(item.get("current_price"))
+    return bool(
+        _valid_record(item)
+        and str(item.get("current_date", "")) > str(item.get("trade_date", ""))
+        and selected is not None and selected > 0
+        and current is not None and current > 0
+        and _finite_number(item.get("return_pct")) is not None
+    )
+
+
+def _signal_issue(signal_date: str, base_date: str, selected_date: str,
+                  sessions: Sequence[str], recent_days: int) -> tuple[str, str]:
+    later = [value for value in sessions if signal_date < value <= selected_date]
+    base_later = [value for value in sessions if base_date < value <= selected_date]
+    if signal_date and selected_date and signal_date > selected_date:
+        return "invalid_signal_date", "信号日期晚于入选日期"
+    if signal_date and signal_date == selected_date:
+        return "unformed_signal", "可能见底信号当日尚未形成"
+    if signal_date and len(later) >= recent_days:
+        return "outside_signal_window", f"见底日期 {signal_date} 已超出入选时近 {recent_days} 个交易日"
+    if base_date and (base_date > selected_date or len(base_later) > 1):
+        return "stale_signal_base", f"策略基准 {base_date} 过期或与入选日不一致，无法核验当时信号"
+    return "", ""
+
+
+def audit_history_signals(
+    history: Mapping[str, object],
+    trading_dates: Iterable[str] = (),
+    signal_base_dates: Mapping[str, str] | None = None,
+    generated_at: str = "",
+    recent_days: int = 4,
+) -> tuple[dict, dict]:
+    """Quarantine provably invalid recommendations without rewriting the past.
+
+    ``trading_dates`` must be actual exchange sessions, never guessed weekdays.
+    Existing ledger dates are a conservative lower bound: four known sessions
+    after the signal prove expiry even if the ledger has gaps. Unknown dates
+    alone never prove validity. Provenance mappings are supplied only when a
+    historical run/snapshot establishes the base used for that selection date.
+    """
+    working = copy.deepcopy(dict(history))
+    dates = working.get("dates", [])
+    if not isinstance(dates, list):
+        dates = []
+        working["dates"] = dates
+    explicit_sessions = {_iso_date(value) for value in trading_dates} - {""}
+    sessions = sorted(explicit_sessions | {
+        _iso_date(day.get("trade_date")) for day in dates if isinstance(day, Mapping)
+    } - {""})
+    report = {"moved_count": 0, "outside_signal_window": 0, "stale_signal_base": 0,
+              "invalid_signal_date": 0, "unformed_signal": 0, "legacy_unverified": 0,
+              "reclassified_removals": 0}
+    for day in dates:
+        if not isinstance(day, dict):
+            continue
+        selected_date = _iso_date(day.get("trade_date"))
+        removed = day.get("removed") if isinstance(day.get("removed"), list) else []
+        invalid_codes: set[str] = set()
+        for tier in (FIRST_TIER, SECOND_TIER, THIRD_TIER):
+            values = day.get(tier)
+            if not isinstance(values, list):
+                continue
+            kept = []
+            for record in values:
+                if not isinstance(record, dict):
+                    continue
+                original_record = copy.deepcopy(record)
+                signal_date = _iso_date(record.get("bottom_date"))
+                base_date = _iso_date(record.get("signal_base_date"))
+                if not base_date and signal_base_dates:
+                    base_date = _iso_date(signal_base_dates.get(selected_date))
+                    if base_date:
+                        record["signal_base_date"] = base_date
+                        record["signal_base_provenance"] = "historical_snapshot_audit"
+                reason, note = _signal_issue(signal_date, base_date, selected_date, sessions, recent_days)
+                if not reason and record.get("invalid_signal"):
+                    reason = str(record.get("invalid_reason") or "previous_correction")
+                    note = str(record.get("removal_reason") or "历史信号已纠错")
+                if reason:
+                    code = str(record.get("code", ""))
+                    invalid_codes.add(code)
+                    correction_id = f"{selected_date}:signal-audit:{tier}:{code}:{signal_date}"
+                    if not any(item.get("id") == correction_id for item in removed if isinstance(item, Mapping)):
+                        correction = copy.deepcopy(record)
+                        correction.update({
+                            "id": correction_id, "original_record": original_record,
+                            "selected_tier": tier, "invalid_signal": True,
+                            "invalid_reason": reason, "outside_signal_window": reason == "outside_signal_window",
+                            "performance_eligible": False, "signal_integrity": "invalid",
+                            "removal_reason": note + "（历史纠错，不计绩效）",
+                            "removed_at": generated_at, "active_again": False,
+                            "integrity_checked_at": generated_at,
+                        })
+                        removed.append(correction)
+                    report["moved_count"] += 1
+                    report[reason] = report.get(reason, 0) + 1
+                    continue
+                if (signal_date in explicit_sessions and selected_date in explicit_sessions
+                        and base_date in explicit_sessions):
+                    record["signal_integrity"] = "window_verified"
+                else:
+                    record["signal_integrity"] = "legacy_unverified"
+                    report["legacy_unverified"] += 1
+                kept.append(record)
+            day[tier] = kept
+        for event in removed:
+            if not isinstance(event, dict) or event.get("invalid_signal"):
+                continue
+            event_signal = _iso_date(event.get("bottom_date"))
+            event_base = _iso_date(event.get("signal_base_date"))
+            if not event_base and signal_base_dates:
+                event_base = _iso_date(signal_base_dates.get(selected_date))
+            reason, note = _signal_issue(event_signal, event_base, selected_date, sessions, recent_days)
+            if not reason:
+                continue
+            # An event derived from an invalid original pick is not evidence
+            # that a valid signal later disappeared. Preserve the event in full.
+            event.setdefault("original_record", copy.deepcopy(event))
+            event.update({"invalid_signal": True, "invalid_reason": reason,
+                          "outside_signal_window": reason == "outside_signal_window",
+                          "signal_integrity": "invalid", "performance_eligible": False,
+                          "removal_reason": note + "（原移除记录归入历史纠错，不计绩效）",
+                          "integrity_checked_at": generated_at})
+            if event_base:
+                event["signal_base_date"] = event_base
+            report["reclassified_removals"] += 1
+        if invalid_codes:
+            day["live_active_codes"] = [code for code in day.get("live_active_codes", []) if str(code) not in invalid_codes]
+        if removed or "removed" in day:
+            day["removed"] = removed
+    working["signal_integrity_version"] = SIGNAL_INTEGRITY_VERSION
+    reference_date = max((str(day.get("trade_date", "")) for day in dates if isinstance(day, Mapping)), default="")
+    working["summary"] = summarize(dates, reference_date)
+    if working != history and generated_at:
+        working["updated_at"] = generated_at
+    return working, report
 
 
 def empty_history(started_on: str = "") -> dict:
@@ -75,6 +239,8 @@ def _pick(row: Mapping[str, object], trade_date: str, tier: str) -> dict:
         "return_pct": 0.0,
         "status": "待产生后续行情",
         "bottom_date": str(row.get("bottom_date", "")),
+        "signal_base_date": _iso_date(row.get("signal_base_date")),
+        "signal_integrity": "legacy_unverified",
         "bottom_price": float(row.get("bottom_price", 0.0) or 0.0),
         "bottom_price_gap_abs": float(
             row.get("bottom_price_gap_abs", 0.0) or 0.0
@@ -175,6 +341,7 @@ def _move_unformed_same_day_records(
                 correction = correction_by_code.get(code)
                 if correction is None:
                     correction = copy.deepcopy(item)
+                    correction["original_record"] = copy.deepcopy(item)
                     removed_values.append(correction)
                     correction_by_code[code] = correction
                 selected_tier = (
@@ -195,6 +362,8 @@ def _move_unformed_same_day_records(
                         "active_again": False,
                         "restored_at": "",
                         "invalid_signal": True,
+                        "invalid_reason": "unformed_signal",
+                        "performance_eligible": False,
                     }
                 )
                 changed = True
@@ -218,6 +387,9 @@ def record_intraday_pools(
     tiers: Mapping[str, Sequence[Mapping[str, object]]],
     observed_codes: Iterable[str],
     generated_at: str = "",
+    *,
+    signal_base_date: str = "",
+    trading_dates: Iterable[str] = (),
 ) -> tuple[dict, bool]:
     """Persist intraday appearances and possible-bottom repaint removals.
 
@@ -290,6 +462,9 @@ def record_intraday_pools(
                 current[code] = (tier, row)
             if code and code not in existing:
                 record = _pick(row, trade_date, tier)
+                if signal_base_date:
+                    record["signal_base_date"] = _iso_date(signal_base_date)
+                    record["signal_base_provenance"] = "selection_run"
                 record["first_seen_at"] = generated_at
                 day[tier].append(record)
                 existing[code] = (tier, record)
@@ -381,6 +556,10 @@ def record_intraday_pools(
     if changed:
         working["updated_at"] = generated_at or datetime.now().astimezone().isoformat(timespec="seconds")
         working["summary"] = summarize(dates, trade_date)
+    audited, _ = audit_history_signals(working, trading_dates, generated_at=generated_at)
+    if audited != working:
+        working = audited
+        changed = True
     return working, changed
 
 
@@ -390,7 +569,7 @@ def _all_records(dates: Iterable[Mapping[str, object]]) -> list[dict]:
         for key in (FIRST_TIER, SECOND_TIER, THIRD_TIER):
             values = day.get(key, [])
             if isinstance(values, list):
-                records.extend(item for item in values if isinstance(item, dict))
+                records.extend(item for item in values if isinstance(item, dict) and _valid_record(item))
     return records
 
 
@@ -403,9 +582,7 @@ def summarize(
     settled = [
         item
         for item in records
-        if str(item.get("current_date", "")) > str(item.get("trade_date", ""))
-        and float(item.get("selected_price", 0.0) or 0.0) > 0
-        and float(item.get("current_price", 0.0) or 0.0) > 0
+        if _settled_record(item)
     ]
     successful = [item for item in settled if float(item.get("return_pct", 0.0)) > 0]
     average = (
@@ -423,9 +600,7 @@ def summarize(
     monthly_settled = [
         item
         for item in monthly_records
-        if str(item.get("current_date", "")) > str(item.get("trade_date", ""))
-        and float(item.get("selected_price", 0.0) or 0.0) > 0
-        and float(item.get("current_price", 0.0) or 0.0) > 0
+        if _settled_record(item)
     ]
     monthly_successful = [
         item
@@ -443,13 +618,18 @@ def summarize(
                 for day in date_values
                 if isinstance(day, Mapping) and isinstance(day.get("removed"), list)
                 for item in day.get("removed", [])
-                if isinstance(item, Mapping) and item.get("code")
+                if isinstance(item, Mapping) and item.get("code") and not item.get("invalid_signal")
             }
         ),
         "evaluated_count": len(settled),
         "success_count": len(successful),
         "success_rate_pct": len(successful) / len(settled) * 100.0 if settled else None,
         "average_return_pct": average,
+        "invalid_signal_count": len({
+            (str(day.get("trade_date", "")), str(item.get("code", "")))
+            for day in date_values for item in day.get("removed", [])
+            if isinstance(item, Mapping) and item.get("invalid_signal")
+        }),
         "current_month": {
             "month": statistics_month,
             "selection_count": len(monthly_records),
@@ -507,6 +687,8 @@ def record_close(
     tiers: Mapping[str, list[dict]],
     all_rows: Iterable[Mapping[str, object]],
     generated_at: str = "",
+    *,
+    trading_dates: Iterable[str] = (),
 ) -> dict:
     if history.get("strategy_version") != STRATEGY_VERSION:
         working = empty_history(trade_date)
@@ -526,6 +708,8 @@ def record_close(
         tiers,
         prices,
         generated_at,
+        signal_base_date=trade_date,
+        trading_dates=trading_dates,
     )
     updated = refresh_history(working, prices, trade_date, generated_at)
     updated["last_close_trade_date"] = trade_date

@@ -83,6 +83,14 @@ a { color: inherit; }
 .brand-mark::after { right: 12px; background: var(--blue); }
 .market-state { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
 .market-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 5px rgba(23,123,85,.1); }
+.selection-notice { margin: 0 0 22px; padding: 16px 18px; border-left: 4px solid var(--yellow); background: var(--yellow-soft); color: var(--ink); border-radius: 4px 12px 12px 4px; }
+.selection-notice[hidden] { display: none; }
+.selection-notice strong { display: block; margin-bottom: 6px; }
+.selection-notice p { margin: 0; font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
+.data-provenance { display: flex; flex-wrap: wrap; gap: 5px 20px; margin: 14px 0 20px; font-size: 12px; color: var(--muted); line-height: 1.6; }
+.history-group.corrected { margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--yellow); }
+.history-group.corrected h3::before { border-radius: 2px; background: var(--yellow); }
+.history-group.corrected .removal-status { max-width: 250px; }
 .view-dock {
   position: sticky;
   z-index: 30;
@@ -345,6 +353,8 @@ h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-
   .calendar-day { min-height: 48px; padding: 6px; border-radius: 9px; }
   .calendar-day .count { display: none; }
   .history-detail { padding: 18px; }
+  .history-group.corrected .history-row { grid-template-columns: 1fr; gap: 6px; }
+  .history-group.corrected .removal-status { max-width: none; text-align: left; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -457,6 +467,7 @@ SCRIPT = r"""
     return Number.isFinite(n) ? n.toFixed(digits === undefined ? 2 : digits) : "—";
   }
   function signed(value) {
+    if ((typeof value !== "number" && typeof value !== "string") || (typeof value === "string" && !value.trim())) return "—";
     var n = Number(value);
     if (!Number.isFinite(n)) return "—";
     return (n > 0 ? "+" : "") + n.toFixed(2) + "%";
@@ -532,18 +543,23 @@ SCRIPT = r"""
   }
   function picks() {
     var pools = state.live_pools || {};
+    if (selectionBlocked()) return {first: [], second: [], third: []};
     return {
       first: pools.first || pools.main || [],
       second: pools.second || pools.secondary || [],
       third: pools.third || []
     };
   }
+  function selectionBlocked() {
+    return (state.live_pools || {}).available === false ||
+      ["blocked", "stale", "paused", "unavailable", "stale_baseline"].includes(state.selection_status);
+  }
   function renderCards(targetId, rows, tier) {
     var target = document.getElementById(targetId);
     target.replaceChildren();
     if (!rows.length) {
       var emptyLabel = tier === "first" ? "第一梯队" : tier === "second" ? "第二梯队" : "第三梯队";
-      target.appendChild(node("div", "empty", "今天暂时没有" + emptyLabel + "股票。"));
+      target.appendChild(node("div", "empty", selectionBlocked() ? "选股暂停展示，等待有效策略数据。" : "今天暂时没有" + emptyLabel + "股票。"));
       return;
     }
     rows.forEach(function (item) {
@@ -572,7 +588,7 @@ SCRIPT = r"""
       });
       if (tags.childNodes.length) card.appendChild(tags);
       var signalPrice = node("div", "signal-price");
-      var signalCell = node("span", "", "见底日收盘");
+      var signalCell = node("span", "", "见底日收盘" + (item.bottom_date ? " · " + String(item.bottom_date).slice(5) : ""));
       signalCell.appendChild(node("strong", "", number(item.bottom_price)));
       var todayCell = node("span", "", "今日价");
       todayCell.appendChild(node("strong", "", number(item.price || item.close)));
@@ -591,6 +607,13 @@ SCRIPT = r"""
     });
   }
   function updateToday() {
+    var blocked = selectionBlocked();
+    var notice = document.getElementById("selection-notice");
+    notice.hidden = !blocked && state.selection_status !== "partial";
+    document.getElementById("selection-notice-title").textContent = blocked ? "选股暂停：计算数据待更新" : "部分股票数据待补齐";
+    document.getElementById("selection-note").textContent = state.selection_note || "策略计算数据已过期，正在补齐日线并重算。当前暂停展示选股，不能据此判断今天没有符合条件的股票。";
+    document.getElementById("quote-time").textContent = state.quote_timestamp ? "行情时间：" + state.quote_timestamp : "行情日期：" + (state.live_trade_date || state.close_trade_date || "待确认") + "（最新可用）";
+    document.getElementById("signal-base-time").textContent = "策略基准日：" + (state.signal_base_date || state.close_trade_date || "待确认");
     var current = picks();
     renderCards("first-picks", sortedRows(current.first, sortPreference.key, sortPreference.direction), "first");
     renderCards("second-picks", sortedRows(current.second, sortPreference.key, sortPreference.direction), "second");
@@ -598,7 +621,7 @@ SCRIPT = r"""
     document.getElementById("first-count").textContent = String(current.first.length);
     document.getElementById("second-count").textContent = String(current.second.length);
     document.getElementById("third-count").textContent = String(current.third.length);
-    document.getElementById("today-total-value").textContent = String(current.first.length + current.second.length + current.third.length);
+    document.getElementById("today-total-value").textContent = blocked ? "—" : String(current.first.length + current.second.length + current.third.length);
     var date = state.live_trade_date || state.close_trade_date || "";
     if (date) {
       var parts = date.split("-");
@@ -606,12 +629,15 @@ SCRIPT = r"""
       document.getElementById("date-month").textContent = (parts[0] || "") + " / " + (parts[1] || "");
       document.getElementById("today-date-copy").textContent = date;
     }
-    document.getElementById("market-label").textContent = state.market_label || "收盘选股";
+    document.getElementById("market-label").textContent = blocked ? "选股暂停 · 数据待修复" : state.market_label || "收盘选股";
     document.getElementById("update-time").textContent = state.generated_at_display || state.generated_at || "";
   }
   function historyDates() {
     var history = state.history || {};
     return Array.isArray(history.dates) ? history.dates : [];
+  }
+  function validHistoryRecord(item) {
+    return item && !item.invalid_signal && item.performance_eligible !== false;
   }
   function monthlySummary(year, month) {
     var prefix = year + "-" + String(month + 1).padStart(2, "0") + "-";
@@ -620,15 +646,8 @@ SCRIPT = r"""
       if (!String(day.trade_date || "").startsWith(prefix)) return;
       ["first", "second", "third"].forEach(function (tier) {
         var values = day[tier];
-        if (Array.isArray(values)) records = records.concat(values);
+        if (Array.isArray(values)) records = records.concat(values.filter(validHistoryRecord));
       });
-    });
-    var evaluated = records.filter(function (item) {
-      return String(item.current_date || "") > String(item.trade_date || "") &&
-        Number(item.selected_price || 0) > 0 && Number(item.current_price || 0) > 0;
-    });
-    var successful = evaluated.filter(function (item) {
-      return Number(item.return_pct || 0) > 0;
     });
     function finiteValue(value) {
       if (typeof value !== "number" && typeof value !== "string") return null;
@@ -636,12 +655,15 @@ SCRIPT = r"""
       var parsed = Number(value);
       return Number.isFinite(parsed) ? parsed : null;
     }
-    var returns = evaluated.filter(function (item) {
+    var evaluated = records.filter(function (item) {
       var selectedPrice = finiteValue(item.selected_price);
       var currentPrice = finiteValue(item.current_price);
-      return selectedPrice !== null && selectedPrice > 0 &&
+      return String(item.current_date || "") > String(item.trade_date || "") &&
+        selectedPrice !== null && selectedPrice > 0 &&
         currentPrice !== null && currentPrice > 0 && finiteValue(item.return_pct) !== null;
-    }).map(function (item) { return finiteValue(item.return_pct); });
+    });
+    var successful = evaluated.filter(function (item) { return finiteValue(item.return_pct) > 0; });
+    var returns = evaluated.map(function (item) { return finiteValue(item.return_pct); });
     return {
       label: year + "年" + String(month + 1) + "月",
       evaluatedCount: evaluated.length,
@@ -705,6 +727,7 @@ SCRIPT = r"""
       var row = node("div", "history-row");
       var stock = node("div", "history-stock");
       stock.append(node("strong", "", item.name || "未命名"), node("small", "", item.code + " · 入选 " + number(item.selected_price)));
+      if (item.signal_integrity === "legacy_unverified") stock.appendChild(node("small", "", "历史基准信息不全，待核验"));
       var result = node("div", "history-return " + tone(item.return_pct));
       result.append(node("strong", "", signed(item.return_pct)), node("small", "", item.status || "待观察"));
       row.append(stock, result);
@@ -723,8 +746,8 @@ SCRIPT = r"""
     rows.forEach(function (item) {
       var code = String(item.code || "");
       if (!code) return;
-      var current = byCode.get(code);
-      if (!current || (current.invalid_signal && !item.invalid_signal)) byCode.set(code, item);
+      var key = code + (item.invalid_signal ? ":correction" : ":signal-removal");
+      if (!byCode.has(key)) byCode.set(key, item);
     });
     return Array.from(byCode.values());
   }
@@ -740,7 +763,7 @@ SCRIPT = r"""
       var result = node("div", "removal-status");
       var restored = Boolean(item.active_again);
       result.append(
-        node("strong", "", restored ? "曾移除，已重新入选" : "已移除"),
+        node("strong", "", item.invalid_signal ? "历史纠错 · 不计绩效" : restored ? "曾移除，已重新入选" : "已移除"),
         node(
           "small",
           "",
@@ -759,13 +782,16 @@ SCRIPT = r"""
       detail.appendChild(node("div", "detail-empty", "选择一个有记录的日期，查看当天三梯队股票和它们的至今收益。"));
       return;
     }
-    var first = day.first || [];
-    var second = day.second || [];
-    var third = day.third || [];
-    var removed = uniqueRemovedRows(day.removed || []);
+    var first = (day.first || []).filter(validHistoryRecord);
+    var second = (day.second || []).filter(validHistoryRecord);
+    var third = (day.third || []).filter(validHistoryRecord);
+    var allRemoved = uniqueRemovedRows(day.removed || []);
+    var removed = allRemoved.filter(function (item) { return !item.invalid_signal; });
+    var corrected = allRemoved.filter(function (item) { return item.invalid_signal; });
     var head = node("div", "detail-date");
     var countCopy = "共 " + (first.length + second.length + third.length) + " 只";
     if (removed.length) countCopy += " · 移除 " + removed.length + " 只";
+    if (corrected.length) countCopy += " · 纠错 " + corrected.length + " 只";
     head.append(node("h2", "", day.trade_date), node("span", "", countCopy));
     detail.appendChild(head);
     var groupFirst = node("section", "history-group first");
@@ -792,6 +818,15 @@ SCRIPT = r"""
       groupRemoved.appendChild(removedRows);
       detail.appendChild(groupRemoved);
     }
+    if (corrected.length) {
+      var groupCorrected = node("section", "history-group corrected");
+      groupCorrected.appendChild(node("h3", "", "历史纠错"));
+      groupCorrected.appendChild(node("p", "neutral", "保留当时记录供核对；不属于有效入选，不计胜率或收益。与真实信号消失的盘中移除分开记录。"));
+      var correctedRows = node("div");
+      renderRemovedRows(correctedRows, corrected);
+      groupCorrected.appendChild(correctedRows);
+      detail.appendChild(groupCorrected);
+    }
   }
   function renderCalendar() {
     var map = dateMap();
@@ -813,9 +848,9 @@ SCRIPT = r"""
       button.disabled = !record;
       button.appendChild(node("span", "num", String(dayNumber)));
       if (record) {
-        var first = record.first || [];
-        var second = record.second || [];
-        var third = record.third || [];
+        var first = (record.first || []).filter(validHistoryRecord);
+        var second = (record.second || []).filter(validHistoryRecord);
+        var third = (record.third || []).filter(validHistoryRecord);
         var removed = record.removed || [];
         var dots = node("span", "dots");
         if (first.length) dots.appendChild(node("i", "f"));
@@ -880,7 +915,7 @@ SCRIPT = r"""
         }
       }
     } catch (error) {
-      document.getElementById("market-label").textContent = "使用最近一次数据";
+      document.getElementById("market-label").textContent = selectionBlocked() ? "选股暂停 · 数据待修复" : "使用最近一次数据";
     }
   }
   initSortControls();
@@ -914,6 +949,7 @@ def render_report(
     events: Sequence[Mapping[str, object]] | None = None,
     history: Mapping[str, object] | None = None,
     trade_date_override: str = "",
+    live_state: Mapping[str, object] | None = None,
 ) -> str:
     rows = [_row(item) for item in evaluations]
     tiers = split_tiers(rows, cfg)
@@ -929,6 +965,7 @@ def render_report(
         "market_label": "收盘选股",
         "close_trade_date": trade_date,
         "live_trade_date": trade_date,
+        "signal_base_date": trade_date,
         "live_pools": {
             FIRST_TIER: tiers[FIRST_TIER],
             SECOND_TIER: tiers[SECOND_TIER],
@@ -939,6 +976,26 @@ def render_report(
         "target_count": scanned,
         "quote_count": max(0, scanned - len(errors)),
     }
+    if live_state is not None:
+        for key in (
+            "generated_at", "generated_at_display", "market_label", "close_trade_date",
+            "live_trade_date", "signal_base_date", "strategy_base_date", "quote_timestamp",
+            "selection_status", "selection_note", "strategy_is_stale", "is_stale",
+            "target_count", "quote_count",
+        ):
+            if key in live_state:
+                initial[key] = live_state[key]
+        # Rebuilds must not turn quote time into a fresh strategy base or hide a
+        # blocked selection while the first live.json fetch is still pending.
+        initial["signal_base_date"] = str(live_state.get("signal_base_date") or live_state.get("close_trade_date") or "")
+        live_pools = live_state.get("live_pools")
+        if isinstance(live_pools, Mapping):
+            blocked = live_pools.get("available") is False or live_state.get("selection_status") == "blocked"
+            initial["live_pools"] = {
+                tier: [] if blocked else live_pools.get(tier, [])
+                for tier in (FIRST_TIER, SECOND_TIER, THIRD_TIER)
+            }
+            initial["live_pools"]["available"] = not blocked
     title = f"每日三梯队选股 · {trade_date or '等待数据'}"
     return f"""<!doctype html>
 <html lang="zh-CN">
@@ -969,9 +1026,11 @@ def render_report(
     <section id="today-view" class="view-panel">
       <header class="day-head">
         <div class="date-seal" aria-label="交易日期"><span id="date-day" class="date-day">{html.escape(trade_date[-2:] if trade_date else '--')}</span><span id="date-month" class="date-month">{html.escape(trade_date[:7].replace('-', ' / ') if trade_date else '')}</span></div>
-        <div><p class="eyebrow">TODAY / <span id="today-date-copy">{html.escape(trade_date)}</span></p><h1>今天，只看三梯队。</h1><p class="intro">第一梯队看龙虎线靠拢，第二梯队看当前价格是否处在黄线下方，第三梯队收纳其余近三个交易日见底信号。</p></div>
+        <div><p class="eyebrow">TODAY / <span id="today-date-copy">{html.escape(trade_date)}</span></p><h1>今天，只看三梯队。</h1><p class="intro">第一梯队看龙虎线靠拢，第二梯队看当前价格是否处在黄线下方，第三梯队收纳其余近 4 个交易日见底信号。</p></div>
         <div class="today-total"><strong id="today-total-value">0</strong><span>今日合计</span></div>
       </header>
+      <div class="data-provenance"><span id="quote-time"></span><span id="signal-base-time"></span></div>
+      <aside id="selection-notice" class="selection-notice" role="status" hidden><strong id="selection-notice-title">选股暂停：计算数据待更新</strong><p id="selection-note"></p></aside>
       <div class="sort-toolbar" aria-label="今日选股排序">
         <div class="sort-controls">
           <label class="sort-label" for="sort-key">排序</label>
@@ -994,7 +1053,7 @@ def render_report(
       </section>
     </section>
     <section id="history-view" class="view-panel" hidden>
-      <header class="history-head"><p class="eyebrow">HISTORY LEDGER</p><h1>每一天的选择，都留在日历里。</h1><p class="intro">点击有标记的日期查看当日股票、入选价、最新价和至今收益。盘中曾入选但“可能见底”信号后来消失的股票，会保留在当日移除区。</p></header>
+      <header class="history-head"><p class="eyebrow">HISTORY LEDGER</p><h1>每一天的选择，都留在日历里。</h1><p class="intro">点击有标记的日期查看当日股票、入选价、最新价和至今收益。真实信号消失保留在盘中移除区；过期数据导致的误选保留在历史纠错区，不计入胜率和收益。</p></header>
       <div class="metric-strip">
         <div class="metric"><span>累计入选记录</span><strong id="history-count">0</strong><small>同一股票不同日期入选，按独立记录计算</small></div>
         <div class="metric"><span>当月胜率</span><strong id="success-rate">—</strong><small id="success-sample">当月已产生后续行情 0 条</small></div>

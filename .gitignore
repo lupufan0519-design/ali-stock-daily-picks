@@ -3,3 +3,4 @@ __pycache__/
 .venv/
 _site/
 results/live.json
+cache/daily_bars/
