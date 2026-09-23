@@ -1721,6 +1721,37 @@
       "market": 0,
       "updated_at": "2026-08-20T01:35:34+00:00"
     },
+    "002121": {
+      "company_intro": "公司主营业务聚焦在智能电网和新型电化学储能两大板块，战略愿景是成为国内乃至世界一流的能源服务商。",
+      "concepts": [
+        "深圳特区",
+        "物联网",
+        "锂电池概念"
+      ],
+      "customer_summary": "在智能电网领域，公司多年来都是电网行业的核心供应商，同时智能电网海外业务覆盖“一带一路”多个区域。",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": -248.014726543112,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T05:55:50+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -473829049.73,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -219003964.63,
+        "parent_profit_yoy_pct": -215.216539515222,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -15.103144150971,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002121&type=web",
+        "stale": false
+      },
+      "industry": "电网设备",
+      "market": 0,
+      "updated_at": "2026-09-23T05:55:46+00:00"
+    },
     "002131": {
       "company_intro": "致力于成为全球领先的数字集团，以数字化驱动重构传播。",
       "concepts": [
@@ -15653,5 +15684,5 @@
       "updated_at": "2026-08-26T01:35:35+00:00"
     }
   },
-  "updated_at": "2026-09-23T05:05:42+00:00"
+  "updated_at": "2026-09-23T05:55:46+00:00"
 }
