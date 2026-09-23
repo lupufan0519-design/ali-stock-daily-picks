@@ -52,6 +52,37 @@
       "market": 0,
       "updated_at": "2026-08-25T01:55:40+00:00"
     },
+    "000048": {
+      "company_intro": "深圳市京基智农时代股份有限公司(以下简称“京基智农”)创立于1979年。",
+      "concepts": [
+        "深圳特区",
+        "乡村振兴",
+        "猪肉概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": -294.881607832151,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:52+00:00",
+        "notice_date": "2026-08-24",
+        "operating_cash_flow": 40518058.43,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -489244066.67,
+        "parent_profit_yoy_pct": -316.386237613667,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -10.747185513428,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000048&type=web",
+        "stale": false
+      },
+      "industry": "养殖业",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "000063": {
       "company_intro": "主要提供通信设备相关产品与服务。",
       "concepts": [
@@ -64,6 +95,37 @@
       "market": 0,
       "updated_at": "2026-08-25T01:55:40+00:00"
     },
+    "000099": {
+      "company_intro": "中信海直已先后为中海油、中石油、上海石化、ESSO(埃索)、BP公司(英国石油)、TOTAL(道达尔)、AGIP(阿吉普)、CHEVRO。",
+      "concepts": [
+        "军工",
+        "深圳特区",
+        "风能"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -18.176885546474,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 240012589.85,
+        "operating_cash_to_parent_profit": 1.915262884725251,
+        "parent_profit": 125315742.17,
+        "parent_profit_yoy_pct": -18.310401335854,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -2.886304835779,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000099&type=web",
+        "stale": false
+      },
+      "industry": "航空机场",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "000157": {
       "company_intro": "主要从事领域为工程机械、矿山机械、农业机械。",
       "concepts": [
@@ -72,6 +134,25 @@
         "一带一路"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -56.820191861436,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 2419537032.76,
+        "operating_cash_to_parent_profit": 1.1509606806280843,
+        "parent_profit": 2102189130.77,
+        "parent_profit_yoy_pct": -23.965371818018,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 9.17494521045,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000157&type=web",
+        "stale": false
+      },
       "industry": "工程机械",
       "market": 0,
       "updated_at": "2026-09-01T01:30:48+00:00"
@@ -127,9 +208,90 @@
         "锂电池概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -25.076088028527,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-12",
+        "operating_cash_flow": 1557413240.48,
+        "operating_cash_to_parent_profit": 4.877063799363185,
+        "parent_profit": 319334194.62,
+        "parent_profit_yoy_pct": -19.942345570681,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 11.556670562848,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000422&type=web",
+        "stale": false
+      },
       "industry": "农化制品",
       "market": 0,
-      "updated_at": "2026-08-24T01:30:48+00:00"
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "000423": {
+      "company_intro": "主要从事阿胶及系列中成药、保健食品和食品的研发、生产和销售，拥有3次驰名认定保护记录。",
+      "concepts": [
+        "创投",
+        "中药概念",
+        "电商概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": 4.555791944822,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:52+00:00",
+        "notice_date": "2026-08-21",
+        "operating_cash_flow": 81567258.59,
+        "operating_cash_to_parent_profit": 0.09480402517552415,
+        "parent_profit": 860377588.81,
+        "parent_profit_yoy_pct": 5.658046541241,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 3.393637555143,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000423&type=web",
+        "stale": false
+      },
+      "industry": "中药Ⅱ",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "000428": {
+      "company_intro": "致力于扛起民族酒店品牌高质量发展旗帜，为我国酒店及旅游事业发展做出更大的贡献。",
+      "concepts": [
+        "旅游酒店",
+        "参股保险",
+        "央国企改革"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -5.360206297907,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 8620325.94,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -113166152.93,
+        "parent_profit_yoy_pct": -6.058326720357,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -4.920328216151,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000428&type=web",
+        "stale": false
+      },
+      "industry": "酒店餐饮",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "000513": {
       "company_intro": "丽珠医药集团股份有限公司(A股代码:000513.SZ;H股代码:01513.HK)是一家覆盖医药研发、生产与商业化的大型综合医药集团。",
@@ -294,13 +456,13 @@
         "央国企改革"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-23",
+      "financial_as_of": "2026-09-22",
       "financials": {
         "adjusted_profit_yoy_pct": 167.768331879737,
-        "as_of": "2026-09-23",
+        "as_of": "2026-09-22",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-23T01:30:55+00:00",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
         "notice_date": "2026-08-15",
         "operating_cash_flow": 355569084.16,
         "operating_cash_to_parent_profit": 12.329074212117337,
@@ -325,6 +487,25 @@
         "风能"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -12.448696422908,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 1110688323.52,
+        "operating_cash_to_parent_profit": 1.4299734826314396,
+        "parent_profit": 776719524.53,
+        "parent_profit_yoy_pct": -13.407489974191,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -7.944867035719,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000600&type=web",
+        "stale": false
+      },
       "industry": "电力",
       "market": 0,
       "updated_at": "2026-09-03T01:30:44+00:00"
@@ -349,9 +530,28 @@
         "成渝特区"
       ],
       "customer_summary": "公司拥有以五氧化二钒、高钒铁、钒氮合金、钒铝合金、钒电解液等为代表的钒系列产品，以钛白粉、钛渣等为代表的钛系列产品，具备年经营钛精矿175万吨和年产钒制品(以V2O5计)4.42万吨、钛白粉3。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 203.679390273936,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-24",
+        "operating_cash_flow": 275153666.49,
+        "operating_cash_to_parent_profit": 1.2427062794644246,
+        "parent_profit": 221414883.82,
+        "parent_profit_yoy_pct": 211.096963902288,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 17.445982267256,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000629&type=web",
+        "stale": false
+      },
       "industry": "冶钢原料",
       "market": 0,
-      "updated_at": "2026-08-20T01:35:34+00:00"
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "000636": {
       "company_intro": "风华高科致力于成为世界一流的电子元器件整合配套供应商及解决方案提供商。",
@@ -376,6 +576,36 @@
       "industry": "小金属",
       "market": 0,
       "updated_at": "2026-09-03T01:30:44+00:00"
+    },
+    "000668": {
+      "company_intro": "主营业务涵盖房地产开发、物业管理、建筑安装、投资管理、贸易、医疗大健康产业等领域。",
+      "concepts": [
+        "电商概念",
+        "网红经济"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": -6.360867350326,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:52+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": -40976889.07,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -24128234.3,
+        "parent_profit_yoy_pct": 3.551643115176,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 5.487579218292,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000668&type=web",
+        "stale": false
+      },
+      "industry": "房地产开发",
+      "market": 0,
+      "updated_at": "2026-09-23T03:37:46+00:00"
     },
     "000676": {
       "company_intro": "目前公司主要业务包括互联网媒体、数字营销、自有品牌、区块链和元宇宙等。",
@@ -409,6 +639,25 @@
         "智能电网"
       ],
       "customer_summary": "作为奥运电力设备及国家智能电网的设备供应商，东方电子已发展成为集科研开发、生产经营、技术服务、系统集成于一体的大型高新技术企业，是中国能源管理系统解决方案的主要供应商之一，参加IEC(国际电工。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 7.75561395995,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": -770300281.21,
+        "operating_cash_to_parent_profit": -1.9120967565201143,
+        "parent_profit": 402856329.62,
+        "parent_profit_yoy_pct": 33.223837110474,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 15.977006526515,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000682&type=web",
+        "stale": false
+      },
       "industry": "电网设备",
       "market": 0,
       "updated_at": "2026-09-03T01:30:44+00:00"
@@ -436,6 +685,37 @@
       "industry": "环境治理",
       "market": 0,
       "updated_at": "2026-09-09T01:50:39+00:00"
+    },
+    "000729": {
+      "company_intro": "公司主营业务为啤酒、水、啤酒原料、饮料、酵母、饲料等产品的制造和销售。",
+      "concepts": [
+        "酿酒概念",
+        "创投",
+        "央国企改革"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 33.164757049949,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-21",
+        "operating_cash_flow": 2892409458.18,
+        "operating_cash_to_parent_profit": 2.0674065651377225,
+        "parent_profit": 1399052081.46,
+        "parent_profit_yoy_pct": 26.861102680222,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 5.529678060262,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000729&type=web",
+        "stale": false
+      },
+      "industry": "非白酒",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "000759": {
       "company_intro": "致力于发展现代流通业，是湖北本土零售龙头企业，也是国家商务部重点培育的全国20家商业企业之一。",
@@ -468,9 +748,28 @@
         "券商概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 88.625719119001,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 30062737330.81,
+        "operating_cash_to_parent_profit": 2.5801076963527048,
+        "parent_profit": 11651737395.81,
+        "parent_profit_yoy_pct": 80.095703436332,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 74.58567384671,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000776&type=web",
+        "stale": false
+      },
       "industry": "证券Ⅱ",
       "market": 0,
-      "updated_at": "2026-08-21T01:45:40+00:00"
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "000779": {
       "company_intro": "致力于为党委政府提供决策咨询，为工程建设提供技术保障。",
@@ -495,6 +794,37 @@
       "industry": "装修建材",
       "market": 0,
       "updated_at": "2026-08-24T01:35:33+00:00"
+    },
+    "000796": {
+      "company_intro": "致力成为集游、购、娱、食、住、行于一体的大众旅游综合解决方案提供商。",
+      "concepts": [
+        "旅游酒店",
+        "海洋经济",
+        "互联网金融"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -44.000978550976,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": -49765521.78,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -11005831.72,
+        "parent_profit_yoy_pct": 54.675655729908,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 37.079443225478,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000796&type=web",
+        "stale": false
+      },
+      "industry": "旅游及景区",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "000811": {
       "company_intro": "主营业务涵盖低温冷冻、中央空调、环保制热、能化装备、精密铸件、智慧服务、氢能装备等产业集群。",
@@ -551,6 +881,25 @@
         "供销社概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 57.315351100437,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 1852227155.56,
+        "operating_cash_to_parent_profit": 1.3719316167481999,
+        "parent_profit": 1350087083.75,
+        "parent_profit_yoy_pct": 57.92743763565,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 51.533294623578,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000893&type=web",
+        "stale": false
+      },
       "industry": "农化制品",
       "market": 0,
       "updated_at": "2026-09-10T01:40:40+00:00"
@@ -634,6 +983,37 @@
       "market": 0,
       "updated_at": "2026-08-25T01:30:44+00:00"
     },
+    "000958": {
+      "company_intro": "主营业务包括新能源及热电联产，主要产品为电力及热力。",
+      "concepts": [
+        "核能核电",
+        "光伏概念",
+        "风能"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 299.301673056918,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 1706048199.81,
+        "operating_cash_to_parent_profit": 0.9678337914990098,
+        "parent_profit": 1762749156.72,
+        "parent_profit_yoy_pct": -10.522657468401,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -21.49625801141,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000958&type=web",
+        "stale": false
+      },
+      "industry": "电力",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "000960": {
       "company_intro": "公司主要产品有锡锭、阴极铜、锌锭、铟锭、锡材及锡化工产品等。",
       "concepts": [
@@ -669,6 +1049,37 @@
       "industry": "塑料",
       "market": 0,
       "updated_at": "2026-09-03T01:30:44+00:00"
+    },
+    "000975": {
+      "company_intro": "主要提供贵金属相关产品与服务。",
+      "concepts": [
+        "黄金概念",
+        "西部大开发",
+        "央国企改革"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": 49.234311795038,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:52+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 3067124985.84,
+        "operating_cash_to_parent_profit": 1.269256129484283,
+        "parent_profit": 2416474433.01,
+        "parent_profit_yoy_pct": 51.433498918725,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 4.471124817696,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000975&type=web",
+        "stale": false
+      },
+      "industry": "贵金属",
+      "market": 0,
+      "updated_at": "2026-09-23T03:37:46+00:00"
     },
     "000981": {
       "company_intro": "整车制造作为公司的主营业务，下辖子公司安徽知道新能源科技有限公司以“打造新能源城市物流车新物种”为目标。",
@@ -738,6 +1149,25 @@
         "西部大开发"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 1568.32733221142,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-10",
+        "operating_cash_flow": 284219814.86,
+        "operating_cash_to_parent_profit": 3.8921504124070525,
+        "parent_profit": 73023851.79,
+        "parent_profit_yoy_pct": 715.753125091282,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 29.753449534704,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ001258&type=web",
+        "stale": false
+      },
       "industry": "电力",
       "market": 0,
       "updated_at": "2026-09-04T01:35:43+00:00"
@@ -786,9 +1216,59 @@
         "央国企改革"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -26.595713853067,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 8132002880.39,
+        "operating_cash_to_parent_profit": 3.3986659927843945,
+        "parent_profit": 2392704342.72,
+        "parent_profit_yoy_pct": -29.100559715105,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -6.480871639205,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ001289&type=web",
+        "stale": false
+      },
       "industry": "电力",
       "market": 0,
       "updated_at": "2026-09-01T01:35:37+00:00"
+    },
+    "001299": {
+      "company_intro": "长期专注燃气经营，坚持走“精、专、强、新”的高质量发展道路。",
+      "concepts": [
+        "西部大开发",
+        "天然气",
+        "储能概念"
+      ],
+      "customer_summary": "作为国内较早进入城镇燃气行业从事天然气供应的企业，依托陕西丰富的天然气资源，以气惠民生为己任，秉持“美好未来，尽我所能”的企业精神，根植陕西市场，长期专注燃气经营，坚持走“精、专、强、新”的高。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -23.980462990151,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 45012213.72,
+        "operating_cash_to_parent_profit": 1.1270777790346127,
+        "parent_profit": 39937096.23,
+        "parent_profit_yoy_pct": -22.17353878555,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -8.744933921148,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ001299&type=web",
+        "stale": false
+      },
+      "industry": "燃气Ⅱ",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "001301": {
       "company_intro": "作为新兴的负极材料供应商，公司着力于人造石墨负极材料，在自主化和一体化方面具有突出优势。",
@@ -916,6 +1396,37 @@
       "market": 0,
       "updated_at": "2026-08-25T01:30:44+00:00"
     },
+    "002017": {
+      "company_intro": "它已在移动网络运营商、银行、政府机构的不同领域提供服务，在80多个国家/地区拥有35亿用户。",
+      "concepts": [
+        "物联网",
+        "移动支付",
+        "网络安全"
+      ],
+      "customer_summary": "作为全球领先的供应商，东信始终致力于智能卡、数字身份和安全产品、物联网和行业解决方案。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 5.553931722776,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": -30019129.74,
+        "operating_cash_to_parent_profit": -0.34876368512697853,
+        "parent_profit": 86072980.13,
+        "parent_profit_yoy_pct": 6.967173856697,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 1.566094504273,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002017&type=web",
+        "stale": false
+      },
+      "industry": "通信设备",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "002020": {
       "company_intro": "致力于成为中国精神神经、心脑血管领域的领先者。",
       "concepts": [
@@ -940,6 +1451,37 @@
       "market": 0,
       "updated_at": "2026-08-25T02:10:46+00:00"
     },
+    "002027": {
+      "company_intro": "为更多广告客户提供高质量赋能。",
+      "concepts": [
+        "大数据",
+        "阿里概念",
+        "AI智能体"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": -7.061441167365,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:52+00:00",
+        "notice_date": "2026-08-19",
+        "operating_cash_flow": 4453428032.4,
+        "operating_cash_to_parent_profit": 1.423704817919492,
+        "parent_profit": 3128055743.26,
+        "parent_profit_yoy_pct": 17.385157045862,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -1.979286906294,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002027&type=web",
+        "stale": false
+      },
+      "industry": "广告营销",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "002028": {
       "company_intro": "致力于成为电气行业全球领先企业。",
       "concepts": [
@@ -963,6 +1505,37 @@
       "industry": "环境治理",
       "market": 0,
       "updated_at": "2026-08-25T01:30:44+00:00"
+    },
+    "002044": {
+      "company_intro": "为企业和个人客户提供高品质的健康管理服务，在预防医学领域拥有显著的影响力。",
+      "concepts": [
+        "长江三角",
+        "大数据",
+        "养老概念"
+      ],
+      "customer_summary": "美年健康以健康体检为核心业务，集健康咨询、健康评估、健康管理于一体，依托覆盖全国的网络布局、数千万级的客户群体、海量专业的健康大数据，以及标准化的医疗健康服务体系，在专业预防、精准筛查、慢病管。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 13.166296327663,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-31",
+        "operating_cash_flow": -428819196.49,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -182388732.05,
+        "parent_profit_yoy_pct": 17.606528153078,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -6.446783402986,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002044&type=web",
+        "stale": false
+      },
+      "industry": "医疗服务",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "002049": {
       "company_intro": "主要提供半导体相关产品与服务。",
@@ -999,6 +1572,37 @@
       "industry": "造纸",
       "market": 0,
       "updated_at": "2026-08-25T01:35:37+00:00"
+    },
+    "002072": {
+      "company_intro": "公司主要从事煤炭贸易业务。",
+      "concepts": [
+        "黄金概念",
+        "国产芯片",
+        "卫星互联网"
+      ],
+      "customer_summary": "经过多年发展，公司已构建了稳定的供应商网络和客户群体，实现供应商地区分散、货源渠道多样化的采购体系，对有效提升业务稳定性和盈利能力给予了一定的支持。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 28.844744667466,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": -29453689.63,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -8183621.7,
+        "parent_profit_yoy_pct": 59.898925174726,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -5.590142199787,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002072&type=web",
+        "stale": false
+      },
+      "industry": "贸易Ⅱ",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "002080": {
       "company_intro": "主要提供玻璃玻纤相关产品与服务。",
@@ -1054,6 +1658,37 @@
       "industry": "纺织制造",
       "market": 0,
       "updated_at": "2026-09-07T01:35:33+00:00"
+    },
+    "002085": {
+      "company_intro": "公司将一如既往地专注于科技创新和实体经济，在金属材料轻量化应用领域和通用飞机制造领域做精做专做强做久。",
+      "concepts": [
+        "节能环保",
+        "长江三角",
+        "通用航空"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -16.993216384248,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 436200462.68,
+        "operating_cash_to_parent_profit": 1.0431987044308149,
+        "parent_profit": 418137465.88,
+        "parent_profit_yoy_pct": -16.464555569399,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -0.176100845202,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002085&type=web",
+        "stale": false
+      },
+      "industry": "汽车零部件",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "002104": {
       "company_intro": "致力于为银行、通信、政府公共服务部门、防务、交通和先进制造等领域提供金融科技、物联网和数字安全及数字化服务整套解决方案。",
@@ -1165,6 +1800,37 @@
       "market": 0,
       "updated_at": "2026-09-07T01:30:45+00:00"
     },
+    "002164": {
+      "company_intro": "始终专注于传动设备，服务于高端市场，以卓越的品质为客户提供整体的传动解决方案。",
+      "concepts": [
+        "长江三角",
+        "风能",
+        "机器人概念"
+      ],
+      "customer_summary": "东力坚持高效化、智能化、绿色化、国际化为方向引领，始终专注于传动设备，服务于高端市场，以卓越的品质为客户提供整体的传动解决方案。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 16.492805408871,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-18",
+        "operating_cash_flow": 20270930.32,
+        "operating_cash_to_parent_profit": 0.3806355498372837,
+        "parent_profit": 53255483.7,
+        "parent_profit_yoy_pct": 74.172935765128,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 6.210406900789,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002164&type=web",
+        "stale": false
+      },
+      "industry": "通用设备",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "002167": {
       "company_intro": "是一家专注于锆系列制品研发、生产和销售的国家火炬计划重点高新技术企业。",
       "concepts": [
@@ -1188,6 +1854,37 @@
       "industry": "医疗服务",
       "market": 0,
       "updated_at": "2026-08-20T01:35:34+00:00"
+    },
+    "002180": {
+      "company_intro": "公司主营业务覆盖激光打印机、集成电路芯片、通用耗材及核心部件三大业务板块。",
+      "concepts": [
+        "物联网",
+        "智能电网",
+        "3D打印"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 128.087973764553,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 121200548.82,
+        "operating_cash_to_parent_profit": 1.3884789387808028,
+        "parent_profit": 87290160.07,
+        "parent_profit_yoy_pct": 127.998433163724,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -62.972768400566,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002180&type=web",
+        "stale": false
+      },
+      "industry": "计算机设备",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "002181": {
       "company_intro": "2012年6月，粤传媒重大资产重组，广州日报报业集团经营性资产整体注入上市公司。",
@@ -1260,6 +1957,99 @@
       "market": 0,
       "updated_at": "2026-08-25T01:30:44+00:00"
     },
+    "002230": {
+      "company_intro": "致力于“让机器能听会说，能理解会思考，用人工智能建设美好世界”。",
+      "concepts": [
+        "智慧城市",
+        "智能穿戴",
+        "在线教育"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -74.882123048703,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-21",
+        "operating_cash_flow": -945025869.53,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -203840829.1,
+        "parent_profit_yoy_pct": 14.684976808159,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 6.52405122022,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002230&type=web",
+        "stale": false
+      },
+      "industry": "软件开发",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "002244": {
+      "company_intro": "2008年5月29日，滨江集团在深圳成功上市，成为该年度唯一一家国内A股IPO上市的房地产企业。",
+      "concepts": [
+        "长江三角",
+        "养老概念",
+        "旅游概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -15.986732230335,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 5534876483.62,
+        "operating_cash_to_parent_profit": 3.5693488969335156,
+        "parent_profit": 1550668383.35,
+        "parent_profit_yoy_pct": -16.301114068566,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -29.34751530033,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002244&type=web",
+        "stale": false
+      },
+      "industry": "房地产开发",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "002249": {
+      "company_intro": "中山大洋电机股份有限公司是全球建筑及家居电器电机、车辆旋转电器、新能源汽车电驱动系统等行业的龙头企业之一。",
+      "concepts": [
+        "风能",
+        "燃料电池概念",
+        "充电桩"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -24.012950703555,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 670307323.07,
+        "operating_cash_to_parent_profit": 1.6031873250221085,
+        "parent_profit": 418109170.78,
+        "parent_profit_yoy_pct": -30.51499097933,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -0.981519806699,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002249&type=web",
+        "stale": false
+      },
+      "industry": "电机Ⅱ",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "002250": {
       "company_intro": "联化科技股份有限公司是一家领先的化学和技术解决方案提供商，致力于服务全球植保、医药、功能化学品以及设备与工程技术等领域。",
       "concepts": [
@@ -1280,6 +2070,25 @@
         "核能核电"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -24.419470828668,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 169812663.53,
+        "operating_cash_to_parent_profit": 1.0545263172504697,
+        "parent_profit": 161032172.22,
+        "parent_profit_yoy_pct": -15.872552493047,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 1.846980974093,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002255&type=web",
+        "stale": false
+      },
       "industry": "其他电源设备Ⅱ",
       "market": 0,
       "updated_at": "2026-08-25T02:05:42+00:00"
@@ -1292,6 +2101,25 @@
         "锂电池概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -96.472776270356,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": -40840656.04,
+        "operating_cash_to_parent_profit": -11.08321588519983,
+        "parent_profit": 3684910.27,
+        "parent_profit_yoy_pct": 19.932905262789,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 0.551773676982,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002256&type=web",
+        "stale": false
+      },
       "industry": "电力",
       "market": 0,
       "updated_at": "2026-09-07T01:35:33+00:00"
@@ -1307,6 +2135,68 @@
       "industry": "农化制品",
       "market": 0,
       "updated_at": "2026-08-17T01:30:45+00:00"
+    },
+    "002271": {
+      "company_intro": "为数以万计的重大基础设施建设、工业建筑和民用、商用建筑提供高品质的系统解决方案。",
+      "concepts": [
+        "新材料",
+        "铁路基建",
+        "水利建设"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 13.585714387452,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": -340192498.31,
+        "operating_cash_to_parent_profit": -0.5546115128523482,
+        "parent_profit": 613388814.38,
+        "parent_profit_yoy_pct": 8.672408277651,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 9.566622828105,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002271&type=web",
+        "stale": false
+      },
+      "industry": "装修建材",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "002274": {
+      "company_intro": "江苏华昌化工股份有限公司坐落在长江三角洲的江苏省张家港市，地处沿海和长江两大经济开发带交汇之处。",
+      "concepts": [
+        "煤化工概念",
+        "化工原料",
+        "长江三角"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 2667.53510205329,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-21",
+        "operating_cash_flow": 197196544.63,
+        "operating_cash_to_parent_profit": 1.6018473239514681,
+        "parent_profit": 123105705.32,
+        "parent_profit_yoy_pct": 1026.89565382257,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 24.848643409161,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002274&type=web",
+        "stale": false
+      },
+      "industry": "化学原料",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "002281": {
       "company_intro": "提供客户全面所需系列产品和多维技术支持，已成为多家电信设备集成商、互联网服务提供商、电信运营商的合作伙伴。",
@@ -1397,6 +2287,37 @@
       "market": 0,
       "updated_at": "2026-08-21T01:30:44+00:00"
     },
+    "002309": {
+      "company_intro": "中利集团拥有线缆、光伏两大主营业务，通过30多年的不断发展，现已发展成为国家级重点高新技术集团。",
+      "concepts": [
+        "军工",
+        "新能源",
+        "锂电池概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 21.287268351656,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-15",
+        "operating_cash_flow": -461569435.74,
+        "operating_cash_to_parent_profit": -4.016397078196851,
+        "parent_profit": 114921265.69,
+        "parent_profit_yoy_pct": 261.367679052296,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 76.566777604991,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002309&type=web",
+        "stale": false
+      },
+      "industry": "电网设备",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "002326": {
       "company_intro": "2009年12月22日上市，股票代码:002326。",
       "concepts": [
@@ -1421,13 +2342,67 @@
       "market": 0,
       "updated_at": "2026-08-24T01:30:48+00:00"
     },
+    "002340": {
+      "company_intro": "为全球动力锂电池回收提供中国解决方案，消纳处理中国10%的退役锂电池。",
+      "concepts": [
+        "节能环保",
+        "稀缺资源",
+        "深圳特区"
+      ],
+      "customer_summary": "公司在全球率先提出\"资源有限、循环无限\"的绿色产业理念，以开采城市矿山的商业模式来\"消除污染、再造资源\"，遏制全球温室效应，推进减碳与碳中和，是世界开采城市矿山的领导者与世界新能源产业的推动者。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -32.495473760352,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 607698042.6,
+        "operating_cash_to_parent_profit": 0.5646421654323706,
+        "parent_profit": 1076253386.31,
+        "parent_profit_yoy_pct": 34.682757857644,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 2.427308419479,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002340&type=web",
+        "stale": false
+      },
+      "industry": "电池",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "002345": {
       "company_intro": "公司始终坚持提供给顾客以设计独特、质量、工艺取胜的质感非凡的产品，同时依托优质的渠道资源、精准的营销体系和规范有效的管理等优势。",
-      "concepts": [],
+      "concepts": [
+        "黄金概念",
+        "电商概念",
+        "新零售"
+      ],
       "customer_summary": "",
-      "industry": "珠宝首饰",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 27.631609037982,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 1309476588.12,
+        "operating_cash_to_parent_profit": 3.1026522129271004,
+        "parent_profit": 422050716.05,
+        "parent_profit_yoy_pct": 27.416246244449,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 6.645547791922,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002345&type=web",
+        "stale": false
+      },
+      "industry": "饰品",
       "market": 0,
-      "updated_at": "2026-08-20T01:35:34+00:00"
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "002353": {
       "company_intro": "为客户提供有竞争力、安全、可信赖的产品、服务与系统化解决方案。",
@@ -1547,6 +2522,37 @@
       "industry": "家电零部件Ⅱ",
       "market": 0,
       "updated_at": "2026-08-21T02:05:43+00:00"
+    },
+    "002405": {
+      "company_intro": "公司从早期的位置服务提供商，逐步转型为以智能辅助驾驶为核心。",
+      "concepts": [
+        "卫星导航",
+        "大数据",
+        "特斯拉概念"
+      ],
+      "customer_summary": "公司拥有甲级测绘资质等多项权威认证与海量专利，客户覆盖全球主流车企。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -52.193293248789,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": -267256321.06,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -488823333.62,
+        "parent_profit_yoy_pct": -57.409918227051,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 0.355170544099,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002405&type=web",
+        "stale": false
+      },
+      "industry": "软件开发",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "002407": {
       "company_intro": "主营业务为氟基新材料、新能源材料、电子信息材料和新能源电池，产品广泛应用于电解铝、半导体集成电路、光伏、TFT液晶屏幕、电动汽车等领域。",
@@ -1670,6 +2676,68 @@
       "market": 0,
       "updated_at": "2026-09-07T02:25:35+00:00"
     },
+    "002444": {
+      "company_intro": "直接为全球终端用户提供高品质、全品类产品。",
+      "concepts": [
+        "参股银行",
+        "电商概念",
+        "智能家居"
+      ],
+      "customer_summary": "公司拥有覆盖全球的销售渠道，直接服务于全球大型建材、五金、百货、汽配等连锁超市及各类工业用户，是众多专业级工具品牌的合作伙伴，同时依托国内外电商平台，直接为全球终端用户提供高品质、全品类产品。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 1.722124459727,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 900730603.05,
+        "operating_cash_to_parent_profit": 0.6903759441591585,
+        "parent_profit": 1304695812.0,
+        "parent_profit_yoy_pct": 2.500976510423,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 9.208212572931,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002444&type=web",
+        "stale": false
+      },
+      "industry": "通用设备",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "002448": {
+      "company_intro": "主营产品气缸套产销量位居行业前列。",
+      "concepts": [
+        "风能",
+        "燃料电池概念",
+        "无人机"
+      ],
+      "customer_summary": "中原内配集团股份有限公司是全球先进的动力活塞组件系统供应商和端对端供应链管理服务商，主营产品气缸套产销量位居行业前列，为全球乘用车、商用车、工程机械、农业机械、船舶工业等动力领域提供绿色、环保。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 18.637447750726,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 200242213.22,
+        "operating_cash_to_parent_profit": 0.5786018342940461,
+        "parent_profit": 346079464.93,
+        "parent_profit_yoy_pct": 48.143945502898,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 27.001634213044,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002448&type=web",
+        "stale": false
+      },
+      "industry": "汽车零部件",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "002459": {
       "company_intro": "晶澳太阳能科技股份有限公司(简称“晶澳科技”)，是全球客户信赖的绿色能源解决方案合作伙伴。",
       "concepts": [
@@ -1742,6 +2810,37 @@
       "market": 0,
       "updated_at": "2026-08-20T01:35:34+00:00"
     },
+    "002490": {
+      "company_intro": "致力于为能源装备工业提供优良的产品及服务。",
+      "concepts": [
+        "海工装备",
+        "页岩气",
+        "油气设服"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -47.533505290735,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 20448235.54,
+        "operating_cash_to_parent_profit": 4.856122081749864,
+        "parent_profit": 4210815.79,
+        "parent_profit_yoy_pct": -65.382045943765,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 57.099607283789,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002490&type=web",
+        "stale": false
+      },
+      "industry": "专用设备",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "002498": {
       "company_intro": "公司致力于为客户提供电缆及附件、电力设计、输变电工程、竣工试验、运行维护等一体化解决方案。",
       "concepts": [
@@ -1777,6 +2876,37 @@
       "market": 0,
       "updated_at": "2026-09-03T01:30:44+00:00"
     },
+    "002572": {
+      "company_intro": "索菲亚家居股份有限公司是一家主要从事定制柜、橱柜、木门、墙地一体、配套五金、家具家品、定制大宗业务的研发、生产和销售的公司。",
+      "concepts": [
+        "参股券商",
+        "电商概念",
+        "虚拟现实"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -71.505573376713,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 49274689.91,
+        "operating_cash_to_parent_profit": 0.7958136084339347,
+        "parent_profit": 61917375.36,
+        "parent_profit_yoy_pct": -80.613256389844,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -25.80171224481,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002572&type=web",
+        "stale": false
+      },
+      "industry": "家居用品",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "002575": {
       "company_intro": "未来将为入孵企业提供高效的全方位的培育服务。",
       "concepts": [
@@ -1800,6 +2930,37 @@
       "market": 0,
       "updated_at": "2026-09-03T01:30:44+00:00"
     },
+    "002586": {
+      "company_intro": "为客户提供工程勘察、设计、施工、科研、设备、管理、咨询等全生命周期的服务。",
+      "concepts": [
+        "工程建设",
+        "水利建设",
+        "央国企改革"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -80.322174873994,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": -155725713.01,
+        "operating_cash_to_parent_profit": -20.917750247286367,
+        "parent_profit": 7444668.34,
+        "parent_profit_yoy_pct": -10.604821480598,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -26.255592964605,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002586&type=web",
+        "stale": false
+      },
+      "industry": "基础建设",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "002588": {
       "company_intro": "为用户提供测土施肥、植物检测等农业检测一体化服务。",
       "concepts": [
@@ -1822,6 +2983,37 @@
       "industry": "专用设备",
       "market": 0,
       "updated_at": "2026-09-03T01:30:44+00:00"
+    },
+    "002615": {
+      "company_intro": "浙江哈尔斯真空器皿股份有限公司创立于1985年，是国内具有影响力的杯壶行业品牌运营商和制造商。",
+      "concepts": [
+        "婴童概念",
+        "智能家居",
+        "体育产业"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -48.306470119742,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-18",
+        "operating_cash_flow": -34736654.44,
+        "operating_cash_to_parent_profit": -0.7107910795736951,
+        "parent_profit": 48870414.16,
+        "parent_profit_yoy_pct": -46.502925504816,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 12.832745577451,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002615&type=web",
+        "stale": false
+      },
+      "industry": "家居用品",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "002645": {
       "company_intro": "公司一直致力于成为服务全球市场的再生资源加工装备专业制造商和综合服务提供商。",
@@ -1890,6 +3082,37 @@
       "market": 0,
       "updated_at": "2026-08-27T01:30:46+00:00"
     },
+    "002677": {
+      "company_intro": "致力于用科技创造健康厨房之美，让亿万家庭的厨房生活更健康、更智能、更时尚。",
+      "concepts": [
+        "人工智能",
+        "智能驾驶",
+        "AI应用"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": -230.91081100515,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:52+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -22570971.38,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -10708136.97,
+        "parent_profit_yoy_pct": -187.184664123892,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -37.327205679798,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002677&type=web",
+        "stale": false
+      },
+      "industry": "厨卫电器",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "002703": {
       "company_intro": "为国内外客户提供优质的产品和优良的服务。",
       "concepts": [
@@ -1901,6 +3124,99 @@
       "industry": "汽车零部件",
       "market": 0,
       "updated_at": "2026-08-21T01:50:45+00:00"
+    },
+    "002706": {
+      "company_intro": "为全球30多个国家和地区的客户提供专业而高效的服务。",
+      "concepts": [
+        "物联网",
+        "风能",
+        "智能家居"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -39.045236159568,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-15",
+        "operating_cash_flow": 156175643.47,
+        "operating_cash_to_parent_profit": 1.014076124088045,
+        "parent_profit": 154007810.42,
+        "parent_profit_yoy_pct": -37.508029992988,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 8.774552061038,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002706&type=web",
+        "stale": false
+      },
+      "industry": "电网设备",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "002716": {
+      "company_intro": "主要产品有银锭、金锭、铅锭、硝酸银、精铋、精碲、锑白、电积铜、钯粉及银制工艺品等。",
+      "concepts": [
+        "黄金概念",
+        "央国企改革",
+        "小金属概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 256.001764384193,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-21",
+        "operating_cash_flow": -1377398839.39,
+        "operating_cash_to_parent_profit": -8.191861060555796,
+        "parent_profit": 168142358.52,
+        "parent_profit_yoy_pct": 170.338708966631,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 92.53658868601,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002716&type=web",
+        "stale": false
+      },
+      "industry": "贵金属",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "002737": {
+      "company_intro": "葵花药业集团股份有限公司是以“保障中国儿童用药安全，呵护中国儿童健康成长。",
+      "concepts": [
+        "中药概念",
+        "婴童概念",
+        "流感"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 46.155749168213,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 25547970.31,
+        "operating_cash_to_parent_profit": 0.32148162630395016,
+        "parent_profit": 79469457.1,
+        "parent_profit_yoy_pct": -2.263498279477,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 14.335313305806,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002737&type=web",
+        "stale": false
+      },
+      "industry": "中药Ⅱ",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "002741": {
       "company_intro": "同时提供其他专业化学品的定制开发及技术服务。",
@@ -1998,6 +3314,35 @@
       "industry": "小金属",
       "market": 0,
       "updated_at": "2026-09-03T01:30:44+00:00"
+    },
+    "002847": {
+      "company_intro": "致力于成为中国卓越的食品制造企业，盐津铺子任重道远、大有可为。",
+      "concepts": [
+        "电商概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 16.756914102873,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 586819923.55,
+        "operating_cash_to_parent_profit": 1.3798384785325686,
+        "parent_profit": 425281605.55,
+        "parent_profit_yoy_pct": 14.103900610052,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 4.407914359352,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002847&type=web",
+        "stale": false
+      },
+      "industry": "休闲食品",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "002850": {
       "company_intro": "为锂电池、储能电站和整车厂提供精密零部件的全套制造方案，致力于维持全球锂电池精密结构件领域的龙头地位并成为汽车部件总成知名供应商。",
@@ -2233,9 +3578,57 @@
         "社区团购"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 6.792572396172,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": 167126324.96,
+        "operating_cash_to_parent_profit": 2.0869677343955955,
+        "parent_profit": 80080933.79,
+        "parent_profit_yoy_pct": 7.339842865666,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 13.179598206358,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002991&type=web",
+        "stale": false
+      },
       "industry": "休闲食品",
       "market": 0,
       "updated_at": "2026-08-28T01:30:44+00:00"
+    },
+    "003000": {
+      "company_intro": "公司积极践行国家“双碳”战略和湖南“三高四新”战略，被湖南省委省政府授予“新湖南贡献奖”。",
+      "concepts": [
+        "社区团购"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 10.912668696885,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 159435870.73,
+        "operating_cash_to_parent_profit": 1.498277448559744,
+        "parent_profit": 106412781.48,
+        "parent_profit_yoy_pct": -4.978392875471,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 23.08415833782,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ003000&type=web",
+        "stale": false
+      },
+      "industry": "休闲食品",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "003001": {
       "company_intro": "主要提供专业工程相关产品与服务。",
@@ -2328,6 +3721,37 @@
       "market": 0,
       "updated_at": "2026-09-07T01:30:45+00:00"
     },
+    "300001": {
+      "company_intro": "特锐德高度专注于户外箱式电力产品的集成设计与研发生产，坚持“一步领先。",
+      "concepts": [
+        "智能电网",
+        "铁路基建",
+        "充电桩"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 40.046894004102,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": -410478543.61,
+        "operating_cash_to_parent_profit": -0.9601292052729309,
+        "parent_profit": 427524276.27,
+        "parent_profit_yoy_pct": 30.734818379854,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 6.071144721529,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300001&type=web",
+        "stale": false
+      },
+      "industry": "电网设备",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "300005": {
       "company_intro": "在2009年作为首批企业之一，成功登陆中国创业板(股票代码:300005)。",
       "concepts": [
@@ -2364,6 +3788,68 @@
       "market": 0,
       "updated_at": "2026-08-25T01:30:44+00:00"
     },
+    "300033": {
+      "company_intro": "公司是国内领先的互联网金融信息服务提供商，也是最大的网上证券交易系统供应商之一。",
+      "concepts": [
+        "云计算",
+        "长江三角",
+        "大数据"
+      ],
+      "customer_summary": "公司是国内领先的互联网金融信息服务提供商，也是最大的网上证券交易系统供应商之一。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 92.894690838603,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": 2219388283.46,
+        "operating_cash_to_parent_profit": 2.330542478895407,
+        "parent_profit": 952305441.14,
+        "parent_profit_yoy_pct": 89.755543829126,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 48.681901781153,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300033&type=web",
+        "stale": false
+      },
+      "industry": "软件开发",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "300036": {
+      "company_intro": "致力于为全球更多用户打造领先的GI&GIS技术和产品。",
+      "concepts": [
+        "云计算",
+        "智慧城市",
+        "卫星导航"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -5008.71630676706,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": -209033541.6,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -128548438.29,
+        "parent_profit_yoy_pct": -1174.2703644835,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -29.176935194209,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300036&type=web",
+        "stale": false
+      },
+      "industry": "软件开发",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "300040": {
       "company_intro": "公司通过融合数字技术、电力电子技术和新型能源技术，推动“零碳”技术发展。",
       "concepts": [
@@ -2387,6 +3873,37 @@
       "industry": "计算机设备",
       "market": 0,
       "updated_at": "2026-08-21T01:50:45+00:00"
+    },
+    "300045": {
+      "company_intro": "华力创通的主营业务包括卫星应用、雷达信号处理、航空电子、无人系统和仿真测试。",
+      "concepts": [
+        "军工",
+        "创投",
+        "卫星导航"
+      ],
+      "customer_summary": "创建二十多年来，华力创通始终紧跟国家战略性需求，服务于关键技术领域的科技自立自强，率先将国外先进计算机仿真技术应用于国防领域，成功研制出中国第一代半实物仿真计算机、合成孔径雷达信号模拟器，参与。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -1248.23390100399,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 22173554.01,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -36016474.04,
+        "parent_profit_yoy_pct": -1314.36059609256,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -28.129316249203,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300045&type=web",
+        "stale": false
+      },
+      "industry": "军工电子Ⅱ",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "300049": {
       "company_intro": "内蒙古福瑞医疗科技股份有限公司1998年创建于内蒙古乌兰察布市，管理总部设于北京。",
@@ -2570,6 +4087,37 @@
       "market": 0,
       "updated_at": "2026-08-20T01:35:34+00:00"
     },
+    "300086": {
+      "company_intro": "主营业务涵盖儿童药、母婴健康产品、医疗服务等领域，是国家级高新技术企业。",
+      "concepts": [
+        "中药概念",
+        "婴童概念",
+        "病毒防治"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 26.025982915634,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -11243259.81,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -32766488.74,
+        "parent_profit_yoy_pct": 39.413004749559,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -37.66884377486,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300086&type=web",
+        "stale": false
+      },
+      "industry": "化学制药",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "300100": {
       "company_intro": "公司主营业务涵盖智能控制系统(包括HDM、座椅电机、车用丝杠、人形机器人用丝杠及关节模组)、新能源动力系统(电驱动)、轮毂轴承以及精密零。",
       "concepts": [
@@ -2629,6 +4177,37 @@
       "industry": "消费电子",
       "market": 0,
       "updated_at": "2026-08-28T01:50:37+00:00"
+    },
+    "300118": {
+      "company_intro": "为全球提供新能源绿色解决方案及一体化服务，不断通过产品帮助客户实现“低碳”或“零碳”目标。",
+      "concepts": [
+        "新能源",
+        "光伏概念",
+        "HJT电池"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -2.996534040585,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 117347078.27,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -820149432.25,
+        "parent_profit_yoy_pct": -20.814321517564,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -45.974857424222,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300118&type=web",
+        "stale": false
+      },
+      "industry": "光伏设备",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "300120": {
       "company_intro": "公司主要产品包括不限于各种类型的液晶显示模组、触控显示模组、3D防护屏、电子车牌等产品的研发、生产及销售。",
@@ -2741,9 +4320,28 @@
         "油气设服"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 0.324007740619,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -91786296.61,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -18527425.95,
+        "parent_profit_yoy_pct": -173.373848014745,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 11.547873309516,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300157&type=web",
+        "stale": false
+      },
       "industry": "通用设备",
       "market": 0,
-      "updated_at": "2026-08-20T01:35:34+00:00"
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "300164": {
       "company_intro": "通源石油已经发展成为可为油田客户提供包括综合提高采收率、钻完井技术服务、压裂技术服务、煤层气技术服务以及区块一体化总包服务上市集团公司。",
@@ -2753,9 +4351,28 @@
         "油气设服"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -328.903956215481,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": -2639481.64,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -24638719.26,
+        "parent_profit_yoy_pct": -163.775145448824,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -10.596320047503,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300164&type=web",
+        "stale": false
+      },
       "industry": "油服工程",
       "market": 0,
-      "updated_at": "2026-08-21T01:35:34+00:00"
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "300170": {
       "company_intro": "主要提供IT服务Ⅱ相关产品与服务。",
@@ -2792,6 +4409,37 @@
       "industry": "软件开发",
       "market": 0,
       "updated_at": "2026-08-24T02:25:37+00:00"
+    },
+    "300191": {
+      "company_intro": "主要提供油服工程相关产品与服务。",
+      "concepts": [
+        "油气设服",
+        "海洋经济",
+        "天然气"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": 525.370945795755,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:52+00:00",
+        "notice_date": "2026-08-06",
+        "operating_cash_flow": 394322987.23,
+        "operating_cash_to_parent_profit": 3.352946729250111,
+        "parent_profit": 117604906.69,
+        "parent_profit_yoy_pct": 522.938161431054,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 200.488273384385,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300191&type=web",
+        "stale": false
+      },
+      "industry": "油服工程",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "300199": {
       "company_intro": "始终专注于多肽药物及小核酸领域。",
@@ -3014,6 +4662,37 @@
       "market": 0,
       "updated_at": "2026-08-25T01:50:38+00:00"
     },
+    "300258": {
+      "company_intro": "公司主营业务为汽车差速器锥齿轮、新能源汽车用电机轴和差速器总成、汽车变速器结合齿齿轮、汽车变速器轴类件、EDL(电子差速锁齿轮)、同步器。",
+      "concepts": [
+        "新能源车",
+        "机器人概念",
+        "减速器"
+      ],
+      "customer_summary": "江苏太平洋精锻科技股份有限公司，成立于1992年12月9日，深交所创业板上市公司，股票名称:精锻科技，股票代码:300258，公司主营业务为汽车差速器锥齿轮、新能源汽车用电机轴和差速器总成、汽。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -174.497069423776,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": -49901077.04,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -27469931.2,
+        "parent_profit_yoy_pct": -145.330702436407,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -10.376432593086,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300258&type=web",
+        "stale": false
+      },
+      "industry": "汽车零部件",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "300270": {
       "company_intro": "定位于以AI视频应用为核心的行业物联网解决方案与运营服务提供商，依托于“中威云”AIoT视频云平台和视频中台能力。",
       "concepts": [
@@ -3125,9 +4804,28 @@
         "深圳特区"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 31.12593282325,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": 97174026.19,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -9554209.75,
+        "parent_profit_yoy_pct": 35.433369770216,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 18.604694728687,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300317&type=web",
+        "stale": false
+      },
       "industry": "电力",
       "market": 0,
-      "updated_at": "2026-08-19T01:35:33+00:00"
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "300323": {
       "company_intro": "提供解决方案。",
@@ -3391,6 +5089,25 @@
         "华为概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 122.53021815139,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 1271555641.94,
+        "operating_cash_to_parent_profit": 4.510712377596041,
+        "parent_profit": 281896856.97,
+        "parent_profit_yoy_pct": 61.584367158402,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 90.058220701468,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300432&type=web",
+        "stale": false
+      },
       "industry": "电池",
       "market": 0,
       "updated_at": "2026-09-03T01:30:44+00:00"
@@ -3415,6 +5132,25 @@
         "光伏概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -187.753513546675,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -312419620.9,
+        "operating_cash_to_parent_profit": -1.3344707514649432,
+        "parent_profit": 234115000.69,
+        "parent_profit_yoy_pct": 126.162509565716,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -38.143655472695,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300444&type=web",
+        "stale": false
+      },
       "industry": "电网设备",
       "market": 0,
       "updated_at": "2026-09-01T01:30:48+00:00"
@@ -3427,6 +5163,25 @@
         "油气设服"
       ],
       "customer_summary": "面向未来，公司将坚定“以国为重、思变创新、自立自强、矢志一流”发展理念，持续释放航天文化、人才、技术优势，推动产业和资本进一步融合，努力成为智造能力领先、运营管理高效、经济效益显著、产业链地位。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -39.861707188645,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 488464750.61,
+        "operating_cash_to_parent_profit": 2.01063300848067,
+        "parent_profit": 242940779.62,
+        "parent_profit_yoy_pct": -37.953752800476,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -6.357140886045,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300446&type=web",
+        "stale": false
+      },
       "industry": "汽车零部件",
       "market": 0,
       "updated_at": "2026-08-25T01:35:37+00:00"
@@ -3723,6 +5478,37 @@
       "industry": "专用设备",
       "market": 0,
       "updated_at": "2026-08-25T05:15:42+00:00"
+    },
+    "300541": {
+      "company_intro": "先进数通主要面向金融行业、互联网行业及政企行业提供IT解决方案及专业服务。",
+      "concepts": [
+        "互联网服务",
+        "大数据",
+        "互联网金融"
+      ],
+      "customer_summary": "北京先进数通信息技术股份公司，2000年成立于北京市海淀区，2016年于深圳证券交易所挂牌上市(股票代码:300541)，是国内先进的行业应用软件与IT服务供应商。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -129.648056980297,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-14",
+        "operating_cash_flow": -327163628.44,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -14876183.81,
+        "parent_profit_yoy_pct": -123.762583209761,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -5.655536662497,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300541&type=web",
+        "stale": false
+      },
+      "industry": "IT服务Ⅱ",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "300545": {
       "company_intro": "是国内领先的LCD/OLED整线模组、柔性制造及非标自动化设备专业解决方案提供商;在新型半导体显示、汽车智能座舱系统、半导体封测、新能源。",
@@ -4127,9 +5913,59 @@
         "无人机"
       ],
       "customer_summary": "21世纪初，为解决国外对碳纤维“技术、产品、装备”三封锁、核心技术受制于人的被动局面，光威复材毅然从传统渔具行业向高科技新材料行业转型，于2002年成立威海拓展纤维有限公司，在创始人陈光威先生。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -25.183305260822,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": -114043692.93,
+        "operating_cash_to_parent_profit": -0.5735710910057608,
+        "parent_profit": 198830963.97,
+        "parent_profit_yoy_pct": -26.207773882108,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 9.825367352772,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300699&type=web",
+        "stale": false
+      },
       "industry": "航空装备Ⅱ",
       "market": 0,
-      "updated_at": "2026-08-21T01:45:40+00:00"
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "300700": {
+      "company_intro": "为目标客户提供一体化整体解决方案与服务，产品产销量和市场占有率均居国内行业前列。",
+      "concepts": [
+        "新材料",
+        "光伏概念",
+        "燃料电池概念"
+      ],
+      "customer_summary": "发展至今，岱勒新材已围绕光伏、氢能、led及半导体、电子产品等领域建立起电镀金刚石线、环形金刚石线、钨丝绳、高纯度石英砂、石墨复合双极板、电子专用材料等多元化产品矩阵，为目标客户提供一体化整体。",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": 109.648728481175,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:52+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 26615530.3,
+        "operating_cash_to_parent_profit": 3.3512668643761816,
+        "parent_profit": 7941931.03,
+        "parent_profit_yoy_pct": 111.816189448671,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 37.316842851116,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300700&type=web",
+        "stale": false
+      },
+      "industry": "通用设备",
+      "market": 0,
+      "updated_at": "2026-09-23T03:37:46+00:00"
     },
     "300706": {
       "company_intro": "主要产品包括ITO、钼、铜、铝、硅、钛、钽及各类合金与稀有金属靶材。",
@@ -4199,6 +6035,35 @@
       "market": 0,
       "updated_at": "2026-09-03T01:30:44+00:00"
     },
+    "300737": {
+      "company_intro": "能够及时、高效地为顾客提供满意的产品和服务。",
+      "concepts": [
+        "水利建设"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 310.764994112113,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 194705516.71,
+        "operating_cash_to_parent_profit": 2.8896550903688083,
+        "parent_profit": 67380192.66,
+        "parent_profit_yoy_pct": 43.498951115753,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -9.420972223593,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300737&type=web",
+        "stale": false
+      },
+      "industry": "装修建材",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "300738": {
       "company_intro": "是国内领先的互联网云计算与大数据基础服务综合解决方案提供商，致力构建多云多网多端数字产业生态平台。",
       "concepts": [
@@ -4238,6 +6103,25 @@
         "特斯拉概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": 43.444603004956,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:52+00:00",
+        "notice_date": "2026-07-25",
+        "operating_cash_flow": 60216851000.0,
+        "operating_cash_to_parent_profit": 1.3912034058218554,
+        "parent_profit": 43284002000.0,
+        "parent_profit_yoy_pct": 41.983941749454,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 54.800369148545,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300750&type=web",
+        "stale": false
+      },
       "industry": "电池",
       "market": 0,
       "updated_at": "2026-09-09T06:00:57+00:00"
@@ -4375,6 +6259,37 @@
       "market": 0,
       "updated_at": "2026-09-01T01:55:34+00:00"
     },
+    "300774": {
+      "company_intro": "主营业务为在工业水处理、高盐废水资源化再利用以及盐湖提锂及盐湖等矿产的综合开发领域。",
+      "concepts": [
+        "节能环保",
+        "京津冀",
+        "小金属概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -172.15722134939,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": -15161947.25,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -18990225.05,
+        "parent_profit_yoy_pct": -138.242999650773,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -6.990340244034,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300774&type=web",
+        "stale": false
+      },
+      "industry": "环境治理",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "300776": {
       "company_intro": "面向光伏、新型显示和半导体等领域提供一体化加工解决方案的激光装备制造企业。",
       "concepts": [
@@ -4500,6 +6415,37 @@
       "industry": "消费电子",
       "market": 0,
       "updated_at": "2026-08-25T02:05:42+00:00"
+    },
+    "300830": {
+      "company_intro": "公司的主营业务包括两部分:一是为电力、军工、制造、铁路、石化等大型企业提供定制化行业解决方案;二是为央企、国企、行业龙头等企业提供标准化。",
+      "concepts": [
+        "军工",
+        "云计算",
+        "智能电网"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -9.382485762623,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 16386584.45,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -23449085.58,
+        "parent_profit_yoy_pct": -4.543797379575,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -5.25245915706,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300830&type=web",
+        "stale": false
+      },
+      "industry": "软件开发",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "300836": {
       "company_intro": "主要提供专用设备相关产品与服务。",
@@ -4778,6 +6724,25 @@
         "农业种植"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 153.17242044562,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 1810746201.26,
+        "operating_cash_to_parent_profit": 1.4965793488990655,
+        "parent_profit": 1209923284.45,
+        "parent_profit_yoy_pct": 156.575085419101,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 54.261588625756,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300972&type=web",
+        "stale": false
+      },
       "industry": "休闲食品",
       "market": 0,
       "updated_at": "2026-09-01T01:30:48+00:00"
@@ -4802,9 +6767,59 @@
         "人工智能"
       ],
       "customer_summary": "已形成以石油石化、建筑地产两大优势行业为核心，多业务领域客户群体不断扩大的发展格局。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -156.876448714317,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -146448829.01,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -4437281.3,
+        "parent_profit_yoy_pct": -467.727452089174,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -23.694535101325,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300996&type=web",
+        "stale": false
+      },
       "industry": "软件开发",
       "market": 0,
       "updated_at": "2026-08-25T06:33:36+00:00"
+    },
+    "300997": {
+      "company_intro": "提供营养美味的健康饮料;为确保水果罐头产品新鲜、营养，公司不断优化生产工艺和生产线及设备。",
+      "concepts": [
+        "参股银行",
+        "乡村振兴",
+        "网红经济"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 26.384243071627,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 69300374.96,
+        "operating_cash_to_parent_profit": 2.983121676263253,
+        "parent_profit": 23230824.11,
+        "parent_profit_yoy_pct": 25.216496439253,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -1.74150866245,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300997&type=web",
+        "stale": false
+      },
+      "industry": "饮料乳品",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "301005": {
       "company_intro": "公司秉承着“为客户提供优质的连接与紧固技术解决方案”的使命，力争在汽车行业中保持领先地位。",
@@ -5455,6 +7470,25 @@
         "贬值受益"
       ],
       "customer_summary": "深圳市华宝新能源股份有限公司开创了SolarGenerator光充户外电源、一体化阳台光储家庭绿电系统和光伏瓦家庭绿电系统，构建研发、生产、品牌、零售，服务于一体的端到端直销模式，获得《时代周。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -125.038802325999,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 146975362.88,
+        "operating_cash_to_parent_profit": 14.159002589046347,
+        "parent_profit": 10380347.2,
+        "parent_profit_yoy_pct": -91.532669153684,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 34.706689474381,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ301327&type=web",
+        "stale": false
+      },
       "industry": "电池",
       "market": 0,
       "updated_at": "2026-09-04T01:30:50+00:00"
@@ -5936,13 +7970,13 @@
         "充电桩"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-23",
+      "financial_as_of": "2026-09-22",
       "financials": {
         "adjusted_profit_yoy_pct": -9.434098807346,
-        "as_of": "2026-09-23",
+        "as_of": "2026-09-22",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-23T01:30:55+00:00",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
         "notice_date": "2026-08-21",
         "operating_cash_flow": 35504658.11,
         "operating_cash_to_parent_profit": 0.75450003609214,
@@ -5970,6 +8004,37 @@
       "industry": "半导体",
       "market": 0,
       "updated_at": "2026-09-03T01:30:44+00:00"
+    },
+    "301613": {
+      "company_intro": "公司主要从事新能源汽车电池系统铝合金零部件的研发、生产和销售，拥有铝合金材料研发、产品设计、先进生产工艺以及规模化生产的完整业务体系。",
+      "concepts": [
+        "小米概念",
+        "新能源车",
+        "机器人概念"
+      ],
+      "customer_summary": "公司已与比亚迪、吉利、宁德时代、中创新航、徐工等新能源产业下游整车厂商和动力电池厂商建立了稳定的合作关系，成为新能源产业重要的零部件供应商。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -57.732455376138,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": -120807011.64,
+        "operating_cash_to_parent_profit": -1.6264455632493466,
+        "parent_profit": 74276701.52,
+        "parent_profit_yoy_pct": -47.007168402604,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 11.017711309166,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ301613&type=web",
+        "stale": false
+      },
+      "industry": "汽车零部件",
+      "market": 0,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "301622": {
       "company_intro": "主要产品是磁组件器件和单磁体器件，产品广泛用于3C(笔记本电脑、平板电脑、手机、智能穿戴)、新能源汽车、智能家居、风力发电等领域。",
@@ -6162,6 +8227,35 @@
       "market": 1,
       "updated_at": "2026-08-20T01:45:37+00:00"
     },
+    "600012": {
+      "company_intro": "本公司的主营业务为投资、建设、运营及管理安徽省境内的部分收费公路。",
+      "concepts": [
+        "央国企改革"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": 8.402178775639,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:52+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 1721737923.35,
+        "operating_cash_to_parent_profit": 1.7090794521639878,
+        "parent_profit": 1007406601.94,
+        "parent_profit_yoy_pct": 4.886289901379,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -13.752068533467,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600012&type=web",
+        "stale": false
+      },
+      "industry": "铁路公路",
+      "market": 1,
+      "updated_at": "2026-09-23T03:37:46+00:00"
+    },
     "600021": {
       "company_intro": "上海电力股份有限公司(简称“上海电力”。",
       "concepts": [
@@ -6182,9 +8276,59 @@
         "新能源车"
       ],
       "customer_summary": "宇通客车股份有限公司是中国客车行业首家上市公司(SH.600066)，集客车产品研发、制造与销售为一体，产品主要服务于公交、客运、旅游、团体、校车及专用出行等细分市场。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 15.833496922154,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-11",
+        "operating_cash_flow": 5948735721.09,
+        "operating_cash_to_parent_profit": 3.185548326297365,
+        "parent_profit": 1867413428.32,
+        "parent_profit_yoy_pct": -3.518668666278,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 3.652478417409,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600066&type=web",
+        "stale": false
+      },
       "industry": "商用车",
       "market": 1,
       "updated_at": "2026-09-09T05:05:36+00:00"
+    },
+    "600089": {
+      "company_intro": "特变电工股份有限公司致力为全球能源事业提供绿色智慧能源系统解决方案，是国家级高新技术企业集团和大型能源装备制造企业集团。",
+      "concepts": [
+        "煤化工概念",
+        "新能源",
+        "黄金概念"
+      ],
+      "customer_summary": "特变电工立足服务\"双碳\"目标，以高质量发展为主线，以先进能源技术创新为驱动，以清洁低碳能源供应为保障，坚定不移推进绿色发展，高质量共建\"一带一路\"，与全球合作伙伴一起，为人类社会可持续发展贡献。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -4.091378905021,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": 6219687556.26,
+        "operating_cash_to_parent_profit": 2.4368853175200695,
+        "parent_profit": 2552310324.8,
+        "parent_profit_yoy_pct": -19.836108214434,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 16.909049465971,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600089&type=web",
+        "stale": false
+      },
+      "industry": "电网设备",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "600094": {
       "company_intro": "上海大名城企业股份有限公司隶属于名城控股集团，于2011年在上海证券交易所A、B股正式上市(股票代码600094、900940)。",
@@ -6234,6 +8378,37 @@
       "market": 1,
       "updated_at": "2026-08-20T01:35:34+00:00"
     },
+    "600126": {
+      "company_intro": "主营业务为钢铁及其压延产品的生产和销售，经营模式以自产自销为基础，另外进行部分原燃材料以及钢材的贸易。",
+      "concepts": [
+        "节能环保",
+        "云计算",
+        "长江三角"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 81.721954634874,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 744491532.35,
+        "operating_cash_to_parent_profit": 59.43557999278131,
+        "parent_profit": 12526024.52,
+        "parent_profit_yoy_pct": 110.967598453605,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -57.490422275065,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600126&type=web",
+        "stale": false
+      },
+      "industry": "普钢",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "600129": {
       "company_intro": "致力于传承创新中医药和发展现代医药，拥有9家中成药厂、2家化药厂、2家中药饮片厂、20多家医药商业公司。",
       "concepts": [
@@ -6254,6 +8429,25 @@
         "西部大开发"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": -8.274211278162,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:52+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 2854540883.68,
+        "operating_cash_to_parent_profit": 3.586471192493079,
+        "parent_profit": 795919088.84,
+        "parent_profit_yoy_pct": -7.983729017894,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -2.979008732325,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600132&type=web",
+        "stale": false
+      },
       "industry": "非白酒",
       "market": 1,
       "updated_at": "2026-08-25T01:30:44+00:00"
@@ -6313,6 +8507,37 @@
       "market": 1,
       "updated_at": "2026-08-25T02:00:50+00:00"
     },
+    "600188": {
+      "company_intro": "公司秉持“创造绿色动能、引领能源变革”的企业使命，主动融入国家“双碳”战略。",
+      "concepts": [
+        "煤化工概念",
+        "化工原料",
+        "稀缺资源"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": 4.008795257424,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:52+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 13835582000.0,
+        "operating_cash_to_parent_profit": 1.9351427847316593,
+        "parent_profit": 7149644000.0,
+        "parent_profit_yoy_pct": 47.747879557371,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 13.005122251191,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600188&type=web",
+        "stale": false
+      },
+      "industry": "煤炭开采",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "600206": {
       "company_intro": "有研新材主要从事稀土材料、微光电子用薄膜材料、生物医用材料、稀有金属及贵金属、红外光学及光电材料等新材料的研发与生产。",
       "concepts": [
@@ -6324,6 +8549,37 @@
       "industry": "半导体",
       "market": 1,
       "updated_at": "2026-09-03T01:30:44+00:00"
+    },
+    "600230": {
+      "company_intro": "公司主要从事甲苯二异氰酸酯、聚碳酸酯的研发、生产和销售。",
+      "concepts": [
+        "化工原料",
+        "新材料",
+        "央国企改革"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 301.379441769138,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-15",
+        "operating_cash_flow": 336517492.16,
+        "operating_cash_to_parent_profit": 3.3405446167938604,
+        "parent_profit": 100737314.05,
+        "parent_profit_yoy_pct": 330.752161530309,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -4.105220234673,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600230&type=web",
+        "stale": false
+      },
+      "industry": "化学制品",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "600236": {
       "company_intro": "公司荣获上海证券交易所“2022-2023年度信息披露工作评价A级”、入选中国上市公司协会“2023年公司治理最佳实践案例”并获得最佳实。",
@@ -6392,6 +8648,37 @@
       "market": 1,
       "updated_at": "2026-09-04T01:30:50+00:00"
     },
+    "600273": {
+      "company_intro": "浙江嘉化能源化工股份有限公司坐落于省级经济开发区——嘉兴港区乍浦经济开发区内2008年该园区命名为国家级的“中国化工新材料(嘉兴)园区”。",
+      "concepts": [
+        "新能源",
+        "新材料",
+        "光伏概念"
+      ],
+      "customer_summary": "同时公司还是国内外磺化医药系列产品的主要供应商;公司利用工业副产氢，在氢能源领域进行氢能一体化布局，结合公司已布局的光伏发电项目，优化低碳、循环发展生态，实现企业的绿色可持续发展。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -42.809055415533,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": -43667241.02,
+        "operating_cash_to_parent_profit": -0.19951008957146626,
+        "parent_profit": 218872344.32,
+        "parent_profit_yoy_pct": -62.301919973647,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 0.596242303769,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600273&type=web",
+        "stale": false
+      },
+      "industry": "化学制品",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "600276": {
       "company_intro": "作为一家专注研发、生产及推广高品质药物的创新型国际化制药企业，恒瑞医药在五十多年的发展历程中。",
       "concepts": [
@@ -6423,6 +8710,130 @@
       "market": 1,
       "updated_at": "2026-09-23T01:30:50+00:00"
     },
+    "600282": {
+      "company_intro": "为国家重点项目、高端制造业升级提供解决方案。",
+      "concepts": [
+        "节能环保",
+        "创投",
+        "核能核电"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": -1.970055329679,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:52+00:00",
+        "notice_date": "2026-08-21",
+        "operating_cash_flow": 1543064733.29,
+        "operating_cash_to_parent_profit": 1.1671386135362836,
+        "parent_profit": 1322092093.77,
+        "parent_profit_yoy_pct": -9.636770518128,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 7.554214206671,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600282&type=web",
+        "stale": false
+      },
+      "industry": "普钢",
+      "market": 1,
+      "updated_at": "2026-09-23T03:37:46+00:00"
+    },
+    "600328": {
+      "company_intro": "主要提供化学原料相关产品与服务。",
+      "concepts": [
+        "化工原料",
+        "稀缺资源",
+        "核能核电"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -843.590988543771,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": -337070558.13,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -272243891.68,
+        "parent_profit_yoy_pct": -616.439749482878,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -18.519398317889,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600328&type=web",
+        "stale": false
+      },
+      "industry": "化学原料",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "600332": {
+      "company_intro": "主要从事:(1)中西成药、化学原料药、天然药物、生物医药、化学原料药中间体的研究开发、制造与销售;(2)西药、中药和医疗器械的批发、零售。",
+      "concepts": [
+        "参股银行",
+        "生物疫苗",
+        "中药概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -12.102366624692,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": -269950747.12,
+        "operating_cash_to_parent_profit": -0.12879835443602058,
+        "parent_profit": 2095917671.48,
+        "parent_profit_yoy_pct": -16.701103690781,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 0.612911393355,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600332&type=web",
+        "stale": false
+      },
+      "industry": "中药Ⅱ",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "600346": {
+      "company_intro": "公司主营业务已涵盖石油炼化、石化、芳烃、PTA、民用涤纶长丝、工业用涤纶长丝、工程塑料、聚酯薄膜和热电等产业领域。",
+      "concepts": [
+        "锂电池概念",
+        "东北振兴",
+        "降解塑料"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 132.345977058794,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 3499889745.74,
+        "operating_cash_to_parent_profit": 0.48570769916623474,
+        "parent_profit": 7205753072.78,
+        "parent_profit_yoy_pct": 136.246531540461,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -5.470107637103,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600346&type=web",
+        "stale": false
+      },
+      "industry": "炼化及贸易",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "600350": {
       "company_intro": "公司主要从事对交通基础设施的投资运营、以及高速公路产业链上下游相关行业等领域的股权投资。",
       "concepts": [
@@ -6437,7 +8848,7 @@
         "as_of": "2026-09-23",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-23T01:30:55+00:00",
+        "fetched_at": "2026-09-23T03:37:52+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 3553229844.08,
         "operating_cash_to_parent_profit": 2.252396254307578,
@@ -6453,6 +8864,37 @@
       "industry": "铁路公路",
       "market": 1,
       "updated_at": "2026-09-10T02:55:33+00:00"
+    },
+    "600352": {
+      "company_intro": "2010年，龙盛通过启动债转股控股德司达全球公司，开始掌控染料行业的话语权。",
+      "concepts": [
+        "化工原料",
+        "参股银行",
+        "IPO受益"
+      ],
+      "customer_summary": "在全球的主要染料市场，浙江龙盛拥有超过30个销售实体，服务于7，000家客户，约占全球近21%的市场份额，在所有的关键市场都有着销售和技术的支持，在50个国家设有代理机构，拥有在12个国家的1。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 27.505617290443,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 1798786109.11,
+        "operating_cash_to_parent_profit": 1.7915903747019895,
+        "parent_profit": 1004016394.88,
+        "parent_profit_yoy_pct": 8.204547625213,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 12.125120471924,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600352&type=web",
+        "stale": false
+      },
+      "industry": "化学制品",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "600353": {
       "company_intro": "成都旭光电子股份有限公司，前身国营旭光电子管厂，1965年创建于四川广元。",
@@ -6512,9 +8954,28 @@
         "央国企改革"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 24.582768041241,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 216743310.42,
+        "operating_cash_to_parent_profit": 2.0625685349336047,
+        "parent_profit": 105084173.81,
+        "parent_profit_yoy_pct": 22.063476254285,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 11.047933985853,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600396&type=web",
+        "stale": false
+      },
       "industry": "电力",
       "market": 1,
-      "updated_at": "2026-08-20T01:40:38+00:00"
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "600410": {
       "company_intro": "北京华胜天成科技股份有限公司(以下简称华胜天成)面向全球客户提供领先的云计算解决方案和基于行业的数字化服务。",
@@ -6564,6 +9025,68 @@
       "market": 1,
       "updated_at": "2026-09-04T01:30:50+00:00"
     },
+    "600456": {
+      "company_intro": "公司是国家高新技术企业，专业从事钛及钛合金生产、科研，所在地被誉为“中国钛城”、“中国钛谷”。",
+      "concepts": [
+        "军工",
+        "稀缺资源",
+        "新材料"
+      ],
+      "customer_summary": "公司被海关列入“AA类进出口企业”、国家质监总局质量信用A级企业、陕西省“出口名牌企业”，被航空、航天等多家企业评为“A类/优秀供应商”，“突出贡献供应商”。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -29.248882892781,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": -178652853.87,
+        "operating_cash_to_parent_profit": -1.2263721656543145,
+        "parent_profit": 145675887.69,
+        "parent_profit_yoy_pct": -29.104888591452,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 1.17043252579,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600456&type=web",
+        "stale": false
+      },
+      "industry": "小金属",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "600480": {
+      "company_intro": "凌云工业股份有限公司是北方凌云工业集团有限公司控股上市公司，股票代码600480。",
+      "concepts": [
+        "铁路基建",
+        "特斯拉概念",
+        "燃料电池概念"
+      ],
+      "customer_summary": "公司2003年上市，是一家全球化汽车零部件供应商。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -26.722194824571,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 571084735.56,
+        "operating_cash_to_parent_profit": 1.8770937441628477,
+        "parent_profit": 304238793.26,
+        "parent_profit_yoy_pct": -29.732015969888,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 4.493295109043,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600480&type=web",
+        "stale": false
+      },
+      "industry": "汽车零部件",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "600488": {
       "company_intro": "主要从事皮质激素类、氨基酸类原料药及制剂的研发、生产和销售。",
       "concepts": [
@@ -6605,6 +9128,37 @@
       "industry": "化学制药",
       "market": 1,
       "updated_at": "2026-09-08T01:35:34+00:00"
+    },
+    "600525": {
+      "company_intro": "主要提供电网设备相关产品与服务。",
+      "concepts": [
+        "新材料",
+        "深圳特区",
+        "锂电池概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 216.354590993424,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-31",
+        "operating_cash_flow": 114266413.86,
+        "operating_cash_to_parent_profit": 3.1103072655419512,
+        "parent_profit": 36737982.49,
+        "parent_profit_yoy_pct": 110.73780245307,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 9.970529654348,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600525&type=web",
+        "stale": false
+      },
+      "industry": "电网设备",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "600545": {
       "company_intro": "提供智能实用型解决方案，帮助我们客户实现其业务目标。",
@@ -6656,7 +9210,7 @@
         "as_of": "2026-09-22",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-22T01:30:47+00:00",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
         "notice_date": "2026-08-22",
         "operating_cash_flow": 4638595214.32,
         "operating_cash_to_parent_profit": 2.332135652082205,
@@ -6671,7 +9225,7 @@
       },
       "industry": "电力",
       "market": 1,
-      "updated_at": "2026-08-24T01:30:48+00:00"
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "600580": {
       "company_intro": "致力于向全球用户提供安全、高效、智能、绿色的电机动力系统解决方案，助力“碳中和”。",
@@ -6795,6 +9349,37 @@
       "market": 1,
       "updated_at": "2026-09-18T01:35:33+00:00"
     },
+    "600654": {
+      "company_intro": "能够为客户提供覆盖“工业安全、信息安全、人身安全”的一体化解决方案。",
+      "concepts": [
+        "长江三角",
+        "智慧城市",
+        "网络安全"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 623.41553674592,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -55599010.78,
+        "operating_cash_to_parent_profit": -1.1479404943754563,
+        "parent_profit": 48433704.58,
+        "parent_profit_yoy_pct": 1825.51298681831,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -25.406896109357,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600654&type=web",
+        "stale": false
+      },
+      "industry": "软件开发",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "600664": {
       "company_intro": "销售过亿产品包括葡萄糖酸锌口服溶液、复方葡萄糖酸钙口服溶液、钙铁锌口服液、双黄连口服液、阿莫西林胶囊、拉西地平片、注射用盐酸罗沙替丁醋酸。",
       "concepts": [
@@ -6855,6 +9440,37 @@
       "market": 1,
       "updated_at": "2026-08-25T05:05:36+00:00"
     },
+    "600702": {
+      "company_intro": "舍得酒业股份有限公司，中国文化的传播者生态酿酒的先行者之一作为川酒“六朵金花”之一。",
+      "concepts": [
+        "酿酒概念",
+        "成渝特区",
+        "西部大开发"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -69.843823299604,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-19",
+        "operating_cash_flow": -26583743.46,
+        "operating_cash_to_parent_profit": -0.18316673818160947,
+        "parent_profit": 145134120.55,
+        "parent_profit_yoy_pct": -67.259815443463,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -15.337516217863,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600702&type=web",
+        "stale": false
+      },
+      "industry": "白酒Ⅱ",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "600707": {
       "company_intro": "彩虹股份主营业务为平板显示器件及其关键材料的研发、生产和销售。",
       "concepts": [
@@ -6891,7 +9507,7 @@
         "as_of": "2026-09-22",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-22T01:50:47+00:00",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
         "notice_date": "2026-08-20",
         "operating_cash_flow": 191897336.92,
         "operating_cash_to_parent_profit": 0.32433429136417646,
@@ -6992,6 +9608,37 @@
       "market": 1,
       "updated_at": "2026-08-26T01:35:35+00:00"
     },
+    "600779": {
+      "company_intro": "主营白酒产品的生产与销售。",
+      "concepts": [
+        "酿酒概念",
+        "创投",
+        "成渝特区"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -109.636300393993,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -73251358.11,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -6222478.74,
+        "parent_profit_yoy_pct": -105.903216132042,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -27.777828606386,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600779&type=web",
+        "stale": false
+      },
+      "industry": "白酒Ⅱ",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "600783": {
       "company_intro": "公司围绕“长周期”扶持创新型科技企业做强做大、“全流程”赋能实体产业高端高质高效发展等主营业务。",
       "concepts": [
@@ -7000,6 +9647,25 @@
         "央国企改革"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -7.198761003345,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -21199775.3,
+        "operating_cash_to_parent_profit": -0.10828891081067998,
+        "parent_profit": 195770510.03,
+        "parent_profit_yoy_pct": -9.951255390597,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 15.099023892971,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600783&type=web",
+        "stale": false
+      },
       "industry": "通用设备",
       "market": 1,
       "updated_at": "2026-08-25T02:05:42+00:00"
@@ -7052,6 +9718,37 @@
       "market": 1,
       "updated_at": "2026-09-04T01:30:50+00:00"
     },
+    "600884": {
+      "company_intro": "宁波杉杉股份有限公司，A股代码:600884，于上交所主板A股上市。",
+      "concepts": [
+        "锂电池概念",
+        "长江三角",
+        "苹果概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 362.554974585456,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 834520022.6,
+        "operating_cash_to_parent_profit": 1.0146737082369988,
+        "parent_profit": 822451607.67,
+        "parent_profit_yoy_pct": 296.728934153138,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 23.044606777117,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600884&type=web",
+        "stale": false
+      },
+      "industry": "电池",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "600894": {
       "company_intro": "立足于“成为智慧楼宇等相关领域提供高端智能装备及整体解决方案的数字化领先企业”的战略定位。",
       "concepts": [
@@ -7060,6 +9757,25 @@
         "LED概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -11.395700383276,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 111578725.35,
+        "operating_cash_to_parent_profit": 0.8495425610111913,
+        "parent_profit": 131339770.92,
+        "parent_profit_yoy_pct": -41.06434722722,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 0.111534999381,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600894&type=web",
+        "stale": false
+      },
       "industry": "专用设备",
       "market": 1,
       "updated_at": "2026-08-26T01:40:38+00:00"
@@ -7084,9 +9800,28 @@
         "AI智能体"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 114.229558705379,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": -200971121.03,
+        "operating_cash_to_parent_profit": -3.8387788990636795,
+        "parent_profit": 52352877.39,
+        "parent_profit_yoy_pct": 117.49469922129,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -30.778725464694,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600936&type=web",
+        "stale": false
+      },
       "industry": "IT服务Ⅱ",
       "market": 1,
-      "updated_at": "2026-08-20T01:35:34+00:00"
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "600961": {
       "company_intro": "株洲冶炼集团股份有限公司源于1956年始建的株洲冶炼厂，是国家“一五”期间建设的重点企业。",
@@ -7143,6 +9878,68 @@
       "market": 1,
       "updated_at": "2026-08-25T01:35:37+00:00"
     },
+    "601003": {
+      "company_intro": "为用户提供全程化、专业化、个性化的高品质服务，产品畅销国内市场并出口至亚、非、欧、美等几十个国家和地区。",
+      "concepts": [
+        "西部大开发",
+        "养老概念",
+        "央国企改革"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -83.855579920555,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 1475915544.53,
+        "operating_cash_to_parent_profit": 19.389753381611275,
+        "parent_profit": 76118324.74,
+        "parent_profit_yoy_pct": -79.309830010545,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -4.961160966901,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH601003&type=web",
+        "stale": false
+      },
+      "industry": "普钢",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "601012": {
+      "company_intro": "致力于打造全球最具价值的太阳能科技公司。",
+      "concepts": [
+        "新能源",
+        "光伏概念",
+        "西部大开发"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -22.02253645058,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-31",
+        "operating_cash_flow": -5817794006.91,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -3684104428.05,
+        "parent_profit_yoy_pct": -43.38616590965,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -17.578129299304,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH601012&type=web",
+        "stale": false
+      },
+      "industry": "光伏设备",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "601021": {
       "company_intro": "致力于为旅客提供多种实惠的出行产品。",
       "concepts": [
@@ -7198,6 +9995,35 @@
       "market": 1,
       "updated_at": "2026-08-21T01:30:44+00:00"
     },
+    "601089": {
+      "company_intro": "公司主要从事药品制剂及医疗器械的研发、生产和销售，以“专注医药领域，共创健康人生”为使命。",
+      "concepts": [
+        "医疗器械概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -34.026990975448,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-15",
+        "operating_cash_flow": 256833786.35,
+        "operating_cash_to_parent_profit": 1.3793712234384516,
+        "parent_profit": 186196276.96,
+        "parent_profit_yoy_pct": -30.489447247067,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 4.661943536587,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH601089&type=web",
+        "stale": false
+      },
+      "industry": "化学制药",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "601100": {
       "company_intro": "为全球2000多家客户提供服务，主要市场涵盖30多个国家和地区。",
       "concepts": [
@@ -7218,6 +10044,37 @@
       "industry": "航空机场",
       "market": 1,
       "updated_at": "2026-08-20T01:35:34+00:00"
+    },
+    "601116": {
+      "company_intro": "三江购物俱乐部股份有限公司是浙江省大型商贸流通企业，中国连锁经营百强企业。",
+      "concepts": [
+        "电商概念",
+        "阿里概念",
+        "新零售"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -24.89517347351,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 56864197.83,
+        "operating_cash_to_parent_profit": 0.8646623481905923,
+        "parent_profit": 65764628.18,
+        "parent_profit_yoy_pct": -28.028365934878,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -8.27834141491,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH601116&type=web",
+        "stale": false
+      },
+      "industry": "一般零售",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "601126": {
       "company_intro": "为电力的发、输、配、用、储等环节提供继电保护、自动化与控制系统、电力电子、一二次融合、智慧物联等产品及解决方案。",
@@ -7255,6 +10112,68 @@
       "market": 1,
       "updated_at": "2026-09-07T01:30:45+00:00"
     },
+    "601168": {
+      "company_intro": "公司主要从事铜、铅、锌、铁、镍、钒、钼等基本有色金属、黑色金属的采选、冶炼、贸易等业务。",
+      "concepts": [
+        "稀缺资源",
+        "新材料",
+        "黄金概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 129.653865404573,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-07-30",
+        "operating_cash_flow": 8349299931.0,
+        "operating_cash_to_parent_profit": 2.002549470977215,
+        "parent_profit": 4169335166.0,
+        "parent_profit_yoy_pct": 123.034942042883,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 24.743288768491,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH601168&type=web",
+        "stale": false
+      },
+      "industry": "工业金属",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "601179": {
+      "company_intro": "中国西电的主营业务为输配电及控制设备研发、设计、制造、销售、检测、相关设备成套、技术研究、服务与工程承包。",
+      "concepts": [
+        "智能电网",
+        "西部大开发",
+        "水利建设"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 20.744439259299,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": -297210453.45,
+        "operating_cash_to_parent_profit": -0.4319492076791534,
+        "parent_profit": 688068060.24,
+        "parent_profit_yoy_pct": 15.025545952787,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 7.955553290468,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH601179&type=web",
+        "stale": false
+      },
+      "industry": "电网设备",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "601567": {
       "company_intro": "宁波三星医疗电气股份有限公司(601567.SH)是智能用配电整体解决方案提供商。",
       "concepts": [
@@ -7287,6 +10206,25 @@
         "智能电网"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -38.475380919958,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -13887853320.09,
+        "operating_cash_to_parent_profit": -24.941806260215362,
+        "parent_profit": 556810247.63,
+        "parent_profit_yoy_pct": -30.195322671318,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -17.785432908005,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH601611&type=web",
+        "stale": false
+      },
       "industry": "基础建设",
       "market": 1,
       "updated_at": "2026-08-25T01:35:37+00:00"
@@ -7314,6 +10252,37 @@
       "industry": "电力",
       "market": 1,
       "updated_at": "2026-08-21T02:55:49+00:00"
+    },
+    "601633": {
+      "company_intro": "业务包括汽车及零部件设计、研发、生产、销售和服务，旗下拥有哈弗、魏牌、欧拉、坦克及长城皮卡。",
+      "concepts": [
+        "燃料电池概念",
+        "人工智能",
+        "智能驾驶"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-23",
+      "financials": {
+        "adjusted_profit_yoy_pct": -55.042416280536,
+        "as_of": "2026-09-23",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:52+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 10436101628.67,
+        "operating_cash_to_parent_profit": 4.234555698068622,
+        "parent_profit": 2464509236.1,
+        "parent_profit_yoy_pct": -61.108838319956,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 10.577609951178,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH601633&type=web",
+        "stale": false
+      },
+      "industry": "乘用车",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "601678": {
       "company_intro": "致力于成为绿色化工、低碳转型的探索者和实践者，为社会、客户、股东、员工创造最大价值。",
@@ -7354,9 +10323,28 @@
         "一带一路"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -45.417893762967,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 239643565.84,
+        "operating_cash_to_parent_profit": 2.119452403522008,
+        "parent_profit": 113068623.5,
+        "parent_profit_yoy_pct": -37.361692384607,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 0.660036990334,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH601698&type=web",
+        "stale": false
+      },
       "industry": "航天装备Ⅱ",
       "market": 1,
-      "updated_at": "2026-08-21T01:35:34+00:00"
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "601700": {
       "company_intro": "主要提供电网设备相关产品与服务。",
@@ -7389,6 +10377,37 @@
       "market": 1,
       "updated_at": "2026-09-10T01:50:39+00:00"
     },
+    "601727": {
+      "company_intro": "上海电气集团股份有限公司是全球领先的工业级绿色智能系统解决方案提供商。",
+      "concepts": [
+        "新能源",
+        "节能环保",
+        "核能核电"
+      ],
+      "customer_summary": "秉承“开放协同、合作共赢”的理念，上海电气将继续协同全球客户、合作伙伴和广大员工等创造者，提供更卓越的行业系统解决方案，赋能全球创新与绿色可持续发展。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 0.816966813701,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-31",
+        "operating_cash_flow": 3259299000.0,
+        "operating_cash_to_parent_profit": 3.3601228461206976,
+        "parent_profit": 969994000.0,
+        "parent_profit_yoy_pct": 18.183568239858,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 16.626295604128,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH601727&type=web",
+        "stale": false
+      },
+      "industry": "其他电源设备Ⅱ",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "601799": {
       "company_intro": "公司专注于汽车车灯的研发、设计、制造和销售，是我国主要的汽车全套车灯总成制造商和设计方案提供商之一。",
       "concepts": [
@@ -7412,6 +10431,36 @@
       "industry": "出版",
       "market": 1,
       "updated_at": "2026-08-25T06:10:45+00:00"
+    },
+    "601865": {
+      "company_intro": "集团主要产品涵盖太阳能光伏玻璃、优质浮法玻璃、工程玻璃、家居玻璃四大领域。",
+      "concepts": [
+        "光伏概念",
+        "一带一路"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -265.523078683149,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 1340919149.58,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -363017628.12,
+        "parent_profit_yoy_pct": -239.036816072307,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -13.814322402274,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH601865&type=web",
+        "stale": false
+      },
+      "industry": "光伏设备",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "601991": {
       "company_intro": "主要提供电力相关产品与服务。",
@@ -7750,6 +10799,35 @@
       "market": 1,
       "updated_at": "2026-08-24T01:30:48+00:00"
     },
+    "603216": {
+      "company_intro": "梦天家居集团股份有限公司“梦天”品牌现已成为越来越多高端家庭的选择，在全国发展了1100多家经销商专卖店。",
+      "concepts": [
+        "工业互联网"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -79.754850067652,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -119544147.67,
+        "operating_cash_to_parent_profit": -3.797881757829952,
+        "parent_profit": 31476532.26,
+        "parent_profit_yoy_pct": -10.666580307947,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -7.933981344225,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603216&type=web",
+        "stale": false
+      },
+      "industry": "家居用品",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "603226": {
       "company_intro": "菲林格尔家居科技股份有限公司主营业务为从事木地板(主要为强化复合地板、实木复合地板)、橱柜家具的研发、设计、生产及销售。",
       "concepts": [
@@ -7813,6 +10891,25 @@
         "节能环保"
       ],
       "customer_summary": "精细、创新、诚信、责任是景津的企业精神，景津服务于全球数万个用户，积累了丰富的技术和经验，能够为用户提供整体解决方案和交钥匙运营服务。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -34.734362281624,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 33236042.53,
+        "operating_cash_to_parent_profit": 0.15501892249983365,
+        "parent_profit": 214399906.76,
+        "parent_profit_yoy_pct": -34.623825574379,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -2.431262884039,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603279&type=web",
+        "stale": false
+      },
       "industry": "通用设备",
       "market": 1,
       "updated_at": "2026-08-28T01:35:34+00:00"
@@ -7856,6 +10953,25 @@
         "央国企改革"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -41.440310146552,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 23293654.73,
+        "operating_cash_to_parent_profit": 0.13325120781516767,
+        "parent_profit": 174810083.24,
+        "parent_profit_yoy_pct": -49.213823080976,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -7.122070840602,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603299&type=web",
+        "stale": false
+      },
       "industry": "化学原料",
       "market": 1,
       "updated_at": "2026-08-26T01:35:35+00:00"
@@ -7974,6 +11090,68 @@
       "market": 1,
       "updated_at": "2026-09-09T01:40:38+00:00"
     },
+    "603379": {
+      "company_intro": "公司主要产品的产销量位居全国前列。",
+      "concepts": [
+        "锂电池概念",
+        "光伏概念",
+        "氟化工概念"
+      ],
+      "customer_summary": "产品销往世界六大洲，客户遍及100多个国家和地区，是国内外知名汽车、空调生产企业的冷媒供应商。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 5.830080028371,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 830397779.69,
+        "operating_cash_to_parent_profit": 0.7758153201713206,
+        "parent_profit": 1070354964.77,
+        "parent_profit_yoy_pct": 7.61358086587,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 20.726890125508,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603379&type=web",
+        "stale": false
+      },
+      "industry": "化学制品",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "603392": {
+      "company_intro": "致力于将生物技术成果转化为优质产品服务于社会大众。",
+      "concepts": [
+        "生物疫苗",
+        "医疗器械概念",
+        "病毒防治"
+      ],
+      "customer_summary": "公司以“为人类的健康事业做出贡献”为追求，致力于将生物技术成果转化为优质产品服务于社会大众。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 30.389054381103,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": -81324633.68,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -128316086.16,
+        "parent_profit_yoy_pct": 10.915193904054,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 24.290498275745,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603392&type=web",
+        "stale": false
+      },
+      "industry": "医疗器械",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "603399": {
       "company_intro": "锦州永杉锂业股份有限公司(股票代码:603399.sh)主要从事电池级碳酸锂和电池级氢氧化锂的研发、生产和销售以及钼炉料的生产、加工、销。",
       "concepts": [
@@ -8021,6 +11199,37 @@
       "industry": "养殖业",
       "market": 1,
       "updated_at": "2026-08-20T01:35:34+00:00"
+    },
+    "603486": {
+      "company_intro": "致力于发展成为全球顶尖的机器人品牌。",
+      "concepts": [
+        "智能家居",
+        "人工智能",
+        "机器人概念"
+      ],
+      "customer_summary": "我们始终将员工视为企业最宝贵的财富，倡导人人平等、互相尊重、互相扶持，心怀感恩地对待每一位同事、合作伙伴及家人，并以此作为全体科沃斯人为人处事的基本准则。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -6.372074355756,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": 206349665.67,
+        "operating_cash_to_parent_profit": 0.16536402470437112,
+        "parent_profit": 1247851012.57,
+        "parent_profit_yoy_pct": 27.401520630061,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 19.184393423902,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603486&type=web",
+        "stale": false
+      },
+      "industry": "小家电",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "603496": {
       "company_intro": "是国内优秀的网络可视化、智能系统平台、智算方案和服务提供商。",
@@ -8086,6 +11295,25 @@
       "company_intro": "浙江伟明环保股份有限公司是致力于环境治理、高端装备研发制造、新材料研发制造业务的大型股份制企业。",
       "concepts": [],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -36.696444219911,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-15",
+        "operating_cash_flow": 1151417280.33,
+        "operating_cash_to_parent_profit": 1.2386943359770481,
+        "parent_profit": 929541087.65,
+        "parent_profit_yoy_pct": -34.755783983065,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -21.388453976494,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603568&type=web",
+        "stale": false
+      },
       "industry": "环保",
       "market": 1,
       "updated_at": "2026-09-08T01:35:34+00:00"
@@ -8304,6 +11532,37 @@
       "market": 1,
       "updated_at": "2026-09-03T01:30:44+00:00"
     },
+    "603706": {
+      "company_intro": "公司于2019年10月通过自治区二级安全标准化创建达标工作，公司二十一年来。",
+      "concepts": [
+        "西部大开发",
+        "一带一路",
+        "天然气"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -0.709517705127,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -22391691.4,
+        "operating_cash_to_parent_profit": -0.18254728805620207,
+        "parent_profit": 122662416.07,
+        "parent_profit_yoy_pct": -0.779961119893,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -9.140311659199,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603706&type=web",
+        "stale": false
+      },
+      "industry": "燃气Ⅱ",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "603712": {
       "company_intro": "专注推进我国专网无线通信行业发展，主营业务包括专用无线通信、民用无线通信及环保监测三大领域。",
       "concepts": [
@@ -8372,6 +11631,25 @@
         "PPP模式"
       ],
       "customer_summary": "此外，还为合作伙伴提供包括项目开发、工程总承包和运维服务在内的一站式解决方案。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 13.927432832786,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": -140538563.91,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -86345644.44,
+        "parent_profit_yoy_pct": 10.37258983122,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 11.933541722819,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603778&type=web",
+        "stale": false
+      },
       "industry": "光伏设备",
       "market": 1,
       "updated_at": "2026-08-25T02:05:42+00:00"
@@ -8483,6 +11761,35 @@
       "industry": "化学制品",
       "market": 1,
       "updated_at": "2026-08-27T01:30:46+00:00"
+    },
+    "603833": {
+      "company_intro": "欧派家居集团股份有限公司创立于1994年，股票代码603833。",
+      "concepts": [
+        "智能家居"
+      ],
+      "customer_summary": "欧派家居集团以整体橱柜为起点，业务领域延伸到衣柜、整家定制、木门、卫浴、软装、厨电、金属门窗、装甲门、家具配套、整装大家居等，形成多元化产业格局，树立了整体橱柜、衣柜双王牌品类矩阵，是国内集研。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -61.710866185898,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 92497376.87,
+        "operating_cash_to_parent_profit": 0.2094058618928796,
+        "parent_profit": 441713407.8,
+        "parent_profit_yoy_pct": -56.618489517231,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -27.794321964309,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603833&type=web",
+        "stale": false
+      },
+      "industry": "家居用品",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "603876": {
       "company_intro": "努力为用户提供更快更优的售前、售中和售后服务。",
@@ -8698,6 +12005,37 @@
       "market": 1,
       "updated_at": "2026-09-20T08:34:41+00:00"
     },
+    "603993": {
+      "company_intro": "主要从事有色金属的采、选、冶等矿山采掘及加工业务和金属贸易业务。",
+      "concepts": [
+        "稀缺资源",
+        "黄金概念",
+        "小金属概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 78.886706624496,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 16333690735.41,
+        "operating_cash_to_parent_profit": 1.0112370692950658,
+        "parent_profit": 16152187485.37,
+        "parent_profit_yoy_pct": 86.272667882062,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 42.783909061153,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603993&type=web",
+        "stale": false
+      },
+      "industry": "工业金属",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "605011": {
       "company_intro": "杭州热电集团股份有限公司前身为杭州热电厂。",
       "concepts": [
@@ -8866,6 +12204,37 @@
       "industry": "工程机械",
       "market": 1,
       "updated_at": "2026-08-20T01:35:34+00:00"
+    },
+    "605319": {
+      "company_intro": "主要提供汽车零部件相关产品与服务。",
+      "concepts": [
+        "特斯拉概念",
+        "智能驾驶",
+        "新能源车"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 2.980986567209,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-21",
+        "operating_cash_flow": 98811336.74,
+        "operating_cash_to_parent_profit": 0.48144023928331026,
+        "parent_profit": 205241125.85,
+        "parent_profit_yoy_pct": 1.929044763766,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 9.105823999262,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH605319&type=web",
+        "stale": false
+      },
+      "industry": "汽车零部件",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "605358": {
       "company_intro": "杭州立昂微电子股份有限公司是2002年3月在杭州经济技术开发区注册成立的专注于集成电路用半导体材料、半导体功率芯片、集成电路芯片设计、开。",
@@ -9094,6 +12463,25 @@
         "光伏概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -1887.2538279813,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -177263456.18,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -163994519.34,
+        "parent_profit_yoy_pct": -1107.85819582233,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 77.086496298894,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688032&type=web",
+        "stale": false
+      },
       "industry": "光伏设备",
       "market": 1,
       "updated_at": "2026-08-25T02:05:42+00:00"
@@ -9225,6 +12613,25 @@
         "科创板做市股"
       ],
       "customer_summary": "凯赛生物是全球生物法长链二元酸的主导供应商。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 10.879168812821,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 750599232.82,
+        "operating_cash_to_parent_profit": 2.013784603920079,
+        "parent_profit": 372730644.26,
+        "parent_profit_yoy_pct": 20.754918259622,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 13.730985421383,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688065&type=web",
+        "stale": false
+      },
       "industry": "化学制品",
       "market": 1,
       "updated_at": "2026-09-01T01:40:41+00:00"
@@ -9319,6 +12726,37 @@
       "industry": "软件开发",
       "market": 1,
       "updated_at": "2026-08-20T01:45:37+00:00"
+    },
+    "688096": {
+      "company_intro": "全能型水处理整体解决方案提供商”为定位，专注于工业水处理领域。",
+      "concepts": [
+        "节能环保",
+        "算力概念",
+        "微盘股"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -8.679030596729,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -62787152.99,
+        "operating_cash_to_parent_profit": -36.00427638837601,
+        "parent_profit": 1743880.43,
+        "parent_profit_yoy_pct": -24.932735506696,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 8.105418933359,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688096&type=web",
+        "stale": false
+      },
+      "industry": "环境治理",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "688100": {
       "company_intro": "威胜信息主要产品和解决方案包括电监测终端、水气热传感终端、通信网关、通信模块、智慧公用事业管理系统和物联网综合应用解决方案。",
@@ -9856,6 +13294,25 @@
         "钙钛矿电池"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -5.847505662843,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 681632844.44,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -3076329814.24,
+        "parent_profit_yoy_pct": -5.759100308268,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -22.317245297463,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688223&type=web",
+        "stale": false
+      },
       "industry": "光伏设备",
       "market": 1,
       "updated_at": "2026-09-04T01:30:50+00:00"
@@ -10104,12 +13561,62 @@
       "concepts": [
         "医疗器械概念",
         "机器人概念",
-        "专精特新"
+        "并购重组概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -22.478082293835,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": -133607219.21,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -70105917.57,
+        "parent_profit_yoy_pct": -21.821237034061,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -15.997486526503,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688277&type=web",
+        "stale": false
+      },
       "industry": "医疗器械",
       "market": 1,
-      "updated_at": "2026-08-20T01:35:34+00:00"
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "688278": {
+      "company_intro": "厦门特宝生物工程股份有限公司是一家主要从事重组蛋白质及其长效修饰药物研发、生产及销售的创新型生物医药企业、科创板上市企业(股票代码:68。",
+      "concepts": [
+        "生物疫苗",
+        "独家药品",
+        "免疫治疗"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 13.162873252037,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-19",
+        "operating_cash_flow": 336543862.34,
+        "operating_cash_to_parent_profit": 0.7062430889961415,
+        "parent_profit": 476526946.01,
+        "parent_profit_yoy_pct": 11.365623766702,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 21.577205373211,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688278&type=web",
+        "stale": false
+      },
+      "industry": "生物制品",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "688282": {
       "company_intro": "公司致力于研究和发展适应复杂环境的高精度惯性导航及精确制导控制技术。",
@@ -10177,6 +13684,37 @@
       "industry": "化学制药",
       "market": 1,
       "updated_at": "2026-09-03T01:30:44+00:00"
+    },
+    "688303": {
+      "company_intro": "公司于2021年7月22日在上海证券交易所科创板上市，公司是注册制下新疆地区科创板第一股(股票代码:688303)。",
+      "concepts": [
+        "光伏概念",
+        "西部大开发",
+        "半导体概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -40.291299276673,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-21",
+        "operating_cash_flow": -2242844119.43,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -1595039224.91,
+        "parent_profit_yoy_pct": -39.101418458327,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -57.634360052582,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688303&type=web",
+        "stale": false
+      },
+      "industry": "光伏设备",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "688305": {
       "company_intro": "目前公司生产的主要产品包括:KMC系列五轴立式(车铣复合)加工中心、KTX/KTM系列五轴铣车复合加工中心、GMA/B系列五轴高速桥式龙。",
@@ -10343,6 +13881,37 @@
       "market": 1,
       "updated_at": "2026-08-25T02:00:50+00:00"
     },
+    "688335": {
+      "company_intro": "公司主营业务是为城镇和工业(园区)污水处理厂(站)提供污泥脱水干化及废气净化技术装备及服务。",
+      "concepts": [
+        "节能环保",
+        "氢能源",
+        "碳交易"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -501.307811405297,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -59008237.74,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -5085021.66,
+        "parent_profit_yoy_pct": -176.617498341121,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -4.030695593087,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688335&type=web",
+        "stale": false
+      },
+      "industry": "环境治理",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "688336": {
       "company_intro": "三生国健药业(上海)股份有限公司是中国首批专注于创新型抗体药物研究并持续积极创新。",
       "concepts": [
@@ -10404,6 +13973,25 @@
         "风能"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -0.55310290731,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": -5102786000.0,
+        "operating_cash_to_parent_profit": -21.881961954750512,
+        "parent_profit": 233196000.0,
+        "parent_profit_yoy_pct": 10.99338883098,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 24.037123185817,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688349&type=web",
+        "stale": false
+      },
       "industry": "风电设备",
       "market": 1,
       "updated_at": "2026-09-04T01:30:50+00:00"
@@ -10976,6 +14564,37 @@
       "market": 1,
       "updated_at": "2026-09-03T01:30:44+00:00"
     },
+    "688538": {
+      "company_intro": "继续为客户提供一流的产品和服务，力争成为新时代AMOLED显示面板行业标杆。",
+      "concepts": [
+        "央国企改革",
+        "OLED",
+        "华为概念"
+      ],
+      "customer_summary": "公司服务国家战略，以前瞻眼光，专注AMOLED技术，重点发展中大尺寸显示屏产品，秉承勇敢、诚实、智慧、谦和的企业精神，勇于创新、自主研发，已成为国际领先的AMOLED半导体显示面板供应商。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -7.04742637425,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 603646920.59,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -897530451.69,
+        "parent_profit_yoy_pct": -6.882677970299,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -2.953271382982,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688538&type=web",
+        "stale": false
+      },
+      "industry": "光学光电子",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "688539": {
       "company_intro": "公司主要产品涵盖各类压力、加速度、温湿度、位移等传感器，以及通过软件算法将上述传感器集成为传感器网络系统。",
       "concepts": [
@@ -11373,6 +14992,37 @@
       "industry": "专用设备",
       "market": 1,
       "updated_at": "2026-09-03T01:30:44+00:00"
+    },
+    "688648": {
+      "company_intro": "中邮科技是国内智能物流系统领域领先的综合解决方案提供商，公司主要从事智能物流系统的研发、设计、生产、销售并提供相关服务。",
+      "concepts": [
+        "央国企改革",
+        "人工智能",
+        "智能驾驶"
+      ],
+      "customer_summary": "经过长期的积淀与发展，公司产品已覆盖快递物流、电商、烟草、汽车、医疗、机场等多个领域，主要客户包括邮政集团、顺丰、京东、德邦、韵达、燕文物流等大型快递物流集团和电子商务领军企业，以及华为、西门。",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": 49.622103447605,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -109377659.8,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -23385119.98,
+        "parent_profit_yoy_pct": -103.366212574832,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 87.946244482371,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688648&type=web",
+        "stale": false
+      },
+      "industry": "专用设备",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
     },
     "688652": {
       "company_intro": "主要产品包括半导体专用温控设备(Chiller)、晶圆传片设备(Sorter/EFEM)、半导体专用工艺废气处理设备(LocalScru。",
@@ -11804,6 +15454,37 @@
       "market": 1,
       "updated_at": "2026-09-03T01:30:44+00:00"
     },
+    "688790": {
+      "company_intro": "致力于打造具有持续竞争力的射频、模拟芯片公司。",
+      "concepts": [
+        "次新股",
+        "卫星导航",
+        "阿里概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-22",
+      "financials": {
+        "adjusted_profit_yoy_pct": -146.191256912154,
+        "as_of": "2026-09-22",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -196475441.93,
+        "operating_cash_to_parent_profit": -1.2589810657604585,
+        "parent_profit": 156059091.97,
+        "parent_profit_yoy_pct": 487.248544612009,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -8.350418401349,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688790&type=web",
+        "stale": false
+      },
+      "industry": "半导体",
+      "market": 1,
+      "updated_at": "2026-09-23T03:36:04+00:00"
+    },
     "688795": {
       "company_intro": "致力于向全球提供加速计算的基础设施和一站式解决方案，为各行各业的数智化转型提供强大的AI计算支持。",
       "concepts": [
@@ -11903,5 +15584,5 @@
       "updated_at": "2026-08-26T01:35:35+00:00"
     }
   },
-  "updated_at": "2026-09-23T01:35:37+00:00"
+  "updated_at": "2026-09-23T03:37:46+00:00"
 }
