@@ -945,7 +945,7 @@ def parse_tencent_quotes(raw: str, targets: Sequence[dict]) -> dict[str, dict]:
             )
             quotes[code] = {
                 "code": code,
-                "name": str(target.get("name") or fields[1]),
+                "name": str(fields[1] or target.get("name", "")),
                 "market": int(target["market"]),
                 "scope": target.get("scope", ""),
                 "price": float(fields[3]),
@@ -1090,6 +1090,7 @@ def fetch_quotes(
 ) -> tuple[dict[str, dict], str, str]:
     if not targets:
         return {}, "", ""
+    quotes = {}
     try:
         quotes = fetch_tencent_quotes(targets)
         if len(quotes) == len(targets):
@@ -1102,9 +1103,15 @@ def fetch_quotes(
         )
 
     try:
-        quotes, host = fetch_xmtdx_quotes(targets)
-        return quotes, "xmtdx", host
+        missing = [item for item in targets if str(item["code"]) not in quotes]
+        supplemental, host = fetch_xmtdx_quotes(missing)
+        combined = {**supplemental, **quotes}
+        return combined, "tencent+xmtdx" if quotes else "xmtdx", host
     except Exception as xmtdx_error:
+        if quotes:
+            # A missing/suspended symbol must not discard thousands of good
+            # current quotes. Unknown symbols stay outside observed_codes.
+            return quotes, "tencent_partial", "qt.gtimg.cn"
         raise RuntimeError(
             f"腾讯行情失败：{tencent_error}；通达信行情失败：{xmtdx_error}"
         ) from xmtdx_error
@@ -1628,7 +1635,14 @@ def build_live_payload(
     sessions = normalized_sessions(trading_sessions)
     targets = collect_targets(payload)
     label, note = market_state(local_now)
-    quotes, source, host = fetch_quotes(targets)
+    quote_error = ""
+    try:
+        quotes, source, host = fetch_quotes(targets)
+    except Exception as exc:
+        # Publish an explicit pause instead of leaving yesterday's live.json
+        # looking current after a provider-wide outage.
+        quotes, source, host = {}, "unavailable", ""
+        quote_error = f"{type(exc).__name__}: {exc}"
     quote_times = [time for item in quotes.values() if (time := _quote_timestamp(item))]
     latest_quote_time = max(quote_times) if quote_times else None
     quote_age_seconds = (
@@ -1751,6 +1765,7 @@ def build_live_payload(
         "strategy_base_date": close_trade_date,
         "source": source,
         "source_host": host,
+        "quote_error": quote_error,
         "latest_quote_time": (
             latest_quote_time.isoformat(timespec="seconds")
             if latest_quote_time
