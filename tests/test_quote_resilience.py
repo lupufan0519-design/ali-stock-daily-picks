@@ -3,10 +3,21 @@ from datetime import datetime
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
-from intraday import build_live_payload, fetch_quotes, parse_tencent_quotes
+from intraday import build_live_payload, fetch_quotes, fetch_tencent_quotes, parse_tencent_quotes
 
 
 class QuoteResilienceTests(unittest.TestCase):
+    def test_one_failed_quote_batch_preserves_other_batches(self):
+        targets = [{"code": str(i)} for i in range(81)]
+        def fetch_batch(group):
+            if group[0]["code"] == "80":
+                raise TimeoutError("one batch offline")
+            return {item["code"]: {"price": 10} for item in group}
+        with patch("intraday.fetch_tencent_quote_group", side_effect=fetch_batch):
+            quotes = fetch_tencent_quotes(targets)
+        self.assertEqual(len(quotes), 80)
+        self.assertNotIn("80", quotes)
+
     def test_current_st_name_overrides_old_seed_name(self):
         fields = ["0"] * 40
         fields[1], fields[2], fields[30] = "*ST新名", "000001", "20260923110000"

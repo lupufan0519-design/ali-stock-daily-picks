@@ -1021,7 +1021,10 @@ def fetch_tencent_quote_group(targets: Sequence[dict]) -> dict[str, dict]:
 
 def fetch_tencent_quotes(targets: Sequence[dict]) -> dict[str, dict]:
     groups = list(chunks(targets))
+    if not groups:
+        return {}
     quotes: dict[str, dict] = {}
+    errors = []
     workers = min(8, len(groups))
     with ThreadPoolExecutor(max_workers=workers) as pool:
         futures = [
@@ -1029,9 +1032,13 @@ def fetch_tencent_quotes(targets: Sequence[dict]) -> dict[str, dict]:
             for group in groups
         ]
         for future in as_completed(futures):
-            quotes.update(future.result())
+            try:
+                quotes.update(future.result())
+            except Exception as exc:
+                errors.append(f"{type(exc).__name__}: {exc}")
     if not quotes:
-        raise RuntimeError("腾讯行情接口未返回有效报价")
+        detail = errors[0] if errors else "empty response"
+        raise RuntimeError(f"腾讯行情接口未返回有效报价：{detail}")
     return quotes
 
 
