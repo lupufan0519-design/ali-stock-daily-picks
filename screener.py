@@ -1198,6 +1198,13 @@ def scan_http_daily(universe: Sequence[Stock], cfg: dict) -> tuple[list[Evaluati
                 if cfg.get("_daily_cache_only"):
                     raise ValueError(f"No settled daily cache for {symbol} {expected}")
                 data = fetch_daily_prices(symbol, cfg["history_bars"], through_date=expected)
+            if (is_st_name(data.get("quote_name", ""))
+                    and data.get("quote_date", "") >= expected):
+                # Current source name, not a stale universe label, is evidence
+                # for exclusion. No old candle is evaluated or published.
+                data["exclusion_reason"] = "st_excluded"
+                save_daily_cache(data, expected)
+                return None, "", "st_excluded"
             tradable = validate_freshness(data, expected)
             save_daily_cache(data, expected)
             if not tradable:
@@ -1374,7 +1381,9 @@ def audit_evaluation_windows(evaluations: Sequence[Evaluation], cfg: dict) -> in
 
 def write_scan_diagnostics(cfg: dict, evaluations: Sequence[Evaluation], errors: Sequence[str], scanned: int) -> dict:
     excluded = dict(cfg.get("_excluded_reason_counts", {}))
-    excluded["st_excluded"] = sum(not item.eligible or is_st_name(item.name) for item in evaluations)
+    excluded["st_excluded"] = excluded.get("st_excluded", 0) + sum(
+        not item.eligible or is_st_name(item.name) for item in evaluations
+    )
     excluded["no_recent_bottom"] = sum(item.eligible and not item.bottom_ok for item in evaluations)
     diagnostics = {
         "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
