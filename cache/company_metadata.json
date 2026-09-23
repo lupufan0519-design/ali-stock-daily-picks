@@ -10289,13 +10289,13 @@
         "大飞机"
       ],
       "customer_summary": "我们始终秉持“价值创新、服务客户”的理念，长期深耕汽车与智能运输领域，专注于为全球客户提供覆盖汽车电子产品、高端研发服务、智能运输系统、大总成及特种载具的一站式解决方案。",
-      "financial_as_of": "2026-09-22",
+      "financial_as_of": "2026-09-23",
       "financials": {
         "adjusted_profit_yoy_pct": -243.551483090907,
-        "as_of": "2026-09-22",
+        "as_of": "2026-09-23",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-09-22T01:45:39+00:00",
+        "fetched_at": "2026-09-23T01:45:38+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": -656595619.24,
         "operating_cash_to_parent_profit": null,
@@ -10867,13 +10867,13 @@
         "人工智能"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-22",
+      "financial_as_of": "2026-09-23",
       "financials": {
         "adjusted_profit_yoy_pct": -69.177017995741,
-        "as_of": "2026-09-22",
+        "as_of": "2026-09-23",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-09-22T01:30:47+00:00",
+        "fetched_at": "2026-09-23T01:45:38+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": -38353847.28,
         "operating_cash_to_parent_profit": null,
