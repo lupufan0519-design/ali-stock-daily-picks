@@ -6675,6 +6675,37 @@
       "market": 0,
       "updated_at": "2026-09-29T16:22:36+00:00"
     },
+    "002456": {
+      "company_intro": "为客户提供一站式光学光电产品技术服务。",
+      "concepts": [
+        "深圳特区",
+        "虚拟现实",
+        "智能驾驶"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-30",
+      "financials": {
+        "adjusted_profit_yoy_pct": -210.805408895438,
+        "as_of": "2026-09-30",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-30T01:51:01+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 693815149.56,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -443503022.7,
+        "parent_profit_yoy_pct": -307.361318345903,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -20.291167888721,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002456&type=web",
+        "stale": false
+      },
+      "industry": "光学光电子",
+      "market": 0,
+      "updated_at": "2026-09-30T01:50:50+00:00"
+    },
     "002459": {
       "company_intro": "晶澳太阳能科技股份有限公司(简称“晶澳科技”)，是全球客户信赖的绿色能源解决方案合作伙伴。",
       "concepts": [
@@ -9402,7 +9433,7 @@
       },
       "industry": "工程咨询服务Ⅱ",
       "market": 0,
-      "updated_at": "2026-08-31T01:50:42+00:00"
+      "updated_at": "2026-09-30T01:50:50+00:00"
     },
     "003018": {
       "company_intro": "公司主要从事应用于饮料、食品等领域用的包装产品研发、设计、生产和销售。",
@@ -13890,6 +13921,37 @@
       "market": 0,
       "updated_at": "2026-09-07T01:30:45+00:00"
     },
+    "300709": {
+      "company_intro": "江苏精研科技股份有限公司(简称Gian，股票代码:300709)是国内首家金属粉末注射成型(MIM)行业上市公司。",
+      "concepts": [
+        "智能穿戴",
+        "特斯拉概念",
+        "无线耳机"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-30",
+      "financials": {
+        "adjusted_profit_yoy_pct": -96.715892244873,
+        "as_of": "2026-09-30",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-30T01:51:01+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -367980915.88,
+        "operating_cash_to_parent_profit": -26.34875749130176,
+        "parent_profit": 13965778.69,
+        "parent_profit_yoy_pct": -82.704873821833,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 13.520222020282,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300709&type=web",
+        "stale": false
+      },
+      "industry": "消费电子",
+      "market": 0,
+      "updated_at": "2026-09-30T01:50:50+00:00"
+    },
     "300711": {
       "company_intro": "主要向电力、铁路、石油石化等行业提供涵盖智能化信息交换、传输处理、无线接入、嵌入系统、云计算分发、高清可视化通信、IP终端、安全智能化接。",
       "concepts": [
@@ -14441,12 +14503,32 @@
       "company_intro": "主要提供环境治理相关产品与服务。",
       "concepts": [
         "节能环保",
-        "稀土永磁"
+        "稀土永磁",
+        "钒电池"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-30",
+      "financials": {
+        "adjusted_profit_yoy_pct": -4386.19879268376,
+        "as_of": "2026-09-30",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-30T01:51:01+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 38897588.29,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -22420604.01,
+        "parent_profit_yoy_pct": -546.590326610175,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -11.926239490499,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300779&type=web",
+        "stale": false
+      },
       "industry": "环境治理",
       "market": 0,
-      "updated_at": "2026-08-21T01:30:44+00:00"
+      "updated_at": "2026-09-30T01:50:50+00:00"
     },
     "300785": {
       "company_intro": "公司已深入布局消费内容、智能营销与消费数据三大业务板块:凭借消费内容为全网用户提供高效、精准、专业的消费决策支持;通过智能营销帮助电商、。",
@@ -16543,9 +16625,28 @@
         "CPO概念"
       ],
       "customer_summary": "深圳市唯特偶新材料股份有限公司(股票代码:301319)，成立于1998年，集电子焊接材料研发、生产、销售、服务于一体，是国家第一批重点高新技术企业，并拥有广东省认定的工程中心;是微电子焊接材。",
+      "financial_as_of": "2026-09-30",
+      "financials": {
+        "adjusted_profit_yoy_pct": 35.402939471858,
+        "as_of": "2026-09-30",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-30T01:51:01+00:00",
+        "notice_date": "2026-08-06",
+        "operating_cash_flow": -239032883.64,
+        "operating_cash_to_parent_profit": -4.589330909619858,
+        "parent_profit": 52084473.39,
+        "parent_profit_yoy_pct": 23.473371662571,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 40.619659514607,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ301319&type=web",
+        "stale": false
+      },
       "industry": "电子化学品Ⅱ",
       "market": 0,
-      "updated_at": "2026-08-26T01:30:45+00:00"
+      "updated_at": "2026-09-30T01:50:50+00:00"
     },
     "301327": {
       "company_intro": "深圳市华宝新能源股份有限公司开创了SolarGenerator光充户外电源、一体化阳台光储家庭绿电系统和光伏瓦家庭绿电系统。",
@@ -22769,6 +22870,37 @@
       "market": 1,
       "updated_at": "2026-09-23T03:36:04+00:00"
     },
+    "601636": {
+      "company_intro": "旗滨集团当前主要产品有优质浮法玻璃、超白浮法玻璃、着色玻璃等玻璃原片;各种离线L0-E低辐射镀膜玻璃、阳光控制镀膜玻璃、减反射镀膜玻璃、。",
+      "concepts": [
+        "新能源",
+        "光伏概念",
+        "国产芯片"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-30",
+      "financials": {
+        "adjusted_profit_yoy_pct": -186.304040600833,
+        "as_of": "2026-09-30",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-30T01:51:01+00:00",
+        "notice_date": "2026-08-31",
+        "operating_cash_flow": 120368681.14,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -167093374.97,
+        "parent_profit_yoy_pct": -118.763624455367,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -2.442659550521,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH601636&type=web",
+        "stale": false
+      },
+      "industry": "玻璃玻纤",
+      "market": 1,
+      "updated_at": "2026-09-30T01:50:50+00:00"
+    },
     "601678": {
       "company_intro": "致力于成为绿色化工、低碳转型的探索者和实践者，为社会、客户、股东、员工创造最大价值。",
       "concepts": [
@@ -25483,6 +25615,37 @@
       "industry": "计算机设备",
       "market": 1,
       "updated_at": "2026-09-30T01:36:06+00:00"
+    },
+    "603530": {
+      "company_intro": "江苏神马电力股份有限公司(以下简称“神马电力”)是于1996年8月29日由零创办的民营企业。",
+      "concepts": [
+        "核能核电",
+        "智能电网",
+        "特高压"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-30",
+      "financials": {
+        "adjusted_profit_yoy_pct": 32.235573472719,
+        "as_of": "2026-09-30",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-30T01:51:01+00:00",
+        "notice_date": "2026-08-13",
+        "operating_cash_flow": 252551749.88,
+        "operating_cash_to_parent_profit": 1.1757891870508728,
+        "parent_profit": 214793393.8,
+        "parent_profit_yoy_pct": 34.009475503881,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 26.975709541597,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603530&type=web",
+        "stale": false
+      },
+      "industry": "电网设备",
+      "market": 1,
+      "updated_at": "2026-09-30T01:50:50+00:00"
     },
     "603538": {
       "company_intro": "为国内外合作伙伴提供高效、优质且具有成本优势的产品、服务与解决方案。",
@@ -31351,6 +31514,37 @@
       "market": 1,
       "updated_at": "2026-09-03T01:30:44+00:00"
     },
+    "688559": {
+      "company_intro": "并为相关领域龙头客户提供智能制造装备的一体化解决方案。",
+      "concepts": [
+        "深圳特区",
+        "锂电池概念",
+        "3D打印"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-30",
+      "financials": {
+        "adjusted_profit_yoy_pct": 102.590170127193,
+        "as_of": "2026-09-30",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-30T01:51:01+00:00",
+        "notice_date": "2026-08-31",
+        "operating_cash_flow": 1878327926.63,
+        "operating_cash_to_parent_profit": 36.180833827167824,
+        "parent_profit": 51914998.3,
+        "parent_profit_yoy_pct": 107.328371482527,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 84.642385668069,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688559&type=web",
+        "stale": false
+      },
+      "industry": "自动化设备",
+      "market": 1,
+      "updated_at": "2026-09-30T01:50:50+00:00"
+    },
     "688568": {
       "company_intro": "推动主营业务高质量发展。",
       "concepts": [
@@ -32929,5 +33123,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-09-30T01:45:45+00:00"
+  "updated_at": "2026-09-30T01:50:50+00:00"
 }
