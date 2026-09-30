@@ -8637,9 +8637,28 @@
         "超导概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-30",
+      "financials": {
+        "adjusted_profit_yoy_pct": 6.459014789308,
+        "as_of": "2026-09-30",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-30T03:15:49+00:00",
+        "notice_date": "2026-08-18",
+        "operating_cash_flow": 105310722.94,
+        "operating_cash_to_parent_profit": 0.7644207914565343,
+        "parent_profit": 137765382.78,
+        "parent_profit_yoy_pct": 39.87167760106,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 21.422632532431,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002859&type=web",
+        "stale": false
+      },
       "industry": "其他电子Ⅱ",
       "market": 0,
-      "updated_at": "2026-08-26T01:35:35+00:00"
+      "updated_at": "2026-09-30T03:15:45+00:00"
     },
     "002860": {
       "company_intro": "杭州星帅尔电器股份有限公司是一家专业从事研发、生产和销售各类继电器的高新技术企业。",
@@ -33523,5 +33542,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-09-30T02:50:46+00:00"
+  "updated_at": "2026-09-30T03:15:45+00:00"
 }
