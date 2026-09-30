@@ -4049,9 +4049,28 @@
         "长江三角"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-30",
+      "financials": {
+        "adjusted_profit_yoy_pct": -362.129703787475,
+        "as_of": "2026-09-30",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-30T02:50:51+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -149380920.16,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -45795110.59,
+        "parent_profit_yoy_pct": -229.532833075468,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -32.798133731928,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002104&type=web",
+        "stale": false
+      },
       "industry": "通信设备",
       "market": 0,
-      "updated_at": "2026-08-20T01:35:34+00:00"
+      "updated_at": "2026-09-30T02:50:46+00:00"
     },
     "002112": {
       "company_intro": "三变科技股份有限公司是由国资委控股的输变电优秀上市公司，始建于1968年。",
@@ -12791,9 +12810,28 @@
         "国产软件"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-30",
+      "financials": {
+        "adjusted_profit_yoy_pct": -19.167723328406,
+        "as_of": "2026-09-30",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-30T02:50:51+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 28502322.97,
+        "operating_cash_to_parent_profit": 0.7842468263903037,
+        "parent_profit": 36343561.76,
+        "parent_profit_yoy_pct": -17.33485072931,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 14.877746095123,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300468&type=web",
+        "stale": false
+      },
       "industry": "软件开发",
       "market": 0,
-      "updated_at": "2026-08-20T01:35:34+00:00"
+      "updated_at": "2026-09-30T02:50:46+00:00"
     },
     "300469": {
       "company_intro": "主营业务覆盖“智慧交通、绿色交通、数据要素”三大领域为主擎，同时布局数字追溯和数字政务两个侧翼。",
@@ -33485,5 +33523,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-09-30T02:10:48+00:00"
+  "updated_at": "2026-09-30T02:50:46+00:00"
 }
