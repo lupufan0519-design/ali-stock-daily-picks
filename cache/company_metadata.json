@@ -9952,6 +9952,37 @@
       "market": 0,
       "updated_at": "2026-09-07T01:30:45+00:00"
     },
+    "300056": {
+      "company_intro": "已从创立之初的专业滤袋提供方转型升级为烟气岛环保治理(除尘、脱硫、脱硝)、废气废水治理、电厂成套设备提供、节能改造、危废固废处置、城市环。",
+      "concepts": [
+        "节能环保",
+        "燃料电池概念",
+        "垃圾分类"
+      ],
+      "customer_summary": "公司成立之初，专注于工业高温烟气除尘，集高性能高温除尘滤料的研发、生产、销售和服务于一体，成为国内第一家高温袋式过滤除尘上市企业(股票代码:300056)。",
+      "financial_as_of": "2026-09-30",
+      "financials": {
+        "adjusted_profit_yoy_pct": -34.032214186481,
+        "as_of": "2026-09-30",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-09-30T01:55:49+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 7702466.86,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -39716851.63,
+        "parent_profit_yoy_pct": -35.031442828263,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 0.157363694756,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300056&type=web",
+        "stale": false
+      },
+      "industry": "环境治理",
+      "market": 0,
+      "updated_at": "2026-09-30T01:55:45+00:00"
+    },
     "300058": {
       "company_intro": "蓝色光标及其旗下子公司的主营业务包括:全案推广服务(数字营销、公共关系、活动管理等)、全案广告代理(数字广告投放、中国企业出海广告投放以。",
       "concepts": [
@@ -33123,5 +33154,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-09-30T01:50:50+00:00"
+  "updated_at": "2026-09-30T01:55:45+00:00"
 }
