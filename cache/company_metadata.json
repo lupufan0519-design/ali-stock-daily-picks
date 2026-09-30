@@ -6363,9 +6363,28 @@
         "物联网"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-09-30",
+      "financials": {
+        "adjusted_profit_yoy_pct": -41.424603986163,
+        "as_of": "2026-09-30",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-30T02:10:53+00:00",
+        "notice_date": "2026-08-19",
+        "operating_cash_flow": 220536660.54,
+        "operating_cash_to_parent_profit": 0.9200141647048409,
+        "parent_profit": 239710070.78,
+        "parent_profit_yoy_pct": -32.22589516687,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 4.30815087847,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002402&type=web",
+        "stale": false
+      },
       "industry": "家电零部件Ⅱ",
       "market": 0,
-      "updated_at": "2026-08-21T02:05:43+00:00"
+      "updated_at": "2026-09-30T02:10:48+00:00"
     },
     "002405": {
       "company_intro": "公司从早期的位置服务提供商，逐步转型为以智能辅助驾驶为核心。",
@@ -18331,6 +18350,37 @@
       "market": 1,
       "updated_at": "2026-09-30T01:36:06+00:00"
     },
+    "600111": {
+      "company_intro": "专注发展好磁性材料、储氢材料、稀土合金、催化材料、抛光材料、光功能材料六大稀土新材料产业。",
+      "concepts": [
+        "稀缺资源",
+        "新材料",
+        "锂电池概念"
+      ],
+      "customer_summary": "目前，北方稀土产品涵盖稀土全产业链，可生产各类稀土产品共11个大类、100余个种类、近千个规格，其中，稀土原料供应能力全球第一，稀土磁性材料合金产能、抛光材料产能全球第一，终端应用领域稀土永磁。",
+      "financial_as_of": "2026-09-30",
+      "financials": {
+        "adjusted_profit_yoy_pct": 128.794939060839,
+        "as_of": "2026-09-30",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-30T02:10:53+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 1208291208.53,
+        "operating_cash_to_parent_profit": 0.5885013053761711,
+        "parent_profit": 2053166573.28,
+        "parent_profit_yoy_pct": 120.459227455401,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 36.747397269036,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600111&type=web",
+        "stale": false
+      },
+      "industry": "小金属",
+      "market": 1,
+      "updated_at": "2026-09-30T02:10:48+00:00"
+    },
     "600113": {
       "company_intro": "为消费者提供更加丰富、新鲜、安全的食材，为实现新时代更美好的生活而努力奋斗。",
       "concepts": [
@@ -20707,6 +20757,37 @@
       "industry": "元件",
       "market": 1,
       "updated_at": "2026-09-30T01:36:06+00:00"
+    },
+    "600570": {
+      "company_intro": "主要提供软件开发相关产品与服务。",
+      "concepts": [
+        "长江三角",
+        "参股保险",
+        "互联网金融"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-09-30",
+      "financials": {
+        "adjusted_profit_yoy_pct": 8.370141707096,
+        "as_of": "2026-09-30",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-09-30T02:10:53+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": -982280538.55,
+        "operating_cash_to_parent_profit": -3.7684143253760682,
+        "parent_profit": 260661502.09,
+        "parent_profit_yoy_pct": 0.056946680371,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -11.648319594739,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600570&type=web",
+        "stale": false
+      },
+      "industry": "软件开发",
+      "market": 1,
+      "updated_at": "2026-09-30T02:10:48+00:00"
     },
     "600578": {
       "company_intro": "公司以提供安全高效洁净能源为己任，积极响应国家“3060”碳达峰碳中和目标。",
@@ -33404,5 +33485,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-09-30T02:01:01+00:00"
+  "updated_at": "2026-09-30T02:10:48+00:00"
 }
