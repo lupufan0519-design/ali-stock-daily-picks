@@ -26446,10 +26446,8 @@
         "stale": false
       },
       "industry": "光伏设备",
-      "last_error": "RuntimeError: company metadata endpoints returned no data",
       "market": 1,
-      "retry_after": "2026-10-08T03:56:25+00:00",
-      "updated_at": "2026-09-03T01:30:44+00:00"
+      "updated_at": "2026-10-08T05:01:00+00:00"
     },
     "603187": {
       "company_intro": "为客户在销售终端进行低温储存、商品展示和企业形象展示等提供定制化解决方案及专业化服务;同时。",
@@ -34667,6 +34665,37 @@
       "market": 1,
       "updated_at": "2026-08-25T02:05:42+00:00"
     },
+    "688661": {
+      "company_intro": "和林微纳致力于积极承担企业社会责任，打造志愿者活动平台，通过企业公益贡献社会。",
+      "concepts": [
+        "苹果概念",
+        "小米概念",
+        "华为概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-08",
+      "financials": {
+        "adjusted_profit_yoy_pct": -126.803385393698,
+        "as_of": "2026-10-08",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-08T05:01:05+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": -12041662.57,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -6755243.49,
+        "parent_profit_yoy_pct": -122.014261294271,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -6.515131646301,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688661&type=web",
+        "stale": false
+      },
+      "industry": "半导体",
+      "market": 1,
+      "updated_at": "2026-10-08T05:01:00+00:00"
+    },
     "688662": {
       "company_intro": "公司主营业务半导体热电器件、半导体热电系统、半导体热电整机应用产品。",
       "concepts": [
@@ -35733,5 +35762,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-08T02:10:45+00:00"
+  "updated_at": "2026-10-08T05:01:00+00:00"
 }
