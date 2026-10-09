@@ -2388,6 +2388,37 @@
       "market": 0,
       "updated_at": "2026-09-30T01:36:06+00:00"
     },
+    "000831": {
+      "company_intro": "中国稀土股份主要从事中重稀土原矿加工与稀土氧化物等商品的生产经营，以及稀土技术研发和咨询服务。",
+      "concepts": [
+        "稀土永磁",
+        "央国企改革",
+        "小金属概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 55.49439412654,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T05:40:54+00:00",
+        "notice_date": "2026-08-08",
+        "operating_cash_flow": 710707550.91,
+        "operating_cash_to_parent_profit": 2.9993710540185954,
+        "parent_profit": 236952193.68,
+        "parent_profit_yoy_pct": 46.530770296253,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -12.189640261847,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000831&type=web",
+        "stale": false
+      },
+      "industry": "小金属",
+      "market": 0,
+      "updated_at": "2026-10-09T05:40:45+00:00"
+    },
     "000833": {
       "company_intro": "广西粤桂广业控股股份有限公司(以下简称“粤桂股份”)于1998年在深交所成功上市(证券名称为贵糖股份。",
       "concepts": [
@@ -6477,6 +6508,37 @@
       "industry": "电网设备",
       "market": 0,
       "updated_at": "2026-09-23T03:36:04+00:00"
+    },
+    "002310": {
+      "company_intro": "致力于提供城乡高质量发展全套解决方案。",
+      "concepts": [
+        "光伏概念",
+        "央国企改革",
+        "绿色电力"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 108.52179592642,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T05:40:54+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -88309848.82,
+        "operating_cash_to_parent_profit": -28.48359772394151,
+        "parent_profit": 3100375.51,
+        "parent_profit_yoy_pct": 316.038371822911,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 115.489811171319,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002310&type=web",
+        "stale": false
+      },
+      "industry": "电力",
+      "market": 0,
+      "updated_at": "2026-10-09T05:40:45+00:00"
     },
     "002311": {
       "company_intro": "海大集团致力于通过科技与创新，促进全球农业的可持续发展，为日益增长的全球人口提供更丰沛的优质营养与健康食物。",
@@ -12989,6 +13051,37 @@
       "market": 0,
       "updated_at": "2026-08-25T01:50:38+00:00"
     },
+    "300256": {
+      "company_intro": "用创新为企业的发展提供源源不断的生命力，是“国家级高新技术企业”。",
+      "concepts": [
+        "智能穿戴",
+        "特斯拉概念",
+        "虚拟现实"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -1.317541017029,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-09T05:40:54+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 10820316.57,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -31573120.22,
+        "parent_profit_yoy_pct": -237.250403073208,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -7.756995351546,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300256&type=web",
+        "stale": false
+      },
+      "industry": "消费电子",
+      "market": 0,
+      "updated_at": "2026-10-09T05:40:45+00:00"
+    },
     "300258": {
       "company_intro": "公司主营业务为汽车差速器锥齿轮、新能源汽车用电机轴和差速器总成、汽车变速器结合齿齿轮、汽车变速器轴类件、EDL(电子差速锁齿轮)、同步器。",
       "concepts": [
@@ -13310,6 +13403,37 @@
       "industry": "光学光电子",
       "market": 0,
       "updated_at": "2026-09-30T01:36:06+00:00"
+    },
+    "300307": {
+      "company_intro": "创新产品包括全电脑横机、智能鞋面机、自动化制鞋流水线、自动烫衣机、工业机器人等。",
+      "concepts": [
+        "网络游戏",
+        "锂电池概念",
+        "电商概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 103.935633234035,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T05:40:54+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 416079908.8,
+        "operating_cash_to_parent_profit": 2.4009072670945755,
+        "parent_profit": 173301116.0,
+        "parent_profit_yoy_pct": 64.069807416575,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 31.585177194727,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300307&type=web",
+        "stale": false
+      },
+      "industry": "专用设备",
+      "market": 0,
+      "updated_at": "2026-10-09T05:40:45+00:00"
     },
     "300308": {
       "company_intro": "中际旭创股份有限公司(SZ:300308)是领先的高速光互联解决方案提供商。",
@@ -14856,13 +14980,13 @@
         "国产软件"
       ],
       "customer_summary": "公司被认定为“高新技术企业”、“国家企业技术中心”和“省级重点实验室”，入选《智能制造系统解决方案供应商规范条件》企业名单，多次获得省级科技进步奖和行业协会颁发的专项大奖。",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 12.881302549547,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:40:54+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": -83945468.88,
         "operating_cash_to_parent_profit": -6.734586065670754,
@@ -15475,13 +15599,13 @@
         "医疗器械概念"
       ],
       "customer_summary": "2016年1月，获得“微信硬件年度优秀合作伙伴”殊荣。",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 54.877896240115,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:40:54+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": 61522448.98,
         "operating_cash_to_parent_profit": 1.0247403586853836,
@@ -17821,6 +17945,37 @@
       "market": 0,
       "updated_at": "2026-09-29T16:22:36+00:00"
     },
+    "300885": {
+      "company_intro": "公司主要产品有齿轮、轴承、结构件、齿轮箱、链轮、转子、偏心凸轮、摆臂等1500余种粉末冶金零部件。",
+      "concepts": [
+        "新材料",
+        "充电桩",
+        "卫星互联网"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 50.155588265275,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T05:40:54+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 38596887.04,
+        "operating_cash_to_parent_profit": 0.8781506087592771,
+        "parent_profit": 43952468.58,
+        "parent_profit_yoy_pct": 42.970384776663,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 98.622284528555,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300885&type=web",
+        "stale": false
+      },
+      "industry": "通用设备",
+      "market": 0,
+      "updated_at": "2026-10-09T05:40:45+00:00"
+    },
     "300887": {
       "company_intro": "谱尼测试集团可提供综合性检测、计量校准、验货审厂、认证评价等专业化、全方位的技术解决方案。",
       "concepts": [
@@ -19764,6 +19919,37 @@
       "industry": "汽车零部件",
       "market": 0,
       "updated_at": "2026-08-26T01:30:45+00:00"
+    },
+    "301317": {
+      "company_intro": "公司拥有欧美进口精密加工设备、先进的自动化机器人及现代化整机生产流水线。",
+      "concepts": [
+        "中俄贸易概念",
+        "空气能热泵",
+        "液冷服务器"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -78.355746686172,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-09T05:40:54+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": -181099437.73,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -44420078.38,
+        "parent_profit_yoy_pct": -111.413243658198,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 16.230462147961,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ301317&type=web",
+        "stale": false
+      },
+      "industry": "通用设备",
+      "market": 0,
+      "updated_at": "2026-10-09T05:40:45+00:00"
     },
     "301319": {
       "company_intro": "公司产品覆盖锡膏、锡条、锡线、助焊剂、清洗剂、预成型焊片、三防漆、导热材料、胶粘剂等。",
@@ -34371,13 +34557,13 @@
         "EDA概念"
       ],
       "customer_summary": "上海概伦电子股份有限公司，国内首家EDA上市公司，关键核心技术具备国际市场竞争力的EDA领军企业，致力于打造应用驱动的、覆盖集成电路设计与制造的EDA全流程解决方案，支撑各类高端芯片研发的持续。",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -302.509759857363,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:40:54+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": -50710884.19,
         "operating_cash_to_parent_profit": null,
@@ -38951,5 +39137,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-09T05:35:41+00:00"
+  "updated_at": "2026-10-09T05:40:45+00:00"
 }
