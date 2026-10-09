@@ -4675,13 +4675,13 @@
         "特斯拉概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-30",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 5.332041349734,
-        "as_of": "2026-09-30",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-30T01:39:17+00:00",
+        "fetched_at": "2026-10-09T05:50:48+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 357124694.58,
         "operating_cash_to_parent_profit": 0.7895177522071571,
