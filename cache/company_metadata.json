@@ -13009,13 +13009,13 @@
         "风能"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -42.95712421532,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T03:00:58+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": 3735133201.04,
         "operating_cash_to_parent_profit": 0.7103026715806319,
