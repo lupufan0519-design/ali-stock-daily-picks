@@ -11095,9 +11095,28 @@
         "半导体概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 64.997386738719,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T01:40:51+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 567319887.9,
+        "operating_cash_to_parent_profit": 1.0715537414889384,
+        "parent_profit": 529436710.39,
+        "parent_profit_yoy_pct": 70.213698532953,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 11.150580027358,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300054&type=web",
+        "stale": false
+      },
       "industry": "电子化学品Ⅱ",
       "market": 0,
-      "updated_at": "2026-09-07T01:30:45+00:00"
+      "updated_at": "2026-10-09T01:40:46+00:00"
     },
     "300056": {
       "company_intro": "已从创立之初的专业滤袋提供方转型升级为烟气岛环保治理(除尘、脱硫、脱硝)、废气废水治理、电厂成套设备提供、节能改造、危废固废处置、城市环。",
@@ -21372,9 +21391,28 @@
         "稀土永磁"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 16.976972517144,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T01:40:51+00:00",
+        "notice_date": "2026-08-05",
+        "operating_cash_flow": -950403633.5,
+        "operating_cash_to_parent_profit": -5.1840107862820055,
+        "parent_profit": 183333652.78,
+        "parent_profit_yoy_pct": 40.887819389388,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 50.353896505157,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600206&type=web",
+        "stale": false
+      },
       "industry": "半导体",
       "market": 1,
-      "updated_at": "2026-09-03T01:30:44+00:00"
+      "updated_at": "2026-10-09T01:40:46+00:00"
     },
     "600216": {
       "company_intro": "浙江医药股份有限公司是于1997年5月组建的大型股份制综合制药企业。",
@@ -37351,13 +37389,13 @@
         "股权分散"
       ],
       "customer_summary": "提供速率涵盖155Mbps~800Gbps的QSFP-DD、QSFP112、QSFP56、QSFP28、SFP28、SFP+等光模块高速收发芯片解决方案;拥有从芯片级、器件级、模块级、终端级、。",
-      "financial_as_of": "2026-10-01",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 31.294605996752,
-        "as_of": "2026-10-01",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-30T16:21:34+00:00",
+        "fetched_at": "2026-10-09T01:40:51+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": 54644073.34,
         "operating_cash_to_parent_profit": 0.9080524263833354,
@@ -37554,5 +37592,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-09T01:36:10+00:00"
+  "updated_at": "2026-10-09T01:40:46+00:00"
 }
