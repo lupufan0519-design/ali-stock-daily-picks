@@ -9941,6 +9941,37 @@
       "market": 0,
       "updated_at": "2026-10-09T01:30:51+00:00"
     },
+    "002871": {
+      "company_intro": "为市政给排水系统、污水处理系统、消防给水系统、空调暖通系统及燃气系统提供配套产品及解决方案。",
+      "concepts": [
+        "军工",
+        "一带一路",
+        "人工智能"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -19.589211063277,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T06:31:16+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 107919871.38,
+        "operating_cash_to_parent_profit": 2.191668312736698,
+        "parent_profit": 49240968.97,
+        "parent_profit_yoy_pct": -16.567174423695,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 15.453795322918,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002871&type=web",
+        "stale": false
+      },
+      "industry": "通用设备",
+      "market": 0,
+      "updated_at": "2026-10-09T06:30:53+00:00"
+    },
     "002879": {
       "company_intro": "长缆科技集团股份有限公司，1958年始创，2017年深交所上市(股票简称长缆科技。",
       "concepts": [
@@ -13499,13 +13530,13 @@
         "人工智能"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 27.139673682338,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T06:31:16+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": -42676140.74,
         "operating_cash_to_parent_profit": null,
@@ -15801,6 +15832,37 @@
       "industry": "软件开发",
       "market": 0,
       "updated_at": "2026-08-20T01:35:34+00:00"
+    },
+    "300560": {
+      "company_intro": "专注于通信与信息领域，拥有成熟的设计、制造和集成能力。",
+      "concepts": [
+        "军工",
+        "大数据",
+        "国产软件"
+      ],
+      "customer_summary": "主要客户包括中国人民解放军、武警、政府职能部门和中国移动、中国电信、中国联通、中国铁塔、广电等通信运营商以及华为、中兴等知名通信设备供应商，市场遍布全国二十多个省份和“一带一路”多个沿线国家。",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 126.60729347062,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T06:31:16+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -60810673.06,
+        "operating_cash_to_parent_profit": -4.068275312580009,
+        "parent_profit": 14947531.42,
+        "parent_profit_yoy_pct": 49.725539564309,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 0.115506434348,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300560&type=web",
+        "stale": false
+      },
+      "industry": "通信服务",
+      "market": 0,
+      "updated_at": "2026-10-09T06:30:53+00:00"
     },
     "300561": {
       "company_intro": "运用人工智能技术、物联网技术为金融行业客户的运营管理、风险控制、网点转型、渠道建设等提供专业解决方案和服务。",
@@ -40103,5 +40165,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-09T06:20:41+00:00"
+  "updated_at": "2026-10-09T06:30:53+00:00"
 }
