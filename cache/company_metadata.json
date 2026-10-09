@@ -4112,13 +4112,13 @@
         "蓝宝石"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 8.352792181461,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:25:53+00:00",
         "notice_date": "2026-08-15",
         "operating_cash_flow": 827211037.67,
         "operating_cash_to_parent_profit": 1.036986534175382,
@@ -5684,13 +5684,13 @@
         "彩票概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -889.540124522653,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:25:53+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": -58724015.18,
         "operating_cash_to_parent_profit": -41.07774561523474,
@@ -11997,13 +11997,13 @@
         "特斯拉概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-01",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -95.127461058869,
-        "as_of": "2026-10-01",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-30T16:21:34+00:00",
+        "fetched_at": "2026-10-09T05:25:53+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": -202722012.4,
         "operating_cash_to_parent_profit": -11.41132289759638,
@@ -12095,16 +12095,35 @@
       "updated_at": "2026-09-04T01:35:43+00:00"
     },
     "300124": {
-      "company_intro": "专注“信息层、控制层、驱动层、执行层、传感层”核心技术，专注于工业自动化控制产品的研发、生产和销售。",
+      "company_intro": "致力于为全球客户提供智能、高效、绿色、安全的综合产品和解决方案。",
       "concepts": [
         "深圳特区",
-        "工业互联网",
-        "新能源车"
+        "新能源车",
+        "储能概念"
       ],
       "customer_summary": "深圳市汇川技术股份有限公司(简称“汇川技术”)创立于2003年，聚焦工业领域的自动化、数字化、智能化，专注“信息层、控制层、驱动层、执行层、传感层”核心技术，专注于工业自动化控制产品的研发、生。",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 3.152172969361,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T05:25:53+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 1975059030.42,
+        "operating_cash_to_parent_profit": 0.7028869621898893,
+        "parent_profit": 2809924122.46,
+        "parent_profit_yoy_pct": -5.350818477469,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 20.312158277794,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300124&type=web",
+        "stale": false
+      },
       "industry": "自动化设备",
       "market": 0,
-      "updated_at": "2026-08-25T01:30:44+00:00"
+      "updated_at": "2026-10-09T05:25:41+00:00"
     },
     "300125": {
       "company_intro": "致力于提供高转化率、低衰减和高发电量的光伏电池，为客户在太阳能领域提供高效电池解决方案。",
@@ -20798,7 +20817,7 @@
         "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-09T05:25:53+00:00",
         "notice_date": "2026-08-21",
         "operating_cash_flow": 35504658.11,
         "operating_cash_to_parent_profit": 0.75450003609214,
@@ -21810,13 +21829,13 @@
         "央国企改革"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 6.676223000202,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:25:53+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": -55813826.73,
         "operating_cash_to_parent_profit": null,
@@ -23693,7 +23712,7 @@
         "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-09T05:25:53+00:00",
         "notice_date": "2026-08-08",
         "operating_cash_flow": 1868375779.7,
         "operating_cash_to_parent_profit": null,
@@ -25463,7 +25482,7 @@
         "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-09T05:25:53+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": -74901742.95,
         "operating_cash_to_parent_profit": null,
@@ -27775,13 +27794,13 @@
         "腾讯云"
       ],
       "customer_summary": "获得腾讯战略投资、是企业微信战略合作伙伴。",
-      "financial_as_of": "2026-10-01",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 74.683789796955,
-        "as_of": "2026-10-01",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-30T16:21:34+00:00",
+        "fetched_at": "2026-10-09T05:25:53+00:00",
         "notice_date": "2026-08-21",
         "operating_cash_flow": -31791764.23,
         "operating_cash_to_parent_profit": -0.2770431355102277,
@@ -28358,6 +28377,37 @@
       "industry": "装修装饰Ⅱ",
       "market": 1,
       "updated_at": "2026-09-30T01:36:06+00:00"
+    },
+    "603138": {
+      "company_intro": "海量数据秉承“专注做好数据库”的使命，始终致力于数据库产品的研发、销售和服务。",
+      "concepts": [
+        "创投",
+        "云计算",
+        "大数据"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -99.57497175591,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-09T05:25:53+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -101906581.86,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -94839465.49,
+        "parent_profit_yoy_pct": -112.133800936157,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -17.366487265992,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603138&type=web",
+        "stale": false
+      },
+      "industry": "IT服务Ⅱ",
+      "market": 1,
+      "updated_at": "2026-10-09T05:25:41+00:00"
     },
     "603156": {
       "company_intro": "为原料长期稳定的质量和产量提供了强有力保障。",
@@ -33466,7 +33516,7 @@
         "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-09T05:25:53+00:00",
         "notice_date": "2026-08-20",
         "operating_cash_flow": 87225669.48,
         "operating_cash_to_parent_profit": 0.6451888611374893,
@@ -38614,6 +38664,68 @@
       "market": 1,
       "updated_at": "2026-09-29T16:22:36+00:00"
     },
+    "688820": {
+      "company_intro": "并进一步提供晶圆级封装(WLP)和芯粒多芯片集成封装等全流程的先进封测服务。",
+      "concepts": [
+        "次新股",
+        "半导体概念",
+        "先进封装"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 3.314918645861,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T05:25:53+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 1473511282.85,
+        "operating_cash_to_parent_profit": 3.2791372212805436,
+        "parent_profit": 449359445.31,
+        "parent_profit_yoy_pct": 3.326089767472,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 7.200613329349,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688820&type=web",
+        "stale": false
+      },
+      "industry": "半导体",
+      "market": 1,
+      "updated_at": "2026-10-09T05:25:41+00:00"
+    },
+    "688981": {
+      "company_intro": "中芯国际还在美国、欧洲、日本和中国台湾设立营销办事处、提供客户服务。",
+      "concepts": [
+        "国产芯片",
+        "半导体概念",
+        "中芯概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 57.249865395475,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T05:25:53+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 20759511000.0,
+        "operating_cash_to_parent_profit": 4.646856549099471,
+        "parent_profit": 4467431000.0,
+        "parent_profit_yoy_pct": 94.163023835373,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 19.435688377992,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688981&type=web",
+        "stale": false
+      },
+      "industry": "半导体",
+      "market": 1,
+      "updated_at": "2026-10-09T05:25:41+00:00"
+    },
     "689009": {
       "company_intro": "主要提供摩托车及其他相关产品与服务。",
       "concepts": [
@@ -38646,5 +38758,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-09T05:20:46+00:00"
+  "updated_at": "2026-10-09T05:25:41+00:00"
 }
