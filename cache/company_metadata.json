@@ -9326,7 +9326,7 @@
         "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-09T06:35:55+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": -44052092.8,
         "operating_cash_to_parent_profit": -3.946648661414664,
@@ -10345,13 +10345,13 @@
         "专精特新"
       ],
       "customer_summary": "秉承“诚信、务实、创新”的企业精神，在行业内多年深耕的锋龙股份拥有着稳定优质的客户群体和丰富的生产经验，与Stihl、Husqvarna、Makita、MTD、Honda、Kohler、TTI。",
-      "financial_as_of": "2026-10-01",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -114.908754708909,
-        "as_of": "2026-10-01",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-09-30T16:21:34+00:00",
+        "fetched_at": "2026-10-09T06:35:55+00:00",
         "notice_date": "2026-08-18",
         "operating_cash_flow": 161586.31,
         "operating_cash_to_parent_profit": null,
@@ -11212,13 +11212,13 @@
         "央国企改革"
       ],
       "customer_summary": "目前，公司是国内核电站HVAC设备主要供应商之一，在核电、地铁、隧道等领域的市场占有率居国内前列。",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -134.472559323024,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T06:35:55+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": -139807839.96,
         "operating_cash_to_parent_profit": null,
@@ -13369,7 +13369,7 @@
         "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-09T06:35:55+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": -146126026.97,
         "operating_cash_to_parent_profit": null,
@@ -21378,7 +21378,7 @@
         "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-09T06:35:55+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": 36343402.45,
         "operating_cash_to_parent_profit": 1.4828727654275882,
@@ -30732,13 +30732,13 @@
         "混合现实"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 8.500054856713,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T06:35:55+00:00",
         "notice_date": "2026-08-22",
         "operating_cash_flow": -30493386.28,
         "operating_cash_to_parent_profit": null,
@@ -34875,12 +34875,31 @@
       "concepts": [
         "光伏概念",
         "OLED",
-        "半导体概念"
+        "HJT电池"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -55.886137525251,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T06:35:55+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 191875633.23,
+        "operating_cash_to_parent_profit": 1.8728852634621216,
+        "parent_profit": 102449219.38,
+        "parent_profit_yoy_pct": -46.741067733853,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 13.267894184268,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688147&type=web",
+        "stale": false
+      },
       "industry": "半导体",
       "market": 1,
-      "updated_at": "2026-09-04T01:30:50+00:00"
+      "updated_at": "2026-10-09T06:35:42+00:00"
     },
     "688148": {
       "company_intro": "公司主要从事锂电池三元正极材料前驱体、镍电池正极材料、锂盐、硫酸盐等产品的研发、生产和销售。",
@@ -40165,5 +40184,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-09T06:30:53+00:00"
+  "updated_at": "2026-10-09T06:35:42+00:00"
 }
