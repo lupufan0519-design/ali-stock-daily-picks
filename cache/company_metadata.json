@@ -5981,7 +5981,7 @@
         "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-09T05:35:46+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": -40840656.04,
         "operating_cash_to_parent_profit": -11.08321588519983,
@@ -10933,7 +10933,7 @@
         "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-09T05:35:46+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": 83498863.71,
         "operating_cash_to_parent_profit": 2.3064799556728186,
@@ -13393,13 +13393,13 @@
         "光伏概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -80.903893197556,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:35:46+00:00",
         "notice_date": "2026-08-22",
         "operating_cash_flow": 1366210239.69,
         "operating_cash_to_parent_profit": 5.882731810826861,
@@ -14180,6 +14180,37 @@
       "market": 0,
       "updated_at": "2026-08-25T01:55:40+00:00"
     },
+    "300418": {
+      "company_intro": "自2022年确立\"ALLinAGI与AIGC\"战略以来，已经构建起完整的技术生态体系。",
+      "concepts": [
+        "互联网服务",
+        "创投",
+        "网络游戏"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 46.740344649177,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T05:35:46+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": -467192371.76,
+        "operating_cash_to_parent_profit": -0.42940220466174106,
+        "parent_profit": 1088006458.02,
+        "parent_profit_yoy_pct": 227.171019351191,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 43.549843509491,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300418&type=web",
+        "stale": false
+      },
+      "industry": "数字媒体",
+      "market": 0,
+      "updated_at": "2026-10-09T05:35:41+00:00"
+    },
     "300420": {
       "company_intro": "主营业务涵盖智慧矿山核心装置、散物料预拌设备生产线、立体停车设备、停车投资运营、自动化生产线及仓储物流、储能投资运营、金融服务七大板块。",
       "concepts": [
@@ -14597,7 +14628,7 @@
         "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-09T05:35:46+00:00",
         "notice_date": "2026-08-08",
         "operating_cash_flow": -71822873.73,
         "operating_cash_to_parent_profit": -28.074755027073934,
@@ -15719,6 +15750,37 @@
       "industry": "半导体",
       "market": 0,
       "updated_at": "2026-09-30T01:36:06+00:00"
+    },
+    "300607": {
+      "company_intro": "致力于成为全球领先的具身智能科技公司。",
+      "concepts": [
+        "物联网",
+        "华为概念",
+        "机器视觉"
+      ],
+      "customer_summary": "拓斯达已触达客户逾20万家，累计服务客户超1.5万家，包括伯恩光学、立讯精密、富士康、华勤技术、歌尔股份、三星、康宁、宁德时代等知名企业，并成为逾20家《财富》世界500强公司的供应商。",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 324.366635797968,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T05:35:46+00:00",
+        "notice_date": "2026-08-21",
+        "operating_cash_flow": 146918388.43,
+        "operating_cash_to_parent_profit": 1.4086883819813074,
+        "parent_profit": 104294455.97,
+        "parent_profit_yoy_pct": 262.987897202718,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 18.614436720823,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300607&type=web",
+        "stale": false
+      },
+      "industry": "自动化设备",
+      "market": 0,
+      "updated_at": "2026-10-09T05:35:41+00:00"
     },
     "300615": {
       "company_intro": "欣天科技是一家主要从事移动通信产业中射频器件的研发，生产和销售的国家高新技术企业。",
@@ -21969,6 +22031,37 @@
       "market": 1,
       "updated_at": "2026-08-25T02:00:50+00:00"
     },
+    "600172": {
+      "company_intro": "公司主要产品有碳系新材料(超硬材料及制品、超硬复合材料及制品、首饰用钻石、金刚石线锯、金刚石微粉、石墨烯)、智能制造、合金粉、3D打印金。",
+      "concepts": [
+        "节能环保",
+        "新材料",
+        "央国企改革"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 24.907106758005,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-09T05:35:46+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 98184162.1,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -222235451.8,
+        "parent_profit_yoy_pct": 25.738546434765,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 15.480018756419,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600172&type=web",
+        "stale": false
+      },
+      "industry": "通用设备",
+      "market": 1,
+      "updated_at": "2026-10-09T05:35:41+00:00"
+    },
     "600176": {
       "company_intro": "以玻璃纤维及制品的生产与销售为主营业务，是我国新材料行业进入资本市场早。",
       "concepts": [
@@ -24610,13 +24703,13 @@
         "3D玻璃"
       ],
       "customer_summary": "公司的经营宗旨是用户至上，行业领先，科技保障，不断创新，为客户提供高品质蓝宝石产品，为客户提供高效、安全、可靠的智能算力及相关服务，公司的发展目标是成为具有国际竞争力的蓝宝石供应商，成为国内领。",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 51.433382962288,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:35:46+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": 75451716.57,
         "operating_cash_to_parent_profit": null,
@@ -24946,7 +25039,7 @@
         "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-09T05:35:46+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 1762197768.95,
         "operating_cash_to_parent_profit": 34.09877403625809,
@@ -30178,13 +30271,13 @@
         "新零售"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 718.73797734183,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:35:46+00:00",
         "notice_date": "2026-08-22",
         "operating_cash_flow": 49193195.0,
         "operating_cash_to_parent_profit": 1.7584532893058669,
@@ -32366,13 +32459,13 @@
         "培育钻石"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-30",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 64.545754321603,
-        "as_of": "2026-09-30",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-30T01:39:17+00:00",
+        "fetched_at": "2026-10-09T05:35:46+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 100378002.21,
         "operating_cash_to_parent_profit": 1.0652007260583212,
@@ -35463,13 +35556,13 @@
         "人工智能"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-30",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -23.671950455577,
-        "as_of": "2026-09-30",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-30T01:39:17+00:00",
+        "fetched_at": "2026-10-09T05:35:46+00:00",
         "notice_date": "2026-08-22",
         "operating_cash_flow": 13912484.83,
         "operating_cash_to_parent_profit": 0.33410652058454926,
@@ -37528,13 +37621,13 @@
         "专精特新"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-30",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 62.483615881103,
-        "as_of": "2026-09-30",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-29T16:30:03+00:00",
+        "fetched_at": "2026-10-09T05:35:46+00:00",
         "notice_date": "2026-08-19",
         "operating_cash_flow": -349757880.24,
         "operating_cash_to_parent_profit": -7.151069714731939,
@@ -38385,9 +38478,28 @@
         "智能驾驶"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 813.523762298069,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T05:35:46+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 709205.57,
+        "operating_cash_to_parent_profit": 0.07256891127091725,
+        "parent_profit": 9772856.69,
+        "parent_profit_yoy_pct": 156.868482577981,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 22.454266084081,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688787&type=web",
+        "stale": false
+      },
       "industry": "IT服务Ⅱ",
       "market": 1,
-      "updated_at": "2026-08-28T01:30:44+00:00"
+      "updated_at": "2026-10-09T05:35:41+00:00"
     },
     "688788": {
       "company_intro": "提供全栈式智能系统解决方案，获评“广东省专精特新企业”、“广东省智能无线通信工程技术研究中心”。",
@@ -38839,5 +38951,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-09T05:30:55+00:00"
+  "updated_at": "2026-10-09T05:35:41+00:00"
 }
