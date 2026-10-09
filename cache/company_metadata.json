@@ -4551,13 +4551,13 @@
         "长江三角"
       ],
       "customer_summary": "三维通信坚持“根系中国，连接全球”的战略方向，持续助力海内外客户在发展过程中的数字基建和智能革新，以卓越品质与服务立足市场，与全球合作伙伴一起创造数字、智能、互联的美好未来。",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 996.772830265569,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:30:59+00:00",
         "notice_date": "2026-08-18",
         "operating_cash_flow": -18960510.39,
         "operating_cash_to_parent_profit": -0.37624908864347,
@@ -12417,13 +12417,13 @@
         "海洋经济"
       ],
       "customer_summary": "打造了基于大数据、云计算、移动互联，全链条、全自主知识产权的技术研发体系，实现了大数据端到端全产业链的自主研发，并以丰富的大数据软件产品和解决方案服务于通信、金融、工业、政府、城市、农业、医疗。",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 7.995452048933,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:30:59+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": -304111584.28,
         "operating_cash_to_parent_profit": null,
@@ -28771,6 +28771,37 @@
       "market": 1,
       "updated_at": "2026-09-29T16:22:36+00:00"
     },
+    "603221": {
+      "company_intro": "努力为每一个家庭、每一间办公室提供环保、健康、舒适的铺地材料。",
+      "concepts": [
+        "长江三角",
+        "养老概念",
+        "电商概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -241.664981993433,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-09T05:30:59+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 35098159.25,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -38479516.26,
+        "parent_profit_yoy_pct": -236.864379090186,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -6.338660246449,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603221&type=web",
+        "stale": false
+      },
+      "industry": "家居用品",
+      "market": 1,
+      "updated_at": "2026-10-09T05:30:55+00:00"
+    },
     "603223": {
       "company_intro": "2015年6月30日在上海证券交易所上市。",
       "concepts": [
@@ -30271,13 +30302,13 @@
         "人工智能"
       ],
       "customer_summary": "2018年12月，江苏利通成功登陆上交所主板市场，实现发展历程中又一次成功转型，主要服务于海信、TCL、三星、索尼、康佳、创维、海尔、长虹、高创等知名电视机整机企业。",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 1088.94980206613,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:30:59+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": 2573219134.54,
         "operating_cash_to_parent_profit": 3.6633941826008134,
@@ -34624,6 +34655,37 @@
       "market": 1,
       "updated_at": "2026-09-03T01:30:44+00:00"
     },
+    "688251": {
+      "company_intro": "专注于绿色智能物流机器人产品、智能工厂系统设计与建造、孪生系统平台等核心业务。",
+      "concepts": [
+        "人工智能",
+        "智能驾驶",
+        "数字孪生"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -2069.20936908097,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-09T05:30:59+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": -43852905.83,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -47899749.57,
+        "parent_profit_yoy_pct": -9704.42583279229,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -38.463857828749,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688251&type=web",
+        "stale": false
+      },
+      "industry": "IT服务Ⅱ",
+      "market": 1,
+      "updated_at": "2026-10-09T05:30:55+00:00"
+    },
     "688253": {
       "company_intro": "持续提供精准、快速、便捷的诊断服务，致力于成为医疗诊断创新的中坚力量。",
       "concepts": [
@@ -35191,9 +35253,28 @@
         "半导体概念"
       ],
       "customer_summary": "科德数控股份有限公司(股票简称:科德数控股票代码:688305)是大连光洋科技集团有限公司的控股子公司，是中国本土专业化高档数控系统和关键功能部件的完整产业制造商;是国内制造类企业中，实现“机。",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -40.147958273064,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T05:30:59+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 15558974.73,
+        "operating_cash_to_parent_profit": 0.44626442153045476,
+        "parent_profit": 34864923.08,
+        "parent_profit_yoy_pct": -28.928938259934,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -27.366060897245,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688305&type=web",
+        "stale": false
+      },
       "industry": "通用设备",
       "market": 1,
-      "updated_at": "2026-08-31T01:40:39+00:00"
+      "updated_at": "2026-10-09T05:30:55+00:00"
     },
     "688308": {
       "company_intro": "为全球智造提供切削加工解决方案。",
@@ -38758,5 +38839,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-09T05:25:41+00:00"
+  "updated_at": "2026-10-09T05:30:55+00:00"
 }
