@@ -2191,13 +2191,13 @@
         "智能电视"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 186.026862576124,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:10:46+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": -2238771974.41,
         "operating_cash_to_parent_profit": -13.812358163624257,
@@ -11036,6 +11036,37 @@
       "market": 0,
       "updated_at": "2026-09-30T01:36:06+00:00"
     },
+    "300017": {
+      "company_intro": "公司专注于边缘计算、云分发、云安全、云计算、云服务及绿色数据中心业务。",
+      "concepts": [
+        "互联网服务",
+        "云计算",
+        "长江三角"
+      ],
+      "customer_summary": "公司专注于边缘计算、云分发、云安全、云计算、云服务及绿色数据中心业务，帮助企业技术创新实践，是产业数字化转型升级值得信赖的合作伙伴。",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -7.850006094936,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T05:10:46+00:00",
+        "notice_date": "2026-08-15",
+        "operating_cash_flow": 364781673.59,
+        "operating_cash_to_parent_profit": 1.0485264236591532,
+        "parent_profit": 347899361.77,
+        "parent_profit_yoy_pct": -6.605619309055,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -1.380790905106,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300017&type=web",
+        "stale": false
+      },
+      "industry": "IT服务Ⅱ",
+      "market": 0,
+      "updated_at": "2026-10-09T05:10:43+00:00"
+    },
     "300024": {
       "company_intro": "新松坚持走自主创新之路，书写了中国机器人发展史上百余项“行业首创”。",
       "concepts": [
@@ -13052,9 +13083,28 @@
         "物联网"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 14.643833928229,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-09T05:10:46+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -8078834.82,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -58812703.44,
+        "parent_profit_yoy_pct": 12.976064170296,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -39.566259865918,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300287&type=web",
+        "stale": false
+      },
       "industry": "IT服务Ⅱ",
       "market": 0,
-      "updated_at": "2026-08-25T01:35:37+00:00"
+      "updated_at": "2026-10-09T05:10:43+00:00"
     },
     "300291": {
       "company_intro": "致力于构建“内容”和“实业”双向赋能的IP运营模式。",
@@ -14472,13 +14522,13 @@
         "互联网金融"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -46.240920386805,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:10:46+00:00",
         "notice_date": "2026-08-20",
         "operating_cash_flow": -83182230.21,
         "operating_cash_to_parent_profit": -9.05230398868579,
@@ -15403,6 +15453,37 @@
       "market": 0,
       "updated_at": "2026-09-29T16:22:36+00:00"
     },
+    "300588": {
+      "company_intro": "新疆熙菱信息技术股份有限公司(股票代码:300588)是一家专注于大数据智能应用服务的国家级专精特新“小巨人”企业、“中国大数据50强”。",
+      "concepts": [
+        "西部大开发",
+        "智慧城市",
+        "大数据"
+      ],
+      "customer_summary": "新疆熙菱信息技术股份有限公司(股票代码:300588)是一家专注于大数据智能应用服务的国家级专精特新“小巨人”企业、“中国大数据50强”企业，也是新疆首批在A股上市的信息化软件高新技术企业，深。",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -14.566039057408,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-09T05:10:46+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -45481774.92,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -35918704.0,
+        "parent_profit_yoy_pct": -18.379915059168,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -13.787642970733,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300588&type=web",
+        "stale": false
+      },
+      "industry": "计算机设备",
+      "market": 0,
+      "updated_at": "2026-10-09T05:10:43+00:00"
+    },
     "300591": {
       "company_intro": "主营业务为各类军警装备及被装产品的研发设计、生产制造;警用及社会用安全防范器材的研发与设计、生产制造;皮具产品研发设计、生产制造、品牌运。",
       "concepts": [
@@ -15838,9 +15919,28 @@
         "智慧城市"
       ],
       "customer_summary": "目前，科蓝软件客户覆盖大型国有银行、政策性银行和绝大多数城市商业银行、农村商业银行、外资银行等，为银行及各类非银金融机构提供多样性产品及数字化转型解决方案，在银行数字渠道建设市场占有率极高，在。",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -742.622842169125,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-09T05:10:46+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 3694799.14,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -75243397.55,
+        "parent_profit_yoy_pct": -1110.48364303667,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -42.347971881263,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300663&type=web",
+        "stale": false
+      },
       "industry": "软件开发",
       "market": 0,
-      "updated_at": "2026-08-20T01:55:33+00:00"
+      "updated_at": "2026-10-09T05:10:43+00:00"
     },
     "300666": {
       "company_intro": "为公司的持续发展提供了有力的技术支撑。",
@@ -26613,13 +26713,13 @@
         "国产芯片"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -186.304040600833,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:10:46+00:00",
         "notice_date": "2026-08-31",
         "operating_cash_flow": 120368681.14,
         "operating_cash_to_parent_profit": null,
@@ -32847,13 +32947,13 @@
         "新材料"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-01",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 127.060025928406,
-        "as_of": "2026-10-01",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-30T16:21:34+00:00",
+        "fetched_at": "2026-10-09T05:10:46+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": 272525407.04,
         "operating_cash_to_parent_profit": 1.7741729072642982,
@@ -38449,5 +38549,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-09T02:55:42+00:00"
+  "updated_at": "2026-10-09T05:10:43+00:00"
 }
