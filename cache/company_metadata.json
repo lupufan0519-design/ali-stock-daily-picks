@@ -16069,13 +16069,13 @@
         "在线教育"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-01",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -29.112244526312,
-        "as_of": "2026-10-01",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-09-30T16:21:34+00:00",
+        "fetched_at": "2026-10-09T06:00:55+00:00",
         "notice_date": "2026-08-24",
         "operating_cash_flow": -88924895.04,
         "operating_cash_to_parent_profit": null,
@@ -17186,9 +17186,28 @@
         "阿里概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 60.695191423268,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-09T06:00:55+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -38913384.88,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -10833099.23,
+        "parent_profit_yoy_pct": 66.033900191724,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 24.390848657366,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300766&type=web",
+        "stale": false
+      },
       "industry": "软件开发",
       "market": 0,
-      "updated_at": "2026-08-25T02:05:42+00:00"
+      "updated_at": "2026-10-09T06:00:51+00:00"
     },
     "300768": {
       "company_intro": "为客户提供全场景网络安全解决方案。",
@@ -31438,13 +31457,13 @@
         "大数据"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-30",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 3.671575454438,
-        "as_of": "2026-09-30",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-30T01:39:17+00:00",
+        "fetched_at": "2026-10-09T06:00:55+00:00",
         "notice_date": "2026-08-22",
         "operating_cash_flow": 436346761.87,
         "operating_cash_to_parent_profit": 5.08070371959545,
@@ -39137,5 +39156,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-09T05:40:45+00:00"
+  "updated_at": "2026-10-09T06:00:51+00:00"
 }
