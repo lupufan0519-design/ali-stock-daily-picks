@@ -4422,13 +4422,13 @@
         "物联网"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 360.592838672913,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": -232292201.25,
         "operating_cash_to_parent_profit": -3.0052976001469167,
@@ -9977,6 +9977,36 @@
       "market": 0,
       "updated_at": "2026-08-24T01:35:33+00:00"
     },
+    "002888": {
+      "company_intro": "惠威致力于追求尽善尽美的声音重放，始终秉承企业理念:专注声音品质Hearthedifference。",
+      "concepts": [
+        "无线耳机",
+        "消费电子概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -15.396244582666,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 19489190.34,
+        "operating_cash_to_parent_profit": 2.51968682329813,
+        "parent_profit": 7734766.94,
+        "parent_profit_yoy_pct": -12.233826208106,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -7.423286889687,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002888&type=web",
+        "stale": false
+      },
+      "industry": "消费电子",
+      "market": 0,
+      "updated_at": "2026-10-09T06:15:50+00:00"
+    },
     "002892": {
       "company_intro": "主要提供电机Ⅱ相关产品与服务。",
       "concepts": [
@@ -13481,13 +13511,13 @@
         "LED概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -48.002025986652,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": -59770844.65,
         "operating_cash_to_parent_profit": -0.700120774069919,
@@ -13796,13 +13826,13 @@
         "3D打印"
       ],
       "customer_summary": "铝热传输材料分为复合和非复合材料，铝热传输材料主要用于交通运输(汽车、轨道交通等)、空气分离、电站空冷、电力设备、工程机械、储能和家用电器等领域，公司产品最大的应用领域在汽车行业，经过近几年的。",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 175.337077679321,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": -479219195.66,
         "operating_cash_to_parent_profit": -5.412579248903344,
@@ -15983,13 +16013,13 @@
         "存储芯片"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 158.113337390801,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T02:05:53+00:00",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": 332861122.72,
         "operating_cash_to_parent_profit": 0.3454089810573894,
@@ -19250,6 +19280,37 @@
       "market": 0,
       "updated_at": "2026-08-24T01:35:33+00:00"
     },
+    "301092": {
+      "company_intro": "公司现有控股子公司6个，其中主要生产基地3个，是国内离子交换树脂行业的重点骨干企业。",
+      "concepts": [
+        "军工",
+        "新材料",
+        "稀土永磁"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -26.509455170813,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 46561059.18,
+        "operating_cash_to_parent_profit": 1.2091371512196984,
+        "parent_profit": 38507673.95,
+        "parent_profit_yoy_pct": -27.86147430346,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -12.70509901656,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ301092&type=web",
+        "stale": false
+      },
+      "industry": "塑料",
+      "market": 0,
+      "updated_at": "2026-10-09T06:15:50+00:00"
+    },
     "301093": {
       "company_intro": "公司主要产品为注射剂用内包材覆膜胶塞、常规胶塞、预灌封、卡式瓶用内包材密封弹性体、新型密封组合件等各类包装组件。",
       "concepts": [
@@ -19812,13 +19873,13 @@
         "土壤修复"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-30",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 70.366947285063,
-        "as_of": "2026-09-30",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-09-29T16:30:03+00:00",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
         "notice_date": "2026-08-24",
         "operating_cash_flow": -69678525.19,
         "operating_cash_to_parent_profit": null,
@@ -20705,13 +20766,13 @@
         "人形机器人"
       ],
       "customer_summary": "公司以领先的智能传感器技术为核心，立足于零缺陷的品质保障理念，专业致力于为客户提供专业、精密、高性能的智能传感器产品及解决方案，主要产品包括压力传感器、力/力矩传感器、氧传感器、氮氧传感器、温。",
-      "financial_as_of": "2026-09-30",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -90.223348212593,
-        "as_of": "2026-09-30",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-29T16:30:03+00:00",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": -14604738.79,
         "operating_cash_to_parent_profit": -4.170997538990329,
@@ -24054,6 +24115,37 @@
       "market": 1,
       "updated_at": "2026-09-23T03:36:04+00:00"
     },
+    "600487": {
+      "company_intro": "江苏亨通光电股份有限公司，中国光纤光网、智能电网、大数据物联网、新能源新材料等领域的国家创新型企业。",
+      "concepts": [
+        "物联网",
+        "长江三角",
+        "风能"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 100.618967296457,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -864794244.74,
+        "operating_cash_to_parent_profit": -0.27721133915756463,
+        "parent_profit": 3119620746.28,
+        "parent_profit_yoy_pct": 93.381059137176,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 31.131920828898,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600487&type=web",
+        "stale": false
+      },
+      "industry": "通信设备",
+      "market": 1,
+      "updated_at": "2026-10-09T06:15:50+00:00"
+    },
     "600488": {
       "company_intro": "主要从事皮质激素类、氨基酸类原料药及制剂的研发、生产和销售。",
       "concepts": [
@@ -24507,13 +24599,13 @@
         "锂电池概念"
       ],
       "customer_summary": "建立了包括稀土开采、治炼、应用和研发的完整体系，树立了以深加工带动产业发展的稀土开发模式之典范;培育了包括三元材料、钴酸锂，磷酸铁锂，锰酸锂等主流锂离子正极材料的研发和大规模制造能力，成为锂电。",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 122.807207570367,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
         "notice_date": "2026-08-21",
         "operating_cash_flow": -2462660558.26,
         "operating_cash_to_parent_profit": -1.1190104502108296,
@@ -24839,6 +24931,37 @@
       "industry": "软件开发",
       "market": 1,
       "updated_at": "2026-09-29T16:22:36+00:00"
+    },
+    "600589": {
+      "company_intro": "公司主营业务涵盖数字基础设施建设和运营、IDC及其全方位的增值服务、分布式智能算力运营服务、新能源源网荷储一体化智能算力中心等。",
+      "concepts": [
+        "云计算",
+        "大数据",
+        "小米概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -108.328825721298,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
+        "notice_date": "2026-08-21",
+        "operating_cash_flow": 40174268.02,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -69744050.26,
+        "parent_profit_yoy_pct": -202.312236032175,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 26.056755275983,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600589&type=web",
+        "stale": false
+      },
+      "industry": "IT服务Ⅱ",
+      "market": 1,
+      "updated_at": "2026-10-09T06:15:50+00:00"
     },
     "600596": {
       "company_intro": "主要提供农化制品相关产品与服务。",
@@ -35419,13 +35542,13 @@
         "半导体概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-30",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -35.914811570689,
-        "as_of": "2026-09-30",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-30T05:00:53+00:00",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": 2797993046.82,
         "operating_cash_to_parent_profit": 11.403028215651489,
@@ -35440,7 +35563,7 @@
       },
       "industry": "半导体",
       "market": 1,
-      "updated_at": "2026-09-03T01:30:44+00:00"
+      "updated_at": "2026-10-09T06:15:50+00:00"
     },
     "688251": {
       "company_intro": "专注于绿色智能物流机器人产品、智能工厂系统设计与建造、孪生系统平台等核心业务。",
@@ -35871,6 +35994,36 @@
       "industry": "自动化设备",
       "market": 1,
       "updated_at": "2026-09-29T16:22:36+00:00"
+    },
+    "688291": {
+      "company_intro": "为广大系统集成商提供优质的产品和优质的服务，共同推进中国激光产业的发展和进步。",
+      "concepts": [
+        "航天航空",
+        "3D打印"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -25.841619070029,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 9446437.62,
+        "operating_cash_to_parent_profit": 0.14767985008013548,
+        "parent_profit": 63965650.12,
+        "parent_profit_yoy_pct": 130.90992339192,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 0.53579763941,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688291&type=web",
+        "stale": false
+      },
+      "industry": "软件开发",
+      "market": 1,
+      "updated_at": "2026-10-09T06:15:50+00:00"
     },
     "688293": {
       "company_intro": "奥浦迈以提供多样化、高性能、质量高度稳定的产品为核心准则，以快速响应、精益求精的服务态度。",
@@ -36953,6 +37106,37 @@
       "market": 1,
       "updated_at": "2026-09-07T01:30:45+00:00"
     },
+    "688396": {
+      "company_intro": "目前公司主营业务可分为产品与方案、制造与服务两大业务板块。",
+      "concepts": [
+        "央国企改革",
+        "工业互联网",
+        "小米概念"
+      ],
+      "customer_summary": "未来公司将围绕自身的核心优势、提升核心技术及结合内外部资源，不断推动企业发展，进一步向综合一体化的产品公司转型，成为令客户满意的功率半导体和智能传感器产品与方案供应商。",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 51.48060339958,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 1391211715.01,
+        "operating_cash_to_parent_profit": 1.9258108586291596,
+        "parent_profit": 722403089.99,
+        "parent_profit_yoy_pct": 113.226979100882,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 17.444635369667,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688396&type=web",
+        "stale": false
+      },
+      "industry": "半导体",
+      "market": 1,
+      "updated_at": "2026-10-09T06:15:50+00:00"
+    },
     "688400": {
       "company_intro": "为客户提供可配置视觉系统、智能视觉装备与核心视觉器件等高端产品与解决方案。",
       "concepts": [
@@ -37555,9 +37739,28 @@
         "虚拟现实"
       ],
       "customer_summary": "基于公司独有的芯片设计平台即服务(SiliconPlatformasaService，SiPaaS)经营模式，目前公司主营业务的应用领域广泛包括消费电子、汽车电子、计算机及周边、工业、数据处理。",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -73.693805137383,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
+        "notice_date": "2026-08-18",
+        "operating_cash_flow": 625794918.53,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -612125014.89,
+        "parent_profit_yoy_pct": -91.379633090986,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 91.367807862788,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688521&type=web",
+        "stale": false
+      },
       "industry": "半导体",
       "market": 1,
-      "updated_at": "2026-08-20T01:35:34+00:00"
+      "updated_at": "2026-10-09T06:15:50+00:00"
     },
     "688522": {
       "company_intro": "也是全球为数不多掌握从微带贴片阵列天线、射频前端、数字中频后端、信号处理、数据融合到雷达数据产品开发等相控阵雷达设计制造、雷达软件生态和。",
@@ -38141,13 +38344,13 @@
         "医疗器械概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -736.245115992277,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": -17474739.05,
         "operating_cash_to_parent_profit": null,
@@ -39461,13 +39664,13 @@
         "CPO概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 944.345979577163,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T06:16:11+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 548469380.63,
         "operating_cash_to_parent_profit": 0.9670905604429721,
@@ -39695,5 +39898,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-09T06:10:46+00:00"
+  "updated_at": "2026-10-09T06:15:50+00:00"
 }
