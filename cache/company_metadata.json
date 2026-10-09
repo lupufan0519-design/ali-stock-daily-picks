@@ -8368,6 +8368,37 @@
       "market": 0,
       "updated_at": "2026-09-30T01:36:06+00:00"
     },
+    "002559": {
+      "company_intro": "江苏亚威机床股份有限公司始创于1956年，产品数控化率100%，是中国金属成形机床行业首家上市公司。",
+      "concepts": [
+        "军工",
+        "光伏概念",
+        "央国企改革"
+      ],
+      "customer_summary": "江苏亚威机床股份有限公司始创于1956年，产品数控化率100%，是中国金属成形机床行业首家上市公司，国内领先的数字化、柔性化、自动化、智能化金属板材加工解决方案供应商。",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -39.475606806119,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T06:41:09+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 54463450.13,
+        "operating_cash_to_parent_profit": 1.2008262994677628,
+        "parent_profit": 45354977.78,
+        "parent_profit_yoy_pct": -35.806874554451,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -0.86823862675,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002559&type=web",
+        "stale": false
+      },
+      "industry": "通用设备",
+      "market": 0,
+      "updated_at": "2026-10-09T06:40:54+00:00"
+    },
     "002565": {
       "company_intro": "主要提供包装印刷相关产品与服务。",
       "concepts": [
@@ -15981,6 +16012,37 @@
       "market": 0,
       "updated_at": "2026-09-07T01:30:45+00:00"
     },
+    "300571": {
+      "company_intro": "公司目前的主营业务以智慧家庭业务为主，5G通信业务为辅。",
+      "concepts": [
+        "物联网",
+        "在线教育",
+        "智能家居"
+      ],
+      "customer_summary": "公司智慧家庭业务及5G通信业务的销售模式以TOB为主，主要客户为国内通信运营商，主要通过参与通信运营商的招投标获取订单。",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -252.879451791428,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-09T06:41:09+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -29385660.45,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -9496649.01,
+        "parent_profit_yoy_pct": -172.505930745483,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -0.736448805441,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300571&type=web",
+        "stale": false
+      },
+      "industry": "通信服务",
+      "market": 0,
+      "updated_at": "2026-10-09T06:40:54+00:00"
+    },
     "300576": {
       "company_intro": "主要提供电子化学品Ⅱ相关产品与服务。",
       "concepts": [
@@ -16063,13 +16125,13 @@
         "网红经济"
       ],
       "customer_summary": "公司深耕军警被装研发及生产领域多年，自2007年起至今一直是原解放军总后勤部(现后勤保障部)、原武警后勤部在库供应商，参与了解放军、武警部队的多项产品研发与生产任务;同时亦参与公安、税务等各政。",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 78.761458750551,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T06:41:09+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": 25535674.08,
         "operating_cash_to_parent_profit": null,
@@ -26701,6 +26763,34 @@
       "market": 1,
       "updated_at": "2026-10-08T01:56:25+00:00"
     },
+    "600962": {
+      "company_intro": "公司主营业务资料正在自动补全。",
+      "concepts": [],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": -105.13774432077,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T06:41:09+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 535386068.87,
+        "operating_cash_to_parent_profit": 293.98096198608647,
+        "parent_profit": 1821158.98,
+        "parent_profit_yoy_pct": -92.738651958019,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -12.365007188555,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600962&type=web",
+        "stale": false
+      },
+      "industry": "",
+      "last_error": "RuntimeError: company metadata endpoints returned no data",
+      "market": 1,
+      "retry_after": "2026-10-09T08:40:54+00:00"
+    },
     "600977": {
       "company_intro": "公司主营业务包括创作、发行、放映、科技、服务、创新六大板块，涵盖电影剧集制片。",
       "concepts": [
@@ -31399,13 +31489,13 @@
         "智慧城市"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-23",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -31.453115643653,
-        "as_of": "2026-09-23",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-09-23T01:30:55+00:00",
+        "fetched_at": "2026-10-09T06:41:09+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": -192064725.95,
         "operating_cash_to_parent_profit": null,
@@ -31420,7 +31510,7 @@
       },
       "industry": "计算机设备",
       "market": 1,
-      "updated_at": "2026-08-26T01:30:45+00:00"
+      "updated_at": "2026-10-09T06:40:54+00:00"
     },
     "603662": {
       "company_intro": "柯力总部设于浙江宁波，采用集团化管理模式，在深圳、广州、福州、郑州、苏州、池州等城市投资27家控股公司和11家参股公司。",
@@ -40184,5 +40274,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-09T06:35:42+00:00"
+  "updated_at": "2026-10-09T06:40:54+00:00"
 }
