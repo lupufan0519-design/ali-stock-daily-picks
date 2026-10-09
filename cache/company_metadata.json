@@ -8787,6 +8787,37 @@
       "market": 0,
       "updated_at": "2026-09-29T16:22:36+00:00"
     },
+    "002653": {
+      "company_intro": "为新药的研发提供了强有力的保障。",
+      "concepts": [
+        "西部大开发",
+        "参股保险",
+        "医疗器械概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 324.175300396492,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T02:45:59+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 760621969.4,
+        "operating_cash_to_parent_profit": 0.8935579673357822,
+        "parent_profit": 851228456.58,
+        "parent_profit_yoy_pct": 426.982442108396,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 54.71447190254,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002653&type=web",
+        "stale": false
+      },
+      "industry": "化学制药",
+      "market": 0,
+      "updated_at": "2026-10-09T02:45:55+00:00"
+    },
     "002668": {
       "company_intro": "主要产品包括冰箱(含冷柜)和洗衣机两大类。",
       "concepts": [
@@ -38389,5 +38420,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-09T02:20:40+00:00"
+  "updated_at": "2026-10-09T02:45:55+00:00"
 }
