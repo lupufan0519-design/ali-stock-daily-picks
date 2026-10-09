@@ -15251,13 +15251,13 @@
         "国产软件"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": -249.598462931911,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-09T05:05:40+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": -10652939.25,
         "operating_cash_to_parent_profit": null,
