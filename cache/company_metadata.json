@@ -35984,6 +35984,35 @@
       "market": 1,
       "updated_at": "2026-09-29T16:22:36+00:00"
     },
+    "688428": {
+      "company_intro": "诺诚健华医药有限公司(上交所代码:688428;港交所代码:09969)是一家商业化阶段的生物医药高科技公司。",
+      "concepts": [
+        "创新药"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-09",
+      "financials": {
+        "adjusted_profit_yoy_pct": 327.377120802526,
+        "as_of": "2026-10-09",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-09T02:56:04+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 81473709.81,
+        "operating_cash_to_parent_profit": 0.3307154914162336,
+        "parent_profit": 246355891.77,
+        "parent_profit_yoy_pct": 918.691719755135,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 55.455830119808,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688428&type=web",
+        "stale": false
+      },
+      "industry": "化学制药",
+      "market": 1,
+      "updated_at": "2026-10-09T02:55:42+00:00"
+    },
     "688433": {
       "company_intro": "为增材制造整体装备的自主可控与持续创新提供支撑。",
       "concepts": [
@@ -38420,5 +38449,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-09T02:45:55+00:00"
+  "updated_at": "2026-10-09T02:55:42+00:00"
 }
