@@ -3945,13 +3945,13 @@
         "光伏概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-30",
+      "financial_as_of": "2026-10-09",
       "financials": {
         "adjusted_profit_yoy_pct": 13.11828600484,
-        "as_of": "2026-09-30",
+        "as_of": "2026-10-09",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-30T01:39:17+00:00",
+        "fetched_at": "2026-10-09T02:20:44+00:00",
         "notice_date": "2026-08-15",
         "operating_cash_flow": 227212823.34,
         "operating_cash_to_parent_profit": 0.15523012763122496,
@@ -3966,7 +3966,7 @@
       },
       "industry": "电网设备",
       "market": 0,
-      "updated_at": "2026-09-01T01:40:41+00:00"
+      "updated_at": "2026-10-09T02:20:40+00:00"
     },
     "002034": {
       "company_intro": "旺能环境股份有限公司(股票代码:002034)是美欣达集团旗下专注城市固废综合治理的环保企业。",
@@ -38389,5 +38389,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-09T01:50:54+00:00"
+  "updated_at": "2026-10-09T02:20:40+00:00"
 }
