@@ -45237,13 +45237,13 @@
         "智能驾驶"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -122.119799389566,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T01:31:40+00:00",
+        "fetched_at": "2026-10-13T07:00:57+00:00",
         "notice_date": "2026-08-21",
         "operating_cash_flow": -54724428.03,
         "operating_cash_to_parent_profit": -30.108826695204357,
