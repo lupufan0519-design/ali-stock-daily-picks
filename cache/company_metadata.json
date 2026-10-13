@@ -1802,13 +1802,13 @@
         "小金属概念"
       ],
       "customer_summary": "通过科技创新和绿色发展，努力成为国际领先的生态环境解决方案供应商和运营商。",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 108.478510694622,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T06:20:51+00:00",
+        "fetched_at": "2026-10-13T02:01:07+00:00",
         "notice_date": "2026-08-20",
         "operating_cash_flow": -144728276.79,
         "operating_cash_to_parent_profit": -1.9504759377720828,
@@ -2817,13 +2817,13 @@
         "供销社概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 57.315351100437,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T05:15:47+00:00",
+        "fetched_at": "2026-10-13T02:01:07+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": 1852227155.56,
         "operating_cash_to_parent_profit": 1.3719316167481999,
@@ -2838,7 +2838,7 @@
       },
       "industry": "农化制品",
       "market": 0,
-      "updated_at": "2026-09-10T01:40:40+00:00"
+      "updated_at": "2026-10-13T02:01:03+00:00"
     },
     "000899": {
       "company_intro": "赣能股份坚持实体运营与资本运作相结合、内涵式发展与外延式扩张相结合的双驱动发展模式。",
@@ -5020,6 +5020,37 @@
       "industry": "元件",
       "market": 0,
       "updated_at": "2026-10-12T19:34:11+00:00"
+    },
+    "002141": {
+      "company_intro": "2014年，公司实际控制人和控股股东发生变更。",
+      "concepts": [
+        "创投",
+        "生物疫苗",
+        "锂电池概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 471.194925238828,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T02:01:07+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 118443466.11,
+        "operating_cash_to_parent_profit": 3.791951186584363,
+        "parent_profit": 31235493.36,
+        "parent_profit_yoy_pct": -22.274393637621,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -20.742713025284,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002141&type=web",
+        "stale": false
+      },
+      "industry": "元件",
+      "market": 0,
+      "updated_at": "2026-10-13T02:01:03+00:00"
     },
     "002149": {
       "company_intro": "主要从事稀有金属材料的研发、生产和销售。",
@@ -15086,13 +15117,13 @@
         "算力概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 36.763184203691,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T01:51:22+00:00",
+        "fetched_at": "2026-10-13T02:01:07+00:00",
         "notice_date": "2026-08-19",
         "operating_cash_flow": 1000881668.42,
         "operating_cash_to_parent_profit": 0.8311002643636833,
@@ -15936,6 +15967,37 @@
       "industry": "电网设备",
       "market": 0,
       "updated_at": "2026-09-29T16:22:36+00:00"
+    },
+    "300491": {
+      "company_intro": "石家庄通合电子科技股份有限公司是一家致力于电力电子行业技术创新、产品创新、管理创新。",
+      "concepts": [
+        "军工",
+        "新能源",
+        "智能电网"
+      ],
+      "customer_summary": "石家庄通合电子科技股份有限公司是一家致力于电力电子行业技术创新、产品创新、管理创新，以电力电子行业产品研发、生产、销售和服务于一体，为客户提供系统能源解决方案的高新技术企业。",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -144.529419561036,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T02:01:07+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 33823365.03,
+        "operating_cash_to_parent_profit": 31.448387521625005,
+        "parent_profit": 1075519.85,
+        "parent_profit_yoy_pct": -93.047434669008,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 34.465465848141,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300491&type=web",
+        "stale": false
+      },
+      "industry": "其他电源设备Ⅱ",
+      "market": 0,
+      "updated_at": "2026-10-13T02:01:03+00:00"
     },
     "300492": {
       "company_intro": "在规划、建筑及各项专项设计等领域为国际公司、央企国企、政府平台公司、上市房企以及民营机构提供专业咨询和综合工程设计服务。",
@@ -24164,13 +24226,13 @@
       "company_intro": "返利科技为客户提供电商平台促销、优惠特权整合供应、电商一站式直播代运营服务及全域整合营销等核心服务。",
       "concepts": [],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 4.463042898901,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-09T01:31:40+00:00",
+        "fetched_at": "2026-10-13T02:01:07+00:00",
         "notice_date": "2026-08-22",
         "operating_cash_flow": 16224107.11,
         "operating_cash_to_parent_profit": null,
@@ -24279,6 +24341,37 @@
       "industry": "电力",
       "market": 1,
       "updated_at": "2026-09-20T08:34:41+00:00"
+    },
+    "600237": {
+      "company_intro": "主要产品年生产能力:电容器用聚丙烯薄膜20000吨、聚酯薄膜5800吨、金属化膜7500吨、消费及工控类电容器1亿只、新能源汽车、轨道交。",
+      "concepts": [
+        "新材料",
+        "央国企改革",
+        "新能源车"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -9.134280959316,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T02:01:07+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": 88045821.05,
+        "operating_cash_to_parent_profit": 1.6887168440710605,
+        "parent_profit": 52137705.24,
+        "parent_profit_yoy_pct": -10.808428077637,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -10.572939029827,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600237&type=web",
+        "stale": false
+      },
+      "industry": "元件",
+      "market": 1,
+      "updated_at": "2026-10-13T02:01:03+00:00"
     },
     "600246": {
       "company_intro": "北京万通新发展集团股份有限公司是中国城市规划建设的先驱探索者和贡献者。",
@@ -31247,13 +31340,13 @@
         "油气资源"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 92.040404466222,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-13T02:01:07+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": 144547634.13,
         "operating_cash_to_parent_profit": 0.784267919573732,
@@ -40515,13 +40608,13 @@
         "风能"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -749.012138862825,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-09T01:45:56+00:00",
+        "fetched_at": "2026-10-13T02:01:07+00:00",
         "notice_date": "2026-08-15",
         "operating_cash_flow": 208011599.15,
         "operating_cash_to_parent_profit": null,
@@ -42222,5 +42315,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T01:55:37+00:00"
+  "updated_at": "2026-10-13T02:01:03+00:00"
 }
