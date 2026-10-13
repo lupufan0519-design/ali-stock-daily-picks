@@ -36402,6 +36402,37 @@
       "market": 1,
       "updated_at": "2026-10-09T06:20:41+00:00"
     },
+    "688061": {
+      "company_intro": "上海灿瑞科技股份有限公司目前拥有磁传感器、电源管理芯片、电机驱动、光电传感器等多样化传感器及数模混合芯片矩阵。",
+      "concepts": [
+        "无人机",
+        "国产芯片",
+        "传感器"
+      ],
+      "customer_summary": "灿瑞产品应用范围广阔，已全面覆盖在汽车电子、工业控制、智能安防、医疗设备、物联网、移动终端等主流应用场景，是智能磁传感器、模拟及数模混合集成电路的领先供应商之一。",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 18.25232046979,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-13T02:30:58+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": -79795549.8,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -24059262.66,
+        "parent_profit_yoy_pct": 10.305327059979,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 4.787309198854,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688061&type=web",
+        "stale": false
+      },
+      "industry": "半导体",
+      "market": 1,
+      "updated_at": "2026-10-13T02:30:55+00:00"
+    },
     "688062": {
       "company_intro": "为患者提供疗效更好、可及性更强的生物创新药，满足全球未被满足的临床需求。",
       "concepts": [
@@ -43041,5 +43072,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T02:25:40+00:00"
+  "updated_at": "2026-10-13T02:30:55+00:00"
 }
