@@ -10400,6 +10400,37 @@
       "market": 0,
       "updated_at": "2026-10-08T01:56:25+00:00"
     },
+    "002600": {
+      "company_intro": "领益智造在全球范围内为客户提供精密功能件、结构件、模组等一站式智能制造服务及解决方案。",
+      "concepts": [
+        "新材料",
+        "3D打印",
+        "智能穿戴"
+      ],
+      "customer_summary": "作为值得信赖的AI终端硬件核心供应商，领益智造在全球范围内为客户提供精密功能件、结构件、模组等一站式智能制造服务及解决方案。",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -35.828873968971,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T05:45:49+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 1709919094.31,
+        "operating_cash_to_parent_profit": 2.2391977581310516,
+        "parent_profit": 763630227.88,
+        "parent_profit_yoy_pct": -17.876932890275,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 6.450073621215,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002600&type=web",
+        "stale": false
+      },
+      "industry": "消费电子",
+      "market": 0,
+      "updated_at": "2026-10-13T05:45:46+00:00"
+    },
     "002601": {
       "company_intro": "主营钛白粉产能151万吨/年，海绵钛产能8万吨/年，双居全球前列。",
       "concepts": [
@@ -51786,13 +51817,13 @@
         "半导体概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -628.375658247764,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-09T06:10:58+00:00",
+        "fetched_at": "2026-10-13T05:45:49+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": -16029105.45,
         "operating_cash_to_parent_profit": null,
@@ -52869,5 +52900,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T05:35:41+00:00"
+  "updated_at": "2026-10-13T05:45:46+00:00"
 }
