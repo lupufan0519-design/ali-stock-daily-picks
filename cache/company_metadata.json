@@ -9189,6 +9189,36 @@
       "market": 0,
       "updated_at": "2026-09-29T16:22:36+00:00"
     },
+    "002636": {
+      "company_intro": "为公司持续稳定的发展提供了强有力的基础和保障。",
+      "concepts": [
+        "医疗器械概念",
+        "PCB"
+      ],
+      "customer_summary": "金安国纪十几年的发展赢得了客户、供应商、合作银行及当地政府的广泛信任。",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 955.34099152027,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T01:55:41+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 359199503.48,
+        "operating_cash_to_parent_profit": 0.46899805116393306,
+        "parent_profit": 765886985.22,
+        "parent_profit_yoy_pct": 986.660848452154,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 65.743063728449,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002636&type=web",
+        "stale": false
+      },
+      "industry": "元件",
+      "market": 0,
+      "updated_at": "2026-10-13T01:55:37+00:00"
+    },
     "002637": {
       "company_intro": "主要产品产销量多年稳居全国前列，多种产品进入国际市场。",
       "concepts": [
@@ -42192,5 +42222,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T01:50:45+00:00"
+  "updated_at": "2026-10-13T01:55:37+00:00"
 }
