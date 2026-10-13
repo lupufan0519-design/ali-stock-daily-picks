@@ -11379,6 +11379,37 @@
       "market": 0,
       "updated_at": "2026-09-28T18:04:19+00:00"
     },
+    "003010": {
+      "company_intro": "高质量地为宝洁、拜耳、蒙牛等超百个国内外知名品牌提供了数字化服务。",
+      "concepts": [
+        "互联网服务",
+        "婴童概念",
+        "电商概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 128.647152081344,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T01:45:45+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 237448987.6,
+        "operating_cash_to_parent_profit": 1.4179988801597372,
+        "parent_profit": 167453579.07,
+        "parent_profit_yoy_pct": 131.724974698443,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 73.287366992931,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ003010&type=web",
+        "stale": false
+      },
+      "industry": "互联网电商",
+      "market": 0,
+      "updated_at": "2026-10-13T01:45:42+00:00"
+    },
     "003013": {
       "company_intro": "能够为全球提供完备、系统的城市交通综合解决方案。",
       "concepts": [
@@ -40160,6 +40191,37 @@
       "market": 1,
       "updated_at": "2026-10-09T01:50:54+00:00"
     },
+    "688552": {
+      "company_intro": "主要提供军工电子Ⅱ相关产品与服务。",
+      "concepts": [
+        "军工",
+        "安防概念",
+        "央国企改革"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -94.510925044961,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T01:45:45+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -99753405.45,
+        "operating_cash_to_parent_profit": -25.634210923241962,
+        "parent_profit": 3891417.05,
+        "parent_profit_yoy_pct": -92.663002090901,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -22.841423675621,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688552&type=web",
+        "stale": false
+      },
+      "industry": "军工电子Ⅱ",
+      "market": 1,
+      "updated_at": "2026-10-13T01:45:42+00:00"
+    },
     "688556": {
       "company_intro": "公司始终坚持研发驱动，通过对精密切割、精密磨削、电镀化学等平台化技术的深度钻研与成果沉淀。",
       "concepts": [
@@ -42100,5 +42162,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T01:40:48+00:00"
+  "updated_at": "2026-10-13T01:45:42+00:00"
 }
