@@ -28333,6 +28333,36 @@
       "market": 1,
       "updated_at": "2026-09-15T05:05:33+00:00"
     },
+    "601058": {
+      "company_intro": "致力于为全球轮胎用户提供更优质的产品与服务，以先进的技术推动橡胶轮胎行业高质量发展。",
+      "concepts": [
+        "养老金",
+        "标准普尔"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 12.749585651299,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T01:50:49+00:00",
+        "notice_date": "2026-08-31",
+        "operating_cash_flow": 1032804763.59,
+        "operating_cash_to_parent_profit": 0.4781836299097803,
+        "parent_profit": 2159849687.42,
+        "parent_profit_yoy_pct": 17.966400592348,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 13.8760164156,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH601058&type=web",
+        "stale": false
+      },
+      "industry": "汽车零部件",
+      "market": 1,
+      "updated_at": "2026-10-13T01:50:45+00:00"
+    },
     "601061": {
       "company_intro": "公司主营的贸易品种包括铌、铜、铝等有色金属以及铁矿石、钢材等黑色金属。",
       "concepts": [
@@ -42162,5 +42192,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T01:45:42+00:00"
+  "updated_at": "2026-10-13T01:50:45+00:00"
 }
