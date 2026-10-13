@@ -1525,6 +1525,37 @@
       "market": 0,
       "updated_at": "2026-10-08T01:56:25+00:00"
     },
+    "000656": {
+      "company_intro": "扩大价值提供范围，提供高品质、多元化的美好生活产品与服务，形成生态协同的新战略格局。",
+      "concepts": [
+        "成渝特区",
+        "婴童概念",
+        "电子竞技"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 98.928287824589,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T02:15:47+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": -134824766.42,
+        "operating_cash_to_parent_profit": -7.263991059898026,
+        "parent_profit": 18560701.04,
+        "parent_profit_yoy_pct": 100.246735646717,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -87.108103749239,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000656&type=web",
+        "stale": false
+      },
+      "industry": "房地产开发",
+      "market": 0,
+      "updated_at": "2026-10-13T02:15:41+00:00"
+    },
     "000657": {
       "company_intro": "中钨高新材料股份有限公司是在深圳证券交易所上市的高技术制造企业，是世界500强企业中国五矿集团有限公司旗下专业发展钨产业的企业。",
       "concepts": [
@@ -3632,13 +3663,13 @@
         "CPO概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -21.467878810217,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-13T02:15:47+00:00",
         "notice_date": "2026-08-15",
         "operating_cash_flow": -477052422.73,
         "operating_cash_to_parent_profit": -17.610174585376424,
@@ -3790,6 +3821,37 @@
       "industry": "电池",
       "market": 0,
       "updated_at": "2026-10-09T01:45:47+00:00"
+    },
+    "001309": {
+      "company_intro": "主要提供半导体相关产品与服务。",
+      "concepts": [
+        "5G概念",
+        "智能驾驶",
+        "国产芯片"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 4975.96982695761,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T02:15:47+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": -6735565797.74,
+        "operating_cash_to_parent_profit": -1.1194012085193144,
+        "parent_profit": 6017114995.48,
+        "parent_profit_yoy_pct": 5201.60075499928,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 311.545591321299,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ001309&type=web",
+        "stale": false
+      },
+      "industry": "半导体",
+      "market": 0,
+      "updated_at": "2026-10-13T02:15:41+00:00"
     },
     "001317": {
       "company_intro": "是一家为汽车行业和快消品、大宗物资等非汽车行业提供多式联运、仓储及供应链增值一体化服务的第三方物流企业。",
@@ -8309,6 +8371,37 @@
       "market": 0,
       "updated_at": "2026-09-23T03:36:04+00:00"
     },
+    "002491": {
+      "company_intro": "通鼎互联信息股份有限公司是通鼎集团旗下核心子公司。",
+      "concepts": [
+        "大数据",
+        "网络安全",
+        "5G概念"
+      ],
+      "customer_summary": "凭借稳定可靠的产品质量和优良的售前、售中、售后服务，成为中国移动、中国电信、中国联通三大运营商重要供应商和重要合作伙伴，获得铁路公司、广电、总参、国电通信中心的进网许可证，产品覆盖全国各省、市。",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 3856.1791244364,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T02:15:47+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 143069421.29,
+        "operating_cash_to_parent_profit": 0.7063833368833671,
+        "parent_profit": 202537933.47,
+        "parent_profit_yoy_pct": 326.04282943258,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 61.456029373229,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002491&type=web",
+        "stale": false
+      },
+      "industry": "通信设备",
+      "market": 0,
+      "updated_at": "2026-10-13T02:15:41+00:00"
+    },
     "002493": {
       "company_intro": "公司主要从事石化相关产品的研发、生产和销售，多年来已形成炼油—芳烃、烯烃—精对苯二甲酸、乙二醇—聚酯(纤维、瓶片、薄膜)上下游完整产业链。",
       "concepts": [
@@ -8854,6 +8947,37 @@
       "industry": "综合Ⅱ",
       "market": 0,
       "updated_at": "2026-08-20T01:35:34+00:00"
+    },
+    "002579": {
+      "company_intro": "致力于在全球范围内持续为客户提供高品质的产品和服务，致力于成为全球领先的PCB电子信息产品与服务供应商。",
+      "concepts": [
+        "创投",
+        "物联网",
+        "智能穿戴"
+      ],
+      "customer_summary": "经过多年的发展，凭借丰富的行业经验、先进的技术水平和高效创新的管理团队，中京电子已构筑起集研发、生产、销售和服务于一体的现代化经营管理体系，产品广泛应用于消费电子、网络通信、汽车电子、新型显示。",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -1058.36450582533,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-13T02:15:47+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": 91685191.87,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -89849644.18,
+        "parent_profit_yoy_pct": -591.365690517999,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -8.894875774043,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002579&type=web",
+        "stale": false
+      },
+      "industry": "元件",
+      "market": 0,
+      "updated_at": "2026-10-13T02:15:41+00:00"
     },
     "002580": {
       "company_intro": "向客户提供电池产品、储能系统和一体化智能电源解决方案，是国际知名、国内领先的绿色能源解决方案供应商。",
@@ -12573,13 +12697,13 @@
         "页岩气"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -188.576108320497,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-13T02:15:47+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": -52004121.41,
         "operating_cash_to_parent_profit": null,
@@ -18478,6 +18602,37 @@
       "market": 0,
       "updated_at": "2026-10-09T06:00:51+00:00"
     },
+    "300767": {
+      "company_intro": "震安科技股份有限公司(品牌:SafetyInside)是减隔震技术全套解决方案和全生命周期服务提供商。",
+      "concepts": [
+        "西部大开发",
+        "雄安新区",
+        "数据中心"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 96.211625085384,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T02:15:47+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 104891088.91,
+        "operating_cash_to_parent_profit": 21.369448316879637,
+        "parent_profit": 4908460.31,
+        "parent_profit_yoy_pct": 129.299794732102,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -34.519756139754,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300767&type=web",
+        "stale": false
+      },
+      "industry": "橡胶",
+      "market": 0,
+      "updated_at": "2026-10-13T02:15:41+00:00"
+    },
     "300768": {
       "company_intro": "为客户提供全场景网络安全解决方案。",
       "concepts": [
@@ -19053,6 +19208,37 @@
       "industry": "风电设备",
       "market": 0,
       "updated_at": "2026-08-20T01:35:34+00:00"
+    },
+    "300852": {
+      "company_intro": "自设立以来专注于高品质电路板(PCB)制造。",
+      "concepts": [
+        "5G概念",
+        "PCB",
+        "新能源车"
+      ],
+      "customer_summary": "所产PCB广泛应用于工控、汽车、交通、通信、医疗等领域，主要客户包括日立、松下、欧姆龙等行业知名企业。",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 25.965454330038,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T02:15:47+00:00",
+        "notice_date": "2026-08-04",
+        "operating_cash_flow": 15932831.91,
+        "operating_cash_to_parent_profit": 0.18135636818580694,
+        "parent_profit": 87853721.76,
+        "parent_profit_yoy_pct": 16.533153495087,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 43.385144725479,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300852&type=web",
+        "stale": false
+      },
+      "industry": "元件",
+      "market": 0,
+      "updated_at": "2026-10-13T02:15:41+00:00"
     },
     "300859": {
       "company_intro": "主营业务涵盖:旅游运输、湖面游艇观光、旅游资源开发、索道、观光车、温泉旅游、国际旅行社、食品、农副产品销售、餐饮等。",
@@ -21546,6 +21732,37 @@
       "market": 0,
       "updated_at": "2026-08-31T01:35:36+00:00"
     },
+    "301282": {
+      "company_intro": "为全球电子与新兴产业提供优质电路板为企业使命，恪守“以客户为中心、全力以赴、团队合作、持续改进”的核心价值观。",
+      "concepts": [
+        "航天航空",
+        "智能驾驶",
+        "PCB"
+      ],
+      "customer_summary": "公司2006年成立，2012年正式投产，2022年8月在深圳证券交易所创业板上市(股票简称:金禄电子;股票代码:301282)，产品广泛应用于汽车电子(智能电动汽车核心部件、传统汽车零部件)、。",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 16.633908117383,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T02:15:47+00:00",
+        "notice_date": "2026-08-15",
+        "operating_cash_flow": -17749616.99,
+        "operating_cash_to_parent_profit": -0.3190377801218647,
+        "parent_profit": 55634843.57,
+        "parent_profit_yoy_pct": 6.255146081447,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 43.466660177033,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ301282&type=web",
+        "stale": false
+      },
+      "industry": "元件",
+      "market": 0,
+      "updated_at": "2026-10-13T02:15:41+00:00"
+    },
     "301291": {
       "company_intro": "广东明阳电气股份有限公司主要从事应用于新能源、新型基础设施等领域的输配电及控制设备的研发、生产和销售。",
       "concepts": [
@@ -23085,13 +23302,13 @@
         "半导体概念"
       ],
       "customer_summary": "深圳强达电路服务于全球超过5000家客户，月出货各类线路板10000余款，深圳强达为客户提供一对一的技术服务、24h在线支持，让客户百分之百的安心和舒心。",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -3.839764713477,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-13T02:15:47+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 13993554.17,
         "operating_cash_to_parent_profit": 0.24271259229612072,
@@ -25411,13 +25628,13 @@
         "参股保险"
       ],
       "customer_summary": "盛和资源以科技创新为依托，以共创共赢为理念，以绿色环保为准则，与合作伙伴一起致力于有序开发全球稀土和“三稀”资源，推动行业良性、绿色发展。",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 141.231820534558,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T06:06:13+00:00",
+        "fetched_at": "2026-10-13T02:15:47+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": -637686864.14,
         "operating_cash_to_parent_profit": -0.7192371563740354,
@@ -42447,13 +42664,13 @@
         "股权分散"
       ],
       "customer_summary": "提供速率涵盖155Mbps~800Gbps的QSFP-DD、QSFP112、QSFP56、QSFP28、SFP28、SFP+等光模块高速收发芯片解决方案;拥有从芯片级、器件级、模块级、终端级、。",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 31.294605996752,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T01:40:51+00:00",
+        "fetched_at": "2026-10-13T02:15:47+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": 54644073.34,
         "operating_cash_to_parent_profit": 0.9080524263833354,
@@ -42712,5 +42929,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T02:10:43+00:00"
+  "updated_at": "2026-10-13T02:15:41+00:00"
 }
