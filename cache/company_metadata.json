@@ -19084,6 +19084,37 @@
       "market": 0,
       "updated_at": "2026-09-08T01:30:44+00:00"
     },
+    "300802": {
+      "company_intro": "上海矩子科技股份有限公司主营业务为智能设备及组件的研发、生产和销售，主要产品包括机器视觉设备、控制线缆组件、控制单元及设备。",
+      "concepts": [
+        "创投",
+        "LED概念",
+        "光伏概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 20.332275261175,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T03:00:58+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 19412578.16,
+        "operating_cash_to_parent_profit": 0.3119828914539315,
+        "parent_profit": 62223213.81,
+        "parent_profit_yoy_pct": 24.191428588656,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 22.237485979772,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300802&type=web",
+        "stale": false
+      },
+      "industry": "自动化设备",
+      "market": 0,
+      "updated_at": "2026-10-13T03:00:55+00:00"
+    },
     "300810": {
       "company_intro": "专注于高性能信号处理平台、声纳系统、仿真系统和大数据应用等产品的研制开发。",
       "concepts": [],
@@ -19484,13 +19515,13 @@
         "旅游概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -67.41131188528,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T01:31:40+00:00",
+        "fetched_at": "2026-10-13T03:00:58+00:00",
         "notice_date": "2026-08-18",
         "operating_cash_flow": 37272371.21,
         "operating_cash_to_parent_profit": 10.130868829058135,
@@ -21122,13 +21153,13 @@
         "稀土永磁"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -26.509455170813,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T06:16:11+00:00",
+        "fetched_at": "2026-10-13T03:00:58+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 46561059.18,
         "operating_cash_to_parent_profit": 1.2091371512196984,
@@ -43544,5 +43575,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T02:50:47+00:00"
+  "updated_at": "2026-10-13T03:00:55+00:00"
 }
