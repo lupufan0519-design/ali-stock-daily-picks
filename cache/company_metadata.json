@@ -29484,13 +29484,13 @@
         "苹果概念"
       ],
       "customer_summary": "已经成为多家国际消费电子品牌商的稀土永磁材料应用器件供应商。",
-      "financial_as_of": "2026-09-23",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -148.817288902065,
-        "as_of": "2026-09-23",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-09-23T01:30:55+00:00",
+        "fetched_at": "2026-10-13T06:01:05+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": 83818197.99,
         "operating_cash_to_parent_profit": null,
@@ -51913,18 +51913,18 @@
     "688702": {
       "company_intro": "主营业务为以太网交换芯片及配套产品的研发、设计和销售。",
       "concepts": [
-        "工业互联网",
         "国产芯片",
-        "半导体概念"
+        "半导体概念",
+        "数据中心"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-23",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 42.33171068352,
-        "as_of": "2026-09-23",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-09-23T01:30:55+00:00",
+        "fetched_at": "2026-10-13T06:01:05+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": -327250128.27,
         "operating_cash_to_parent_profit": null,
@@ -51939,7 +51939,7 @@
       },
       "industry": "半导体",
       "market": 1,
-      "updated_at": "2026-08-25T02:10:46+00:00"
+      "updated_at": "2026-10-13T06:01:01+00:00"
     },
     "688708": {
       "company_intro": "是国内知名的电磁功能材料与结构提供商。",
@@ -53136,5 +53136,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T05:50:43+00:00"
+  "updated_at": "2026-10-13T06:01:01+00:00"
 }
