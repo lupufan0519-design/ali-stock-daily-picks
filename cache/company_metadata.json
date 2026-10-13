@@ -98,13 +98,13 @@
         "电商概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-23",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 23.555247751886,
-        "as_of": "2026-09-23",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-23T01:30:55+00:00",
+        "fetched_at": "2026-10-13T03:15:40+00:00",
         "notice_date": "2026-08-21",
         "operating_cash_flow": 383972620.4,
         "operating_cash_to_parent_profit": 3.8204569496193312,
@@ -17141,13 +17141,13 @@
         "大数据"
       ],
       "customer_summary": "新疆熙菱信息技术股份有限公司(股票代码:300588)是一家专注于大数据智能应用服务的国家级专精特新“小巨人”企业、“中国大数据50强”企业，也是新疆首批在A股上市的信息化软件高新技术企业，深。",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -14.566039057408,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-09T05:10:46+00:00",
+        "fetched_at": "2026-10-13T03:15:40+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": -45481774.92,
         "operating_cash_to_parent_profit": null,
