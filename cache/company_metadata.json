@@ -7797,9 +7797,28 @@
         "西部大开发"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 770.087742013021,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T01:40:51+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": -156785010.72,
+        "operating_cash_to_parent_profit": -2.111017152890468,
+        "parent_profit": 74269889.52,
+        "parent_profit_yoy_pct": 235.307923503077,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 38.206439516649,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002428&type=web",
+        "stale": false
+      },
       "industry": "小金属",
       "market": 0,
-      "updated_at": "2026-09-04T01:30:50+00:00"
+      "updated_at": "2026-10-13T01:40:48+00:00"
     },
     "002437": {
       "company_intro": "誉衡药业(股票代码:002437)自2010年上市以来，坚持“产品领先”战略。",
@@ -8837,13 +8856,13 @@
         "央国企改革"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -80.322174873994,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T01:36:19+00:00",
+        "fetched_at": "2026-10-13T01:40:51+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": -155725713.01,
         "operating_cash_to_parent_profit": -20.917750247286367,
@@ -13085,13 +13104,13 @@
         "油气设服"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-22",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -328.903956215481,
-        "as_of": "2026-09-22",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "fetched_at": "2026-10-13T01:40:51+00:00",
         "notice_date": "2026-08-22",
         "operating_cash_flow": -2639481.64,
         "operating_cash_to_parent_profit": null,
@@ -17720,6 +17739,36 @@
       "market": 0,
       "updated_at": "2026-09-03T01:30:44+00:00"
     },
+    "300727": {
+      "company_intro": "公司致力于有机硅新材料和纺织化学品系列产品的研发、生产及应用。",
+      "concepts": [
+        "有机硅概念",
+        "液冷服务器"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -34.968316444074,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T01:40:51+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 81110767.93,
+        "operating_cash_to_parent_profit": 2.0090399578984313,
+        "parent_profit": 40372899.31,
+        "parent_profit_yoy_pct": -30.08771677067,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 19.934363893593,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300727&type=web",
+        "stale": false
+      },
+      "industry": "化学制品",
+      "market": 0,
+      "updated_at": "2026-10-13T01:40:48+00:00"
+    },
     "300731": {
       "company_intro": "深圳科创新源新材料股份有限公司是国内外领先的高分子材料应用开发整体解决方案提供商。",
       "concepts": [
@@ -21415,6 +21464,37 @@
       "market": 0,
       "updated_at": "2026-09-30T01:50:50+00:00"
     },
+    "301321": {
+      "company_intro": "可为系统厂、整机厂等客户提供车载显示产品一站式综合解决方案。",
+      "concepts": [
+        "虚拟现实",
+        "小米概念",
+        "OLED"
+      ],
+      "customer_summary": "作为显示面板重要合作伙伴，公司拥有包括京东方、华星光电、群创光电、天马、惠科等知名面板企业客户，并取得了众多境内外知名消费电子生产企业、汽车生产企业和VR生产企业等终端客户的认可，公司积极投身。",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 151.026102194914,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T01:40:51+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": 164919099.74,
+        "operating_cash_to_parent_profit": 8.200824394709583,
+        "parent_profit": 20110063.55,
+        "parent_profit_yoy_pct": 176.031560600314,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 29.364257541718,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ301321&type=web",
+        "stale": false
+      },
+      "industry": "光学光电子",
+      "market": 0,
+      "updated_at": "2026-10-13T01:40:48+00:00"
+    },
     "301327": {
       "company_intro": "深圳市华宝新能源股份有限公司开创了SolarGenerator光充户外电源、一体化阳台光储家庭绿电系统和光伏瓦家庭绿电系统。",
       "concepts": [
@@ -22824,13 +22904,13 @@
         "小米汽车"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -126.92622153574,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-09T06:20:51+00:00",
+        "fetched_at": "2026-10-13T01:40:51+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": 401096223.23,
         "operating_cash_to_parent_profit": null,
@@ -24151,6 +24231,37 @@
       "market": 1,
       "updated_at": "2026-08-25T05:25:40+00:00"
     },
+    "600255": {
+      "company_intro": "公司主要从事铜及铜合金板材、带材、线材、辐照交联电缆、特种电缆等产品的生产、开发与销售。",
+      "concepts": [
+        "新材料",
+        "央国企改革",
+        "铜缆高速连接"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 170.718458737946,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T01:40:51+00:00",
+        "notice_date": "2026-08-11",
+        "operating_cash_flow": -385136037.28,
+        "operating_cash_to_parent_profit": -9.038319936649891,
+        "parent_profit": 42611463.19,
+        "parent_profit_yoy_pct": 115.971781385433,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 25.546802577997,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600255&type=web",
+        "stale": false
+      },
+      "industry": "金属新材料",
+      "market": 1,
+      "updated_at": "2026-10-13T01:40:48+00:00"
+    },
     "600258": {
       "company_intro": "主要从事酒店运营管理及景区、旅行社等经营活动。",
       "concepts": [
@@ -24481,13 +24592,13 @@
         "央国企改革"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 25.071530336037,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-09T01:31:40+00:00",
+        "fetched_at": "2026-10-13T01:40:51+00:00",
         "notice_date": "2026-08-18",
         "operating_cash_flow": 254199851.91,
         "operating_cash_to_parent_profit": null,
@@ -26686,13 +26797,13 @@
         "央国企改革"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 216.190918346416,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T06:45:48+00:00",
+        "fetched_at": "2026-10-13T01:40:51+00:00",
         "notice_date": "2026-08-22",
         "operating_cash_flow": 7354813.47,
         "operating_cash_to_parent_profit": 3.586958002021037,
@@ -36130,13 +36241,13 @@
         "辅助生殖"
       ],
       "customer_summary": "公司多肽制剂产品注射用恩夫韦肽和卡贝缩宫素注射液为国内首仿多肽药物;比伐芦定、利拉鲁肽、胸腺法新、艾替班特、恩夫韦肽等合成难度较大的仿制原料药已出口至欧美、印度、韩国等国际市场，终端客户包括费。",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 50.185257972425,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T05:25:53+00:00",
+        "fetched_at": "2026-10-13T01:40:51+00:00",
         "notice_date": "2026-08-20",
         "operating_cash_flow": 87225669.48,
         "operating_cash_to_parent_profit": 0.6451888611374893,
@@ -41989,5 +42100,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T01:35:37+00:00"
+  "updated_at": "2026-10-13T01:40:48+00:00"
 }
