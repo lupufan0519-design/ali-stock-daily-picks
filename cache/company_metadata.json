@@ -47347,13 +47347,13 @@
         "减速器"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -193.496868943269,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-09T01:31:40+00:00",
+        "fetched_at": "2026-10-13T06:50:44+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": -233364706.45,
         "operating_cash_to_parent_profit": null,
