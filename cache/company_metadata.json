@@ -51078,6 +51078,37 @@
       "market": 1,
       "updated_at": "2026-09-29T16:22:36+00:00"
     },
+    "688618": {
+      "company_intro": "为客户提供从售前、售中到售后一站式服务。",
+      "concepts": [
+        "深圳特区",
+        "国产软件",
+        "人工智能"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -141.575663852772,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-13T06:10:49+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 8111232.11,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -381642.72,
+        "parent_profit_yoy_pct": -102.380750822823,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -10.335220362465,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688618&type=web",
+        "stale": false
+      },
+      "industry": "通信设备",
+      "market": 1,
+      "updated_at": "2026-10-13T06:10:47+00:00"
+    },
     "688619": {
       "company_intro": "致力于人工智能产品研发和行业实战应用。",
       "concepts": [
@@ -53136,5 +53167,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T06:01:01+00:00"
+  "updated_at": "2026-10-13T06:10:47+00:00"
 }
