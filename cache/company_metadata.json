@@ -18505,6 +18505,37 @@
       "market": 0,
       "updated_at": "2026-09-30T01:36:06+00:00"
     },
+    "300752": {
+      "company_intro": "致力于成为“全球显示产业的领导者”。",
+      "concepts": [
+        "深圳特区",
+        "量子科技",
+        "虚拟现实"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -50.391667052944,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T02:45:42+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 159372115.56,
+        "operating_cash_to_parent_profit": 6.729540104710398,
+        "parent_profit": 23682467.61,
+        "parent_profit_yoy_pct": -46.530315273294,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 11.861630782774,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300752&type=web",
+        "stale": false
+      },
+      "industry": "光学光电子",
+      "market": 0,
+      "updated_at": "2026-10-13T02:45:40+00:00"
+    },
     "300753": {
       "company_intro": "主要产品包括电子注药泵、微电脑注药泵、一次性注药泵、无线镇痛管理系统、脉搏血氧仪及传感器等疼痛管理领域医疗器械。",
       "concepts": [
@@ -43482,5 +43513,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T02:40:47+00:00"
+  "updated_at": "2026-10-13T02:45:40+00:00"
 }
