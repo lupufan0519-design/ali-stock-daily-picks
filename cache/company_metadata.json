@@ -26774,13 +26774,13 @@
         "旅游概念"
       ],
       "customer_summary": "其中祥源茶业是一家专业化的高品质茶叶产品及相关服务供应商，以生产、运营“祥源茶”品牌系列产品为核心业务，形成了以祁门红茶和武夷岩茶为两大消费茶类，普洱茶、福建白茶、祁门安茶为三大后发酵茶类的产。",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -39.947917772764,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T01:31:40+00:00",
+        "fetched_at": "2026-10-13T02:25:44+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": 120359885.7,
         "operating_cash_to_parent_profit": 2.5906033735040928,
@@ -27466,9 +27466,28 @@
         "央国企改革"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -89.181263612205,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T02:25:44+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 1863972045.83,
+        "operating_cash_to_parent_profit": 18.645983021220992,
+        "parent_profit": 99966413.34,
+        "parent_profit_yoy_pct": -77.865494027078,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -1.784900861454,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600707&type=web",
+        "stale": false
+      },
       "industry": "光学光电子",
       "market": 1,
-      "updated_at": "2026-09-03T01:30:44+00:00"
+      "updated_at": "2026-10-13T02:25:40+00:00"
     },
     "600711": {
       "company_intro": "公司致力于能源金属资源的开发利用，主营业务板块包括能源金属业务、基本金属业务、金属贸易业务及其他。",
@@ -43022,5 +43041,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T02:20:40+00:00"
+  "updated_at": "2026-10-13T02:25:40+00:00"
 }
