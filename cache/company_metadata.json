@@ -1718,6 +1718,37 @@
       "market": 0,
       "updated_at": "2026-10-13T05:10:47+00:00"
     },
+    "000628": {
+      "company_intro": "为高新区产业生态圈构建和高质量发展提供有力支撑。",
+      "concepts": [
+        "工程建设",
+        "参股期货",
+        "成渝特区"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -3.747105537721,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T05:50:50+00:00",
+        "notice_date": "2026-08-24",
+        "operating_cash_flow": 83457202.66,
+        "operating_cash_to_parent_profit": 1.7194859966797993,
+        "parent_profit": 48536133.95,
+        "parent_profit_yoy_pct": -27.474630531107,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -34.401564258546,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000628&type=web",
+        "stale": false
+      },
+      "industry": "房屋建设Ⅱ",
+      "market": 0,
+      "updated_at": "2026-10-13T05:50:43+00:00"
+    },
     "000629": {
       "company_intro": "总部坐落在被誉为“钒钛之都”的四川省攀枝花市。",
       "concepts": [
@@ -3103,13 +3134,13 @@
         "特斯拉概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 3.31930312109,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-13T05:50:50+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": 757594978.77,
         "operating_cash_to_parent_profit": 1.1133428408179074,
@@ -4423,13 +4454,13 @@
         "油气资源"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -243.595686971785,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-13T05:50:50+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": -29646147.14,
         "operating_cash_to_parent_profit": null,
@@ -17244,13 +17275,13 @@
         "虚拟现实"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 222.544050616795,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-13T05:50:50+00:00",
         "notice_date": "2026-08-24",
         "operating_cash_flow": 54346556.87,
         "operating_cash_to_parent_profit": 1.092164162694432,
@@ -19381,6 +19412,37 @@
       "market": 0,
       "updated_at": "2026-10-13T05:20:46+00:00"
     },
+    "300536": {
+      "company_intro": "专心致力于城市节约型园林设计与施工、苗木种植、园林养护等智慧艺术的探寻。",
+      "concepts": [
+        "工程建设",
+        "节能环保",
+        "PPP模式"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -108.102961386435,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-13T05:50:50+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -10428540.01,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -29112420.98,
+        "parent_profit_yoy_pct": -133.187854982214,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 61.367444568862,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300536&type=web",
+        "stale": false
+      },
+      "industry": "IT服务Ⅱ",
+      "market": 0,
+      "updated_at": "2026-10-13T05:50:43+00:00"
+    },
     "300537": {
       "company_intro": "主要产品包括PCB光刻胶、显示光刻胶、半导体光刻胶等各类光刻胶和消费电子涂料、汽车涂料、PVC地板涂料、功能膜材涂料及金属包装涂料各类专。",
       "concepts": [
@@ -19628,6 +19690,37 @@
       "industry": "计算机设备",
       "market": 0,
       "updated_at": "2026-09-29T16:22:36+00:00"
+    },
+    "300553": {
+      "company_intro": "主要产品全自动平衡修正机已广泛应用于家用电器、电动工具和汽车等行业领域。",
+      "concepts": [
+        "军工",
+        "海工装备",
+        "人工智能"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -154.902182380177,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T05:50:50+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 14657831.65,
+        "operating_cash_to_parent_profit": 10.148311859335886,
+        "parent_profit": 1444361.57,
+        "parent_profit_yoy_pct": -93.720411412097,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -6.393065428948,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300553&type=web",
+        "stale": false
+      },
+      "industry": "通用设备",
+      "market": 0,
+      "updated_at": "2026-10-13T05:50:43+00:00"
     },
     "300557": {
       "company_intro": "为石油石化/交通隧道火灾监测、重要场所周界安全防范、大型桥梁健康监测与综合管养、重大装备状态监测与故障诊断、电力设施/电缆廊道综合监测、。",
@@ -23547,6 +23640,37 @@
       "industry": "其他电源设备Ⅱ",
       "market": 0,
       "updated_at": "2026-10-13T05:10:47+00:00"
+    },
+    "300871": {
+      "company_intro": "提供安全可靠好用的动保产品，为动物健康筑就坚实防线，为食品安全提供专业保障。",
+      "concepts": [
+        "医疗器械概念",
+        "农药兽药",
+        "猪肉概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 43.262486788407,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T05:50:50+00:00",
+        "notice_date": "2026-08-15",
+        "operating_cash_flow": 128270559.46,
+        "operating_cash_to_parent_profit": 0.6233982316131863,
+        "parent_profit": 205760223.49,
+        "parent_profit_yoy_pct": 75.59098334115,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 5.197046121931,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300871&type=web",
+        "stale": false
+      },
+      "industry": "动物保健Ⅱ",
+      "market": 0,
+      "updated_at": "2026-10-13T05:50:43+00:00"
     },
     "300873": {
       "company_intro": "为客户提供高精度、高柔性的工业级解决方案。",
@@ -30203,13 +30327,13 @@
         "3D打印"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-01",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -25.037583112452,
-        "as_of": "2026-10-01",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-30T16:21:34+00:00",
+        "fetched_at": "2026-10-13T05:50:50+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 708927967.99,
         "operating_cash_to_parent_profit": 3.536234429427351,
@@ -40947,9 +41071,28 @@
         "降解塑料"
       ],
       "customer_summary": "坚持技术创新和管理创新，致力于成为全球范围内拥有全产业链竞争优势的化工材料制造和服务商，为客户和合作伙伴的事业发展持续贡献力量。",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 10.771949509063,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T05:50:50+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 41636058.55,
+        "operating_cash_to_parent_profit": 0.10702442767573925,
+        "parent_profit": 389033227.78,
+        "parent_profit_yoy_pct": 10.864456282736,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 29.099690733711,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603650&type=web",
+        "stale": false
+      },
       "industry": "橡胶",
       "market": 1,
-      "updated_at": "2026-09-04T01:30:50+00:00"
+      "updated_at": "2026-10-13T05:50:43+00:00"
     },
     "603655": {
       "company_intro": "朗博公司生产的主要产品有车用O型圈及垫圈、轮毂组件、油封、轴封等产品。",
@@ -43013,13 +43156,13 @@
         "储能概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -38.014918652708,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T06:10:58+00:00",
+        "fetched_at": "2026-10-13T05:50:50+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": 45179090.87,
         "operating_cash_to_parent_profit": 1.1086981956831445,
@@ -44865,13 +45008,13 @@
         "特斯拉概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-30",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 27.915295112064,
-        "as_of": "2026-09-30",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-29T16:30:03+00:00",
+        "fetched_at": "2026-10-13T05:50:50+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": -590013929.32,
         "operating_cash_to_parent_profit": -2.2937167334677198,
@@ -45556,6 +45699,37 @@
       "market": 1,
       "updated_at": "2026-10-08T01:56:25+00:00"
     },
+    "688153": {
+      "company_intro": "为用户提供高品质的产品，在最近两年取得显著成效。",
+      "concepts": [
+        "智能穿戴",
+        "5G概念",
+        "小米概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -434.175989450572,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-13T05:50:50+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": -144477195.86,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -95518605.58,
+        "parent_profit_yoy_pct": -912.531630136703,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -1.256071176959,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688153&type=web",
+        "stale": false
+      },
+      "industry": "半导体",
+      "market": 1,
+      "updated_at": "2026-10-13T05:50:43+00:00"
+    },
     "688155": {
       "company_intro": "公司主营各类智能制造装备的研发、生产与销售，其中新能源电池装备占比最大。",
       "concepts": [
@@ -45659,6 +45833,37 @@
       "industry": "生物制品",
       "market": 1,
       "updated_at": "2026-10-13T03:30:54+00:00"
+    },
+    "688165": {
+      "company_intro": "逐步成长为国内知名的机器人以及智能制造解决方案提供商，专注、专业打造全系列机器人产品以及跨行业智能制造解决方案。",
+      "concepts": [
+        "锂电池概念",
+        "央国企改革",
+        "人工智能"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 30.712805709306,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-13T05:50:50+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 27121800.18,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -56925846.4,
+        "parent_profit_yoy_pct": 62.475293812397,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 28.932472733334,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688165&type=web",
+        "stale": false
+      },
+      "industry": "自动化设备",
+      "market": 1,
+      "updated_at": "2026-10-13T05:50:43+00:00"
     },
     "688166": {
       "company_intro": "为患者提供价值卓越的产品。",
@@ -51145,6 +51350,37 @@
       "market": 1,
       "updated_at": "2026-09-03T01:30:44+00:00"
     },
+    "688653": {
+      "company_intro": "我们将持续为不断扩大的客户群体提供优质的解决方案，并将持续秉承“技术为本、精益求精”的理念。",
+      "concepts": [
+        "物联网",
+        "智能家居",
+        "无人机"
+      ],
+      "customer_summary": "我们将持续为不断扩大的客户群体提供优质的解决方案，并将持续秉承“技术为本、精益求精”的理念，努力跻身全球一线射频半导体芯片设计公司之列。",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 142.059666337677,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T05:50:50+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 36792969.78,
+        "operating_cash_to_parent_profit": 1.3371128178155616,
+        "parent_profit": 27516728.05,
+        "parent_profit_yoy_pct": 211.253231709988,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 20.578176463251,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688653&type=web",
+        "stale": false
+      },
+      "industry": "半导体",
+      "market": 1,
+      "updated_at": "2026-10-13T05:50:43+00:00"
+    },
     "688659": {
       "company_intro": "安徽元琛环保科技股份有限公司(股票代码:688659)专注环保新材料技术研发及应用20年。",
       "concepts": [
@@ -52900,5 +53136,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T05:45:46+00:00"
+  "updated_at": "2026-10-13T05:50:43+00:00"
 }
