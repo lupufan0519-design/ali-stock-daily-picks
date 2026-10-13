@@ -2399,6 +2399,37 @@
       "market": 0,
       "updated_at": "2026-08-20T01:35:34+00:00"
     },
+    "000823": {
+      "company_intro": "主要提供元件相关产品与服务。",
+      "concepts": [
+        "参股银行",
+        "苹果概念",
+        "央国企改革"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -2.623376288222,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T01:30:59+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": 235712070.29,
+        "operating_cash_to_parent_profit": 2.0771714682517235,
+        "parent_profit": 113477425.38,
+        "parent_profit_yoy_pct": -1.169689222801,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 10.044792081221,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000823&type=web",
+        "stale": false
+      },
+      "industry": "元件",
+      "market": 0,
+      "updated_at": "2026-10-13T01:30:52+00:00"
+    },
     "000825": {
       "company_intro": "太钢不锈专注发展以不锈钢为主的特殊钢，拥有太原、临沂、天津等不锈钢专业化生产基地。",
       "concepts": [],
@@ -11681,6 +11712,37 @@
       "market": 0,
       "updated_at": "2026-09-23T03:36:04+00:00"
     },
+    "300037": {
+      "company_intro": "新宙邦致力于用电子化学品和功能材料创造美好未来，主要产品有电池化学品、有机氟化学品、电容化学品、半导体化学品等。",
+      "concepts": [
+        "深圳特区",
+        "锂电池概念",
+        "特斯拉概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 107.928558593479,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T01:30:59+00:00",
+        "notice_date": "2026-08-21",
+        "operating_cash_flow": 1126734792.91,
+        "operating_cash_to_parent_profit": 1.1452775346783046,
+        "parent_profit": 983809390.12,
+        "parent_profit_yoy_pct": 103.333814046492,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 75.661099978029,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300037&type=web",
+        "stale": false
+      },
+      "industry": "电池",
+      "market": 0,
+      "updated_at": "2026-10-13T01:30:52+00:00"
+    },
     "300040": {
       "company_intro": "公司通过融合数字技术、电力电子技术和新型能源技术，推动“零碳”技术发展。",
       "concepts": [
@@ -15253,6 +15315,37 @@
       "industry": "IT服务Ⅱ",
       "market": 0,
       "updated_at": "2026-09-29T16:22:36+00:00"
+    },
+    "300442": {
+      "company_intro": "主要提供通信服务相关产品与服务。",
+      "concepts": [
+        "互联网服务",
+        "数据中心",
+        "东数西算"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 37.339458198532,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T01:30:59+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 2958027620.47,
+        "operating_cash_to_parent_profit": 2.4579631777932356,
+        "parent_profit": 1203446677.8,
+        "parent_profit_yoy_pct": 36.426320744972,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 50.054459319584,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300442&type=web",
+        "stale": false
+      },
+      "industry": "通信服务",
+      "market": 0,
+      "updated_at": "2026-10-13T01:30:52+00:00"
     },
     "300444": {
       "company_intro": "主要产品包括环网柜、箱式变电站、柱上开关、高低压成套开关柜、配网自动化监控系统及其他配电自动化设备。",
@@ -29229,13 +29322,13 @@
         "西部大开发"
       ],
       "customer_summary": "金堆城钼业股份有限公司(简称“金钼股份”)是全球钼行业内具有较强影响力的钼专业供应商，为国际钼协会执行理事单位、中国有色金属工业协会钼业分会会长单位，被中国矿业联合会授予“中国钼业之都”称号。",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 29.069827011244,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T01:31:40+00:00",
+        "fetched_at": "2026-10-13T01:30:59+00:00",
         "notice_date": "2026-08-21",
         "operating_cash_flow": 949203711.18,
         "operating_cash_to_parent_profit": 0.5452147058792031,
@@ -35377,16 +35470,35 @@
       "updated_at": "2026-10-09T01:30:51+00:00"
     },
     "688093": {
-      "company_intro": "主要提供其他电子Ⅱ相关产品与服务。",
+      "company_intro": "苏州世华新材料科技股份有限公司是一家从事功能性材料研发、生产及销售的国家级专精特新小巨人企业、国家高新技术企业、科创板上市公司(股票简称。",
       "concepts": [
         "苹果概念",
         "OLED",
         "PCB"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -40.10431604042,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T01:30:59+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 234391119.28,
+        "operating_cash_to_parent_profit": 1.9152460912632185,
+        "parent_profit": 122381724.39,
+        "parent_profit_yoy_pct": -36.610200331367,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -25.011083328123,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688093&type=web",
+        "stale": false
+      },
       "industry": "其他电子Ⅱ",
       "market": 1,
-      "updated_at": "2026-08-27T01:30:46+00:00"
+      "updated_at": "2026-10-13T01:30:52+00:00"
     },
     "688095": {
       "company_intro": "福昕软件自成立以来一直专注版式文档领域，提供全方位、一站式、覆盖文档全生命周期的产品技术与解决方案。",
@@ -38913,6 +39025,37 @@
       "market": 1,
       "updated_at": "2026-09-03T01:30:44+00:00"
     },
+    "688479": {
+      "company_intro": "一直专注于信息技术在汽车行业的应用与服务，是国内领先的汽车行业软件与智能服务提供商。",
+      "concepts": [
+        "国产软件",
+        "人工智能",
+        "信创"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -83.216165606806,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T01:30:59+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": -16950019.26,
+        "operating_cash_to_parent_profit": -1.4531166550771961,
+        "parent_profit": 11664596.37,
+        "parent_profit_yoy_pct": -28.041236385589,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -6.527451597479,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688479&type=web",
+        "stale": false
+      },
+      "industry": "软件开发",
+      "market": 1,
+      "updated_at": "2026-10-13T01:30:52+00:00"
+    },
     "688480": {
       "company_intro": "赛恩斯环保股份有限公司是一家专业从事重金属污染防治的高新技术企业，以成为重金属污染防治领域的领航者为核心发展目标。",
       "concepts": [
@@ -39760,13 +39903,13 @@
         "医疗器械概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-23",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -81.168383553227,
-        "as_of": "2026-09-23",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-23T01:30:55+00:00",
+        "fetched_at": "2026-10-13T01:30:59+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": -18209215.68,
         "operating_cash_to_parent_profit": -1.2894644021193329,
@@ -39781,7 +39924,7 @@
       },
       "industry": "通用设备",
       "market": 1,
-      "updated_at": "2026-09-10T01:40:40+00:00"
+      "updated_at": "2026-10-13T01:30:52+00:00"
     },
     "688584": {
       "company_intro": "主要产品为半导体硅外延片。",
@@ -41274,13 +41417,13 @@
         "CPO概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 944.345979577163,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T06:16:11+00:00",
+        "fetched_at": "2026-10-13T01:30:59+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 548469380.63,
         "operating_cash_to_parent_profit": 0.9670905604429721,
@@ -41508,5 +41651,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-12T19:34:11+00:00"
+  "updated_at": "2026-10-13T01:30:52+00:00"
 }
