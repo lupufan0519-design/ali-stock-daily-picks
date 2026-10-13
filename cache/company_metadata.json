@@ -10443,13 +10443,13 @@
         "超导概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 6.459014789308,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-13T02:35:44+00:00",
         "notice_date": "2026-08-18",
         "operating_cash_flow": 105310722.94,
         "operating_cash_to_parent_profit": 0.7644207914565343,
@@ -21185,13 +21185,13 @@
         "PCB"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 216.637734823046,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-13T02:35:44+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": -287582404.77,
         "operating_cash_to_parent_profit": -13.374707840151945,
@@ -32614,6 +32614,37 @@
       "market": 1,
       "updated_at": "2026-09-23T03:36:04+00:00"
     },
+    "603386": {
+      "company_intro": "公司专注新产品技术创新，打造行业独树一帜的技术研发工厂，不同类别的产品有专门的研发团队。",
+      "concepts": [
+        "医疗器械概念",
+        "小米概念",
+        "华为概念"
+      ],
+      "customer_summary": "目前在华南地区(广东深圳、惠州、珠海)、华中地区(湖南长沙、江西龙南)、华东地区(安徽广德)建有六大生产基地，业务范围涵盖“特种PCB”、“高多层PCB样板快板”、“中小批量PCB”、“大批量。",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -148.447717853122,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-13T02:35:44+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 19314425.48,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -8441298.68,
+        "parent_profit_yoy_pct": -122.137831205566,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 6.733622319244,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603386&type=web",
+        "stale": false
+      },
+      "industry": "元件",
+      "market": 1,
+      "updated_at": "2026-10-13T02:35:41+00:00"
+    },
     "603392": {
       "company_intro": "致力于将生物技术成果转化为优质产品服务于社会大众。",
       "concepts": [
@@ -34752,9 +34783,28 @@
         "5G概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -390.793095895556,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-13T02:35:44+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 49223175.02,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -51290208.64,
+        "parent_profit_yoy_pct": -235.350390055714,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 9.349790618592,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603936&type=web",
+        "stale": false
+      },
       "industry": "元件",
       "market": 1,
-      "updated_at": "2026-09-07T01:30:45+00:00"
+      "updated_at": "2026-10-13T02:35:41+00:00"
     },
     "603938": {
       "company_intro": "唐山三孚硅业股份有限公司是一家资源综合利用，产业循环发展的高科技化工企业。",
@@ -43072,5 +43122,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T02:30:55+00:00"
+  "updated_at": "2026-10-13T02:35:41+00:00"
 }
