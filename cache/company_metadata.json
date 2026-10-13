@@ -1389,6 +1389,37 @@
       "market": 0,
       "updated_at": "2026-09-29T16:22:36+00:00"
     },
+    "000608": {
+      "company_intro": "公司较早专注于商业地产项目的持有、开发、招商和运营，同时涉足高端住宅、酒店、写字楼、城市综合体的开发与经营。",
+      "concepts": [
+        "西部大开发",
+        "租售同权",
+        "算力概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -37.829694389044,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-13T02:50:51+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -82499482.63,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -51929851.02,
+        "parent_profit_yoy_pct": -32.50339877615,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -10.82642508186,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000608&type=web",
+        "stale": false
+      },
+      "industry": "房地产开发",
+      "market": 0,
+      "updated_at": "2026-10-13T02:50:47+00:00"
+    },
     "000617": {
       "company_intro": "中国石油集团资本股份有限公司作为中国石油天然气集团有限公司金融业务管理的专业化公司。",
       "concepts": [
@@ -43513,5 +43544,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T02:45:40+00:00"
+  "updated_at": "2026-10-13T02:50:47+00:00"
 }
