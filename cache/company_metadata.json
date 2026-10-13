@@ -16300,13 +16300,13 @@
         "LED概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -48.002025986652,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T06:16:11+00:00",
+        "fetched_at": "2026-10-13T05:15:51+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": -59770844.65,
         "operating_cash_to_parent_profit": -0.700120774069919,
@@ -19926,12 +19926,31 @@
       "concepts": [
         "新材料",
         "OLED",
-        "国产芯片"
+        "华为概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 17.147686997507,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T05:15:51+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 328776566.4,
+        "operating_cash_to_parent_profit": 0.609190412759674,
+        "parent_profit": 539694255.71,
+        "parent_profit_yoy_pct": 113.614660885001,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 30.678380968998,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300666&type=web",
+        "stale": false
+      },
       "industry": "半导体",
       "market": 0,
-      "updated_at": "2026-09-03T01:30:44+00:00"
+      "updated_at": "2026-10-13T05:15:47+00:00"
     },
     "300668": {
       "company_intro": "为大型综合性复杂项目提供全链条、多专业整合一体化设计服务。",
@@ -26759,13 +26778,13 @@
         "工业母机"
       ],
       "customer_summary": "PrismarkPartnersLLC(独立第三方顾问公司)的最新研究报告显示，2020年鼎泰高科的PCB钻针销量跃踞全球第一位，全球市场占有率19%，成为线路板行业微钻领域全球龙头供应商。",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 353.277417549201,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-13T05:15:51+00:00",
         "notice_date": "2026-08-20",
         "operating_cash_flow": -45475718.67,
         "operating_cash_to_parent_profit": -0.06696159717167083,
@@ -32505,13 +32524,13 @@
         "锂电池概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -23.982288348044,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-13T05:15:51+00:00",
         "notice_date": "2026-08-18",
         "operating_cash_flow": 2512140048.78,
         "operating_cash_to_parent_profit": 6.453595459026701,
@@ -50813,5 +50832,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T05:10:47+00:00"
+  "updated_at": "2026-10-13T05:15:47+00:00"
 }
