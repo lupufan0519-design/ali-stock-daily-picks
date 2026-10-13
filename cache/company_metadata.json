@@ -222,13 +222,13 @@
         "猪肉概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-23",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -294.881607832151,
-        "as_of": "2026-09-23",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-09-23T03:37:52+00:00",
+        "fetched_at": "2026-10-13T02:05:45+00:00",
         "notice_date": "2026-08-24",
         "operating_cash_flow": 40518058.43,
         "operating_cash_to_parent_profit": null,
@@ -8616,13 +8616,13 @@
         "一带一路"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 494.964229494474,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-13T02:05:45+00:00",
         "notice_date": "2026-08-22",
         "operating_cash_flow": 69588211.81,
         "operating_cash_to_parent_profit": 0.5117850250659651,
@@ -15152,6 +15152,37 @@
       "market": 0,
       "updated_at": "2026-09-07T01:30:45+00:00"
     },
+    "300400": {
+      "company_intro": "一直秉持着“专注持久分享”的企业理念，“诚实整洁强健”的企业精神，竭力为客户提供SMT&THT智能制造解决方案。",
+      "concepts": [
+        "深圳特区",
+        "智能穿戴",
+        "特斯拉概念"
+      ],
+      "customer_summary": "深圳市劲拓自动化设备股份有限公司成立于1997年，2004年完成股份制改革，2010年获颁“国家高新技术企业”，并于2014年在深圳创业板上市(股票代码300400)，是一家集研发、生产、销售。",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 5.728193881274,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T02:05:45+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 38381317.0,
+        "operating_cash_to_parent_profit": 0.6681005028412265,
+        "parent_profit": 57448418.07,
+        "parent_profit_yoy_pct": 7.675317558756,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 13.344325875861,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300400&type=web",
+        "stale": false
+      },
+      "industry": "自动化设备",
+      "market": 0,
+      "updated_at": "2026-10-13T02:05:42+00:00"
+    },
     "300408": {
       "company_intro": "致力于为客户需求提供解决方案，为员工成长搭建发展平台，为股东投资创造增值回报。",
       "concepts": [
@@ -16669,9 +16700,28 @@
         "5G概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": -2.553393579997,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T02:05:45+00:00",
+        "notice_date": "2026-08-15",
+        "operating_cash_flow": -72626209.38,
+        "operating_cash_to_parent_profit": -0.4119125901069741,
+        "parent_profit": 176314614.13,
+        "parent_profit_yoy_pct": 1.706144118992,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 20.813089898571,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300570&type=web",
+        "stale": false
+      },
       "industry": "通信设备",
       "market": 0,
-      "updated_at": "2026-09-07T01:30:45+00:00"
+      "updated_at": "2026-10-13T02:05:42+00:00"
     },
     "300571": {
       "company_intro": "公司目前的主营业务以智慧家庭业务为主，5G通信业务为辅。",
@@ -31416,6 +31466,36 @@
       "market": 1,
       "updated_at": "2026-08-25T05:10:43+00:00"
     },
+    "603257": {
+      "company_intro": "为境内外有色金属采矿、选矿、冶炼及加工领域客户提供涵盖设计咨询、总承包、装备集成、数智转型等全链条技术解决方案及全过程服务;同时积极拓展。",
+      "concepts": [
+        "黄金概念",
+        "一带一路"
+      ],
+      "customer_summary": "中国瑞林始终秉承“专业、信誉、创新、合作”的价值观和“成就客户、成就员工”的经营理念，坚持技术驱动的定位，致力成为全球有色行业具有自主知识产权和核心竞争力的技术解决方案服务商及专有技术产品化智。",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 32.633091405825,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T02:05:45+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": -97650509.75,
+        "operating_cash_to_parent_profit": -1.029851848368322,
+        "parent_profit": 94819958.72,
+        "parent_profit_yoy_pct": 26.856043164802,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -25.276398793874,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603257&type=web",
+        "stale": false
+      },
+      "industry": "工程咨询服务Ⅱ",
+      "market": 1,
+      "updated_at": "2026-10-13T02:05:42+00:00"
+    },
     "603260": {
       "company_intro": "合盛硅业致力于科技创新、数字智造、绿色发展，专注于人才建设、流程变革、组织升级。",
       "concepts": [
@@ -32050,6 +32130,37 @@
       "industry": "食品加工",
       "market": 1,
       "updated_at": "2026-08-26T01:50:38+00:00"
+    },
+    "603353": {
+      "company_intro": "主营业务为加油站零售连锁经营、成品油仓储、物流配送、批发，在成品油流通领域形成完整产业链。",
+      "concepts": [
+        "华为概念",
+        "国产芯片",
+        "半导体概念"
+      ],
+      "customer_summary": "公司已组建了熟悉行业运营的专业化团队，通过综合分析确定目标市场，已经筛选出足够的优质合作伙伴;通过专业化、标准化运营管理赋能合作伙伴，实现团队本地化运营确保企业健康快速发展。",
+      "financial_as_of": "2026-10-13",
+      "financials": {
+        "adjusted_profit_yoy_pct": 281.46073186092,
+        "as_of": "2026-10-13",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-13T02:05:45+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 94796019.73,
+        "operating_cash_to_parent_profit": 1.1624244394351428,
+        "parent_profit": 81550263.84,
+        "parent_profit_yoy_pct": 480.476103821122,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -6.048200215209,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603353&type=web",
+        "stale": false
+      },
+      "industry": "炼化及贸易",
+      "market": 1,
+      "updated_at": "2026-10-13T02:05:42+00:00"
     },
     "603370": {
       "company_intro": "公司主要产品为各类精密冲压铁芯及铁芯生产相关的精密冲压模具。",
@@ -32863,13 +32974,13 @@
         "人工智能"
       ],
       "customer_summary": "2018年12月，江苏利通成功登陆上交所主板市场，实现发展历程中又一次成功转型，主要服务于海信、TCL、三星、索尼、康佳、创维、海尔、长虹、高创等知名电视机整机企业。",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 1088.94980206613,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T05:30:59+00:00",
+        "fetched_at": "2026-10-13T02:05:45+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": 2573219134.54,
         "operating_cash_to_parent_profit": 3.6633941826008134,
@@ -36246,13 +36357,13 @@
         "天然气"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-08",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": -73.496001598644,
-        "as_of": "2026-10-08",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T01:59:02+00:00",
+        "fetched_at": "2026-10-13T02:05:45+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": 214671354.89,
         "operating_cash_to_parent_profit": 3.161889842976806,
@@ -39987,13 +40098,13 @@
         "增强现实"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-13",
       "financials": {
         "adjusted_profit_yoy_pct": 457.767777488416,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-13",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-13T02:05:45+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": -23636325.28,
         "operating_cash_to_parent_profit": -0.051264558415132604,
@@ -42315,5 +42426,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-13T02:01:03+00:00"
+  "updated_at": "2026-10-13T02:05:42+00:00"
 }
