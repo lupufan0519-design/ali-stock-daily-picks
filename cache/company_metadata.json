@@ -19636,9 +19636,28 @@
         "智能穿戴"
       ],
       "customer_summary": "润欣拥有经验丰富的技术团队、优秀的供应商及客户资源。",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": 62.699326818413,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-14T02:45:50+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -1058202.09,
+        "operating_cash_to_parent_profit": -0.022890532146227317,
+        "parent_profit": 46228811.25,
+        "parent_profit_yoy_pct": 54.438036103728,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 1.793038033795,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300493&type=web",
+        "stale": false
+      },
       "industry": "其他电子Ⅱ",
       "market": 0,
-      "updated_at": "2026-08-25T02:00:50+00:00"
+      "updated_at": "2026-10-14T02:45:47+00:00"
     },
     "300496": {
       "company_intro": "中科创达软件股份有限公司作为全球领先的智能操作系统产品和技术提供商，自2008年成立以来。",
@@ -55253,5 +55272,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-14T02:40:45+00:00"
+  "updated_at": "2026-10-14T02:45:47+00:00"
 }
