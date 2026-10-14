@@ -9599,6 +9599,37 @@
       "market": 0,
       "updated_at": "2026-09-30T01:50:50+00:00"
     },
+    "002458": {
+      "company_intro": "山东益生种畜禽股份有限公司始建于1989年，总部位于山东省烟台市。",
+      "concepts": [
+        "猪肉概念",
+        "鸡肉概念",
+        "乳业"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": 9002.54799737611,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-14T03:05:46+00:00",
+        "notice_date": "2026-07-23",
+        "operating_cash_flow": 460504034.29,
+        "operating_cash_to_parent_profit": 1.4971520009731,
+        "parent_profit": 307586693.93,
+        "parent_profit_yoy_pct": 4897.29305801646,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 28.436269038649,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002458&type=web",
+        "stale": false
+      },
+      "industry": "养殖业",
+      "market": 0,
+      "updated_at": "2026-10-14T03:05:42+00:00"
+    },
     "002459": {
       "company_intro": "晶澳太阳能科技股份有限公司(简称“晶澳科技”)，是全球客户信赖的绿色能源解决方案合作伙伴。",
       "concepts": [
@@ -55272,5 +55303,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-14T02:45:47+00:00"
+  "updated_at": "2026-10-14T03:05:42+00:00"
 }
