@@ -5253,13 +5253,13 @@
         "央国企改革"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -54.574731666477,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:12:00+00:00",
+        "fetched_at": "2026-10-14T01:55:50+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": -130192972.65,
         "operating_cash_to_parent_profit": -2.654460549998364,
@@ -5461,6 +5461,36 @@
       "industry": "IT服务Ⅱ",
       "market": 0,
       "updated_at": "2026-09-29T16:22:36+00:00"
+    },
+    "002066": {
+      "company_intro": "主要提供装修建材相关产品与服务。",
+      "concepts": [
+        "新材料",
+        "央国企改革"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": -251.701110498317,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-14T01:55:50+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": -176833429.94,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -20914250.63,
+        "parent_profit_yoy_pct": -192.542615365893,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -7.343018101303,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002066&type=web",
+        "stale": false
+      },
+      "industry": "装修建材",
+      "market": 0,
+      "updated_at": "2026-10-14T01:55:46+00:00"
     },
     "002067": {
       "company_intro": "致力于成为一家中国最优秀、最专业的纸品供应商。",
@@ -14012,6 +14042,37 @@
       "market": 0,
       "updated_at": "2026-08-25T01:50:38+00:00"
     },
+    "003033": {
+      "company_intro": "青岛征和工业股份有限公司(QingdaoChohoIndustrialCo.。",
+      "concepts": [
+        "机器人概念",
+        "机器人执行器",
+        "人形机器人"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": 5.975545356943,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-14T01:55:50+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 73289837.88,
+        "operating_cash_to_parent_profit": 1.0458223437303518,
+        "parent_profit": 70078669.02,
+        "parent_profit_yoy_pct": -21.261446588963,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 8.09855365407,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ003033&type=web",
+        "stale": false
+      },
+      "industry": "摩托车及其他",
+      "market": 0,
+      "updated_at": "2026-10-14T01:55:46+00:00"
+    },
     "003036": {
       "company_intro": "一向致力于打造数字化、自动化、智能化的高端纺织机械装备。",
       "concepts": [
@@ -15300,6 +15361,37 @@
       "industry": "其他电源设备Ⅱ",
       "market": 0,
       "updated_at": "2026-10-14T01:30:49+00:00"
+    },
+    "300109": {
+      "company_intro": "公司目前拥有精细化工和精准医疗两大业务板块:精细化工业务主要包括聚乙烯吡咯烷酮(PVP)及欧瑞姿(PVM/MA)两大系列产品的生产、销售。",
+      "concepts": [
+        "新能源",
+        "基因测序",
+        "精准医疗"
+      ],
+      "customer_summary": "秉承“用心创新”的企业精神以及“服务客户，成就员工，回报股东，造福社会”的企业价值观，新开源集团坚持长期主义，已由一家区域性小化工厂，成长为一家有国际影响力、可持续发展的控股公司。",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": -13.969178221973,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-14T01:55:50+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 100262174.33,
+        "operating_cash_to_parent_profit": 0.9925682546869522,
+        "parent_profit": 101012876.3,
+        "parent_profit_yoy_pct": -27.306224213461,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 5.294874187392,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300109&type=web",
+        "stale": false
+      },
+      "industry": "化学制品",
+      "market": 0,
+      "updated_at": "2026-10-14T01:55:46+00:00"
     },
     "300112": {
       "company_intro": "作为中国过程自动化仪表新技术的领先提供商，万讯始终秉承“与您共享世界新技术成果”的经营理念。",
@@ -17010,13 +17102,13 @@
         "3D打印"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 12.538080371521,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:12:00+00:00",
+        "fetched_at": "2026-10-14T01:55:50+00:00",
         "notice_date": "2026-08-06",
         "operating_cash_flow": 455673130.71,
         "operating_cash_to_parent_profit": 1.2561401186792642,
@@ -21156,13 +21248,13 @@
         "华为概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 17.147686997507,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:15:51+00:00",
+        "fetched_at": "2026-10-14T01:55:50+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": 328776566.4,
         "operating_cash_to_parent_profit": 0.609190412759674,
@@ -44177,13 +44269,13 @@
         "3D打印"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 31.085332452034,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:26:10+00:00",
+        "fetched_at": "2026-10-14T01:55:50+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": -49601886.72,
         "operating_cash_to_parent_profit": -0.365798851038303,
@@ -47731,14 +47823,33 @@
     "688253": {
       "company_intro": "持续提供精准、快速、便捷的诊断服务，致力于成为医疗诊断创新的中坚力量。",
       "concepts": [
+        "脑机接口",
         "体外诊断概念",
-        "流感",
-        "幽门螺杆菌概念"
+        "流感"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": -82.314506562221,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-14T01:55:50+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -62378584.47,
+        "operating_cash_to_parent_profit": -2.004719720269113,
+        "parent_profit": 31115863.15,
+        "parent_profit_yoy_pct": -75.12119853267,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -49.091188065192,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688253&type=web",
+        "stale": false
+      },
       "industry": "医疗器械",
       "market": 1,
-      "updated_at": "2026-08-26T01:30:45+00:00"
+      "updated_at": "2026-10-14T01:55:46+00:00"
     },
     "688256": {
       "company_intro": "寒武纪提供云边端一体、软硬件协同、训练推理融合、具备统一生态的系列化智能芯片产品和平台化基础系统软件。",
@@ -54083,5 +54194,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-14T01:50:47+00:00"
+  "updated_at": "2026-10-14T01:55:46+00:00"
 }
