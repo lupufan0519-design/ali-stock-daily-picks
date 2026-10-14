@@ -284,13 +284,13 @@
         "苹果概念"
       ],
       "customer_summary": "公司致力于不断创新，更好地服务客户与应用领域的差异化需求。",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -250.732379094471,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-13T05:12:00+00:00",
+        "fetched_at": "2026-10-14T05:05:41+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": 2631019304.2,
         "operating_cash_to_parent_profit": null,
