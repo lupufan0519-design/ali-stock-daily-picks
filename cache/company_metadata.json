@@ -17546,13 +17546,13 @@
         "电商概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 103.935633234035,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:12:00+00:00",
+        "fetched_at": "2026-10-14T03:25:42+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 416079908.8,
         "operating_cash_to_parent_profit": 2.4009072670945755,
