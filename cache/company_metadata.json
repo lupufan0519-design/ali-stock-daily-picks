@@ -873,13 +873,13 @@
         "小金属概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -9.664846433866,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-13T05:12:00+00:00",
+        "fetched_at": "2026-10-14T02:15:52+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": 9697261.47,
         "operating_cash_to_parent_profit": null,
@@ -15945,13 +15945,13 @@
         "数据中心"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 131.840687461433,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:21:12+00:00",
+        "fetched_at": "2026-10-14T02:15:52+00:00",
         "notice_date": "2026-08-20",
         "operating_cash_flow": 47304327.75,
         "operating_cash_to_parent_profit": 0.8510436800106058,
@@ -21095,6 +21095,37 @@
       "industry": "电机Ⅱ",
       "market": 0,
       "updated_at": "2026-08-27T01:30:46+00:00"
+    },
+    "300627": {
+      "company_intro": "向社会提供更多优质产品和解决方案。",
+      "concepts": [
+        "卫星导航",
+        "无人机",
+        "智能驾驶"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": -9.066351690015,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-14T02:15:52+00:00",
+        "notice_date": "2026-08-14",
+        "operating_cash_flow": 51910848.2,
+        "operating_cash_to_parent_profit": 0.15581470690874957,
+        "parent_profit": 333157564.07,
+        "parent_profit_yoy_pct": 2.049038262439,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 5.202659095729,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300627&type=web",
+        "stale": false
+      },
+      "industry": "通信设备",
+      "market": 0,
+      "updated_at": "2026-10-14T02:15:49+00:00"
     },
     "300632": {
       "company_intro": "厦门光莆电子股份有限公司1994年诞生于厦门，2017年登陆深交所创业板(股票代码:300632)。",
@@ -42788,13 +42819,13 @@
         "电商概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 11.94695485401,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T05:15:47+00:00",
+        "fetched_at": "2026-10-14T02:15:52+00:00",
         "notice_date": "2026-08-31",
         "operating_cash_flow": 417165595.01,
         "operating_cash_to_parent_profit": 0.7720270115943265,
@@ -47906,13 +47937,13 @@
         "机器人概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -70.146440413928,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-09T01:31:40+00:00",
+        "fetched_at": "2026-10-14T02:15:52+00:00",
         "notice_date": "2026-08-20",
         "operating_cash_flow": -83531018.63,
         "operating_cash_to_parent_profit": null,
@@ -55050,5 +55081,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-14T02:10:44+00:00"
+  "updated_at": "2026-10-14T02:15:49+00:00"
 }
