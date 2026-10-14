@@ -8748,13 +8748,13 @@
         "氢能源"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 1622.35317864959,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T05:15:47+00:00",
+        "fetched_at": "2026-10-14T02:35:46+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": 32090494.9,
         "operating_cash_to_parent_profit": 0.7392710423530072,
@@ -18630,6 +18630,37 @@
       "industry": "数字媒体",
       "market": 0,
       "updated_at": "2026-08-25T01:55:40+00:00"
+    },
+    "300415": {
+      "company_intro": "YIZUMI始终致力于为全球客户提供更先进的、更具投资回报的成型装备系统解决方案。",
+      "concepts": [
+        "5G概念",
+        "工业母机",
+        "机器人概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": -8.537589340079,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-14T02:35:46+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 89794277.55,
+        "operating_cash_to_parent_profit": 0.28034153472202894,
+        "parent_profit": 320303153.22,
+        "parent_profit_yoy_pct": -7.048494766046,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 12.966611309732,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300415&type=web",
+        "stale": false
+      },
+      "industry": "专用设备",
+      "market": 0,
+      "updated_at": "2026-10-14T02:35:43+00:00"
     },
     "300416": {
       "company_intro": "集团主要产品有力学环境试验设备、气候环境试验设备等，属于试验机领域内、光机电一体化的高端装备制造业。",
@@ -52047,12 +52078,31 @@
       "concepts": [
         "军工",
         "卫星导航",
-        "工业互联网"
+        "国产芯片"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": -249.09824854965,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-14T02:35:46+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -78446724.53,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -29416222.42,
+        "parent_profit_yoy_pct": -195.089976393116,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -25.875286192769,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688539&type=web",
+        "stale": false
+      },
       "industry": "元件",
       "market": 1,
-      "updated_at": "2026-08-28T01:35:34+00:00"
+      "updated_at": "2026-10-14T02:35:43+00:00"
     },
     "688543": {
       "company_intro": "主要从事各类武器装备弹药、引信、固体火箭发动机复合推进剂、武器装备系统等军工产品的科研生产。",
@@ -55172,5 +55222,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-14T02:30:55+00:00"
+  "updated_at": "2026-10-14T02:35:43+00:00"
 }
