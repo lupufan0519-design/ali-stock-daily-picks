@@ -2650,13 +2650,13 @@
         "风能"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 1.526882750093,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T05:15:47+00:00",
+        "fetched_at": "2026-10-14T01:50:50+00:00",
         "notice_date": "2026-08-15",
         "operating_cash_flow": 2084596422.59,
         "operating_cash_to_parent_profit": 2.4828559000944828,
@@ -4919,13 +4919,13 @@
         "核能核电"
       ],
       "customer_summary": "公司作为全球制冷元器件行业龙头企业，是全球多家知名空调厂商的战略合作伙伴，主要产品产销量均位居全球前列。",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -9.700392823378,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T03:31:46+00:00",
+        "fetched_at": "2026-10-14T01:50:50+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 546936227.33,
         "operating_cash_to_parent_profit": 1.1717526523347386,
@@ -8056,13 +8056,13 @@
         "绿色电力"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 108.52179592642,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T05:40:54+00:00",
+        "fetched_at": "2026-10-14T01:50:50+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": -88309848.82,
         "operating_cash_to_parent_profit": -28.48359772394151,
@@ -9602,13 +9602,13 @@
         "苹果概念"
       ],
       "customer_summary": "立讯拥有20余年的行业经验，在不断变化的未来里，我们继续保持创新和奋斗精神，和各界合作伙伴一起共同成长与发展，开创美好的未来。",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 6.472875651221,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:21:12+00:00",
+        "fetched_at": "2026-10-14T01:50:50+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": -2445863006.32,
         "operating_cash_to_parent_profit": -0.3118649878185645,
@@ -16334,13 +16334,13 @@
         "3D打印"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 57.523666683395,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:26:10+00:00",
+        "fetched_at": "2026-10-14T01:50:50+00:00",
         "notice_date": "2026-08-15",
         "operating_cash_flow": -4191068.56,
         "operating_cash_to_parent_profit": -0.04488432176549157,
@@ -35358,13 +35358,13 @@
         "西部大开发"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -432.935678409262,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-09T01:45:56+00:00",
+        "fetched_at": "2026-10-14T01:50:50+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": -26715378.15,
         "operating_cash_to_parent_profit": null,
@@ -38987,13 +38987,13 @@
         "贬值受益"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 507.248174355546,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:31:04+00:00",
+        "fetched_at": "2026-10-14T01:50:50+00:00",
         "notice_date": "2026-07-21",
         "operating_cash_flow": 721772204.53,
         "operating_cash_to_parent_profit": 1.3788573646419795,
@@ -45474,13 +45474,13 @@
         "机器人概念"
       ],
       "customer_summary": "公司自成立以来，坚持以军事需求为导向，以解决部队实战问题为出发点，按照产学研深度融合、一体化发展的思路，立足于自主创新，专注于系统顶层设计和装备发展体系规划，突破并构建了光电侦察设备、军用机器。",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -32.069732035061,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-13T05:31:04+00:00",
+        "fetched_at": "2026-10-14T01:50:50+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": -38372589.85,
         "operating_cash_to_parent_profit": null,
@@ -46265,13 +46265,13 @@
         "新能源车"
       ],
       "customer_summary": "杰华特微电子股份有限公司成立于2013年，是一家快速成长的高性能模拟和数模混合半导体供应商。",
-      "financial_as_of": "2026-09-30",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -76.139622996998,
-        "as_of": "2026-09-30",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-09-29T16:30:03+00:00",
+        "fetched_at": "2026-10-14T01:50:50+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": -775100014.57,
         "operating_cash_to_parent_profit": null,
@@ -47893,13 +47893,13 @@
         "创新药"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 700.65553441694,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:21:12+00:00",
+        "fetched_at": "2026-10-14T01:50:50+00:00",
         "notice_date": "2026-08-01",
         "operating_cash_flow": 808513913.12,
         "operating_cash_to_parent_profit": 1.263281071066813,
@@ -48434,6 +48434,37 @@
       "industry": "通用设备",
       "market": 1,
       "updated_at": "2026-10-09T05:30:55+00:00"
+    },
+    "688306": {
+      "company_intro": "是一家全球化的智能制造装备供应商及工业4.0智能制造整体解决方案提供商。",
+      "concepts": [
+        "医疗器械概念",
+        "智能驾驶",
+        "新能源车"
+      ],
+      "customer_summary": "宁波均普智能制造股份有限公司(NingboPIAAutomationHoldingCorp)是均胜集团的控股子公司，是一家全球化的智能制造装备供应商及工业4.0智能制造整体解决方案提供商。",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": 16.018075768941,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-14T01:50:50+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 43085888.54,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -25573530.29,
+        "parent_profit_yoy_pct": 7.899613299769,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 19.129105207342,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688306&type=web",
+        "stale": false
+      },
+      "industry": "自动化设备",
+      "market": 1,
+      "updated_at": "2026-10-14T01:50:47+00:00"
     },
     "688307": {
       "company_intro": "公司始终致力于为智能化、信息化、工业化时代日益增长的图像、视频采集需求提供高质量成像产品和专项技术开发服务。",
@@ -54052,5 +54083,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-14T01:45:46+00:00"
+  "updated_at": "2026-10-14T01:50:47+00:00"
 }
