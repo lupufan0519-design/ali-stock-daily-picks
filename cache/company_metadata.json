@@ -51740,6 +51740,37 @@
       "market": 1,
       "updated_at": "2026-10-13T02:20:40+00:00"
     },
+    "688511": {
+      "company_intro": "现主要从事紫外光电管、航空发动机点火管、弹用点火管、弹用点火线圈、航空显示管、过电压保护管、熔断器、线式温度传感器组件、火焰探测器、新型。",
+      "concepts": [
+        "航天航空",
+        "军工",
+        "西部大开发"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": -126.385373791779,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-14T02:40:48+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 80570835.71,
+        "operating_cash_to_parent_profit": 49.35436118287473,
+        "parent_profit": 1632496.78,
+        "parent_profit_yoy_pct": -94.12175248455,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -64.852011943764,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688511&type=web",
+        "stale": false
+      },
+      "industry": "军工电子Ⅱ",
+      "market": 1,
+      "updated_at": "2026-10-14T02:40:45+00:00"
+    },
     "688513": {
       "company_intro": "致力于成为全球麻醉镇痛领域领军企业，为临床提供更安全、疗效更确切的高品质药品。",
       "concepts": [
@@ -55222,5 +55253,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-14T02:35:43+00:00"
+  "updated_at": "2026-10-14T02:40:45+00:00"
 }
