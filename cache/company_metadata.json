@@ -23675,13 +23675,13 @@
         "C2M概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -49.954528063034,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:12:00+00:00",
+        "fetched_at": "2026-10-14T02:20:48+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": 56016541.28,
         "operating_cash_to_parent_profit": 2.0673442851073704,
@@ -50902,13 +50902,13 @@
         "创新药"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 327.377120802526,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T02:56:04+00:00",
+        "fetched_at": "2026-10-14T02:20:48+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": 81473709.81,
         "operating_cash_to_parent_profit": 0.3307154914162336,
