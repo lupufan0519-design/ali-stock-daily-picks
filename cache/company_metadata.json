@@ -908,6 +908,36 @@
       "market": 0,
       "updated_at": "2026-08-26T01:30:45+00:00"
     },
+    "000517": {
+      "company_intro": "致力于打造安居、乐居、宜居的住宅精品，不断提升城市品位。",
+      "concepts": [
+        "长江三角",
+        "建筑节能"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": -1227.01114866581,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-14T02:30:58+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 1074814907.24,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -156625964.32,
+        "parent_profit_yoy_pct": -529.691590070777,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -73.464894993091,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000517&type=web",
+        "stale": false
+      },
+      "industry": "房地产开发",
+      "market": 0,
+      "updated_at": "2026-10-14T02:30:55+00:00"
+    },
     "000518": {
       "company_intro": "1993年4月26日，经国家体改委体改生(1992)87号文和江苏省人民政府苏政复(1992)62号文批准。",
       "concepts": [
@@ -9026,13 +9056,13 @@
         "物联网"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -41.424603986163,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T06:10:58+00:00",
+        "fetched_at": "2026-10-14T02:30:58+00:00",
         "notice_date": "2026-08-19",
         "operating_cash_flow": 220536660.54,
         "operating_cash_to_parent_profit": 0.9200141647048409,
@@ -24692,6 +24722,37 @@
       "industry": "化学制品",
       "market": 0,
       "updated_at": "2026-08-20T01:35:34+00:00"
+    },
+    "300911": {
+      "company_intro": "主营高端厨电及集成厨房全场景解决方案。",
+      "concepts": [
+        "东数西算",
+        "AIGC概念",
+        "算力概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": 19.015812776812,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-14T02:30:58+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -30231995.11,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -54100623.87,
+        "parent_profit_yoy_pct": 24.530842453921,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -52.925380469388,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300911&type=web",
+        "stale": false
+      },
+      "industry": "厨卫电器",
+      "market": 0,
+      "updated_at": "2026-10-14T02:30:55+00:00"
     },
     "300912": {
       "company_intro": "公司主营发动机尾气后处理系统，是行业内少数拥有全产业链能力的公司。",
@@ -55111,5 +55172,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-14T02:25:43+00:00"
+  "updated_at": "2026-10-14T02:30:55+00:00"
 }
