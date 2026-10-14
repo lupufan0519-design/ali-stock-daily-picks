@@ -2266,6 +2266,37 @@
       "market": 0,
       "updated_at": "2026-09-30T01:36:06+00:00"
     },
+    "000722": {
+      "company_intro": "公司控股股东为湖南能源集团有限公司，实际控制人为湖南省国资委。",
+      "concepts": [
+        "光伏概念",
+        "水利建设",
+        "央国企改革"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": 202.859723619531,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-14T01:45:51+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 367940490.41,
+        "operating_cash_to_parent_profit": 1.9883335038416836,
+        "parent_profit": 185049685.93,
+        "parent_profit_yoy_pct": 77.446499946966,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 31.20422855691,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000722&type=web",
+        "stale": false
+      },
+      "industry": "电力",
+      "market": 0,
+      "updated_at": "2026-10-14T01:45:46+00:00"
+    },
     "000729": {
       "company_intro": "公司主营业务为啤酒、水、啤酒原料、饮料、酵母、饲料等产品的制造和销售。",
       "concepts": [
@@ -28398,13 +28429,13 @@
         "工业母机"
       ],
       "customer_summary": "PrismarkPartnersLLC(独立第三方顾问公司)的最新研究报告显示，2020年鼎泰高科的PCB钻针销量跃踞全球第一位，全球市场占有率19%，成为线路板行业微钻领域全球龙头供应商。",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 353.277417549201,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:15:51+00:00",
+        "fetched_at": "2026-10-14T01:45:51+00:00",
         "notice_date": "2026-08-20",
         "operating_cash_flow": -45475718.67,
         "operating_cash_to_parent_profit": -0.06696159717167083,
@@ -45535,13 +45566,13 @@
         "机器人概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 1338.79017836446,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:12:00+00:00",
+        "fetched_at": "2026-10-14T01:45:51+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": 105491958.01,
         "operating_cash_to_parent_profit": 2.521072666784657,
@@ -46327,13 +46358,13 @@
         "HJT电池"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -55.886137525251,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-12T19:35:33+00:00",
+        "fetched_at": "2026-10-14T01:45:51+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": 191875633.23,
         "operating_cash_to_parent_profit": 1.8728852634621216,
@@ -54021,5 +54052,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-14T01:40:47+00:00"
+  "updated_at": "2026-10-14T01:45:46+00:00"
 }
