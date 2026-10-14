@@ -24072,7 +24072,7 @@
         "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T17:24:45+00:00",
+        "fetched_at": "2026-10-14T05:40:50+00:00",
         "notice_date": "2026-07-28",
         "operating_cash_flow": 74434709.2,
         "operating_cash_to_parent_profit": 10.1561803554966,
@@ -41196,6 +41196,37 @@
       "market": 1,
       "updated_at": "2026-10-13T03:30:54+00:00"
     },
+    "603344": {
+      "company_intro": "自成立以来主要从事微特电机及相关产品的研发、生产及销售。",
+      "concepts": [
+        "锂电池概念",
+        "小米概念",
+        "新能源车"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": -27.709003315001,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-14T05:40:50+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 70910288.17,
+        "operating_cash_to_parent_profit": 1.0430073110657252,
+        "parent_profit": 67986376.91,
+        "parent_profit_yoy_pct": -24.849531713815,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 8.345218239733,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603344&type=web",
+        "stale": false
+      },
+      "industry": "电机Ⅱ",
+      "market": 1,
+      "updated_at": "2026-10-14T05:40:47+00:00"
+    },
     "603345": {
       "company_intro": "致力于为消费者提供更好更优质的产品，提高品牌美誉度和企业竞争力，以企业可持续高质量发展服务健康中国建设。",
       "concepts": [
@@ -54477,7 +54508,7 @@
         "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T17:24:45+00:00",
+        "fetched_at": "2026-10-14T05:40:50+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 117891495.81,
         "operating_cash_to_parent_profit": 6.366944557704543,
@@ -55406,5 +55437,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-14T03:15:49+00:00"
+  "updated_at": "2026-10-14T05:40:47+00:00"
 }
