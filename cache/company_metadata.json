@@ -8346,13 +8346,13 @@
         "核能核电"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 8.370553665587,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-12T19:35:33+00:00",
+        "fetched_at": "2026-10-14T02:05:48+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": 625979433.54,
         "operating_cash_to_parent_profit": 1.5799321891218734,
@@ -35480,6 +35480,36 @@
       "market": 1,
       "updated_at": "2026-10-13T01:35:37+00:00"
     },
+    "600808": {
+      "company_intro": "马鞍山钢铁股份有限公司是中国宝武钢铁集团有限公司控股子公司，拥有A+H股上市公司1家。",
+      "concepts": [
+        "铁路基建",
+        "央国企改革"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": -105.819832019199,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-14T02:05:48+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 3715856893.0,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -69898789.0,
+        "parent_profit_yoy_pct": 6.527823444876,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -2.23497016796,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600808&type=web",
+        "stale": false
+      },
+      "industry": "普钢",
+      "market": 1,
+      "updated_at": "2026-10-14T02:05:44+00:00"
+    },
     "600821": {
       "company_intro": "上市公司主营业务变更为新能源电力的开发、投资、建设及运营。",
       "concepts": [
@@ -51976,6 +52006,37 @@
       "market": 1,
       "updated_at": "2026-10-13T05:00:51+00:00"
     },
+    "688550": {
+      "company_intro": "可提供从实验室到工业化生产的全链条合成解决方案，实现产品高纯度与杂质精准管控。",
+      "concepts": [
+        "新材料",
+        "西部大开发",
+        "央国企改革"
+      ],
+      "customer_summary": "目前，公司已成为全球显示材料领域的核心供应商，医药CDMO及原料药业务服务多家全球顶尖制药企业，半导体与电子材料业务成功导入三星、京东方等头部企业供应链，且各业务板块均实现规模化产能与全球化客。",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": -25.659212266296,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-14T02:05:48+00:00",
+        "notice_date": "2026-08-21",
+        "operating_cash_flow": 161357669.55,
+        "operating_cash_to_parent_profit": 1.250385816354536,
+        "parent_profit": 129046305.1,
+        "parent_profit_yoy_pct": -22.296461751631,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 2.267180643179,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688550&type=web",
+        "stale": false
+      },
+      "industry": "电子化学品Ⅱ",
+      "market": 1,
+      "updated_at": "2026-10-14T02:05:44+00:00"
+    },
     "688551": {
       "company_intro": "公司目前主要产品线有测试电源、氢能测试及智能制造装备、功率半导体测试及智能制造装备等。",
       "concepts": [
@@ -54958,5 +55019,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-14T02:01:01+00:00"
+  "updated_at": "2026-10-14T02:05:44+00:00"
 }
