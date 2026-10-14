@@ -4468,6 +4468,37 @@
       "market": 0,
       "updated_at": "2026-10-13T02:15:41+00:00"
     },
+    "001314": {
+      "company_intro": "亿道信息母公司为加固型移动计算机提供商，专注于加固手持终端、加固平板电脑、加固笔记本电脑、工业终端设备等的产品和解决方案。",
+      "concepts": [
+        "物联网",
+        "智能穿戴",
+        "在线教育"
+      ],
+      "customer_summary": "在未来，亿道信息将坚持创新、合作、开放、共赢的发展，贴近客户和合作伙伴，携手共建，一路同行，通过加固型移动计算机的力量助力产业的推进和产业价值的提升。",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": 756.323386837736,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-14T01:40:50+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": -743954391.41,
+        "operating_cash_to_parent_profit": -3.8010878063152087,
+        "parent_profit": 195721443.26,
+        "parent_profit_yoy_pct": 1614.80283236938,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 80.678347051603,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ001314&type=web",
+        "stale": false
+      },
+      "industry": "消费电子",
+      "market": 0,
+      "updated_at": "2026-10-14T01:40:47+00:00"
+    },
     "001316": {
       "company_intro": "主要产品包括PMA零部件、高分子复合材料类、精细化工类、胶带胶膜等，性能上完全可与进口产品媲美。",
       "concepts": [
@@ -41004,13 +41035,13 @@
         "资源开采概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -23.90785909986,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T01:31:40+00:00",
+        "fetched_at": "2026-10-14T01:40:50+00:00",
         "notice_date": "2026-08-21",
         "operating_cash_flow": 315439267.92,
         "operating_cash_to_parent_profit": 3.51560419237027,
@@ -45442,13 +45473,13 @@
         "新材料"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 127.060025928406,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T05:10:46+00:00",
+        "fetched_at": "2026-10-14T01:40:50+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": 272525407.04,
         "operating_cash_to_parent_profit": 1.7741729072642982,
@@ -53990,5 +54021,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-14T01:35:35+00:00"
+  "updated_at": "2026-10-14T01:40:47+00:00"
 }
