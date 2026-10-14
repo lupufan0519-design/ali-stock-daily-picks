@@ -22250,13 +22250,13 @@
         "肝炎概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -21.264684082372,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-14T03:20:48+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 94948932.54,
         "operating_cash_to_parent_profit": 0.19588231814490634,
