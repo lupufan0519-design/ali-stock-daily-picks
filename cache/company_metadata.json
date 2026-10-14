@@ -3226,13 +3226,13 @@
         "特斯拉概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 3.31930312109,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:50:50+00:00",
+        "fetched_at": "2026-10-14T03:15:53+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": 757594978.77,
         "operating_cash_to_parent_profit": 1.1133428408179074,
@@ -11469,13 +11469,13 @@
         "机器人概念"
       ],
       "customer_summary": "公司拥有国家企业技术中心，是国家先进制造业与现代服务业融合试点单位、国家服务型制造示范企业、中国机器人TOP10峰会成员、智能制造系统解决方案供应商TOP10、中国最具投资价值百强企业、智能工。",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -16.020282578212,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T05:15:47+00:00",
+        "fetched_at": "2026-10-14T03:15:53+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": 239829408.74,
         "operating_cash_to_parent_profit": 1.022530849992323,
@@ -18035,9 +18035,28 @@
         "智慧城市"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": -44.842778678072,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-14T03:15:53+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -108029561.92,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -26170289.54,
+        "parent_profit_yoy_pct": 70.527916865451,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -20.778260692879,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300353&type=web",
+        "stale": false
+      },
       "industry": "通信设备",
       "market": 0,
-      "updated_at": "2026-09-03T01:30:44+00:00"
+      "updated_at": "2026-10-14T03:15:49+00:00"
     },
     "300354": {
       "company_intro": "主要提供通用设备相关产品与服务。",
@@ -38750,13 +38769,13 @@
         "机器人概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-30",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -10.031444301008,
-        "as_of": "2026-09-30",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-30T01:45:54+00:00",
+        "fetched_at": "2026-10-14T03:15:53+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": 146529969.98,
         "operating_cash_to_parent_profit": 1.1535095398870638,
@@ -38771,7 +38790,7 @@
       },
       "industry": "汽车零部件",
       "market": 1,
-      "updated_at": "2026-09-02T02:50:40+00:00"
+      "updated_at": "2026-10-14T03:15:49+00:00"
     },
     "603042": {
       "company_intro": "进一步成长为给客户提供“五横一纵”云到“端+边”的软硬件融合系统解决方案提供商。",
@@ -55383,5 +55402,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-14T03:10:46+00:00"
+  "updated_at": "2026-10-14T03:15:49+00:00"
 }
