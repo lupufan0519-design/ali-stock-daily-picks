@@ -2336,13 +2336,13 @@
         "物联网"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -24.331963693039,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:21:12+00:00",
+        "fetched_at": "2026-10-14T02:10:47+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": 816538241.23,
         "operating_cash_to_parent_profit": 3.312311955277607,
@@ -6683,13 +6683,13 @@
         "储能概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 1269.62891257714,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-14T02:10:47+00:00",
         "notice_date": "2026-08-18",
         "operating_cash_flow": 442180736.8,
         "operating_cash_to_parent_profit": 0.4414745929614989,
@@ -11687,13 +11687,13 @@
         "稀土永磁"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 14338.6944930655,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-14T02:10:47+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": -226863540.46,
         "operating_cash_to_parent_profit": -0.2041490249965163,
@@ -40118,13 +40118,13 @@
         "MLCC"
       ],
       "customer_summary": "公司坚定发展实业，现已形成以北京、苏州、成都、合肥四大科研生产基地为核心的整体产业格局，聚焦各自产业资源及优势，以陶瓷类电子元器件为基础，加快提升核心竞争力，推进企业全面发展，努力成为国内具有。",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -40.112974709001,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:21:12+00:00",
+        "fetched_at": "2026-10-14T02:10:47+00:00",
         "notice_date": "2026-08-29",
         "operating_cash_flow": 65803707.34,
         "operating_cash_to_parent_profit": 0.29997633633686493,
@@ -41652,13 +41652,13 @@
         "特高压"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 32.235573472719,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T01:31:40+00:00",
+        "fetched_at": "2026-10-14T02:10:47+00:00",
         "notice_date": "2026-08-13",
         "operating_cash_flow": 252551749.88,
         "operating_cash_to_parent_profit": 1.1757891870508728,
@@ -49772,6 +49772,37 @@
       "market": 1,
       "updated_at": "2026-09-07T01:35:33+00:00"
     },
+    "688343": {
+      "company_intro": "作为国内领先的拥有AI算法芯片化能力的数字城市整体解决方案提供商，公司致力于通过AI技术进行物理世界结构化。",
+      "concepts": [
+        "智慧城市",
+        "智能穿戴",
+        "人工智能"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-14",
+      "financials": {
+        "adjusted_profit_yoy_pct": -34.845175732694,
+        "as_of": "2026-10-14",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-14T02:10:47+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -112306486.67,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -252023802.03,
+        "parent_profit_yoy_pct": -22.37834321901,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -1.567872400358,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688343&type=web",
+        "stale": false
+      },
+      "industry": "IT服务Ⅱ",
+      "market": 1,
+      "updated_at": "2026-10-14T02:10:44+00:00"
+    },
     "688345": {
       "company_intro": "广东博力威科技股份有限公司(股票代码:688345)致力于成为全球最具竞争力的锂电解决方案引领者。",
       "concepts": [
@@ -51410,13 +51441,13 @@
         "5G概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -38.370241103592,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-12T19:35:33+00:00",
+        "fetched_at": "2026-10-14T02:10:47+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": -3582088501.49,
         "operating_cash_to_parent_profit": null,
@@ -51440,13 +51471,13 @@
         "创新药"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": -43.582383336398,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-12T19:35:33+00:00",
+        "fetched_at": "2026-10-14T02:10:47+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": -1535973506.85,
         "operating_cash_to_parent_profit": null,
@@ -53794,13 +53825,13 @@
         "医疗器械概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-23",
+      "financial_as_of": "2026-10-14",
       "financials": {
         "adjusted_profit_yoy_pct": 107.99967067345,
-        "as_of": "2026-09-23",
+        "as_of": "2026-10-14",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-23T01:30:55+00:00",
+        "fetched_at": "2026-10-14T02:10:47+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": 167872532.43,
         "operating_cash_to_parent_profit": 1.8056640392944223,
@@ -53815,7 +53846,7 @@
       },
       "industry": "医疗器械",
       "market": 1,
-      "updated_at": "2026-09-07T01:35:33+00:00"
+      "updated_at": "2026-10-14T02:10:44+00:00"
     },
     "688716": {
       "company_intro": "公司的主要产品为树脂形态的PEEK，形成现有的“两大类、三大牌号、六大系列”共52个规格牌号的产品体系。",
@@ -55019,5 +55050,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-14T02:05:44+00:00"
+  "updated_at": "2026-10-14T02:10:44+00:00"
 }
