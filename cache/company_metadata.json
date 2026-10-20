@@ -20086,9 +20086,28 @@
         "医美概念"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 40.397804356534,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-20T02:40:57+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 68628018.25,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -44193896.74,
+        "parent_profit_yoy_pct": 52.166145862899,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 3.793653170641,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002900&type=web",
+        "stale": false
+      },
       "industry": "化学制药",
       "market": 0,
-      "updated_at": "2026-09-01T01:40:41+00:00"
+      "updated_at": "2026-10-20T02:40:48+00:00"
     },
     "002902": {
       "company_intro": "产品包括通信电源、电信机房配电设备、数据中心供配电设备、太阳能供电系统、混合能源供电系统、分布式光伏发电系统、工业电源、户用光伏电源等。",
@@ -30809,13 +30828,13 @@
         "中药概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": -65.405195600697,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-13T05:21:12+00:00",
+        "fetched_at": "2026-10-20T02:40:57+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": -14160939.81,
         "operating_cash_to_parent_profit": -1.033087844714814,
@@ -58121,6 +58140,37 @@
       "market": 1,
       "updated_at": "2026-10-19T17:00:42+00:00"
     },
+    "601579": {
+      "company_intro": "横跨四个世纪专注酿酒，酒药代代传承，酿造年年持续。",
+      "concepts": [
+        "白酒",
+        "酿酒概念",
+        "味蕾经济"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 16.769001049438,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:40:57+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": 42630935.66,
+        "operating_cash_to_parent_profit": 0.3313789767667668,
+        "parent_profit": 128647073.74,
+        "parent_profit_yoy_pct": 37.037722448756,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 4.429703022507,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH601579&type=web",
+        "stale": false
+      },
+      "industry": "非白酒",
+      "market": 1,
+      "updated_at": "2026-10-20T02:40:48+00:00"
+    },
     "601606": {
       "company_intro": "是国内以军品弹药为主营业务的首发上市公司。",
       "concepts": [
@@ -84532,5 +84582,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-20T02:35:47+00:00"
+  "updated_at": "2026-10-20T02:40:48+00:00"
 }
