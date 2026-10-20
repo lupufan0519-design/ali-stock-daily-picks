@@ -34138,13 +34138,13 @@
         "肝炎概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-14",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": -21.264684082372,
-        "as_of": "2026-10-14",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-14T03:20:48+00:00",
+        "fetched_at": "2026-10-20T02:30:58+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 94948932.54,
         "operating_cash_to_parent_profit": 0.19588231814490634,
