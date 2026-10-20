@@ -11379,6 +11379,37 @@
       "market": 0,
       "updated_at": "2026-10-19T17:00:42+00:00"
     },
+    "002251": {
+      "company_intro": "作为优质生活方案的提供者与解决者，步步高永葆工匠精神，坚持创新革变，以“文、娱、食、购、游”全场景+体验+智慧零售集合的模式。",
+      "concepts": [
+        "移动支付",
+        "电商概念",
+        "新零售"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 474.743527494909,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T03:20:53+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 539250236.81,
+        "operating_cash_to_parent_profit": 3.7648052524573807,
+        "parent_profit": 143234563.45,
+        "parent_profit_yoy_pct": -28.619143428392,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 9.788879038383,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002251&type=web",
+        "stale": false
+      },
+      "industry": "一般零售",
+      "market": 0,
+      "updated_at": "2026-10-20T03:20:49+00:00"
+    },
     "002253": {
       "company_intro": "公司长期坚持自主创新，将图形图像技术、人工智能技术应用到三维测量与人脸识别、航空与空中交通管理、飞行模拟等领域。",
       "concepts": [
@@ -16082,6 +16113,37 @@
       "industry": "农化制品",
       "market": 0,
       "updated_at": "2026-09-30T01:36:06+00:00"
+    },
+    "002589": {
+      "company_intro": "瑞康医药集团股份有限公司是一家向全国医疗机构直销药品、医疗器械、医用耗材。",
+      "concepts": [
+        "中药概念",
+        "养老概念",
+        "医疗器械概念"
+      ],
+      "customer_summary": "近年来，集团适应形势发展需要，集中打造药械流通、学术服务、医学诊断、金融科技、中医药、数字化医疗、专业物流、综合器械等八大板块业务，实行“一个指挥中心、十个统一管理”的一体化管理模式，已与国内。",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 86.726501101638,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T03:20:53+00:00",
+        "notice_date": "2026-08-21",
+        "operating_cash_flow": 48717913.32,
+        "operating_cash_to_parent_profit": 4.375088367750778,
+        "parent_profit": 11135298.13,
+        "parent_profit_yoy_pct": -38.70403395727,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -3.634037212725,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002589&type=web",
+        "stale": false
+      },
+      "industry": "医药商业",
+      "market": 0,
+      "updated_at": "2026-10-20T03:20:49+00:00"
     },
     "002595": {
       "company_intro": "公司主营轮胎模具及橡胶机械、大型机械零部件加工、数控机床等业务，建立了覆盖全球的研发、生产与服务体系。",
@@ -84754,5 +84816,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-20T02:50:51+00:00"
+  "updated_at": "2026-10-20T03:20:49+00:00"
 }
