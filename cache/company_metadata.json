@@ -83033,6 +83033,37 @@
       "market": 1,
       "updated_at": "2026-10-14T02:01:01+00:00"
     },
+    "688765": {
+      "company_intro": "致力于打造世界一流的以植物生物反应器技术为平台、以植物源重组蛋白药物为核心产品的生物医药公司。",
+      "concepts": [
+        "农业种植",
+        "转基因",
+        "重组蛋白"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 2.182834705257,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-20T02:10:56+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -95258217.34,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -62756540.53,
+        "parent_profit_yoy_pct": 23.118682174456,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 43.772726364491,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688765&type=web",
+        "stale": false
+      },
+      "industry": "生物制品",
+      "market": 1,
+      "updated_at": "2026-10-20T02:10:53+00:00"
+    },
     "688766": {
       "company_intro": "公司目前主要产品包括NORFlash和EEPROM两大非易失性存储器芯片、微控制器芯片及模拟产品。",
       "concepts": [
@@ -84047,5 +84078,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-20T01:55:39+00:00"
+  "updated_at": "2026-10-20T02:10:53+00:00"
 }
