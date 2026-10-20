@@ -2435,6 +2435,37 @@
       "market": 0,
       "updated_at": "2026-10-13T05:10:47+00:00"
     },
+    "000626": {
+      "company_intro": "主营业务涵盖贸易、作物科学、油脂三大领域，在境外多个国家和地区设立了业务机构。",
+      "concepts": [
+        "参股银行",
+        "长江三角",
+        "中药概念"
+      ],
+      "customer_summary": "公司高度重视生物农药研发创新，建立了一支专业的研发和技术团队，通过研发创新和应用技术创新，利用独家产品形成具有市场竞争力的产品管线，结合自身研产销一体化优势为客户提供综合解决方案，秉承“以创新。",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 70.137019417576,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T01:55:42+00:00",
+        "notice_date": "2026-08-18",
+        "operating_cash_flow": -929755144.67,
+        "operating_cash_to_parent_profit": -4.321847470185572,
+        "parent_profit": 215129097.24,
+        "parent_profit_yoy_pct": 640.135210585576,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 10.220946767314,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000626&type=web",
+        "stale": false
+      },
+      "industry": "物流",
+      "market": 0,
+      "updated_at": "2026-10-20T01:55:39+00:00"
+    },
     "000628": {
       "company_intro": "为高新区产业生态圈构建和高质量发展提供有力支撑。",
       "concepts": [
@@ -11681,6 +11712,37 @@
       "industry": "汽车零部件",
       "market": 0,
       "updated_at": "2026-10-19T17:00:42+00:00"
+    },
+    "002285": {
+      "company_intro": "致力于“让更多人享受真正的资产服务”，为创造城市美好生活不懈努力。",
+      "concepts": [
+        "深圳特区",
+        "互联网金融",
+        "养老概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": -5.354393369613,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-20T01:55:42+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": 10849705.1,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -34005987.02,
+        "parent_profit_yoy_pct": -178.061227807253,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -21.373495833079,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002285&type=web",
+        "stale": false
+      },
+      "industry": "房地产服务",
+      "market": 0,
+      "updated_at": "2026-10-20T01:55:39+00:00"
     },
     "002289": {
       "company_intro": "公司主营业务为液晶显示屏及模组、触摸屏及模组、触摸显示一体化模组等产品的研发、生产和销售;产品主要涵盖CTP(GFF/OGS/GG)、L。",
@@ -33866,11 +33928,34 @@
     },
     "300725": {
       "company_intro": "为药物发现提供化学研发服务，为临床前、临床开发和商业化项目提供高效、高品质的中间体、原料药和药物制剂的工艺开发和生产服务。",
-      "concepts": [],
+      "concepts": [
+        "人工智能",
+        "贬值受益",
+        "CRO"
+      ],
       "customer_summary": "南京药石科技股份有限公司(股票代码:300725，公司简称:药石科技)是全球医药研发和制造领域创新化学产品和服务供应商。",
-      "industry": "生物医药",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 40.702505618491,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T01:55:42+00:00",
+        "notice_date": "2026-08-11",
+        "operating_cash_flow": 192349399.22,
+        "operating_cash_to_parent_profit": 1.9342315354363002,
+        "parent_profit": 99444867.74,
+        "parent_profit_yoy_pct": 37.168931250732,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 15.192269943537,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300725&type=web",
+        "stale": false
+      },
+      "industry": "医疗服务",
       "market": 0,
-      "updated_at": "2026-09-03T01:30:44+00:00"
+      "updated_at": "2026-10-20T01:55:39+00:00"
     },
     "300726": {
       "company_intro": "公司的主要产品为高端电子元器件、电源模块、IF转换器等产品。",
@@ -83962,5 +84047,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-20T01:50:48+00:00"
+  "updated_at": "2026-10-20T01:55:39+00:00"
 }
