@@ -276,6 +276,35 @@
       "market": 0,
       "updated_at": "2026-10-09T06:05:42+00:00"
     },
+    "000036": {
+      "company_intro": "公司主营业务从上市之初单一化纤主业，到纺织服装、石化、房地产的多次重大转变。",
+      "concepts": [
+        "深圳特区"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 296.14338300084,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:45:50+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": 154650050.67,
+        "operating_cash_to_parent_profit": 5.582729019509987,
+        "parent_profit": 27701514.82,
+        "parent_profit_yoy_pct": 1260.82643982253,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 60.148327666545,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000036&type=web",
+        "stale": false
+      },
+      "industry": "房地产开发",
+      "market": 0,
+      "updated_at": "2026-10-20T02:45:47+00:00"
+    },
     "000037": {
       "company_intro": "从事发电厂(站)的建设工程总承包、提供技术咨询和技术服务为主营业务的中外合资股份制企业。",
       "concepts": [
@@ -468,13 +497,13 @@
         "参股期货"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": 106.247386394091,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-20T02:45:50+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": -298404800.5,
         "operating_cash_to_parent_profit": -0.26129669585453663,
@@ -12028,12 +12057,31 @@
       "concepts": [
         "军工",
         "风能",
-        "充电桩"
+        "海工装备"
       ],
       "customer_summary": "是国家电网、南方电网、内蒙电力、人民大会堂、北京奥运工程、广州亚运工程、杭州湾跨海大桥、长江三峡向家坝水电站、鞍钢集团、福州地铁、深圳地铁、南昌地铁、郑州地铁、南宁地铁、天津地铁、福厦高铁、广。",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": -63.847313417987,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:45:50+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": -553776685.17,
+        "operating_cash_to_parent_profit": -29.68273502907286,
+        "parent_profit": 18656524.9,
+        "parent_profit_yoy_pct": -68.825296061544,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 15.918698045346,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002300&type=web",
+        "stale": false
+      },
       "industry": "电网设备",
       "market": 0,
-      "updated_at": "2026-08-25T02:05:42+00:00"
+      "updated_at": "2026-10-20T02:45:47+00:00"
     },
     "002301": {
       "company_intro": "专注政企采购服务30余年。",
@@ -52272,13 +52320,13 @@
         "小金属概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": 56.427409281314,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-20T02:45:50+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": 633409130.52,
         "operating_cash_to_parent_profit": 2.8194220295333774,
@@ -60253,6 +60301,37 @@
       "market": 1,
       "updated_at": "2026-10-19T17:00:42+00:00"
     },
+    "603067": {
+      "company_intro": "公司主要产品有重铬酸钠、重铬酸钾、铬酸酐、氧化铬绿、碱式硫酸铬、精制元明粉、铬黄、金属铬、超细氢氧化铝及维生素K3等。",
+      "concepts": [
+        "军工",
+        "锂电池概念",
+        "钛白粉概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 4.827863204224,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:45:50+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": -126646538.1,
+        "operating_cash_to_parent_profit": -0.410907709817119,
+        "parent_profit": 308211637.49,
+        "parent_profit_yoy_pct": 3.450079890169,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 28.146440293543,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603067&type=web",
+        "stale": false
+      },
+      "industry": "化学原料",
+      "market": 1,
+      "updated_at": "2026-10-20T02:45:47+00:00"
+    },
     "603068": {
       "company_intro": "致力于为物联网应用提供尖端芯片解决方案。",
       "concepts": [
@@ -61475,21 +61554,21 @@
         "贬值受益"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-14",
+      "financial_as_of": "2026-10-20",
       "financials": {
-        "adjusted_profit_yoy_pct": 507.248174355546,
-        "as_of": "2026-10-14",
+        "adjusted_profit_yoy_pct": 224.271171369492,
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-14T01:50:50+00:00",
-        "notice_date": "2026-07-21",
-        "operating_cash_flow": 721772204.53,
-        "operating_cash_to_parent_profit": 1.3788573646419795,
-        "parent_profit": 523456757.05,
-        "parent_profit_yoy_pct": 502.602050727737,
-        "report_date": "2026-06-30",
-        "report_label": "2026年中报",
-        "revenue_yoy_pct": 92.775344493549,
+        "fetched_at": "2026-10-20T02:45:50+00:00",
+        "notice_date": "2026-10-16",
+        "operating_cash_flow": 1463250563.11,
+        "operating_cash_to_parent_profit": 1.7874617986585892,
+        "parent_profit": 818619208.65,
+        "parent_profit_yoy_pct": 224.086926250557,
+        "report_date": "2026-09-30",
+        "report_label": "2026年三季报",
+        "revenue_yoy_pct": 85.986607362136,
         "source": "东方财富财务分析",
         "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH603162&type=web",
         "stale": false
@@ -84582,5 +84661,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-20T02:40:48+00:00"
+  "updated_at": "2026-10-20T02:45:47+00:00"
 }
