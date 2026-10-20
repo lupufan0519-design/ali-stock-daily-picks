@@ -4865,13 +4865,13 @@
         "化债(AMC)概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-14",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": 76.936527816106,
-        "as_of": "2026-10-14",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-14T01:31:12+00:00",
+        "fetched_at": "2026-10-20T02:15:52+00:00",
         "notice_date": "2026-08-21",
         "operating_cash_flow": -125168361.24,
         "operating_cash_to_parent_profit": -21.327474971670867,
@@ -28386,6 +28386,37 @@
       "market": 0,
       "updated_at": "2026-10-19T17:00:42+00:00"
     },
+    "300404": {
+      "company_intro": "是一家为国内外医药企业提供药品、医疗器械研发与生产全流程“一站式”外包服务(CRO+CDMO)的新型高新技术企业。",
+      "concepts": [
+        "中药概念",
+        "医疗器械概念",
+        "脑机接口"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 86.774316903618,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:15:52+00:00",
+        "notice_date": "2026-08-27",
+        "operating_cash_flow": 3092309.7,
+        "operating_cash_to_parent_profit": 0.0831254584894769,
+        "parent_profit": 37200513.01,
+        "parent_profit_yoy_pct": 138.926379606776,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 25.644538192067,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300404&type=web",
+        "stale": false
+      },
+      "industry": "医疗服务",
+      "market": 0,
+      "updated_at": "2026-10-20T02:15:48+00:00"
+    },
     "300407": {
       "company_intro": "主营业务覆盖电气化铁路和城市轨道交通两大领域。",
       "concepts": [
@@ -29141,6 +29172,37 @@
       "industry": "电池",
       "market": 0,
       "updated_at": "2026-09-09T01:35:34+00:00"
+    },
+    "300454": {
+      "company_intro": "主要提供软件开发相关产品与服务。",
+      "concepts": [
+        "深圳特区",
+        "物联网",
+        "云计算"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 169.220323506287,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:15:52+00:00",
+        "notice_date": "2026-08-22",
+        "operating_cash_flow": -475808448.04,
+        "operating_cash_to_parent_profit": -2.057731470845853,
+        "parent_profit": 231229611.24,
+        "parent_profit_yoy_pct": 201.575070341807,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 32.848217281701,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300454&type=web",
+        "stale": false
+      },
+      "industry": "软件开发",
+      "market": 0,
+      "updated_at": "2026-10-20T02:15:48+00:00"
     },
     "300455": {
       "company_intro": "致力于成为国际知名、国内一流的智能装备提供商和智能制造系统解决方案服务商。",
@@ -40325,9 +40387,28 @@
         "创新药"
       ],
       "customer_summary": "目前累计服务客户超12000家，与全球知名药企建立了长期、稳定的合作伙伴关系。",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 6.781502021595,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:15:52+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 96391518.94,
+        "operating_cash_to_parent_profit": 0.9800250230129409,
+        "parent_profit": 98356181.4,
+        "parent_profit_yoy_pct": 17.36458007899,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 28.972027893868,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ301080&type=web",
+        "stale": false
+      },
       "industry": "生物制品",
       "market": 0,
-      "updated_at": "2026-09-01T03:30:50+00:00"
+      "updated_at": "2026-10-20T02:15:48+00:00"
     },
     "301082": {
       "company_intro": "为众多的企业提供了良好的服务，受到用户的一致好评。",
@@ -76297,13 +76378,13 @@
         "2026中报扭亏"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-13",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": 1073.77790112225,
-        "as_of": "2026-10-13",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-12T19:35:33+00:00",
+        "fetched_at": "2026-10-20T02:15:52+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": 4213822938.48,
         "operating_cash_to_parent_profit": 0.9038109905495106,
@@ -82446,9 +82527,28 @@
         "CAR-T细胞疗法"
       ],
       "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 201.04032301014,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:15:52+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 284097170.47,
+        "operating_cash_to_parent_profit": 7.252424066730077,
+        "parent_profit": 39172719.06,
+        "parent_profit_yoy_pct": 357.892995808397,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 23.92070053689,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH688710&type=web",
+        "stale": false
+      },
       "industry": "医疗服务",
       "market": 1,
-      "updated_at": "2026-09-02T01:35:33+00:00"
+      "updated_at": "2026-10-20T02:15:48+00:00"
     },
     "688711": {
       "company_intro": "提供更好的产品和服务，满足并超越顾客的要求和期望。",
@@ -84078,5 +84178,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-20T02:10:53+00:00"
+  "updated_at": "2026-10-20T02:15:48+00:00"
 }
