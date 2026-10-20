@@ -24791,6 +24791,37 @@
       "market": 0,
       "updated_at": "2026-09-29T16:22:36+00:00"
     },
+    "300142": {
+      "company_intro": "公司致力于创新疫苗的研发，现已构建起细菌性疫苗、重组蛋白疫苗、mRNA疫苗、重组腺病毒载体疫苗4大技术平台。",
+      "concepts": [
+        "生物疫苗",
+        "西部大开发",
+        "病毒防治"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 233.811272056589,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:36:09+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": 173917286.99,
+        "operating_cash_to_parent_profit": 3.209268206727249,
+        "parent_profit": 54192194.54,
+        "parent_profit_yoy_pct": 25.559297890274,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -27.724291109172,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300142&type=web",
+        "stale": false
+      },
+      "industry": "生物制品",
+      "market": 0,
+      "updated_at": "2026-10-20T02:35:47+00:00"
+    },
     "300144": {
       "company_intro": "宋城演艺发展股份有限公司(简称宋城演艺，股票代码:300144)十四次获得全国文化企业三十强。",
       "concepts": [
@@ -29252,6 +29283,37 @@
       "industry": "通信服务",
       "market": 0,
       "updated_at": "2026-10-13T01:30:52+00:00"
+    },
+    "300443": {
+      "company_intro": "2015年4月22日，公司正式在深交所创业板上市，股票代码300443。",
+      "concepts": [
+        "创投",
+        "生物疫苗",
+        "核能核电"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": -25.417422620767,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:36:09+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": 339084987.45,
+        "operating_cash_to_parent_profit": 2.378893588576488,
+        "parent_profit": 142538947.13,
+        "parent_profit_yoy_pct": -24.003266069658,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 8.919111636406,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300443&type=web",
+        "stale": false
+      },
+      "industry": "风电设备",
+      "market": 0,
+      "updated_at": "2026-10-20T02:35:47+00:00"
     },
     "300444": {
       "company_intro": "主要产品包括环网柜、箱式变电站、柱上开关、高低压成套开关柜、配网自动化监控系统及其他配电自动化设备。",
@@ -54600,9 +54662,28 @@
         "CRO"
       ],
       "customer_summary": "公司可为合作伙伴提供新药仿制药开发一站式全流程服务。",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": -49.34785454369,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:36:09+00:00",
+        "notice_date": "2026-08-25",
+        "operating_cash_flow": -1012039.29,
+        "operating_cash_to_parent_profit": -0.06856508189415901,
+        "parent_profit": 14760272.46,
+        "parent_profit_yoy_pct": -42.078886366753,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -22.133800192939,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600721&type=web",
+        "stale": false
+      },
       "industry": "医疗服务",
       "market": 1,
-      "updated_at": "2026-09-03T01:30:44+00:00"
+      "updated_at": "2026-10-20T02:35:47+00:00"
     },
     "600722": {
       "company_intro": "主要提供化学原料相关产品与服务。",
@@ -55246,13 +55327,13 @@
         "稀缺资源"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-14",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": -27.668299111292,
-        "as_of": "2026-10-14",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-14T05:25:43+00:00",
+        "fetched_at": "2026-10-20T02:36:09+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": 93330260.99,
         "operating_cash_to_parent_profit": null,
@@ -83354,13 +83435,13 @@
         "重组蛋白"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-14",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": 131.538031560029,
-        "as_of": "2026-10-14",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-14T01:31:12+00:00",
+        "fetched_at": "2026-10-20T02:36:09+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": 86298593.39,
         "operating_cash_to_parent_profit": 0.7800070836679908,
@@ -84451,5 +84532,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-20T02:25:42+00:00"
+  "updated_at": "2026-10-20T02:35:47+00:00"
 }
