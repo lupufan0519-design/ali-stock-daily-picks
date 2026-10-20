@@ -1399,6 +1399,35 @@
       "market": 0,
       "updated_at": "2026-10-13T03:30:54+00:00"
     },
+    "000520": {
+      "company_intro": "主要提供航运港口相关产品与服务。",
+      "concepts": [
+        "一带一路"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 3200.73377371159,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T03:25:48+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 29732028.99,
+        "operating_cash_to_parent_profit": 0.9947172389446534,
+        "parent_profit": 29889930.35,
+        "parent_profit_yoy_pct": 2329.68692781004,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 95.699413097074,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000520&type=web",
+        "stale": false
+      },
+      "industry": "航运港口",
+      "market": 0,
+      "updated_at": "2026-10-20T03:25:44+00:00"
+    },
     "000521": {
       "company_intro": "致力于为全球亿万家庭提供美好生活解决方案。",
       "concepts": [
@@ -84816,5 +84845,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-20T03:20:49+00:00"
+  "updated_at": "2026-10-20T03:25:44+00:00"
 }
