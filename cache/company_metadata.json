@@ -1171,6 +1171,37 @@
       "market": 0,
       "updated_at": "2026-10-09T01:30:51+00:00"
     },
+    "000504": {
+      "company_intro": "南华生物医药股份有限公司是一家以干细胞与再生医学为基础，以细胞临床转化研究与应用为驱动。",
+      "concepts": [
+        "节能环保",
+        "锂电池概念",
+        "医疗器械概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 164.857571464771,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:51:03+00:00",
+        "notice_date": "2026-08-24",
+        "operating_cash_flow": -5959887.14,
+        "operating_cash_to_parent_profit": -0.9945254874025593,
+        "parent_profit": 5992694.22,
+        "parent_profit_yoy_pct": 271.985767576389,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 473.564825070067,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000504&type=web",
+        "stale": false
+      },
+      "industry": "医疗服务",
+      "market": 0,
+      "updated_at": "2026-10-20T02:50:51+00:00"
+    },
     "000505": {
       "company_intro": "海南京粮控股股份有限公司成立于1988年03月22日，注册地位于海口市滨海大道珠江广场帝豪大厦29层。",
       "concepts": [
@@ -2181,13 +2212,13 @@
         "合成生物"
       ],
       "customer_summary": "在生产技术、智能化管理、品牌运营及市场推广具有强大竞争力，客户包括国内众多知名企业:碧桂园旗下现代筑美、尚品宅配、好莱客家居、浙江圣奥、大自然家居、诗尼曼家居等，为市场公认的优秀品牌。",
-      "financial_as_of": "2026-10-14",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": -1275.60862228941,
-        "as_of": "2026-10-14",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "nonpositive_profit",
-        "fetched_at": "2026-10-14T05:25:43+00:00",
+        "fetched_at": "2026-10-20T02:51:03+00:00",
         "notice_date": "2026-08-27",
         "operating_cash_flow": 36017769.63,
         "operating_cash_to_parent_profit": null,
@@ -6296,13 +6327,13 @@
         "西部大开发"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": 1568.32733221142,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-09T06:10:58+00:00",
+        "fetched_at": "2026-10-20T02:51:03+00:00",
         "notice_date": "2026-08-10",
         "operating_cash_flow": 284219814.86,
         "operating_cash_to_parent_profit": 3.8921504124070525,
@@ -12981,6 +13012,37 @@
       "industry": "铁路公路",
       "market": 0,
       "updated_at": "2026-10-19T17:00:42+00:00"
+    },
+    "002358": {
+      "company_intro": "为“碳达峰碳中和”目标提供优质的产品和服务。",
+      "concepts": [
+        "核能核电",
+        "智能电网",
+        "光伏概念"
+      ],
+      "customer_summary": "公司始终秉承“服务于社会贡献于国家”的企业理念，践行“绿色发展智能制造”的企业目标，深耕输变电及相关设备的制造，全面服务于电网(国网、南网)、清洁能源发电(光伏、风电、核电)、石油化工、新基建。",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 24.894848081115,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:51:03+00:00",
+        "notice_date": "2026-08-29",
+        "operating_cash_flow": -285559405.6,
+        "operating_cash_to_parent_profit": -5.541855890609608,
+        "parent_profit": 51527757.35,
+        "parent_profit_yoy_pct": 9.051986696155,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 3.574498928514,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002358&type=web",
+        "stale": false
+      },
+      "industry": "电网设备",
+      "market": 0,
+      "updated_at": "2026-10-20T02:50:51+00:00"
     },
     "002361": {
       "company_intro": "公司主要从事粉末涂料用聚酯树脂系列产品及其原材料(新戊二醇)、高端装备制造配套系统的研发、生产和销售。",
@@ -48153,6 +48215,37 @@
       "industry": "贸易Ⅱ",
       "market": 1,
       "updated_at": "2026-09-30T01:36:06+00:00"
+    },
+    "600059": {
+      "company_intro": "致力于民族产业的振兴和黄酒文化的传播，拥有国家黄酒工程技术研究中心、国家工业遗产——“鉴湖酒坊”。",
+      "concepts": [
+        "参股银行",
+        "长江三角",
+        "电商概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": -34.938302934966,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:51:03+00:00",
+        "notice_date": "2026-08-28",
+        "operating_cash_flow": -310201108.25,
+        "operating_cash_to_parent_profit": -3.3880881872760065,
+        "parent_profit": 91556385.52,
+        "parent_profit_yoy_pct": 1.383346428315,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -11.890862193342,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SH600059&type=web",
+        "stale": false
+      },
+      "industry": "非白酒",
+      "market": 1,
+      "updated_at": "2026-10-20T02:50:51+00:00"
     },
     "600063": {
       "company_intro": "公司主营业务为聚乙烯醇(PVA)及其衍生产品的研发、生产和销售。",
@@ -84661,5 +84754,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-20T02:45:47+00:00"
+  "updated_at": "2026-10-20T02:50:51+00:00"
 }
