@@ -11029,13 +11029,13 @@
         "西部大开发"
       ],
       "customer_summary": "公司主要客户包括比亚迪、宁德时代、中创新航、LGES、SKOn、POSCO、ALB、现代汽车等行业领先企业。",
-      "financial_as_of": "2026-10-09",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": 248.957716632624,
-        "as_of": "2026-10-09",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-08T17:13:03+00:00",
+        "fetched_at": "2026-10-20T02:05:44+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": -250940263.05,
         "operating_cash_to_parent_profit": -0.24801569488021474,
