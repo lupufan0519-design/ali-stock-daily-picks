@@ -1463,6 +1463,37 @@
       "market": 0,
       "updated_at": "2026-09-29T16:22:36+00:00"
     },
+    "000532": {
+      "company_intro": "主要提供多元金融相关产品与服务。",
+      "concepts": [
+        "创投",
+        "参股券商",
+        "锂电池概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 44.354468101476,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:20:55+00:00",
+        "notice_date": "2026-08-21",
+        "operating_cash_flow": 115773515.37,
+        "operating_cash_to_parent_profit": 2.2194109832314632,
+        "parent_profit": 52164072.47,
+        "parent_profit_yoy_pct": 43.758762561037,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 5.978994992196,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ000532&type=web",
+        "stale": false
+      },
+      "industry": "多元金融",
+      "market": 0,
+      "updated_at": "2026-10-20T02:20:49+00:00"
+    },
     "000533": {
       "company_intro": "多次为IEC标准的制定/修订提供建议。",
       "concepts": [
@@ -10711,6 +10742,37 @@
       "market": 0,
       "updated_at": "2026-10-13T05:05:41+00:00"
     },
+    "002215": {
+      "company_intro": "是一家以研发、生产、销售农业投入品(主要是农药制剂和植物营养)并提供专业化综合农业服务的国家级高新技术企业。",
+      "concepts": [
+        "深圳特区",
+        "土地流转",
+        "电商概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 10.453611401663,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "ok",
+        "fetched_at": "2026-10-20T02:20:55+00:00",
+        "notice_date": "2026-08-20",
+        "operating_cash_flow": 91637603.06,
+        "operating_cash_to_parent_profit": 0.11986232293502794,
+        "parent_profit": 764523837.15,
+        "parent_profit_yoy_pct": 17.976393859225,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 7.757753073265,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002215&type=web",
+        "stale": false
+      },
+      "industry": "农化制品",
+      "market": 0,
+      "updated_at": "2026-10-20T02:20:49+00:00"
+    },
     "002218": {
       "company_intro": "国家高新技术企业、工信部《光伏制造行业规范条件》企业、工信部智能光伏试点示范企业、中国新能源行业标志性品牌、广东省战略性新兴产业骨干企业。",
       "concepts": [
@@ -13008,6 +13070,37 @@
       "market": 0,
       "updated_at": "2026-10-20T01:35:39+00:00"
     },
+    "002370": {
+      "company_intro": "致力于成为立足中国、链接全球的创新药研发与产业化平台，为人类健康事业贡献更多力量。",
+      "concepts": [
+        "长江三角",
+        "工业大麻",
+        "幽门螺杆菌概念"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": 102.855810202162,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-20T02:20:55+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": -68212929.27,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -435474.46,
+        "parent_profit_yoy_pct": -100.414041715552,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": 3.582301260367,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ002370&type=web",
+        "stale": false
+      },
+      "industry": "化学制药",
+      "market": 0,
+      "updated_at": "2026-10-20T02:20:49+00:00"
+    },
     "002371": {
       "company_intro": "北方华创主营半导体装备、真空及锂电装备、精密元器件业务，为半导体、新能源、新材料等领域提供解决方案。",
       "concepts": [
@@ -14234,13 +14327,13 @@
         "西部大开发"
       ],
       "customer_summary": "作为以锂为核心的新能源材料公司，公司看好未来新能源汽车市场和储能领域的长期发展前景，并且一直通过不断提升资源保障能力、产品品质及客户满意度来实现与合作伙伴的共赢，促进行业有序健康持续发展。",
-      "financial_as_of": "2026-10-14",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": 318054.904972539,
-        "as_of": "2026-10-14",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-14T01:31:12+00:00",
+        "fetched_at": "2026-10-20T02:20:55+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": 2212067158.9,
         "operating_cash_to_parent_profit": 0.521465518431896,
@@ -17927,13 +18020,13 @@
         "航天航空"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-14",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": 179.77084962849,
-        "as_of": "2026-10-14",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-14T01:31:12+00:00",
+        "fetched_at": "2026-10-20T02:20:55+00:00",
         "notice_date": "2026-08-25",
         "operating_cash_flow": 1084911591.57,
         "operating_cash_to_parent_profit": 1.1314322781760051,
@@ -24939,6 +25032,36 @@
       "market": 0,
       "updated_at": "2026-10-19T17:00:42+00:00"
     },
+    "300163": {
+      "company_intro": "APLUS专注于室内外遮阳面料、遮光面料以及其他工业遮阳面料原料的开发与生产。",
+      "concepts": [
+        "新材料",
+        "建筑节能"
+      ],
+      "customer_summary": "",
+      "financial_as_of": "2026-10-20",
+      "financials": {
+        "adjusted_profit_yoy_pct": -679.009319280669,
+        "as_of": "2026-10-20",
+        "basis": "year_to_date",
+        "cash_ratio_status": "nonpositive_profit",
+        "fetched_at": "2026-10-20T02:20:55+00:00",
+        "notice_date": "2026-08-26",
+        "operating_cash_flow": -3371488.0,
+        "operating_cash_to_parent_profit": null,
+        "parent_profit": -22798457.91,
+        "parent_profit_yoy_pct": -135.809328247538,
+        "report_date": "2026-06-30",
+        "report_label": "2026年中报",
+        "revenue_yoy_pct": -21.927195866295,
+        "source": "东方财富财务分析",
+        "source_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index?code=SZ300163&type=web",
+        "stale": false
+      },
+      "industry": "化学制品",
+      "market": 0,
+      "updated_at": "2026-10-20T02:20:49+00:00"
+    },
     "300164": {
       "company_intro": "通源石油已经发展成为可为油田客户提供包括综合提高采收率、钻完井技术服务、压裂技术服务、煤层气技术服务以及区块一体化总包服务上市集团公司。",
       "concepts": [
@@ -28115,13 +28238,13 @@
         "新能源车"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-10-14",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": 1739.19515437724,
-        "as_of": "2026-10-14",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-10-14T01:31:12+00:00",
+        "fetched_at": "2026-10-20T02:20:55+00:00",
         "notice_date": "2026-08-18",
         "operating_cash_flow": 178387866.43,
         "operating_cash_to_parent_profit": 0.07782084183512293,
@@ -55820,13 +55943,13 @@
         "苹果概念"
       ],
       "customer_summary": "",
-      "financial_as_of": "2026-09-22",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": 362.554974585456,
-        "as_of": "2026-09-22",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-23T03:37:11+00:00",
+        "fetched_at": "2026-10-20T02:20:55+00:00",
         "notice_date": "2026-08-28",
         "operating_cash_flow": 834520022.6,
         "operating_cash_to_parent_profit": 1.0146737082369988,
@@ -76006,13 +76129,13 @@
         "量子科技"
       ],
       "customer_summary": "公司业务覆盖全球6大洲约90个国家和地区，服务客户超8，000家。",
-      "financial_as_of": "2026-09-23",
+      "financial_as_of": "2026-10-20",
       "financials": {
         "adjusted_profit_yoy_pct": -16.214929348145,
-        "as_of": "2026-09-23",
+        "as_of": "2026-10-20",
         "basis": "year_to_date",
         "cash_ratio_status": "ok",
-        "fetched_at": "2026-09-23T01:30:55+00:00",
+        "fetched_at": "2026-10-20T02:20:55+00:00",
         "notice_date": "2026-08-26",
         "operating_cash_flow": -32384348.34,
         "operating_cash_to_parent_profit": -0.5130386021129532,
@@ -76027,7 +76150,7 @@
       },
       "industry": "医疗服务",
       "market": 1,
-      "updated_at": "2026-09-03T01:30:44+00:00"
+      "updated_at": "2026-10-20T02:20:49+00:00"
     },
     "688316": {
       "company_intro": "是一家技术领先的企业级云服务商与数字化方案提供商。",
@@ -84178,5 +84301,5 @@
       "updated_at": "2026-09-30T01:36:06+00:00"
     }
   },
-  "updated_at": "2026-10-20T02:15:48+00:00"
+  "updated_at": "2026-10-20T02:20:49+00:00"
 }
